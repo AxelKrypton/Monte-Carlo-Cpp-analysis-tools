@@ -1,0 +1,13 @@
+*~
+*.backup
+*.swp
+.*.kate-swp
+*.o
+*.a
+*.pyc
+
+\#*\#
+.\#*
+
+build
+debug
