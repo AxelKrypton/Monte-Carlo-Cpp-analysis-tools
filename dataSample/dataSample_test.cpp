@@ -1,5 +1,15 @@
 // use the boost test framework
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE dataSample test
+#define BOOST_TEST_MODULE dataSample
 #include <boost/test/unit_test.hpp>
 
+#include "dataSample.hpp"
+
+BOOST_AUTO_TEST_CASE(build)
+{
+	dataSample * dataSampleInstance1;
+	dataSampleInstance1 = new dataSample;
+	BOOST_REQUIRE(dataSampleInstance1);
+
+	dataSample dataSampleInstance2;
+}

@@ -1,3 +1,3 @@
 add_library(dataSample dataSample.cpp)
 
-add_unit_test(adfadf dataSample_test)
+add_unit_test(dataSample dataSample_test)

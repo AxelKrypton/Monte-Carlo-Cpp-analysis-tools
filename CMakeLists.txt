@@ -3,7 +3,6 @@ project(StATools)
 
 # we have some custom CMake stuff
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-
 include(Macros)
 
 # Have the user asked for tests
