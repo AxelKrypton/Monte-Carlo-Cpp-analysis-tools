@@ -24,6 +24,6 @@
 # file called EXE.cpp and will be linked automatically
 macro(add_unit_test NAME EXE)
 	add_executable("${EXE}" "${EXE}.cpp")
-	target_link_libraries("${EXE}" ${Boost_LIBRARIES})
+	target_link_libraries("${EXE}" dataSample ${Boost_LIBRARIES})
 	add_test("${NAME}" "${EXE}")
 endmacro()

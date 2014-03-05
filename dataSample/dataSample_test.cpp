@@ -13,3 +13,9 @@ BOOST_AUTO_TEST_CASE(build)
 
 	dataSample dataSampleInstance2;
 }
+
+BOOST_AUTO_TEST_CASE(printValuesToScreen)
+{
+	dataSample dataSampleInstance;
+	dataSampleInstance.printValuesToScreen();
+}
