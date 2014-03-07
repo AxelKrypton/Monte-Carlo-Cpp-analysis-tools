@@ -5,7 +5,13 @@
 dataSample::dataSample(std::valarray<double> valuesIn)
 {
 	values = valuesIn;
+	numberOfElements = values.size();
 	mean = calcFirstMoment();
+}
+
+int dataSample::getNumberOfElements()
+{
+	return numberOfElements;
 }
 
 void dataSample::printValuesToScreen()
@@ -26,3 +32,4 @@ double dataSample::calcFirstMoment()
 {
 	return values.sum() / values.size();
 }
+

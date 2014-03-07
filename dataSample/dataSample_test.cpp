@@ -17,6 +17,18 @@ BOOST_AUTO_TEST_CASE(build)
 	BOOST_REQUIRE(dataSampleInstance);
 }
 
+BOOST_AUTO_TEST_CASE(elements)
+{
+	int elementsOfTestArray = 17;
+	std::valarray<double> testValues(elementsOfTestArray);
+
+	dataSample * dataSampleInstance;
+	dataSampleInstance = new dataSample(testValues);
+	int elementsOfDataSample = dataSampleInstance->getNumberOfElements();
+	//todo: replace with int comparision
+	BOOST_CHECK_CLOSE(float(elementsOfDataSample), float(elementsOfTestArray), testPrecision);
+}
+
 BOOST_AUTO_TEST_CASE(mean1)
 {
 	// valarray initialises to zero
