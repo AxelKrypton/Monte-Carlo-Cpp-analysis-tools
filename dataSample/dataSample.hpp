@@ -13,7 +13,8 @@ public:
 
 private:
 	std::valarray<double> values;
-	double mean = 0.;
+	//TODO: why can I not init this here? (gives iso... error)
+	double mean;
 
 	double calcFirstMoment();
 };

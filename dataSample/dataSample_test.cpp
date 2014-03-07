@@ -30,6 +30,19 @@ BOOST_AUTO_TEST_CASE(mean1)
 	BOOST_CHECK_CLOSE(mean, referenceValue, testPrecision);
 }
 
+BOOST_AUTO_TEST_CASE(mean2)
+{
+	std::valarray<double> testValues(1, 23);
+	double referenceValue = 1.;
+
+	dataSample * dataSampleInstance;
+	dataSampleInstance = new dataSample(testValues);
+	BOOST_REQUIRE(dataSampleInstance);
+
+	double mean = dataSampleInstance->getMean();
+	BOOST_CHECK_CLOSE(mean, referenceValue, testPrecision);
+}
+
 BOOST_AUTO_TEST_CASE(printValuesToScreen)
 {
 	std::valarray<double> testValues(1);
