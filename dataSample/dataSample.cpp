@@ -16,3 +16,8 @@ void dataSample::printValuesToScreen()
 	std::cout << std::endl;
 }
 
+double dataSample::getMean()
+{
+	return mean;
+}
+
