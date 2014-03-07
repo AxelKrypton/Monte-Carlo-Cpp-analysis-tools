@@ -7,15 +7,16 @@
 
 BOOST_AUTO_TEST_CASE(build)
 {
-	dataSample * dataSampleInstance1;
-	dataSampleInstance1 = new dataSample;
-	BOOST_REQUIRE(dataSampleInstance1);
+	std::valarray<double> testValues(1);
 
-	dataSample dataSampleInstance2;
+	dataSample * dataSampleInstance1;
+	dataSampleInstance1 = new dataSample(testValues);
+	BOOST_REQUIRE(dataSampleInstance1);
 }
 
 BOOST_AUTO_TEST_CASE(printValuesToScreen)
 {
-	dataSample dataSampleInstance;
+	std::valarray<double> testValues(1);
+	dataSample dataSampleInstance(testValues);
 	dataSampleInstance.printValuesToScreen();
 }

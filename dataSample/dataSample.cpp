@@ -2,6 +2,11 @@
 
 #include "dataSample.hpp"
 
+dataSample::dataSample(std::valarray<double> valuesIn)
+{
+	values = valuesIn;
+}
+
 void dataSample::printValuesToScreen()
 {
 	for (int iteration = 0; iteration < values.size(); iteration ++)

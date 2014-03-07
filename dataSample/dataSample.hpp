@@ -7,6 +7,7 @@
 class dataSample
 {
 public:
+	dataSample(std::valarray<double> valuesIn);
 	void printValuesToScreen();
 
 private:
