@@ -12,4 +12,7 @@ public:
 
 private:
 	std::valarray<double> values;
+	double mean;
+
+	double calcFirstMoment();
 };

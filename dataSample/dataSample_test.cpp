@@ -9,9 +9,9 @@ BOOST_AUTO_TEST_CASE(build)
 {
 	std::valarray<double> testValues(1);
 
-	dataSample * dataSampleInstance1;
-	dataSampleInstance1 = new dataSample(testValues);
-	BOOST_REQUIRE(dataSampleInstance1);
+	dataSample * dataSampleInstance;
+	dataSampleInstance = new dataSample(testValues);
+	BOOST_REQUIRE(dataSampleInstance);
 }
 
 BOOST_AUTO_TEST_CASE(printValuesToScreen)
