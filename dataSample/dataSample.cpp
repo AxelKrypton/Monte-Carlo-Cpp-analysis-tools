@@ -16,7 +16,7 @@ int dataSample::getNumberOfElements()
 
 void dataSample::printValuesToScreen()
 {
-	for (int iteration = 0; iteration < values.size(); iteration ++)
+	for (int iteration = 0; iteration < numberOfElements; iteration ++)
 	{
 		std::cout << values[iteration] << "\t";
 	}
@@ -30,6 +30,6 @@ double dataSample::getMean()
 
 double dataSample::calcFirstMoment()
 {
-	return values.sum() / values.size();
+	return values.sum() / numberOfElements;
 }
 
