@@ -2,6 +2,8 @@
  * Definition of the dataSample class
  */
 
+//todo: put security to headers
+
 #include<valarray>
 
 class dataSample
@@ -11,6 +13,7 @@ public:
 	void printValuesToScreen();
 	int getNumberOfElements();
 	double getMean();
+	double getVariance();
 
 private:
 	std::valarray<double> values;

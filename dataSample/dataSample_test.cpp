@@ -29,6 +29,8 @@ BOOST_AUTO_TEST_CASE(elements)
 	BOOST_CHECK_CLOSE(float(elementsOfDataSample), float(elementsOfTestArray), testPrecision);
 }
 
+BOOST_AUTO_TEST_SUITE(mean)
+
 BOOST_AUTO_TEST_CASE(mean1)
 {
 	// valarray initialises to zero
@@ -73,9 +75,12 @@ BOOST_AUTO_TEST_CASE(mean3)
 	BOOST_CHECK_CLOSE(mean, referenceValue, testPrecision);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_CASE(printValuesToScreen)
 {
 	std::valarray<double> testValues(1);
 	dataSample dataSampleInstance(testValues);
 	dataSampleInstance.printValuesToScreen();
 }
+
