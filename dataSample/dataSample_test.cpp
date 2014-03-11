@@ -29,7 +29,6 @@ BOOST_AUTO_TEST_CASE(elements)
 	BOOST_CHECK_CLOSE(float(elementsOfDataSample), float(elementsOfTestArray), testPrecision);
 }
 
-BOOST_AUTO_TEST_SUITE(mean)
 
 std::valarray<double> makeValarrayWithZeros(int length)
 {
@@ -61,43 +60,86 @@ std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
 	return returnValarray;
 }
 
-void checkDataSampleMean(std::valarray<double> valarrayIn, double referenceValue)
-{
-	dataSample * dataSampleInstance;
-	dataSampleInstance = new dataSample(valarrayIn);
-	BOOST_REQUIRE(dataSampleInstance);
-	BOOST_CHECK_CLOSE(dataSampleInstance->getMean(), referenceValue, testPrecision);
-}
+BOOST_AUTO_TEST_SUITE(mean)
 
-BOOST_AUTO_TEST_CASE(mean1)
-{
-	std::valarray<double> testValues = makeValarrayWithZeros(1);
-	double referenceValue = 0.;
-	checkDataSampleMean(testValues, referenceValue);
-}
+	void checkDataSampleMean(std::valarray<double> valarrayIn, double referenceValue)
+	{
+		dataSample * dataSampleInstance;
+		dataSampleInstance = new dataSample(valarrayIn);
+		BOOST_REQUIRE(dataSampleInstance);
+		BOOST_CHECK_CLOSE(dataSampleInstance->getMean(), referenceValue, testPrecision);
+	}
 
-BOOST_AUTO_TEST_CASE(mean2)
-{
-	std::valarray<double> testValues = makeValarrayWithOnes(23);
-	double referenceValue = 1.;
-	checkDataSampleMean(testValues, referenceValue);
-}
+	BOOST_AUTO_TEST_CASE(mean1)
+	{
+		std::valarray<double> testValues = makeValarrayWithZeros(1);
+		double referenceValue = 0.;
+		checkDataSampleMean(testValues, referenceValue);
+	}
 
-BOOST_AUTO_TEST_CASE(mean3)
-{
-	std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
-	double referenceValue = 11.5;
-	checkDataSampleMean(testValues, referenceValue);
-}
+	BOOST_AUTO_TEST_CASE(mean2)
+	{
+		std::valarray<double> testValues = makeValarrayWithOnes(23);
+		double referenceValue = 1.;
+		checkDataSampleMean(testValues, referenceValue);
+	}
 
-BOOST_AUTO_TEST_CASE(mean4)
-{
-	std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
-	double referenceValue = 0.5;
-	checkDataSampleMean(testValues, referenceValue);
-}
+	BOOST_AUTO_TEST_CASE(mean3)
+	{
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+		double referenceValue = 11.5;
+		checkDataSampleMean(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(mean4)
+	{
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		double referenceValue = 0.5;
+		checkDataSampleMean(testValues, referenceValue);
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(variance)
+
+	void checkDataSampleVariance(std::valarray<double> valarrayIn, double referenceValue)
+	{
+		dataSample * dataSampleInstance;
+		dataSampleInstance = new dataSample(valarrayIn);
+		BOOST_REQUIRE(dataSampleInstance);
+		BOOST_CHECK_CLOSE(dataSampleInstance->getVariance(), referenceValue, testPrecision);
+	}
+
+	BOOST_AUTO_TEST_CASE(variance1)
+	{
+		std::valarray<double> testValues = makeValarrayWithZeros(1);
+		double referenceValue = 0.;
+		checkDataSampleVariance(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(variance2)
+	{
+		std::valarray<double> testValues = makeValarrayWithOnes(23);
+		double referenceValue = 0.;
+		checkDataSampleVariance(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(variance3)
+	{
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+		double referenceValue = 47.9166666667;
+		checkDataSampleVariance(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(variance4)
+	{
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		double referenceValue = 0.0905797101449;
+		checkDataSampleVariance(testValues, referenceValue);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 
 BOOST_AUTO_TEST_CASE(printValuesToScreen)
 {
