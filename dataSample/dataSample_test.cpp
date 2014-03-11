@@ -31,10 +31,39 @@ BOOST_AUTO_TEST_CASE(elements)
 
 BOOST_AUTO_TEST_SUITE(mean)
 
+std::valarray<double> makeValarrayWithZeros(int length)
+{
+	return std::valarray<double>(length);
+}
+
+std::valarray<double> makeValarrayWithOnes(int length)
+{
+	return std::valarray<double>(1., length);
+}
+
+std::valarray<double> makeValarrayWithArrayPosition(int length)
+{
+	std::valarray<double> returnValarray(length);
+	for (int iteration = 0; iteration < returnValarray.size(); iteration ++)
+	{
+		returnValarray[iteration] = iteration;
+	}
+	return returnValarray;
+}
+
+std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
+{
+	std::valarray<double> returnValarray(length);
+	for (int iteration = 0; iteration < returnValarray.size(); iteration ++)
+	{
+		returnValarray[iteration] = (double(iteration)) / (returnValarray.size() -1);
+	}
+	return returnValarray;
+}
+
 BOOST_AUTO_TEST_CASE(mean1)
 {
-	// valarray initialises to zero
-	std::valarray<double> testValues(1);
+	std::valarray<double> testValues = makeValarrayWithZeros(1);
 	double referenceValue = 0.;
 
 	dataSample * dataSampleInstance;
@@ -47,7 +76,7 @@ BOOST_AUTO_TEST_CASE(mean1)
 
 BOOST_AUTO_TEST_CASE(mean2)
 {
-	std::valarray<double> testValues(1, 23);
+	std::valarray<double> testValues = makeValarrayWithOnes(23);
 	double referenceValue = 1.;
 
 	dataSample * dataSampleInstance;
@@ -60,12 +89,21 @@ BOOST_AUTO_TEST_CASE(mean2)
 
 BOOST_AUTO_TEST_CASE(mean3)
 {
-	std::valarray<double> testValues(24);
-	for (int iteration = 0; iteration < testValues.size(); iteration ++)
-	{
-		testValues[iteration] = iteration + 1;
-	}
-	double referenceValue = 12.5;
+	std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+	double referenceValue = 11.5;
+
+	dataSample * dataSampleInstance;
+	dataSampleInstance = new dataSample(testValues);
+	BOOST_REQUIRE(dataSampleInstance);
+
+	double mean = dataSampleInstance->getMean();
+	BOOST_CHECK_CLOSE(mean, referenceValue, testPrecision);
+}
+
+BOOST_AUTO_TEST_CASE(mean4)
+{
+	std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+	double referenceValue = 0.5;
 
 	dataSample * dataSampleInstance;
 	dataSampleInstance = new dataSample(testValues);
