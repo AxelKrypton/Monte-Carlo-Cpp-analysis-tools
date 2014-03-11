@@ -61,56 +61,40 @@ std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
 	return returnValarray;
 }
 
+void checkDataSampleMean(std::valarray<double> valarrayIn, double referenceValue)
+{
+	dataSample * dataSampleInstance;
+	dataSampleInstance = new dataSample(valarrayIn);
+	BOOST_REQUIRE(dataSampleInstance);
+	BOOST_CHECK_CLOSE(dataSampleInstance->getMean(), referenceValue, testPrecision);
+}
+
 BOOST_AUTO_TEST_CASE(mean1)
 {
 	std::valarray<double> testValues = makeValarrayWithZeros(1);
 	double referenceValue = 0.;
-
-	dataSample * dataSampleInstance;
-	dataSampleInstance = new dataSample(testValues);
-	BOOST_REQUIRE(dataSampleInstance);
-
-	double mean = dataSampleInstance->getMean();
-	BOOST_CHECK_CLOSE(mean, referenceValue, testPrecision);
+	checkDataSampleMean(testValues, referenceValue);
 }
 
 BOOST_AUTO_TEST_CASE(mean2)
 {
 	std::valarray<double> testValues = makeValarrayWithOnes(23);
 	double referenceValue = 1.;
-
-	dataSample * dataSampleInstance;
-	dataSampleInstance = new dataSample(testValues);
-	BOOST_REQUIRE(dataSampleInstance);
-
-	double mean = dataSampleInstance->getMean();
-	BOOST_CHECK_CLOSE(mean, referenceValue, testPrecision);
+	checkDataSampleMean(testValues, referenceValue);
 }
 
 BOOST_AUTO_TEST_CASE(mean3)
 {
 	std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
 	double referenceValue = 11.5;
-
-	dataSample * dataSampleInstance;
-	dataSampleInstance = new dataSample(testValues);
-	BOOST_REQUIRE(dataSampleInstance);
-
-	double mean = dataSampleInstance->getMean();
-	BOOST_CHECK_CLOSE(mean, referenceValue, testPrecision);
+	checkDataSampleMean(testValues, referenceValue);
 }
 
 BOOST_AUTO_TEST_CASE(mean4)
 {
 	std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 	double referenceValue = 0.5;
-
-	dataSample * dataSampleInstance;
-	dataSampleInstance = new dataSample(testValues);
-	BOOST_REQUIRE(dataSampleInstance);
-
-	double mean = dataSampleInstance->getMean();
-	BOOST_CHECK_CLOSE(mean, referenceValue, testPrecision);
+	checkDataSampleMean(testValues, referenceValue);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
