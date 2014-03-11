@@ -2,7 +2,8 @@
  * Definition of the dataSample class
  */
 
-//todo: put security to headers
+#ifndef _dataSample_H_
+#define _dataSample_H_
 
 #include<valarray>
 
@@ -23,3 +24,5 @@ private:
 
 	double calcFirstMoment();
 };
+
+#endif
