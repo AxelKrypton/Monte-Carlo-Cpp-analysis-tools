@@ -29,7 +29,11 @@ BOOST_AUTO_TEST_CASE(elements)
 	BOOST_CHECK_CLOSE(float(elementsOfDataSample), float(elementsOfTestArray), testPrecision);
 }
 
-
+/**
+ * Arrays filled with constants have a mean equal to the constant and zero variance.
+ * Arrays proportional to sums over the iteration variable can be evaluated using the triangular numbers,
+ * the  square pyramidal numbers or Faulhaber's formula in general.
+ */
 std::valarray<double> makeValarrayWithZeros(int length)
 {
 	return std::valarray<double>(length);
@@ -40,6 +44,7 @@ std::valarray<double> makeValarrayWithOnes(int length)
 	return std::valarray<double>(1., length);
 }
 
+// mean: (length - 1)/2, variance: (length - 1)(2*length - 1)/6
 std::valarray<double> makeValarrayWithArrayPosition(int length)
 {
 	std::valarray<double> returnValarray(length);
@@ -50,6 +55,7 @@ std::valarray<double> makeValarrayWithArrayPosition(int length)
 	return returnValarray;
 }
 
+// mean: 0.5, variance: (2*length - 1)/6/(length - 1)
 std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
 {
 	std::valarray<double> returnValarray(length);
