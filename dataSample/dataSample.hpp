@@ -22,7 +22,13 @@ public:
 	double getNthMoment(int n);
 	DataSample createBinnedDataSampleWithNumberOfBins(int numberOfBins);
 	DataSample createBinnedDataSampleWithBinsize(int binsize);
+	/**
+	 * Following Berg, equation (2.160).
+	 */
 	DataSample createJackknifeEstimators();
+	// todo: check again this construction
+	DataSample applyFunction(double (*function)(double));
+	double getJackknifeVariance();
 
 private:
 	double calcNthMoment(int n);

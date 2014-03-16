@@ -632,10 +632,62 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(jackknifeElements)
 	{
 		int numberOfElements = 37;
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
 		DataSample sample(testValues);
 		DataSample jackknifeSample = sample.createJackknifeEstimators();
 		BOOST_REQUIRE_EQUAL(sample.getNumberOfElements(), jackknifeSample.getNumberOfElements());
+	}
+
+	BOOST_AUTO_TEST_CASE(jackknifeFirstMoment)
+	{
+		int numberOfElements = 89;
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
+		DataSample sample(testValues);
+		DataSample jackknifeSample = sample.createJackknifeEstimators();
+		BOOST_REQUIRE_EQUAL(sample.getNthMoment(1), jackknifeSample.getNthMoment(1));
+	}
+
+	double calcExpectedValueForSecondMomentOfJackknifeEstimatorsBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
+	{
+		double prefactor = pow(double(numberOfElements), 2.) - 2. * numberOfElements;
+		double normalization = pow(double(numberOfElements-1), 2.);
+		return ( sample.getNthMoment(2) + pow(sample.getNthMoment(1),2.) * prefactor ) / normalization;
+	}
+
+	BOOST_AUTO_TEST_CASE(jackknifeSecondMoment)
+	{
+		int numberOfElements = 45;
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
+		DataSample sample(testValues);
+		DataSample jackknifeSample = sample.createJackknifeEstimators();
+		double expectedValue = calcExpectedValueForSecondMomentOfJackknifeEstimatorsBasedOnAnalyticExpression(sample, numberOfElements);
+		BOOST_CHECK_CLOSE(expectedValue, jackknifeSample.getNthMoment(2), testPrecision);
+	}
+
+	double square(double in)
+	{
+		return in * in;
+	}
+
+	BOOST_AUTO_TEST_CASE(applyFunction)
+	{
+		int numberOfElements = 53;
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
+		DataSample sample(testValues);
+//		DataSample jackknifeSample = sample.createJackknifeEstimators();
+		DataSample sampleFromFunction = sample.applyFunction(square);
+		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample.getNthMoment(2), testPrecision);
+	}
+
+	BOOST_AUTO_TEST_CASE(jackknifeVariance1)
+	{
+		int numberOfElements = 71;
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
+		DataSample sample(testValues);
+		BOOST_REQUIRE_THROW(sample.getJackknifeVariance(), std::logic_error);
+//		DataSample jackknifeSample = sample.createJackknifeEstimators();
+//		DataSample sampleFromFunction = jackknifeSample.applyFunction(square);
+//		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), jackknifeSample.getNthMoment(2), testPrecision);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

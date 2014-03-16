@@ -155,7 +155,24 @@ DataSample DataSample::performBinning(int numberOfBins, int binsize)
 
 DataSample DataSample::createJackknifeEstimators()
 {
-	std::valarray<double> jackknifeEstimators(numberOfElements);
+	int normalization = numberOfElements - 1;
+	double sumOfDataSampleElements = values.sum();
+	std::valarray<double> jackknifeEstimators = (sumOfDataSampleElements - values) / normalization;
 	DataSample dataSample(jackknifeEstimators);
 	return dataSample;
+}
+
+DataSample DataSample::applyFunction(double (*function)(double))
+{
+	std::valarray<double> functionAppliedToArray = values.apply(function);
+	DataSample dataSample(functionAppliedToArray);
+	return dataSample;
+}
+
+double DataSample::getJackknifeVariance()
+{
+	bool isJackknifeSample = false;
+	if ( ! isJackknifeSample )
+		throw std::logic_error("DataSample is not based on jackknife estimate!");
+	return 0;
 }
