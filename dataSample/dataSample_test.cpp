@@ -61,7 +61,7 @@ std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
 	std::valarray<double> returnValarray(length);
 	for (int iteration = 0; iteration < returnValarray.size(); iteration ++)
 	{
-		returnValarray[iteration] = (double(iteration)) / (returnValarray.size() -1);
+		returnValarray[iteration] = (double(iteration)) / (returnValarray.size() - 1);
 	}
 	return returnValarray;
 }

@@ -19,11 +19,12 @@ public:
 private:
 	std::valarray<double> values;
 	//TODO: why can I not init this here? (gives iso... error)
-	double mean;
-	double variance;
+	double firstMoment;
+	double secondMoment;
 	int numberOfElements;
 
 	double calcFirstMoment();
+	double calcSecondMoment();
 	double calcVariance();
 };
 

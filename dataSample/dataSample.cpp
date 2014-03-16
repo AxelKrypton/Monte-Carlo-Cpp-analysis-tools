@@ -6,8 +6,8 @@ dataSample::dataSample(std::valarray<double> valuesIn)
 {
 	values = valuesIn;
 	numberOfElements = values.size();
-	mean = calcFirstMoment();
-	variance = calcVariance();
+	firstMoment = calcFirstMoment();
+	secondMoment = calcSecondMoment();
 }
 
 int dataSample::getNumberOfElements()
@@ -26,12 +26,12 @@ void dataSample::printValuesToScreen()
 
 double dataSample::getMean()
 {
-	return mean;
+	return firstMoment;
 }
 
 double dataSample::getVariance()
 {
-	return variance;
+	return ( secondMoment - pow(firstMoment,2.) );
 }
 
 double dataSample::calcFirstMoment()
@@ -39,15 +39,10 @@ double dataSample::calcFirstMoment()
 	return values.sum() / numberOfElements;
 }
 
-double dataSample::calcVariance()
+double dataSample::calcSecondMoment()
 {
-	//TODO: this fct. seems to be wrong in Alessandros code
-	return pow(( values-mean ), 2.).sum()/( numberOfElements );
-	//TODO: check if this implementation is better
-	/*
-	  std::valarray<double> sampleSquared = std::pow(values, 2.0);
-	  return sampleSquared.sum() / numberOfElements - mean * mean;
-	*/
+	std::valarray<double> sampleSquared = std::pow(values, 2.0);
+	return sampleSquared.sum() / numberOfElements;
 }
 
 
