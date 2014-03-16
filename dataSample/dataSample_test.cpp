@@ -185,6 +185,47 @@ BOOST_AUTO_TEST_SUITE(thirdMoment)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(fourthMoment)
+
+	void checkDataSampleFourthMoment(std::valarray<double> valarrayIn, double referenceValue)
+	{
+		dataSample * dataSampleInstance;
+		dataSampleInstance = new dataSample(valarrayIn);
+		BOOST_REQUIRE(dataSampleInstance);
+		BOOST_CHECK_CLOSE(dataSampleInstance->getFourthMoment(), referenceValue, testPrecision);
+	}
+
+	BOOST_AUTO_TEST_CASE(fourthMoment1)
+	{
+		std::valarray<double> testValues = makeValarrayWithZeros(1);
+		double referenceValue = 0.;
+		checkDataSampleFourthMoment(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(fourthMoment2)
+	{
+		std::valarray<double> testValues = makeValarrayWithOnes(23);
+		double referenceValue = 1.;
+		checkDataSampleFourthMoment(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(fourthMoment3)
+	{
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+		double referenceValue = 59635.1666666667;
+		checkDataSampleFourthMoment(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(fourthMoment4)
+	{
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		double referenceValue = 0.213103750582176;
+		checkDataSampleFourthMoment(testValues, referenceValue);
+	}
+
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(variance)
 
 	void checkDataSampleVariance(std::valarray<double> valarrayIn, double referenceValue)

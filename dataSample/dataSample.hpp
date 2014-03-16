@@ -17,6 +17,7 @@ public:
 	double getVariance();
 	double getSecondMoment();
 	double getThirdMoment();
+	double getFourthMoment();
 
 private:
 	std::valarray<double> values;
@@ -24,11 +25,13 @@ private:
 	double firstMoment;
 	double secondMoment;
 	double thirdMoment;
+	double fourthMoment;
 	int numberOfElements;
 
 	double calcFirstMoment();
 	double calcSecondMoment();
 	double calcThirdMoment();
+	double calcFourthMoment();
 	double calcVariance();
 };
 

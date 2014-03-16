@@ -9,6 +9,7 @@ dataSample::dataSample(std::valarray<double> valuesIn)
 	firstMoment = calcFirstMoment();
 	secondMoment = calcSecondMoment();
 	thirdMoment = calcThirdMoment();
+	fourthMoment = calcFourthMoment();
 }
 
 int dataSample::getNumberOfElements()
@@ -52,6 +53,12 @@ double dataSample::calcThirdMoment()
 	return sampleSquared.sum() / numberOfElements;
 }
 
+double dataSample::calcFourthMoment()
+{
+	std::valarray<double> sampleSquared = std::pow(values, 4.0);
+	return sampleSquared.sum() / numberOfElements;
+}
+
 double dataSample::getSecondMoment()
 {
 	return secondMoment;
@@ -62,3 +69,7 @@ double dataSample::getThirdMoment()
 	return thirdMoment;
 }
 
+double dataSample::getFourthMoment()
+{
+	return fourthMoment;
+}
