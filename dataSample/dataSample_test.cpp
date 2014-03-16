@@ -66,6 +66,7 @@ std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
 	return returnValarray;
 }
 
+//todo: make add. tests for first moment? This is the same as mean...
 BOOST_AUTO_TEST_SUITE(mean)
 
 	void checkDataSampleMean(std::valarray<double> valarrayIn, double referenceValue)
@@ -102,6 +103,46 @@ BOOST_AUTO_TEST_SUITE(mean)
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 		double referenceValue = 0.5;
 		checkDataSampleMean(testValues, referenceValue);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(secondMoment)
+
+	void checkDataSampleSecondMoment(std::valarray<double> valarrayIn, double referenceValue)
+	{
+		dataSample * dataSampleInstance;
+		dataSampleInstance = new dataSample(valarrayIn);
+		BOOST_REQUIRE(dataSampleInstance);
+		BOOST_CHECK_CLOSE(dataSampleInstance->getSecondMoment(), referenceValue, testPrecision);
+	}
+
+	BOOST_AUTO_TEST_CASE(secondMoment1)
+	{
+		std::valarray<double> testValues = makeValarrayWithZeros(1);
+		double referenceValue = 0.;
+		checkDataSampleSecondMoment(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(secondMoment2)
+	{
+		std::valarray<double> testValues = makeValarrayWithOnes(23);
+		double referenceValue = 1.;
+		checkDataSampleSecondMoment(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(secondMoment3)
+	{
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+		double referenceValue = 180.166666666667;
+		checkDataSampleSecondMoment(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(secondMoment4)
+	{
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		double referenceValue = 0.340579710144927;
+		checkDataSampleSecondMoment(testValues, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

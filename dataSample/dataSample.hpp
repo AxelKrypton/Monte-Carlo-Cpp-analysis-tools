@@ -15,6 +15,7 @@ public:
 	int getNumberOfElements();
 	double getMean();
 	double getVariance();
+	double getSecondMoment();
 
 private:
 	std::valarray<double> values;

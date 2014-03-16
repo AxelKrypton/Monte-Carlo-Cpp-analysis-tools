@@ -45,4 +45,8 @@ double dataSample::calcSecondMoment()
 	return sampleSquared.sum() / numberOfElements;
 }
 
+double dataSample::getSecondMoment()
+{
+	return secondMoment;
+}
 
