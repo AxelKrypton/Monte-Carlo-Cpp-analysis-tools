@@ -70,220 +70,233 @@ public:
 	TestDataSample(std::valarray<double> valarrayIn, double referenceValue):
 		referenceValue(referenceValue)
 	{
+		//todo: need delete here?
 		dataSampleInstance = new dataSample(valarrayIn);
 	}
+
+	~TestDataSample()
+	{
+		testActualValueAgainstReferenceValue();
+	}
 protected:
-	virtual void testSpecificProperty() = 0;
+	void testActualValueAgainstReferenceValue()
+	{
+		BOOST_CHECK_CLOSE(actualValue, referenceValue, testPrecision);
+	}
 
 	dataSample * dataSampleInstance;
 	double referenceValue;
+	double actualValue;
 	const static double testPrecision = 10e-8;
 };
 
-//todo: make add. tests for first moment? This is the same as mean...
-BOOST_AUTO_TEST_SUITE(mean)
+//todo: make add. tests for mean? This is the same as first moment...
+BOOST_AUTO_TEST_SUITE(firstMoment)
 
-	class TestDataSampleMean : public TestDataSample
+	class TestDataSampleFirstMoment : public TestDataSample
 	{
 	public:
-		TestDataSampleMean(std::valarray<double> valarrayIn, double referenceValue) :
+		TestDataSampleFirstMoment(std::valarray<double> valarrayIn, double referenceValue) :
 			TestDataSample(valarrayIn, referenceValue)
 		{
-			testSpecificProperty();
+			actualValue = dataSampleInstance->getFirstMoment();
 		};
-
-		virtual void testSpecificProperty()
-		{
-			BOOST_CHECK_CLOSE(dataSampleInstance->getMean(), referenceValue, testPrecision);
-		}
 	};
 
-	BOOST_AUTO_TEST_CASE(mean1)
+	BOOST_AUTO_TEST_CASE(firstMoment1)
 	{
 		std::valarray<double> testValues = makeValarrayWithZeros(1);
 		double referenceValue = 0.;
-		TestDataSampleMean tester(testValues, referenceValue);
+		TestDataSampleFirstMoment tester(testValues, referenceValue);
 	}
 
-	BOOST_AUTO_TEST_CASE(mean2)
+	BOOST_AUTO_TEST_CASE(firstMoment2)
 	{
 		std::valarray<double> testValues = makeValarrayWithOnes(23);
 		double referenceValue = 1.;
-		TestDataSampleMean tester(testValues, referenceValue);
+		TestDataSampleFirstMoment tester(testValues, referenceValue);
 	}
 
-	BOOST_AUTO_TEST_CASE(mean3)
+	BOOST_AUTO_TEST_CASE(firstMoment3)
 	{
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
 		double referenceValue = 11.5;
-		TestDataSampleMean tester(testValues, referenceValue);
+		TestDataSampleFirstMoment tester(testValues, referenceValue);
 	}
 
-	BOOST_AUTO_TEST_CASE(mean4)
+	BOOST_AUTO_TEST_CASE(firstMoment4)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 		double referenceValue = 0.5;
-		TestDataSampleMean tester(testValues, referenceValue);
+		TestDataSampleFirstMoment tester(testValues, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(secondMoment)
 
-	void checkDataSampleSecondMoment(std::valarray<double> valarrayIn, double referenceValue)
+	class TestDataSampleSecondMoment : public TestDataSample
 	{
-		dataSample * dataSampleInstance;
-		dataSampleInstance = new dataSample(valarrayIn);
-		BOOST_REQUIRE(dataSampleInstance);
-		BOOST_CHECK_CLOSE(dataSampleInstance->getSecondMoment(), referenceValue, testPrecision);
-	}
+	public:
+		TestDataSampleSecondMoment(std::valarray<double> valarrayIn, double referenceValue) :
+			TestDataSample(valarrayIn, referenceValue)
+		{
+			actualValue = dataSampleInstance->getSecondMoment();
+		};
+	};
 
 	BOOST_AUTO_TEST_CASE(secondMoment1)
 	{
 		std::valarray<double> testValues = makeValarrayWithZeros(1);
 		double referenceValue = 0.;
-		checkDataSampleSecondMoment(testValues, referenceValue);
+		TestDataSampleSecondMoment tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(secondMoment2)
 	{
 		std::valarray<double> testValues = makeValarrayWithOnes(23);
 		double referenceValue = 1.;
-		checkDataSampleSecondMoment(testValues, referenceValue);
+		TestDataSampleSecondMoment tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(secondMoment3)
 	{
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
 		double referenceValue = 180.166666666667;
-		checkDataSampleSecondMoment(testValues, referenceValue);
+		TestDataSampleSecondMoment tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(secondMoment4)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 		double referenceValue = 0.340579710144927;
-		checkDataSampleSecondMoment(testValues, referenceValue);
+		TestDataSampleSecondMoment tester(testValues, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(thirdMoment)
 
-	void checkDataSampleThirdMoment(std::valarray<double> valarrayIn, double referenceValue)
+	class TestDataSampleThirdMoment : public TestDataSample
 	{
-		dataSample * dataSampleInstance;
-		dataSampleInstance = new dataSample(valarrayIn);
-		BOOST_REQUIRE(dataSampleInstance);
-		BOOST_CHECK_CLOSE(dataSampleInstance->getThirdMoment(), referenceValue, testPrecision);
-	}
+	public:
+		TestDataSampleThirdMoment(std::valarray<double> valarrayIn, double referenceValue) :
+			TestDataSample(valarrayIn, referenceValue)
+		{
+			actualValue = dataSampleInstance->getThirdMoment();
+		};
+	};
 
 	BOOST_AUTO_TEST_CASE(thirdMoment1)
 	{
 		std::valarray<double> testValues = makeValarrayWithZeros(1);
 		double referenceValue = 0.;
-		checkDataSampleThirdMoment(testValues, referenceValue);
+		TestDataSampleThirdMoment tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(thirdMoment2)
 	{
 		std::valarray<double> testValues = makeValarrayWithOnes(23);
 		double referenceValue = 1.;
-		checkDataSampleThirdMoment(testValues, referenceValue);
+		TestDataSampleThirdMoment tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(thirdMoment3)
 	{
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
 		double referenceValue = 3174.;
-		checkDataSampleThirdMoment(testValues, referenceValue);
+		TestDataSampleThirdMoment tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(thirdMoment4)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 		double referenceValue = 0.260869565217391;
-		checkDataSampleThirdMoment(testValues, referenceValue);
+		TestDataSampleThirdMoment tester(testValues, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(fourthMoment)
 
-	void checkDataSampleFourthMoment(std::valarray<double> valarrayIn, double referenceValue)
+	class TestDataSampleFourthMoment : public TestDataSample
 	{
-		dataSample * dataSampleInstance;
-		dataSampleInstance = new dataSample(valarrayIn);
-		BOOST_REQUIRE(dataSampleInstance);
-		BOOST_CHECK_CLOSE(dataSampleInstance->getFourthMoment(), referenceValue, testPrecision);
-	}
+	public:
+		TestDataSampleFourthMoment(std::valarray<double> valarrayIn, double referenceValue) :
+			TestDataSample(valarrayIn, referenceValue)
+		{
+			actualValue = dataSampleInstance->getFourthMoment();
+		};
+	};
 
 	BOOST_AUTO_TEST_CASE(fourthMoment1)
 	{
 		std::valarray<double> testValues = makeValarrayWithZeros(1);
 		double referenceValue = 0.;
-		checkDataSampleFourthMoment(testValues, referenceValue);
+		TestDataSampleFourthMoment tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(fourthMoment2)
 	{
 		std::valarray<double> testValues = makeValarrayWithOnes(23);
 		double referenceValue = 1.;
-		checkDataSampleFourthMoment(testValues, referenceValue);
+		TestDataSampleFourthMoment tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(fourthMoment3)
 	{
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
 		double referenceValue = 59635.1666666667;
-		checkDataSampleFourthMoment(testValues, referenceValue);
+		TestDataSampleFourthMoment tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(fourthMoment4)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 		double referenceValue = 0.213103750582176;
-		checkDataSampleFourthMoment(testValues, referenceValue);
+		TestDataSampleFourthMoment tester(testValues, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(variance)
 
-	void checkDataSampleVariance(std::valarray<double> valarrayIn, double referenceValue)
+	class TestDataSampleVariance : public TestDataSample
 	{
-		dataSample * dataSampleInstance;
-		dataSampleInstance = new dataSample(valarrayIn);
-		BOOST_REQUIRE(dataSampleInstance);
-		BOOST_CHECK_CLOSE(dataSampleInstance->getVariance(), referenceValue, testPrecision);
-	}
+	public:
+		TestDataSampleVariance(std::valarray<double> valarrayIn, double referenceValue) :
+			TestDataSample(valarrayIn, referenceValue)
+		{
+			actualValue = dataSampleInstance->getVariance();
+		};
+	};
 
 	BOOST_AUTO_TEST_CASE(variance1)
 	{
 		std::valarray<double> testValues = makeValarrayWithZeros(1);
 		double referenceValue = 0.;
-		checkDataSampleVariance(testValues, referenceValue);
+		TestDataSampleVariance tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(variance2)
 	{
 		std::valarray<double> testValues = makeValarrayWithOnes(23);
 		double referenceValue = 0.;
-		checkDataSampleVariance(testValues, referenceValue);
+		TestDataSampleVariance tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(variance3)
 	{
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
 		double referenceValue = 47.9166666667;
-		checkDataSampleVariance(testValues, referenceValue);
+		TestDataSampleVariance tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(variance4)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 		double referenceValue = 0.0905797101449;
-		checkDataSampleVariance(testValues, referenceValue);
+		TestDataSampleVariance tester(testValues, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

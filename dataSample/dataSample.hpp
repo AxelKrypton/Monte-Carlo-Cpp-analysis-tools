@@ -15,6 +15,7 @@ public:
 	int getNumberOfElements();
 	double getMean();
 	double getVariance();
+	double getFirstMoment();
 	double getSecondMoment();
 	double getThirdMoment();
 	double getFourthMoment();
