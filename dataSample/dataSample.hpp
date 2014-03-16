@@ -21,6 +21,7 @@ public:
 	double getVariance();
 	double getNthMoment(int n);
 	dataSample createBinnedDataSampleWithNumberOfBins(int numberOfBins);
+	dataSample createBinnedDataSampleWithBinsize(int binsize);
 
 private:
 	double calcNthMoment(int n);
@@ -28,6 +29,8 @@ private:
 	double calcFirstMomentExplicit();
 	void checkIfNIsValid(int n);
 	void checkIfNumberOfBinsIsValid(int numberOfBins);
+	void checkIfBinsizeIsValid(int binsize);
+	void checkIfNumberOfElementsIsValid();
 	int calcBinsize(int numberOfBins);
 	int calcNumberOfBins(int binsize);
 	void initMoments();

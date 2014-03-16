@@ -12,6 +12,7 @@ dataSample::dataSample(std::valarray<double> valuesIn)
 {
 	values = valuesIn;
 	numberOfElements = values.size();
+	checkIfNumberOfElementsIsValid();
 	initMoments();
 }
 
@@ -98,10 +99,27 @@ dataSample dataSample::createBinnedDataSampleWithNumberOfBins(int numberOfBins)
 	return performBinning(numberOfBins, binsize);
 }
 
+dataSample dataSample::createBinnedDataSampleWithBinsize(int binsize)
+{
+	checkIfBinsizeIsValid(binsize);
+	int numberOfBins = calcBinsize(binsize);
+	return performBinning(numberOfBins, binsize);
+}
+
 void dataSample::checkIfNumberOfBinsIsValid(int numberOfBins)
 {
 	if(numberOfBins <= 0)
 		throw std::invalid_argument("Cannot perform binning with zero or less bins!");
+	if(numberOfBins > numberOfElements)
+		throw std::invalid_argument("Cannot perform binning with number of bins bigger than number of datapoints!");
+}
+
+void dataSample::checkIfBinsizeIsValid(int binsize)
+{
+	if(binsize <= 0)
+		throw std::invalid_argument("Cannot perform binning with binsize of zero or less!");
+	if(binsize > numberOfElements)
+		throw std::invalid_argument("Cannot perform binning with binsize bigger than number of datapoints!");
 }
 
 int dataSample::calcBinsize(int numberOfBins)
@@ -125,3 +143,8 @@ dataSample dataSample::performBinning(int numberOfBins, int binsize)
   return dataSampleInstance;
 }
 
+void dataSample::checkIfNumberOfElementsIsValid()
+{
+	if(numberOfElements <= 0)
+		throw std::invalid_argument("Cannot create dataSample with zero or less elements!");
+}

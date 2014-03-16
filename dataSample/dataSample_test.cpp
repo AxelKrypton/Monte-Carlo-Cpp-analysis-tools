@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_SUITE(build)
 		BOOST_CHECK_EQUAL(defaultDataSample.getNumberOfElements(), 1);
 	}
 
-	BOOST_AUTO_TEST_CASE(elements)
+	BOOST_AUTO_TEST_CASE(elements1)
 	{
 		int elementsOfTestArray = 17;
 		std::valarray<double> testValues(elementsOfTestArray);
@@ -95,8 +95,14 @@ BOOST_AUTO_TEST_SUITE(build)
 		dataSample * dataSampleInstance;
 		dataSampleInstance = new dataSample(testValues);
 		int elementsOfDataSample = dataSampleInstance->getNumberOfElements();
-		//todo: replace with int comparision
-		BOOST_CHECK_CLOSE(float(elementsOfDataSample), float(elementsOfTestArray), testPrecision);
+		BOOST_CHECK_EQUAL(elementsOfTestArray, elementsOfDataSample);
+	}
+
+	BOOST_AUTO_TEST_CASE(elements2)
+	{
+		int elementsOfTestArray = 0;
+		std::valarray<double> testValues(elementsOfTestArray);
+		BOOST_REQUIRE_THROW(dataSample dataSampleInstance(testValues), std::invalid_argument);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -394,38 +400,122 @@ BOOST_AUTO_TEST_SUITE(binning)
 
 	BOOST_AUTO_TEST_CASE(binningWrongArgument1)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		int numberOfElements = 27;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
 		dataSample originalSample(testValues);
-		int numberOfBins = 0;
-		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithNumberOfBins(numberOfBins), std::invalid_argument);
+		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithNumberOfBins(0), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(binningWrongArgument2)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		int numberOfElements = 33;
+		int negativeNumber = - numberOfElements;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
 		dataSample originalSample(testValues);
-		int numberOfBins = -1000;
-		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithNumberOfBins(numberOfBins), std::invalid_argument);
+		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithNumberOfBins(negativeNumber), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(binningWrongArgument3)
+	{
+		int numberOfElements = 13;
+		int numberThatIsTooBig = numberOfElements + 1;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithNumberOfBins(numberThatIsTooBig), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(binningWrongArgument4)
+	{
+		int numberOfElements = 19;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithBinsize(0), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(binningWrongArgument5)
+	{
+		int numberOfElements = 41;
+		int numberThatIsTooBig = numberOfElements + 1;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithBinsize(numberThatIsTooBig), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(binningWrongArgument6)
+	{
+		int numberOfElements = 47;
+		int negativeNumber = - numberOfElements;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithBinsize(negativeNumber), std::invalid_argument);
 	}
 
 	//todo: add test to check warning in case number of bins is not a multiple of number of elements?
 
-	BOOST_AUTO_TEST_CASE(trivialBinning1)
+	BOOST_AUTO_TEST_CASE(binningWithNumberOfBins1)
 	{
-		int numberOfElements = 24;
+		int numberOfElements = 27;
+		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements;
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
 		dataSample originalSample(testValues);
-		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(numberOfElements);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
 		BOOST_CHECK_EQUAL(originalSample.getNumberOfElements(), binnedSample.getNumberOfElements());
 	}
 
-	BOOST_AUTO_TEST_CASE(trivialBinning2)
+	BOOST_AUTO_TEST_CASE(binningWithNumberOfBins2)
 	{
-		int numberOfElements = 24;
+		int numberOfElements = 25;
+		int desiredNumberOfElementsOfBinnedDataSample = 1;
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
 		dataSample originalSample(testValues);
-		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(numberOfElements/2);
-		BOOST_CHECK_EQUAL(numberOfElements/2, binnedSample.getNumberOfElements());
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
+		BOOST_CHECK_EQUAL(desiredNumberOfElementsOfBinnedDataSample, binnedSample.getNumberOfElements());
+	}
+
+	BOOST_AUTO_TEST_CASE(binningWithNumberOfBins3)
+	{
+		int numberOfElements = 25;
+		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements/2.;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
+		BOOST_CHECK_EQUAL(desiredNumberOfElementsOfBinnedDataSample, binnedSample.getNumberOfElements());
+	}
+
+	BOOST_AUTO_TEST_CASE(binningWithBinsize1)
+	{
+		int numberOfElements = 25;
+		int desiredBinsize = numberOfElements;
+		int expectedNumberOfElementsInBinnedDataSample = 1;
+
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
+		BOOST_CHECK_EQUAL(expectedNumberOfElementsInBinnedDataSample, binnedSample.getNumberOfElements());
+	}
+
+	BOOST_AUTO_TEST_CASE(binningWithBinsize2)
+	{
+		int numberOfElements = 25;
+		int desiredBinsize = 1;
+		int expectedNumberOfElementsInBinnedDataSample = numberOfElements;
+
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
+		BOOST_CHECK_EQUAL(expectedNumberOfElementsInBinnedDataSample, binnedSample.getNumberOfElements());
+	}
+
+	BOOST_AUTO_TEST_CASE(binningWithBinsize3)
+	{
+		int numberOfElements = 25;
+		int desiredBinsize = 3;
+		int expectedNumberOfElementsInBinnedDataSample = 8;
+
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
+		BOOST_CHECK_EQUAL(expectedNumberOfElementsInBinnedDataSample, binnedSample.getNumberOfElements());
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
