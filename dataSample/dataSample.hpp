@@ -6,6 +6,7 @@
 #define _dataSample_H_
 
 #include<valarray>
+#include<stdexcept>
 
 class dataSample
 {
@@ -19,6 +20,7 @@ public:
 	double getSecondMoment();
 	double getThirdMoment();
 	double getFourthMoment();
+	double getNthMoment(int n);
 
 private:
 	std::valarray<double> values;
@@ -28,11 +30,9 @@ private:
 	double fourthMoment;
 	int numberOfElements;
 
-	double calcFirstMoment();
-	double calcSecondMoment();
-	double calcThirdMoment();
-	double calcFourthMoment();
-	double calcVariance();
+	double calcNthMoment(int n);
+	double calcNthMomentExplicit(int n);
+	double calcFirstMomentExplicit();
 };
 
 #endif

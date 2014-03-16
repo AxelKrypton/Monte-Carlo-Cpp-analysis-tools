@@ -301,6 +301,12 @@ BOOST_AUTO_TEST_SUITE(variance)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_CASE(get0thMoment)
+{
+	std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+	dataSample dataSampleInstance(testValues);
+	BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(0), std::invalid_argument);
+}
 
 BOOST_AUTO_TEST_CASE(printValuesToScreen)
 {

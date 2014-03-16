@@ -1,15 +1,14 @@
 #include<iostream>
-
 #include "dataSample.hpp"
 
 dataSample::dataSample(std::valarray<double> valuesIn)
 {
 	values = valuesIn;
 	numberOfElements = values.size();
-	firstMoment = calcFirstMoment();
-	secondMoment = calcSecondMoment();
-	thirdMoment = calcThirdMoment();
-	fourthMoment = calcFourthMoment();
+	firstMoment = calcNthMoment(1);
+	secondMoment = calcNthMoment(2);
+	thirdMoment = calcNthMoment(3);
+	fourthMoment = calcNthMoment(4);
 }
 
 int dataSample::getNumberOfElements()
@@ -26,37 +25,34 @@ void dataSample::printValuesToScreen()
 	std::cout << std::endl;
 }
 
-double dataSample::getMean()
+void checkIfNIsValid(int n)
 {
-	return firstMoment;
+	if(n == 0)
+		throw std::invalid_argument("The requested moment is not implemented yet!");
 }
 
-double dataSample::getVariance()
+double dataSample::calcNthMoment(int n)
 {
-	return ( secondMoment - pow(firstMoment,2.) );
+	checkIfNIsValid(n);
+	if ( n == 1)
+	{
+		return calcFirstMomentExplicit();
+	}
+	else
+	{
+		return calcNthMomentExplicit(n);
+	}
 }
 
-double dataSample::calcFirstMoment()
+double dataSample::calcNthMomentExplicit(int n)
+{
+	std::valarray<double> sampleToNthPower = std::pow(values, double(n));
+	return sampleToNthPower.sum() / numberOfElements;
+}
+
+double dataSample::calcFirstMomentExplicit()
 {
 	return values.sum() / numberOfElements;
-}
-
-double dataSample::calcSecondMoment()
-{
-	std::valarray<double> sampleSquared = std::pow(values, 2.0);
-	return sampleSquared.sum() / numberOfElements;
-}
-
-double dataSample::calcThirdMoment()
-{
-	std::valarray<double> sampleSquared = std::pow(values, 3.0);
-	return sampleSquared.sum() / numberOfElements;
-}
-
-double dataSample::calcFourthMoment()
-{
-	std::valarray<double> sampleSquared = std::pow(values, 4.0);
-	return sampleSquared.sum() / numberOfElements;
 }
 
 double dataSample::getFirstMoment()
@@ -77,4 +73,19 @@ double dataSample::getThirdMoment()
 double dataSample::getFourthMoment()
 {
 	return fourthMoment;
+}
+
+double dataSample::getMean()
+{
+	return firstMoment;
+}
+
+double dataSample::getVariance()
+{
+	return ( secondMoment - pow(firstMoment,2.) );
+}
+
+double dataSample::getNthMoment(int n)
+{
+	return calcNthMoment(n);
 }
