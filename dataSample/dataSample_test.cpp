@@ -44,7 +44,6 @@ std::valarray<double> makeValarrayWithOnes(int length)
 	return std::valarray<double>(1., length);
 }
 
-// mean: (length - 1)/2, variance: (length - 1)(2*length - 1)/6
 std::valarray<double> makeValarrayWithArrayPosition(int length)
 {
 	std::valarray<double> returnValarray(length);
@@ -55,7 +54,6 @@ std::valarray<double> makeValarrayWithArrayPosition(int length)
 	return returnValarray;
 }
 
-// mean: 0.5, variance: (2*length - 1)/6/(length - 1)
 std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
 {
 	std::valarray<double> returnValarray(length);
@@ -143,6 +141,46 @@ BOOST_AUTO_TEST_SUITE(secondMoment)
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 		double referenceValue = 0.340579710144927;
 		checkDataSampleSecondMoment(testValues, referenceValue);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(thirdMoment)
+
+	void checkDataSampleThirdMoment(std::valarray<double> valarrayIn, double referenceValue)
+	{
+		dataSample * dataSampleInstance;
+		dataSampleInstance = new dataSample(valarrayIn);
+		BOOST_REQUIRE(dataSampleInstance);
+		BOOST_CHECK_CLOSE(dataSampleInstance->getThirdMoment(), referenceValue, testPrecision);
+	}
+
+	BOOST_AUTO_TEST_CASE(thirdMoment1)
+	{
+		std::valarray<double> testValues = makeValarrayWithZeros(1);
+		double referenceValue = 0.;
+		checkDataSampleThirdMoment(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(thirdMoment2)
+	{
+		std::valarray<double> testValues = makeValarrayWithOnes(23);
+		double referenceValue = 1.;
+		checkDataSampleThirdMoment(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(thirdMoment3)
+	{
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+		double referenceValue = 3174.;
+		checkDataSampleThirdMoment(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(thirdMoment4)
+	{
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		double referenceValue = 0.260869565217391;
+		checkDataSampleThirdMoment(testValues, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

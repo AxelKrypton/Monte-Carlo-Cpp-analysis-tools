@@ -16,16 +16,19 @@ public:
 	double getMean();
 	double getVariance();
 	double getSecondMoment();
+	double getThirdMoment();
 
 private:
 	std::valarray<double> values;
 	//TODO: why can I not init this here? (gives iso... error)
 	double firstMoment;
 	double secondMoment;
+	double thirdMoment;
 	int numberOfElements;
 
 	double calcFirstMoment();
 	double calcSecondMoment();
+	double calcThirdMoment();
 	double calcVariance();
 };
 
