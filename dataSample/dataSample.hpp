@@ -13,7 +13,6 @@ class dataSample
 {
 public:
 	dataSample(std::valarray<double> valuesIn);
-	void printValuesToScreen();
 	int getNumberOfElements();
 	int getUpperLimitForNthMoment();
 	int getLowerLimitForNthMoment();

@@ -379,10 +379,3 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_CASE(printValuesToScreen)
-{
-	std::valarray<double> testValues(1);
-	dataSample dataSampleInstance(testValues);
-	dataSampleInstance.printValuesToScreen();
-}
-

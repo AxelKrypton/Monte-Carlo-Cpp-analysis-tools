@@ -29,15 +29,6 @@ int dataSample::getNumberOfElements()
 	return numberOfElements;
 }
 
-void dataSample::printValuesToScreen()
-{
-	for (int iteration = 0; iteration < numberOfElements; iteration ++)
-	{
-		std::cout << values[iteration] << "\t";
-	}
-	std::cout << std::endl;
-}
-
 void dataSample::checkIfNIsValid(int n)
 {
 	if(n < lowerLimitForNthMoment || n > upperLimitForNthMoment)
