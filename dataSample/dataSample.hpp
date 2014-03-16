@@ -6,6 +6,7 @@
 #define _dataSample_H_
 
 #include<valarray>
+#include<vector>
 #include<stdexcept>
 
 class dataSample
@@ -27,10 +28,7 @@ private:
 	void checkIfNIsValid(int n);
 
 	std::valarray<double> values;
-	double firstMoment;
-	double secondMoment;
-	double thirdMoment;
-	double fourthMoment;
+	std::vector<double> moments;
 	int numberOfElements;
 	const static int upperLimitForNthMoment = 4;
 	const static int lowerLimitForNthMoment = 0;

@@ -5,10 +5,13 @@ dataSample::dataSample(std::valarray<double> valuesIn)
 {
 	values = valuesIn;
 	numberOfElements = values.size();
-	firstMoment = calcNthMoment(1);
-	secondMoment = calcNthMoment(2);
-	thirdMoment = calcNthMoment(3);
-	fourthMoment = calcNthMoment(4);
+	int j = upperLimitForNthMoment - lowerLimitForNthMoment + 1;
+	moments = std::vector<double>(j,0);
+	//todo: calc moments on demand...
+	for (int i = 0; i < moments.size(); i++)
+	{
+		moments[i] = calcNthMoment(i);
+	}
 }
 
 int dataSample::getNumberOfElements()
@@ -33,8 +36,6 @@ void dataSample::checkIfNIsValid(int n)
 
 double dataSample::calcNthMoment(int n)
 {
-	//todo: return member variables if already calculated...
-	checkIfNIsValid(n);
 	if ( n == 1)
 	{
 		return calcFirstMomentExplicit();
@@ -58,17 +59,18 @@ double dataSample::calcFirstMomentExplicit()
 
 double dataSample::getMean()
 {
-	return firstMoment;
+	return getNthMoment(1);
 }
 
 double dataSample::getVariance()
 {
-	return ( secondMoment - pow(firstMoment,2.) );
+	return ( getNthMoment(2) - pow(getNthMoment(1),2.) );
 }
 
 double dataSample::getNthMoment(int n)
 {
-	return calcNthMoment(n);
+	checkIfNIsValid(n);
+	return moments[n];
 }
 
 int dataSample::getUpperLimitForNthMoment()
