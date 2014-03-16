@@ -1,14 +1,16 @@
 #include<iostream>
 #include "dataSample.hpp"
 
-DataSample::DataSample()
+DataSample::DataSample(bool isJackknifeSample):
+	isJackknifeSample(isJackknifeSample)
 {
 	values = std::valarray<double>(defaultSizeOfDataSample);
 	numberOfElements = values.size();
 	initMoments();
 }
 
-DataSample::DataSample(std::valarray<double> valuesIn)
+DataSample::DataSample(std::valarray<double> valuesIn, bool isJackknifeSample):
+	isJackknifeSample(isJackknifeSample)
 {
 	values = valuesIn;
 	numberOfElements = values.size();
@@ -158,7 +160,7 @@ DataSample DataSample::createJackknifeEstimators()
 	int normalization = numberOfElements - 1;
 	double sumOfDataSampleElements = values.sum();
 	std::valarray<double> jackknifeEstimators = (sumOfDataSampleElements - values) / normalization;
-	DataSample dataSample(jackknifeEstimators);
+	DataSample dataSample(jackknifeEstimators, true);
 	return dataSample;
 }
 
@@ -169,10 +171,14 @@ DataSample DataSample::applyFunction(double (*function)(double))
 	return dataSample;
 }
 
-double DataSample::getJackknifeVariance()
+void DataSample::checkIfSampleIsJackknifeSample()
 {
-	bool isJackknifeSample = false;
 	if ( ! isJackknifeSample )
 		throw std::logic_error("DataSample is not based on jackknife estimate!");
-	return 0;
+}
+
+double DataSample::getJackknifeVariance()
+{
+	checkIfSampleIsJackknifeSample();
+	return 0.;
 }

@@ -674,20 +674,21 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 		int numberOfElements = 53;
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
 		DataSample sample(testValues);
-//		DataSample jackknifeSample = sample.createJackknifeEstimators();
 		DataSample sampleFromFunction = sample.applyFunction(square);
 		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample.getNthMoment(2), testPrecision);
 	}
 
 	BOOST_AUTO_TEST_CASE(jackknifeVariance1)
 	{
-		int numberOfElements = 71;
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		DataSample sample(testValues);
+		DataSample sample;
 		BOOST_REQUIRE_THROW(sample.getJackknifeVariance(), std::logic_error);
-//		DataSample jackknifeSample = sample.createJackknifeEstimators();
-//		DataSample sampleFromFunction = jackknifeSample.applyFunction(square);
-//		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), jackknifeSample.getNthMoment(2), testPrecision);
+	}
+
+	BOOST_AUTO_TEST_CASE(jackknifeVariance2)
+	{
+		DataSample sample;
+		DataSample jackknifeSample = sample.createJackknifeEstimators();
+		BOOST_CHECK_NO_THROW(jackknifeSample.getJackknifeVariance());
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

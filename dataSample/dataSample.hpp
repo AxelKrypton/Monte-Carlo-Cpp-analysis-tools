@@ -12,8 +12,8 @@
 class DataSample
 {
 public:
-	DataSample();
-	DataSample(std::valarray<double> valuesIn);
+	DataSample(bool isJackknifeSample = false);
+	DataSample(std::valarray<double> valuesIn, bool isJackknifeSample = false);
 	int getNumberOfElements();
 	int getUpperLimitForNthMoment();
 	int getLowerLimitForNthMoment();
@@ -38,6 +38,7 @@ private:
 	void checkIfNumberOfBinsIsValid(int numberOfBins);
 	void checkIfBinsizeIsValid(int binsize);
 	void checkIfNumberOfElementsIsValid();
+	void checkIfSampleIsJackknifeSample();
 	int calcBinsize(int numberOfBins);
 	int calcNumberOfBins(int binsize);
 	void initMoments();
@@ -50,6 +51,7 @@ private:
 	std::valarray<double> values;
 	std::vector<double> moments;
 	int numberOfElements;
+	bool isJackknifeSample;
 	const static int upperLimitForNthMoment = 4;
 	const static int lowerLimitForNthMoment = 0;
 	const static int defaultSizeOfDataSample = 1;
