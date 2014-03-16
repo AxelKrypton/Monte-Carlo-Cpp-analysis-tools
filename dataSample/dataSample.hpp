@@ -12,6 +12,7 @@
 class dataSample
 {
 public:
+	dataSample();
 	dataSample(std::valarray<double> valuesIn);
 	int getNumberOfElements();
 	int getUpperLimitForNthMoment();
@@ -19,12 +20,14 @@ public:
 	double getMean();
 	double getVariance();
 	double getNthMoment(int n);
+	dataSample createBinnedDataSample(int numberOfBins);
 
 private:
 	double calcNthMoment(int n);
 	double calcNthMomentExplicit(int n);
 	double calcFirstMomentExplicit();
 	void checkIfNIsValid(int n);
+	void checkIfNumberOfBinsIsValid(int numberOfBins);
 	void initMoments();
 	int getNumberOfMoments();
 
@@ -33,6 +36,7 @@ private:
 	int numberOfElements;
 	const static int upperLimitForNthMoment = 4;
 	const static int lowerLimitForNthMoment = 0;
+	const static int defaultSizeOfDataSample = 1;
 };
 
 #endif

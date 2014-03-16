@@ -1,6 +1,13 @@
 #include<iostream>
 #include "dataSample.hpp"
 
+dataSample::dataSample()
+{
+	values = std::valarray<double>(defaultSizeOfDataSample);
+	numberOfElements = values.size();
+	initMoments();
+}
+
 dataSample::dataSample(std::valarray<double> valuesIn)
 {
 	values = valuesIn;
@@ -82,4 +89,17 @@ int dataSample::getUpperLimitForNthMoment()
 int dataSample::getLowerLimitForNthMoment()
 {
 	return lowerLimitForNthMoment;
+}
+
+dataSample dataSample::createBinnedDataSample(int numberOfBins)
+{
+	checkIfNumberOfBinsIsValid(numberOfBins);
+	dataSample dataSampleInstance;
+	return dataSampleInstance;
+}
+
+void dataSample::checkIfNumberOfBinsIsValid(int numberOfBins)
+{
+	if(numberOfBins == 0)
+		throw std::invalid_argument("Cannot perform binning with zero bins!");
 }
