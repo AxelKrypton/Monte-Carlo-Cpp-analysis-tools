@@ -27,7 +27,7 @@ void dataSample::printValuesToScreen()
 
 void checkIfNIsValid(int n)
 {
-	if(n == 0)
+	if(n < 0 || n > 4)
 		throw std::invalid_argument("The requested moment is not implemented yet!");
 }
 
@@ -88,4 +88,14 @@ double dataSample::getVariance()
 double dataSample::getNthMoment(int n)
 {
 	return calcNthMoment(n);
+}
+
+int dataSample::getUpperLimitForNthMoment()
+{
+	return upperLimitForNthMoment;
+}
+
+int dataSample::getLowerLimitForNthMoment()
+{
+	return lowerLimitForNthMoment;
 }

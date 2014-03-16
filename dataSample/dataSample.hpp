@@ -14,6 +14,8 @@ public:
 	dataSample(std::valarray<double> valuesIn);
 	void printValuesToScreen();
 	int getNumberOfElements();
+	int getUpperLimitForNthMoment();
+	int getLowerLimitForNthMoment();
 	double getMean();
 	double getVariance();
 	double getFirstMoment();
@@ -29,6 +31,8 @@ private:
 	double thirdMoment;
 	double fourthMoment;
 	int numberOfElements;
+	const static int upperLimitForNthMoment = 4;
+	const static int lowerLimitForNthMoment = 0;
 
 	double calcNthMoment(int n);
 	double calcNthMomentExplicit(int n);

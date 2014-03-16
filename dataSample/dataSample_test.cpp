@@ -90,6 +90,48 @@ protected:
 	const static double testPrecision = 10e-8;
 };
 
+BOOST_AUTO_TEST_SUITE(zerothMoment)
+
+	class TestDataSampleZerothMoment : public TestDataSample
+	{
+	public:
+		TestDataSampleZerothMoment(std::valarray<double> valarrayIn, double referenceValue) :
+			TestDataSample(valarrayIn, referenceValue)
+		{
+			actualValue = dataSampleInstance->getNthMoment(0);
+		};
+	};
+
+	BOOST_AUTO_TEST_CASE(ZerothMoment1)
+	{
+		std::valarray<double> testValues = makeValarrayWithZeros(1);
+		double referenceValue = 1.;
+		TestDataSampleZerothMoment tester(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(ZerothMoment2)
+	{
+		std::valarray<double> testValues = makeValarrayWithOnes(23);
+		double referenceValue = 1.;
+		TestDataSampleZerothMoment tester(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(ZerothMoment3)
+	{
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+		double referenceValue = 1.;
+		TestDataSampleZerothMoment tester(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(ZerothMoment4)
+	{
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		double referenceValue = 1.;
+		TestDataSampleZerothMoment tester(testValues, referenceValue);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 //todo: make add. tests for mean? This is the same as first moment...
 BOOST_AUTO_TEST_SUITE(firstMoment)
 
@@ -301,12 +343,41 @@ BOOST_AUTO_TEST_SUITE(variance)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_CASE(get0thMoment)
-{
-	std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
-	dataSample dataSampleInstance(testValues);
-	BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(0), std::invalid_argument);
-}
+BOOST_AUTO_TEST_SUITE(getNthMoment)
+
+	BOOST_AUTO_TEST_CASE(getNthMomentValidArgument1)
+	{
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		dataSample dataSampleInstance(testValues);
+		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
+		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(highestValueAllowed));
+	}
+
+	BOOST_AUTO_TEST_CASE(getNthMomentValidArgument2)
+	{
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		dataSample dataSampleInstance(testValues);
+		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
+		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed));
+	}
+
+	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument1)
+	{
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		dataSample dataSampleInstance(testValues);
+		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
+		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(highestValueAllowed + 1), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument2)
+	{
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		dataSample dataSampleInstance(testValues);
+		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
+		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed - 1), std::invalid_argument);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_CASE(printValuesToScreen)
 {
