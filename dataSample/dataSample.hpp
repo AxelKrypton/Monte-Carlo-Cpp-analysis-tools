@@ -35,6 +35,9 @@ private:
 	int calcNumberOfBins(int binsize);
 	void initMoments();
 	int getNumberOfMoments();
+	/**
+	 * Following Berg, p.52.
+	 */
 	dataSample performBinning(int numberOfBins, int binsize);
 
 	std::valarray<double> values;

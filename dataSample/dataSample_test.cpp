@@ -518,4 +518,83 @@ BOOST_AUTO_TEST_SUITE(binning)
 		BOOST_CHECK_EQUAL(expectedNumberOfElementsInBinnedDataSample, binnedSample.getNumberOfElements());
 	}
 
+	BOOST_AUTO_TEST_CASE(trivialBinning1)
+	{
+		int numberOfElements = 27;
+		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
+		BOOST_CHECK_EQUAL(originalSample.getNthMoment(1), binnedSample.getNthMoment(1));
+	}
+
+	BOOST_AUTO_TEST_CASE(trivialBinning2)
+	{
+		int numberOfElements = 27;
+		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
+		BOOST_CHECK_EQUAL(originalSample.getNthMoment(2), binnedSample.getNthMoment(2));
+	}
+
+	BOOST_AUTO_TEST_CASE(trivialBinning3)
+	{
+		int numberOfElements = 25;
+		int desiredBinsize = 1;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
+		BOOST_CHECK_EQUAL(originalSample.getNthMoment(2), binnedSample.getNthMoment(2));
+	}
+
+	BOOST_AUTO_TEST_CASE(binning1)
+	{
+		int evenNumberOfElements = 24;
+		int evenDesiredNumberOfElementsOfBinnedDataSample = 12;
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(evenNumberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(evenDesiredNumberOfElementsOfBinnedDataSample);
+		BOOST_CHECK_EQUAL(originalSample.getNthMoment(1), binnedSample.getNthMoment(1));
+	}
+
+	BOOST_AUTO_TEST_CASE(binning2)
+	{
+		int oddNumberOfElements = 25;
+		int evenDesiredNumberOfElementsOfBinnedDataSample = 12;
+		//The expected mean is the same as with numberOfElements = oddNumberOfElements - 1 as the last element falls away..
+		double expectedFirstMoment = 11.5;
+
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(oddNumberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(evenDesiredNumberOfElementsOfBinnedDataSample);
+		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
+	}
+
+	BOOST_AUTO_TEST_CASE(binning3)
+	{
+		int evenNumberOfElements = 26;
+		int oddDesiredNumberOfElementsOfBinnedDataSample = 11;
+		//The expected mean is the same as with numberOfElements = oddNumberOfElements - 4 as the four element falls away..
+		double expectedFirstMoment = 10.5;
+
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(evenNumberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(oddDesiredNumberOfElementsOfBinnedDataSample);
+		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
+	}
+
+	BOOST_AUTO_TEST_CASE(binning4)
+	{
+		int oddNumberOfElements = 29;
+		int oddDesiredNumberOfElementsOfBinnedDataSample = 9;
+		//The expected mean is the same as with numberOfElements = oddNumberOfElements - 2 as the two element falls away..
+		double expectedFirstMoment = 13.;
+
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(oddNumberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(oddDesiredNumberOfElementsOfBinnedDataSample);
+		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
+	}
+
 BOOST_AUTO_TEST_SUITE_END()

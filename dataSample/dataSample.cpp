@@ -106,6 +106,12 @@ dataSample dataSample::createBinnedDataSampleWithBinsize(int binsize)
 	return performBinning(numberOfBins, binsize);
 }
 
+void dataSample::checkIfNumberOfElementsIsValid()
+{
+	if(numberOfElements <= 0)
+		throw std::invalid_argument("Cannot create dataSample with zero or less elements!");
+}
+
 void dataSample::checkIfNumberOfBinsIsValid(int numberOfBins)
 {
 	if(numberOfBins <= 0)
@@ -137,14 +143,13 @@ int dataSample::calcNumberOfBins(int binsize)
 dataSample dataSample::performBinning(int numberOfBins, int binsize)
 {
   std::valarray<double> binnedDataSample(numberOfBins);
-//  for(int i=0; i<nbins; i++)
-//    binned_data[i]=mean_value(x[std::slice(i*binsize, binsize, 1)]);
+  for(int iteration = 0; iteration < numberOfBins; iteration++)
+  {
+	  std::valarray<double> sliceOfData = values[std::slice(iteration*binsize, binsize, 1)];
+	  dataSample temporarySample(sliceOfData);
+	  binnedDataSample[iteration] = temporarySample.getMean();
+  }
   dataSample dataSampleInstance(binnedDataSample);
   return dataSampleInstance;
 }
 
-void dataSample::checkIfNumberOfElementsIsValid()
-{
-	if(numberOfElements <= 0)
-		throw std::invalid_argument("Cannot create dataSample with zero or less elements!");
-}
