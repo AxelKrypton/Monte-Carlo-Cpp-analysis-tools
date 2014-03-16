@@ -153,3 +153,9 @@ dataSample dataSample::performBinning(int numberOfBins, int binsize)
   return dataSampleInstance;
 }
 
+dataSample dataSample::createJackknifeEstimators()
+{
+	std::valarray<double> jackknifeEstimators(numberOfElements);
+	dataSample dataSampleInstance(jackknifeEstimators);
+	return dataSampleInstance;
+}

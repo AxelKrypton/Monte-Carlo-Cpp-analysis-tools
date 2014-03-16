@@ -626,3 +626,17 @@ BOOST_AUTO_TEST_SUITE(binning)
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(jackknife)
+
+BOOST_AUTO_TEST_CASE(jackknifeElements)
+{
+	int numberOfElements = 37;
+	std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+	dataSample sample(testValues);
+	dataSample jackknifeSample = sample.createJackknifeEstimators();
+	BOOST_REQUIRE_EQUAL(sample.getNumberOfElements(), jackknifeSample.getNumberOfElements());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+

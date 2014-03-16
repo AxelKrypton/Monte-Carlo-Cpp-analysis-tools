@@ -22,6 +22,7 @@ public:
 	double getNthMoment(int n);
 	dataSample createBinnedDataSampleWithNumberOfBins(int numberOfBins);
 	dataSample createBinnedDataSampleWithBinsize(int binsize);
+	dataSample createJackknifeEstimators();
 
 private:
 	double calcNthMoment(int n);
