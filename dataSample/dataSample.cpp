@@ -91,15 +91,37 @@ int dataSample::getLowerLimitForNthMoment()
 	return lowerLimitForNthMoment;
 }
 
-dataSample dataSample::createBinnedDataSample(int numberOfBins)
+dataSample dataSample::createBinnedDataSampleWithNumberOfBins(int numberOfBins)
 {
 	checkIfNumberOfBinsIsValid(numberOfBins);
-	dataSample dataSampleInstance;
-	return dataSampleInstance;
+	int binsize = calcBinsize(numberOfBins);
+	return performBinning(numberOfBins, binsize);
 }
 
 void dataSample::checkIfNumberOfBinsIsValid(int numberOfBins)
 {
-	if(numberOfBins == 0)
-		throw std::invalid_argument("Cannot perform binning with zero bins!");
+	if(numberOfBins <= 0)
+		throw std::invalid_argument("Cannot perform binning with zero or less bins!");
 }
+
+int dataSample::calcBinsize(int numberOfBins)
+{
+	return numberOfElements / numberOfBins;
+}
+
+int dataSample::calcNumberOfBins(int binsize)
+{
+	if (numberOfElements % binsize != 0)
+		std::cout << "Warning: binsize is not a multiple of numberOfElements!" << std::endl;
+	return numberOfElements / binsize;
+}
+
+dataSample dataSample::performBinning(int numberOfBins, int binsize)
+{
+  std::valarray<double> binnedDataSample(numberOfBins);
+//  for(int i=0; i<nbins; i++)
+//    binned_data[i]=mean_value(x[std::slice(i*binsize, binsize, 1)]);
+  dataSample dataSampleInstance(binnedDataSample);
+  return dataSampleInstance;
+}
+

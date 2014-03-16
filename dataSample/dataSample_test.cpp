@@ -7,28 +7,6 @@
 
 double testPrecision = 10e-8;
 
-BOOST_AUTO_TEST_CASE(build)
-{
-	std::valarray<double> testValues(1);
-
-	//TODO: check difference between this allocation and x = dataSample(asdf);
-	dataSample * dataSampleInstance;
-	dataSampleInstance = new dataSample(testValues);
-	BOOST_REQUIRE(dataSampleInstance);
-}
-
-BOOST_AUTO_TEST_CASE(elements)
-{
-	int elementsOfTestArray = 17;
-	std::valarray<double> testValues(elementsOfTestArray);
-
-	dataSample * dataSampleInstance;
-	dataSampleInstance = new dataSample(testValues);
-	int elementsOfDataSample = dataSampleInstance->getNumberOfElements();
-	//todo: replace with int comparision
-	BOOST_CHECK_CLOSE(float(elementsOfDataSample), float(elementsOfTestArray), testPrecision);
-}
-
 /**
  * Arrays filled with constants have a mean equal to the constant and zero variance.
  * Arrays proportional to sums over the iteration variable can be evaluated using the triangular numbers,
@@ -89,6 +67,39 @@ protected:
 	double actualValue;
 	const static double testPrecision = 10e-8;
 };
+
+
+BOOST_AUTO_TEST_SUITE(build)
+
+	BOOST_AUTO_TEST_CASE(build1)
+	{
+		std::valarray<double> testValues(1);
+
+		//TODO: check difference between this allocation and x = dataSample(asdf);
+		dataSample * dataSampleInstance;
+		dataSampleInstance = new dataSample(testValues);
+		BOOST_REQUIRE(dataSampleInstance);
+	}
+
+	BOOST_AUTO_TEST_CASE(build2)
+	{
+		dataSample defaultDataSample;
+		BOOST_CHECK_EQUAL(defaultDataSample.getNumberOfElements(), 1);
+	}
+
+	BOOST_AUTO_TEST_CASE(elements)
+	{
+		int elementsOfTestArray = 17;
+		std::valarray<double> testValues(elementsOfTestArray);
+
+		dataSample * dataSampleInstance;
+		dataSampleInstance = new dataSample(testValues);
+		int elementsOfDataSample = dataSampleInstance->getNumberOfElements();
+		//todo: replace with int comparision
+		BOOST_CHECK_CLOSE(float(elementsOfDataSample), float(elementsOfTestArray), testPrecision);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(zerothMoment)
 
@@ -381,12 +392,40 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(binning)
 
-	BOOST_AUTO_TEST_CASE(binningWrongArgument)
+	BOOST_AUTO_TEST_CASE(binningWrongArgument1)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 		dataSample originalSample(testValues);
 		int numberOfBins = 0;
-		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSample(numberOfBins), std::invalid_argument);
+		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithNumberOfBins(numberOfBins), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(binningWrongArgument2)
+	{
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		dataSample originalSample(testValues);
+		int numberOfBins = -1000;
+		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithNumberOfBins(numberOfBins), std::invalid_argument);
+	}
+
+	//todo: add test to check warning in case number of bins is not a multiple of number of elements?
+
+	BOOST_AUTO_TEST_CASE(trivialBinning1)
+	{
+		int numberOfElements = 24;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(numberOfElements);
+		BOOST_CHECK_EQUAL(originalSample.getNumberOfElements(), binnedSample.getNumberOfElements());
+	}
+
+	BOOST_AUTO_TEST_CASE(trivialBinning2)
+	{
+		int numberOfElements = 24;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		dataSample originalSample(testValues);
+		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(numberOfElements/2);
+		BOOST_CHECK_EQUAL(numberOfElements/2, binnedSample.getNumberOfElements());
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

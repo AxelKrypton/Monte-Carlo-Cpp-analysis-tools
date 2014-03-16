@@ -20,7 +20,7 @@ public:
 	double getMean();
 	double getVariance();
 	double getNthMoment(int n);
-	dataSample createBinnedDataSample(int numberOfBins);
+	dataSample createBinnedDataSampleWithNumberOfBins(int numberOfBins);
 
 private:
 	double calcNthMoment(int n);
@@ -28,8 +28,11 @@ private:
 	double calcFirstMomentExplicit();
 	void checkIfNIsValid(int n);
 	void checkIfNumberOfBinsIsValid(int numberOfBins);
+	int calcBinsize(int numberOfBins);
+	int calcNumberOfBins(int binsize);
 	void initMoments();
 	int getNumberOfMoments();
+	dataSample performBinning(int numberOfBins, int binsize);
 
 	std::valarray<double> values;
 	std::vector<double> moments;
