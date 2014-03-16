@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_SUITE(firstMoment)
 		TestDataSampleFirstMoment(std::valarray<double> valarrayIn, double referenceValue) :
 			TestDataSample(valarrayIn, referenceValue)
 		{
-			actualValue = dataSampleInstance->getFirstMoment();
+			actualValue = dataSampleInstance->getNthMoment(1);
 		};
 	};
 
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_SUITE(secondMoment)
 		TestDataSampleSecondMoment(std::valarray<double> valarrayIn, double referenceValue) :
 			TestDataSample(valarrayIn, referenceValue)
 		{
-			actualValue = dataSampleInstance->getSecondMoment();
+			actualValue = dataSampleInstance->getNthMoment(2);
 		};
 	};
 
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_SUITE(thirdMoment)
 		TestDataSampleThirdMoment(std::valarray<double> valarrayIn, double referenceValue) :
 			TestDataSample(valarrayIn, referenceValue)
 		{
-			actualValue = dataSampleInstance->getThirdMoment();
+			actualValue = dataSampleInstance->getNthMoment(3);
 		};
 	};
 
@@ -267,7 +267,7 @@ BOOST_AUTO_TEST_SUITE(fourthMoment)
 		TestDataSampleFourthMoment(std::valarray<double> valarrayIn, double referenceValue) :
 			TestDataSample(valarrayIn, referenceValue)
 		{
-			actualValue = dataSampleInstance->getFourthMoment();
+			actualValue = dataSampleInstance->getNthMoment(4);
 		};
 	};
 

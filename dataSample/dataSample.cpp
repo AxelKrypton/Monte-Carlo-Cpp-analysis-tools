@@ -25,14 +25,15 @@ void dataSample::printValuesToScreen()
 	std::cout << std::endl;
 }
 
-void checkIfNIsValid(int n)
+void dataSample::checkIfNIsValid(int n)
 {
-	if(n < 0 || n > 4)
+	if(n < lowerLimitForNthMoment || n > upperLimitForNthMoment)
 		throw std::invalid_argument("The requested moment is not implemented yet!");
 }
 
 double dataSample::calcNthMoment(int n)
 {
+	//todo: return member variables if already calculated...
 	checkIfNIsValid(n);
 	if ( n == 1)
 	{
@@ -53,26 +54,6 @@ double dataSample::calcNthMomentExplicit(int n)
 double dataSample::calcFirstMomentExplicit()
 {
 	return values.sum() / numberOfElements;
-}
-
-double dataSample::getFirstMoment()
-{
-	return firstMoment;
-}
-
-double dataSample::getSecondMoment()
-{
-	return secondMoment;
-}
-
-double dataSample::getThirdMoment()
-{
-	return thirdMoment;
-}
-
-double dataSample::getFourthMoment()
-{
-	return fourthMoment;
 }
 
 double dataSample::getMean()

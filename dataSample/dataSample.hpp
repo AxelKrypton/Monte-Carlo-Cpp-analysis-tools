@@ -18,13 +18,14 @@ public:
 	int getLowerLimitForNthMoment();
 	double getMean();
 	double getVariance();
-	double getFirstMoment();
-	double getSecondMoment();
-	double getThirdMoment();
-	double getFourthMoment();
 	double getNthMoment(int n);
 
 private:
+	double calcNthMoment(int n);
+	double calcNthMomentExplicit(int n);
+	double calcFirstMomentExplicit();
+	void checkIfNIsValid(int n);
+
 	std::valarray<double> values;
 	double firstMoment;
 	double secondMoment;
@@ -33,10 +34,6 @@ private:
 	int numberOfElements;
 	const static int upperLimitForNthMoment = 4;
 	const static int lowerLimitForNthMoment = 0;
-
-	double calcNthMoment(int n);
-	double calcNthMomentExplicit(int n);
-	double calcFirstMomentExplicit();
 };
 
 #endif
