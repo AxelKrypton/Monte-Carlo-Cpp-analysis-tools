@@ -49,7 +49,7 @@ public:
 		referenceValue(referenceValue)
 	{
 		//todo: need delete here?
-		dataSampleInstance = new dataSample(valarrayIn);
+		dataSampleInstance = new DataSample(valarrayIn);
 	}
 
 	~TestDataSample()
@@ -62,7 +62,7 @@ protected:
 		BOOST_CHECK_CLOSE(actualValue, referenceValue, testPrecision);
 	}
 
-	dataSample * dataSampleInstance;
+	DataSample * dataSampleInstance;
 	double referenceValue;
 	double actualValue;
 	const static double testPrecision = 10e-8;
@@ -75,14 +75,14 @@ BOOST_AUTO_TEST_SUITE(build)
 		std::valarray<double> testValues(1);
 
 		//TODO: check difference between this allocation and x = dataSample(asdf);
-		dataSample * dataSampleInstance;
-		dataSampleInstance = new dataSample(testValues);
+		DataSample * dataSampleInstance;
+		dataSampleInstance = new DataSample(testValues);
 		BOOST_REQUIRE(dataSampleInstance);
 	}
 
 	BOOST_AUTO_TEST_CASE(build2)
 	{
-		dataSample defaultDataSample;
+		DataSample defaultDataSample;
 		BOOST_CHECK_EQUAL(defaultDataSample.getNumberOfElements(), 1);
 	}
 
@@ -91,8 +91,8 @@ BOOST_AUTO_TEST_SUITE(build)
 		int elementsOfTestArray = 17;
 		std::valarray<double> testValues(elementsOfTestArray);
 
-		dataSample * dataSampleInstance;
-		dataSampleInstance = new dataSample(testValues);
+		DataSample * dataSampleInstance;
+		dataSampleInstance = new DataSample(testValues);
 		int elementsOfDataSample = dataSampleInstance->getNumberOfElements();
 		BOOST_CHECK_EQUAL(elementsOfTestArray, elementsOfDataSample);
 	}
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_SUITE(build)
 	{
 		int elementsOfTestArray = 0;
 		std::valarray<double> testValues(elementsOfTestArray);
-		BOOST_REQUIRE_THROW(dataSample dataSampleInstance(testValues), std::invalid_argument);
+		BOOST_REQUIRE_THROW(DataSample dataSampleInstance(testValues), std::invalid_argument);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -364,7 +364,7 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 	BOOST_AUTO_TEST_CASE(getNthMomentValidArgument1)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
-		dataSample dataSampleInstance(testValues);
+		DataSample dataSampleInstance(testValues);
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(highestValueAllowed));
 	}
@@ -372,7 +372,7 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 	BOOST_AUTO_TEST_CASE(getNthMomentValidArgument2)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
-		dataSample dataSampleInstance(testValues);
+		DataSample dataSampleInstance(testValues);
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed));
 	}
@@ -380,7 +380,7 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument1)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
-		dataSample dataSampleInstance(testValues);
+		DataSample dataSampleInstance(testValues);
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(highestValueAllowed + 1), std::invalid_argument);
 	}
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument2)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
-		dataSample dataSampleInstance(testValues);
+		DataSample dataSampleInstance(testValues);
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed - 1), std::invalid_argument);
 	}
@@ -410,16 +410,16 @@ BOOST_AUTO_TEST_SUITE(binning)
 	void testBinningWithNumberOfBins(int numberOfElements, int numberOfBins, double expectedFirstMoment)
 	{
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		dataSample originalSample(testValues);
-		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+		DataSample originalSample(testValues);
+		DataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
 	}
 
 	void testBinningWithBinsize(int numberOfElements, int binsize, double expectedFirstMoment)
 	{
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		dataSample originalSample(testValues);
-		dataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(binsize);
+		DataSample originalSample(testValues);
+		DataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(binsize);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
 	}
 
@@ -427,8 +427,8 @@ BOOST_AUTO_TEST_SUITE(binning)
 	{
 		int numberOfBins = numberOfElements / desiredNumberOfElementsOfBinnedDataSample;
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		dataSample originalSample(testValues);
-		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
+		DataSample originalSample(testValues);
+		DataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
 		BOOST_CHECK_EQUAL(desiredNumberOfElementsOfBinnedDataSample, binnedSample.getNumberOfElements());
 	}
 
@@ -436,22 +436,22 @@ BOOST_AUTO_TEST_SUITE(binning)
 	{
 		int expectedNumberOfElementsInBinnedDataSample = numberOfElements / desiredBinsize;
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		dataSample originalSample(testValues);
-		dataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
+		DataSample originalSample(testValues);
+		DataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
 		BOOST_CHECK_EQUAL(expectedNumberOfElementsInBinnedDataSample, binnedSample.getNumberOfElements());
 	}
 
 	void testBinningWithNumberOfBins_wrongArgument(int numberOfElements, int numberOfBins)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		dataSample originalSample(testValues);
+		DataSample originalSample(testValues);
 		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithNumberOfBins(numberOfBins), std::invalid_argument);
 	}
 
 	void testBinningWithBinsize_wrongArgument(int numberOfElements, int binsize)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		dataSample originalSample(testValues);
+		DataSample originalSample(testValues);
 		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithBinsize(binsize), std::invalid_argument);
 	}
 
@@ -544,8 +544,8 @@ BOOST_AUTO_TEST_SUITE(binning)
 		int numberOfElements = 27;
 		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements;
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		dataSample originalSample(testValues);
-		dataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
+		DataSample originalSample(testValues);
+		DataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
 		BOOST_CHECK_EQUAL(originalSample.getNthMoment(1), binnedSample.getNthMoment(1));
 		BOOST_CHECK_EQUAL(originalSample.getNthMoment(2), binnedSample.getNthMoment(2));
 	}
@@ -555,8 +555,8 @@ BOOST_AUTO_TEST_SUITE(binning)
 		int numberOfElements = 25;
 		int desiredBinsize = 1;
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		dataSample originalSample(testValues);
-		dataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
+		DataSample originalSample(testValues);
+		DataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
 		BOOST_CHECK_EQUAL(originalSample.getNthMoment(2), binnedSample.getNthMoment(2));
 		BOOST_CHECK_EQUAL(originalSample.getNthMoment(2), binnedSample.getNthMoment(2));
 	}
@@ -629,14 +629,14 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(jackknife)
 
-BOOST_AUTO_TEST_CASE(jackknifeElements)
-{
-	int numberOfElements = 37;
-	std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-	dataSample sample(testValues);
-	dataSample jackknifeSample = sample.createJackknifeEstimators();
-	BOOST_REQUIRE_EQUAL(sample.getNumberOfElements(), jackknifeSample.getNumberOfElements());
-}
+	BOOST_AUTO_TEST_CASE(jackknifeElements)
+	{
+		int numberOfElements = 37;
+		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
+		DataSample sample(testValues);
+		DataSample jackknifeSample = sample.createJackknifeEstimators();
+		BOOST_REQUIRE_EQUAL(sample.getNumberOfElements(), jackknifeSample.getNumberOfElements());
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 

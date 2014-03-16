@@ -9,20 +9,20 @@
 #include<vector>
 #include<stdexcept>
 
-class dataSample
+class DataSample
 {
 public:
-	dataSample();
-	dataSample(std::valarray<double> valuesIn);
+	DataSample();
+	DataSample(std::valarray<double> valuesIn);
 	int getNumberOfElements();
 	int getUpperLimitForNthMoment();
 	int getLowerLimitForNthMoment();
 	double getMean();
 	double getVariance();
 	double getNthMoment(int n);
-	dataSample createBinnedDataSampleWithNumberOfBins(int numberOfBins);
-	dataSample createBinnedDataSampleWithBinsize(int binsize);
-	dataSample createJackknifeEstimators();
+	DataSample createBinnedDataSampleWithNumberOfBins(int numberOfBins);
+	DataSample createBinnedDataSampleWithBinsize(int binsize);
+	DataSample createJackknifeEstimators();
 
 private:
 	double calcNthMoment(int n);
@@ -39,7 +39,7 @@ private:
 	/**
 	 * Following Berg, p.52.
 	 */
-	dataSample performBinning(int numberOfBins, int binsize);
+	DataSample performBinning(int numberOfBins, int binsize);
 
 	std::valarray<double> values;
 	std::vector<double> moments;
