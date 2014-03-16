@@ -5,13 +5,23 @@ dataSample::dataSample(std::valarray<double> valuesIn)
 {
 	values = valuesIn;
 	numberOfElements = values.size();
-	int j = upperLimitForNthMoment - lowerLimitForNthMoment + 1;
-	moments = std::vector<double>(j,0);
+	initMoments();
+}
+
+void dataSample::initMoments()
+{
+	int numberOfMoments = getNumberOfMoments();
+	moments = std::vector<double>(numberOfMoments,0);
 	//todo: calc moments on demand...
-	for (int i = 0; i < moments.size(); i++)
+	for (int iteration = 0; iteration < moments.size(); iteration++)
 	{
-		moments[i] = calcNthMoment(i);
+		moments[iteration] = calcNthMoment(iteration);
 	}
+}
+
+int dataSample::getNumberOfMoments()
+{
+	return upperLimitForNthMoment - lowerLimitForNthMoment + 1;
 }
 
 int dataSample::getNumberOfElements()

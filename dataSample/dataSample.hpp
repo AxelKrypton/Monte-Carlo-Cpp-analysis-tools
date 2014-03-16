@@ -26,6 +26,8 @@ private:
 	double calcNthMomentExplicit(int n);
 	double calcFirstMomentExplicit();
 	void checkIfNIsValid(int n);
+	void initMoments();
+	int getNumberOfMoments();
 
 	std::valarray<double> values;
 	std::vector<double> moments;
