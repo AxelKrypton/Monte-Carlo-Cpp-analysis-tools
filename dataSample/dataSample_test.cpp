@@ -64,43 +64,66 @@ std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
 	return returnValarray;
 }
 
+class TestDataSample
+{
+public:
+	TestDataSample(std::valarray<double> valarrayIn, double referenceValue):
+		referenceValue(referenceValue)
+	{
+		dataSampleInstance = new dataSample(valarrayIn);
+	}
+protected:
+	virtual void testSpecificProperty() = 0;
+
+	dataSample * dataSampleInstance;
+	double referenceValue;
+	const static double testPrecision = 10e-8;
+};
+
 //todo: make add. tests for first moment? This is the same as mean...
 BOOST_AUTO_TEST_SUITE(mean)
 
-	void checkDataSampleMean(std::valarray<double> valarrayIn, double referenceValue)
+	class TestDataSampleMean : public TestDataSample
 	{
-		dataSample * dataSampleInstance;
-		dataSampleInstance = new dataSample(valarrayIn);
-		BOOST_REQUIRE(dataSampleInstance);
-		BOOST_CHECK_CLOSE(dataSampleInstance->getMean(), referenceValue, testPrecision);
-	}
+	public:
+		TestDataSampleMean(std::valarray<double> valarrayIn, double referenceValue) :
+			TestDataSample(valarrayIn, referenceValue)
+		{
+			testSpecificProperty();
+		};
+
+		virtual void testSpecificProperty()
+		{
+			BOOST_CHECK_CLOSE(dataSampleInstance->getMean(), referenceValue, testPrecision);
+		}
+	};
 
 	BOOST_AUTO_TEST_CASE(mean1)
 	{
 		std::valarray<double> testValues = makeValarrayWithZeros(1);
 		double referenceValue = 0.;
-		checkDataSampleMean(testValues, referenceValue);
+		TestDataSampleMean tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(mean2)
 	{
 		std::valarray<double> testValues = makeValarrayWithOnes(23);
 		double referenceValue = 1.;
-		checkDataSampleMean(testValues, referenceValue);
+		TestDataSampleMean tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(mean3)
 	{
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
 		double referenceValue = 11.5;
-		checkDataSampleMean(testValues, referenceValue);
+		TestDataSampleMean tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(mean4)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 		double referenceValue = 0.5;
-		checkDataSampleMean(testValues, referenceValue);
+		TestDataSampleMean tester(testValues, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -222,7 +245,6 @@ BOOST_AUTO_TEST_SUITE(fourthMoment)
 		double referenceValue = 0.213103750582176;
 		checkDataSampleFourthMoment(testValues, referenceValue);
 	}
-
 
 BOOST_AUTO_TEST_SUITE_END()
 

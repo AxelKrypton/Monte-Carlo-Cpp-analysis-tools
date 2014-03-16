@@ -21,7 +21,6 @@ public:
 
 private:
 	std::valarray<double> values;
-	//TODO: why can I not init this here? (gives iso... error)
 	double firstMoment;
 	double secondMoment;
 	double thirdMoment;
