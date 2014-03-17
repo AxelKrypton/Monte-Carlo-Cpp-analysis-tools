@@ -52,6 +52,13 @@ public:
 		dataSampleInstance = new DataSample(valarrayIn);
 	}
 
+	TestDataSample(std::string dataFilename, double referenceValue, int column = 1):
+		referenceValue(referenceValue)
+	{
+		//todo: need delete here?
+		dataSampleInstance = new DataSample(dataFilename, column);
+	}
+
 	~TestDataSample()
 	{
 		testActualValueAgainstReferenceValue();
@@ -108,6 +115,12 @@ BOOST_AUTO_TEST_SUITE(build)
 	{
 		std::string fileThatHasOnlyOneColumn = "datafile.example";
 		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatHasOnlyOneColumn, 2), std::runtime_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(build7)
+	{
+		std::string fileThatHasTwoColumns = "datafileWithTwoColumns.example";
+		BOOST_CHECK_NO_THROW( DataSample dataSample(fileThatHasTwoColumns, 2));
 	}
 
 	BOOST_AUTO_TEST_CASE(elements1)
@@ -192,6 +205,12 @@ BOOST_AUTO_TEST_SUITE(firstMoment)
 		{
 			actualValue = dataSampleInstance->getNthMoment(1);
 		};
+
+		TestDataSampleFirstMoment(std::string dataFilename, double referenceValue, int column = 1) :
+			TestDataSample(dataFilename, referenceValue, column)
+		{
+			actualValue = dataSampleInstance->getNthMoment(1);
+		};
 	};
 
 	BOOST_AUTO_TEST_CASE(firstMoment1)
@@ -220,6 +239,27 @@ BOOST_AUTO_TEST_SUITE(firstMoment)
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 		double referenceValue = 0.5;
 		TestDataSampleFirstMoment tester(testValues, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(firstMoment5)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		double referenceValue = 0.56130529942755358;
+		TestDataSampleFirstMoment tester(fileThatDoesExist, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(firstMoment6)
+	{
+		std::string fileThatDoesExist = "datafileWithTwoColumns.example";
+		double referenceValue = 0.56130529942755358;
+		TestDataSampleFirstMoment tester(fileThatDoesExist, referenceValue, 2);
+	}
+
+	BOOST_AUTO_TEST_CASE(firstMoment7)
+	{
+		std::string fileThatDoesExist = "datafileWithTwoColumns.example";
+		double referenceValue = 1.;
+		TestDataSampleFirstMoment tester(fileThatDoesExist, referenceValue, 1);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
