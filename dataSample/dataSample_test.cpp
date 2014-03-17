@@ -669,7 +669,16 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 		return in * in;
 	}
 
-	BOOST_AUTO_TEST_CASE(applyFunction)
+	BOOST_AUTO_TEST_CASE(applyFunction1)
+	{
+		int numberOfElements = 53;
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
+		DataSample sample(testValues);
+		DataSample sampleFromFunction = sample.applyFunction();
+		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample.getNthMoment(1), testPrecision);
+	}
+
+	BOOST_AUTO_TEST_CASE(applyFunction2)
 	{
 		int numberOfElements = 53;
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
@@ -687,8 +696,35 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(jackknifeVariance2)
 	{
 		DataSample sample;
+		BOOST_REQUIRE_THROW(sample.createJackknifeEstimators(), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(jackknifeVariance3)
+	{
+		int numberOfElements = 43;
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
+		DataSample sample(testValues);
 		DataSample jackknifeSample = sample.createJackknifeEstimators();
 		BOOST_CHECK_NO_THROW(jackknifeSample.getJackknifeVariance());
+	}
+
+	double expectedValueForJackknifeVarianceBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
+	{
+		double secondMoment = sample.getNthMoment(2);
+		double firstMoment = sample.getNthMoment(1);
+		double prefactor = 1. / (numberOfElements - 1.);
+		return prefactor * ( secondMoment - pow(firstMoment, 2.) );
+	}
+
+	BOOST_AUTO_TEST_CASE(jackknifeVariance4)
+	{
+		int numberOfElements = 43;
+		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
+		DataSample sample(testValues);
+		DataSample jackknifeSample = sample.createJackknifeEstimators();
+		double jackknifeVariance = jackknifeSample.getJackknifeVariance();
+		double expectedValue = expectedValueForJackknifeVarianceBasedOnAnalyticExpression(sample, numberOfElements);
+		BOOST_CHECK_CLOSE(jackknifeVariance, expectedValue, testPrecision);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

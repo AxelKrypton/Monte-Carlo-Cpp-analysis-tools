@@ -2,12 +2,15 @@
  * Definition of the dataSample class
  */
 
-#ifndef _dataSample_H_
-#define _dataSample_H_
+#ifndef DATASAMPLE_HPP_
+#define DATASAMPLE_HPP_
 
 #include<valarray>
 #include<vector>
 #include<stdexcept>
+
+//TODO: move this to better place
+double defaultFunction(double in);
 
 class DataSample
 {
@@ -27,7 +30,7 @@ public:
 	 */
 	DataSample createJackknifeEstimators();
 	// todo: check again this construction
-	DataSample applyFunction(double (*function)(double));
+	DataSample applyFunction(double (*function)(double) = defaultFunction);
 	double getJackknifeVariance();
 
 private:
@@ -43,6 +46,7 @@ private:
 	int calcNumberOfBins(int binsize);
 	void initMoments();
 	int getNumberOfMoments();
+	int getJackknifeNormalization();
 	/**
 	 * Following Berg, p.52.
 	 */

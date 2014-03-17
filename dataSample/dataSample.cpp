@@ -155,9 +155,16 @@ DataSample DataSample::performBinning(int numberOfBins, int binsize)
   return dataSampleInstance;
 }
 
+int DataSample::getJackknifeNormalization()
+{
+	if(numberOfElements <= 1)
+		throw std::invalid_argument("Cannot create jackknifeEstimators from one or less elements!");
+	return numberOfElements - 1;
+}
+
 DataSample DataSample::createJackknifeEstimators()
 {
-	int normalization = numberOfElements - 1;
+	int normalization = getJackknifeNormalization();
 	double sumOfDataSampleElements = values.sum();
 	std::valarray<double> jackknifeEstimators = (sumOfDataSampleElements - values) / normalization;
 	DataSample dataSample(jackknifeEstimators, true);
@@ -180,5 +187,10 @@ void DataSample::checkIfSampleIsJackknifeSample()
 double DataSample::getJackknifeVariance()
 {
 	checkIfSampleIsJackknifeSample();
-	return 0.;
+	return ( getNthMoment(2) - pow(getNthMoment(1),2.) ) * (numberOfElements - 1.);
+}
+
+double defaultFunction(double in)
+{
+	return in;
 }
