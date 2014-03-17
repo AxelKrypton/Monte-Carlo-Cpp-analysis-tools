@@ -17,6 +17,7 @@ class DataSample
 public:
 	DataSample(bool isJackknifeSample = false);
 	DataSample(std::valarray<double> valuesIn, bool isJackknifeSample = false);
+	DataSample(std::string dataFilename, int column = 1, bool isJackknifeSample = false);
 	int getNumberOfElements();
 	int getUpperLimitForNthMoment();
 	int getLowerLimitForNthMoment();
@@ -29,7 +30,6 @@ public:
 	 * Following Berg, equation (2.160).
 	 */
 	DataSample createJackknifeEstimators();
-	// todo: check again this construction
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
 	double getJackknifeVariance();
 
@@ -42,8 +42,11 @@ private:
 	void checkIfBinsizeIsValid(int binsize);
 	void checkIfNumberOfElementsIsValid();
 	void checkIfSampleIsJackknifeSample();
+	void checkIfDatafileExists(std::string filename);
+	void checkIfColumnIsValid(int column);
 	int calcBinsize(int numberOfBins);
 	int calcNumberOfBins(int binsize);
+	void initMembers();
 	void initMoments();
 	int getNumberOfMoments();
 	int getJackknifeNormalization();
@@ -51,6 +54,7 @@ private:
 	 * Following Berg, p.52.
 	 */
 	DataSample performBinning(int numberOfBins, int binsize);
+	std::valarray<double> readDataFromFile(std::string filename, int column);
 
 	std::valarray<double> values;
 	std::vector<double> moments;

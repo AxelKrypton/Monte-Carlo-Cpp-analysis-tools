@@ -86,6 +86,30 @@ BOOST_AUTO_TEST_SUITE(build)
 		BOOST_CHECK_EQUAL(defaultDataSample.getNumberOfElements(), 1);
 	}
 
+	BOOST_AUTO_TEST_CASE(build3)
+	{
+		std::string fileThatDoesNotExist = "theFileThatShouldNotBe";
+		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatDoesNotExist), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(build4)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		BOOST_CHECK_NO_THROW( DataSample dataSample(fileThatDoesExist));
+	}
+
+	BOOST_AUTO_TEST_CASE(build5)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatDoesExist, 0), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(build6)
+	{
+		std::string fileThatHasOnlyOneColumn = "datafile.example";
+		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatHasOnlyOneColumn, 2), std::runtime_error);
+	}
+
 	BOOST_AUTO_TEST_CASE(elements1)
 	{
 		int elementsOfTestArray = 17;
@@ -102,6 +126,15 @@ BOOST_AUTO_TEST_SUITE(build)
 		int elementsOfTestArray = 0;
 		std::valarray<double> testValues(elementsOfTestArray);
 		BOOST_REQUIRE_THROW(DataSample dataSampleInstance(testValues), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(elements3)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		DataSample dataSample(fileThatDoesExist);
+		int linesInFile = 1005;
+		int numberOfElementsInDataSample = dataSample.getNumberOfElements();
+		BOOST_CHECK_EQUAL(linesInFile, numberOfElementsInDataSample);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

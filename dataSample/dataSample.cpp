@@ -1,18 +1,31 @@
 #include<iostream>
+#include<fstream>
+#include<sstream>
 #include "dataSample.hpp"
 
 DataSample::DataSample(bool isJackknifeSample):
 	isJackknifeSample(isJackknifeSample)
 {
 	values = std::valarray<double>(defaultSizeOfDataSample);
-	numberOfElements = values.size();
-	initMoments();
+	initMembers();
 }
 
 DataSample::DataSample(std::valarray<double> valuesIn, bool isJackknifeSample):
 	isJackknifeSample(isJackknifeSample)
 {
 	values = valuesIn;
+	initMembers();
+}
+
+DataSample::DataSample(std::string dataFilename, int column, bool isJackknifeSample):
+	isJackknifeSample(isJackknifeSample)
+{
+	values = readDataFromFile(dataFilename, column);
+	initMembers();
+}
+
+void DataSample::initMembers()
+{
 	numberOfElements = values.size();
 	checkIfNumberOfElementsIsValid();
 	initMoments();
@@ -130,6 +143,12 @@ void DataSample::checkIfBinsizeIsValid(int binsize)
 		throw std::invalid_argument("Cannot perform binning with binsize bigger than number of datapoints!");
 }
 
+void DataSample::checkIfColumnIsValid(int column)
+{
+	if(column <= 0)
+		throw std::invalid_argument("Numbers of columns must be bigger than zero!");
+}
+
 int DataSample::calcBinsize(int numberOfBins)
 {
 	return numberOfElements / numberOfBins;
@@ -142,6 +161,7 @@ int DataSample::calcNumberOfBins(int binsize)
 	return numberOfElements / binsize;
 }
 
+//todo: refactor
 DataSample DataSample::performBinning(int numberOfBins, int binsize)
 {
   std::valarray<double> binnedDataSample(numberOfBins);
@@ -162,6 +182,7 @@ int DataSample::getJackknifeNormalization()
 	return numberOfElements - 1;
 }
 
+//todo: refactor
 DataSample DataSample::createJackknifeEstimators()
 {
 	int normalization = getJackknifeNormalization();
@@ -193,4 +214,55 @@ double DataSample::getJackknifeVariance()
 double defaultFunction(double in)
 {
 	return in;
+}
+
+void DataSample::checkIfDatafileExists(std::string filename)
+{
+	std::ifstream file;
+	file.open(filename.c_str());
+	if ( !file.is_open() )
+		throw std::invalid_argument("Given file does not exist!");
+	file.close();
+}
+
+//todo: refactor, perhaps think about column numbering
+std::valarray<double> DataSample::readDataFromFile(std::string filename, int column)
+{
+	std::ifstream infile;
+	std::string line;
+	std::vector<double> data;
+	double aux;
+
+	checkIfDatafileExists(filename);
+	checkIfColumnIsValid(column);
+
+	infile.open(filename.c_str());
+
+	while (std::getline(infile, line))
+	{
+		if(line[0] != '#') //ignore lines beginning by # since they are comments for gnuplot
+		{
+			std::stringstream ss(line);
+			for(int i=0; i<column; i++)
+			{
+				if(ss >> aux)
+				{
+					if(i==column-1)
+						data.push_back(aux);
+				}
+				else
+				{
+					throw std::runtime_error("Error reading datafile");
+				}
+			}
+		}
+	}
+	//todo: this is not covered in a test yet...
+	if(!(infile.peek() == EOF && infile.eof()) || infile.bad())
+	{
+		throw std::runtime_error("Error reading datafile");
+	}
+	infile.close();
+
+	return std::valarray<double>(data.data(), data.size());
 }
