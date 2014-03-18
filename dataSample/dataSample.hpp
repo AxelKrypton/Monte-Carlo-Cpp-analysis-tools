@@ -32,6 +32,8 @@ public:
 	DataSample createJackknifeEstimators();
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
 	double getJackknifeVariance();
+	double getJackknifeVariance_v2();
+	double getJackknifeError();
 
 private:
 	double calcNthMoment(int n);

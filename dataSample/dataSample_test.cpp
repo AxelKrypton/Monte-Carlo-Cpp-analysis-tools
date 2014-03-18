@@ -5,7 +5,11 @@
 
 #include "dataSample.hpp"
 
-double testPrecision = 10e-8;
+// double should be correct up to 15 digits (at least)
+// this means two doubles should be the same up to 14 digits
+double doublePrecisionInPercent = 1e-12;
+
+#include <cfloat>
 
 /**
  * Arrays filled with constants have a mean equal to the constant and zero variance.
@@ -42,18 +46,33 @@ std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
 	return returnValarray;
 }
 
+std::valarray<double> makeValarrayWithEntriesBetweenOneAndEight(int length)
+{
+	if (length % 8 != 0)
+		throw std::invalid_argument("length must be multiple of 8!");
+	std::valarray<double> returnValarray(length);
+	for (int iteration = 0; iteration < 8; iteration ++)
+	{
+		for (int iteration2 = 0; iteration2 < length/8; iteration2 ++)
+		{
+			returnValarray[iteration + 8*iteration2] = (double(iteration+1));
+		}
+	}
+	return returnValarray;
+}
+
 class TestDataSample
 {
 public:
 	TestDataSample(std::valarray<double> valarrayIn, double referenceValue):
-		referenceValue(referenceValue)
+		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
 	{
 		//todo: need delete here?
 		dataSampleInstance = new DataSample(valarrayIn);
 	}
 
 	TestDataSample(std::string dataFilename, double referenceValue, int column = 1):
-		referenceValue(referenceValue)
+		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
 	{
 		//todo: need delete here?
 		dataSampleInstance = new DataSample(dataFilename, column);
@@ -72,15 +91,49 @@ protected:
 	DataSample * dataSampleInstance;
 	double referenceValue;
 	double actualValue;
-	const static double testPrecision = 10e-8;
+	double testPrecision;
 };
+
+BOOST_AUTO_TEST_SUITE(precision)
+
+	BOOST_AUTO_TEST_CASE(doublePrecision1)
+	{
+		int numberOfValidDigitsOnSystem = DBL_DIG; //from <cfloat>
+		int desiredNumberOfValidDigits = 15;
+		BOOST_REQUIRE_EQUAL(numberOfValidDigitsOnSystem,desiredNumberOfValidDigits );
+	}
+
+	BOOST_AUTO_TEST_CASE(doublePrecision2)
+	{
+		double numberCorrectUpTo15thDigit        = 1234567890123450e-15;
+		double anotherNumberCorrectUpTo15thDigit = 1234567890123452e-15;
+		BOOST_CHECK_CLOSE(numberCorrectUpTo15thDigit, anotherNumberCorrectUpTo15thDigit, doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(doublePrecision3)
+	{
+		double numberCorrectUpTo15thDigit        = 123456789012345.0;
+		double anotherNumberCorrectUpTo15thDigit = 123456789012345.2;
+		BOOST_CHECK_CLOSE(numberCorrectUpTo15thDigit, anotherNumberCorrectUpTo15thDigit, doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(doublePrecision4)
+	{
+		double twoThird = 2./3.;
+		double oneHalf = .5;
+		double oneThird = twoThird * oneHalf;
+		//                 digits:    1234567890123456
+		double oneThirdTo15thDigit = 3333333333333339e-16;
+		BOOST_CHECK_CLOSE(oneThird, oneThirdTo15thDigit, doublePrecisionInPercent);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(build1)
 	{
 		std::valarray<double> testValues(1);
-
 		//TODO: check difference between this allocation and x = dataSample(asdf);
 		DataSample * dataSampleInstance;
 		dataSampleInstance = new DataSample(testValues);
@@ -419,14 +472,14 @@ BOOST_AUTO_TEST_SUITE(variance)
 	BOOST_AUTO_TEST_CASE(variance3)
 	{
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
-		double referenceValue = 47.9166666667;
+		double referenceValue = 47.91666666666667;
 		TestDataSampleVariance tester(testValues, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(variance4)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
-		double referenceValue = 0.0905797101449;
+		double referenceValue = 0.0905797101449274;
 		TestDataSampleVariance tester(testValues, referenceValue);
 	}
 
@@ -734,7 +787,7 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 		DataSample sample(testValues);
 		DataSample jackknifeSample = sample.createJackknifeEstimators();
 		double expectedValue = calcExpectedValueForSecondMomentOfJackknifeEstimatorsBasedOnAnalyticExpression(sample, numberOfElements);
-		BOOST_CHECK_CLOSE(expectedValue, jackknifeSample.getNthMoment(2), testPrecision);
+		BOOST_CHECK_CLOSE(expectedValue, jackknifeSample.getNthMoment(2), doublePrecisionInPercent);
 	}
 
 	double square(double in)
@@ -748,7 +801,7 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
 		DataSample sample(testValues);
 		DataSample sampleFromFunction = sample.applyFunction();
-		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample.getNthMoment(1), testPrecision);
+		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample.getNthMoment(1), doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(applyFunction2)
@@ -757,7 +810,7 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
 		DataSample sample(testValues);
 		DataSample sampleFromFunction = sample.applyFunction(square);
-		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample.getNthMoment(2), testPrecision);
+		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample.getNthMoment(2), doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(jackknifeVariance1)
@@ -797,8 +850,89 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 		DataSample jackknifeSample = sample.createJackknifeEstimators();
 		double jackknifeVariance = jackknifeSample.getJackknifeVariance();
 		double expectedValue = expectedValueForJackknifeVarianceBasedOnAnalyticExpression(sample, numberOfElements);
-		BOOST_CHECK_CLOSE(jackknifeVariance, expectedValue, testPrecision);
+		BOOST_CHECK_CLOSE(jackknifeVariance, expectedValue, doublePrecisionInPercent);
 	}
+
+	BOOST_AUTO_TEST_CASE(jackknifeError1)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int binsize = 1;
+		DataSample sample(fileThatDoesExist);
+		DataSample binnedSample = sample.createBinnedDataSampleWithBinsize(binsize);
+		DataSample jackknifeSample = binnedSample.createJackknifeEstimators();
+		double expectedValue = 3.44121381077520906E-004;
+		BOOST_CHECK_CLOSE(jackknifeSample.getJackknifeError(), expectedValue, doublePrecisionInPercent);
+	}
+
+//	BOOST_AUTO_TEST_CASE(jackknifeError2)
+//	{
+//		std::string fileThatDoesExist = "datafile.example";
+//		int binsize = 100;
+//		DataSample sample(fileThatDoesExist);
+//		DataSample binnedSample = sample.createBinnedDataSampleWithBinsize(binsize);
+//		std::cout.precision(32);
+//		std::cout << binnedSample.getVariance() << std::endl;
+//		DataSample jackknifeSample = binnedSample.createJackknifeEstimators();
+//		double expectedValue = 1.15015003710525849E-003;
+//		BOOST_CHECK_CLOSE(jackknifeSample.getJackknifeError(), expectedValue, doublePrecisionInPercent);
+//	}
+
+	BOOST_AUTO_TEST_CASE(jackknifeError3)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int numberOfBins = 1005;
+		DataSample sample(fileThatDoesExist);
+		DataSample binnedSample = sample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+		DataSample jackknifeSample = binnedSample.createJackknifeEstimators();
+		double expectedValue = 3.44121381077520906E-004;
+		BOOST_CHECK_CLOSE(jackknifeSample.getJackknifeError(), expectedValue, doublePrecisionInPercent);
+	}
+
+//	BOOST_AUTO_TEST_CASE(jackknifeError4)
+//	{
+//		std::string fileThatDoesExist = "datafile.example";
+//		int numberOfBins = 10;
+//		DataSample sample(fileThatDoesExist);
+//		DataSample binnedSample = sample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+//		DataSample jackknifeSample = sample.createJackknifeEstimators();
+//		double expectedValue = 0.41152744587655254;//1.15015003710525849E-003;
+//		BOOST_CHECK_CLOSE(jackknifeSample.getJackknifeError(), expectedValue, testPrecision);
+//	}
+
+	//todo: fix this test!
+//	BOOST_AUTO_TEST_CASE(jackknifeVarianceError1)
+//	{
+//		int numberOfElements = 40;
+//		std::valarray<double> tmp = makeValarrayWithEntriesBetweenOneAndEight(numberOfElements);
+//		DataSample sample(tmp);
+//		DataSample binnedSample = sample.createBinnedDataSampleWithNumberOfBins(numberOfElements);
+//		std::cout.precision(20);
+//		std::cout << binnedSample.getVariance() << std::endl;
+//		DataSample jackknifeSample = binnedSample.createJackknifeEstimators();
+//
+//		std::cout << "v1:\t"<<jackknifeSample.getJackknifeError() << std::endl;
+//		std::cout << "v2:\t"<<sqrt(jackknifeSample.getJackknifeVariance_v2()) << std::endl;
+//		std::cout << "anl.\t" << expectedValueForJackknifeVarianceBasedOnAnalyticExpression(sample, numberOfElements) << std::endl;
+//		float d1 = 39.*(1./39./39. * (25.5 + 4.5*4.5  * ( 40.*40. - 2.*40.  ) ) - 4.5*4.5) ;
+//		double d2 = 39.*(1./39./39. * (25.5 + 4.5*4.5  * ( 40.*40. - 2.*40.  ) ) - 4.5*4.5) ;
+//		long double d3 = 39.*(1./39./39. * (25.5 + 4.5*4.5  * ( 40.*40. - 2.*40.  ) ) - 4.5*4.5) ;
+//		std::cout << "an2:\t"<< d1 << std::endl;
+//		std::cout << "an2:\t"<< d2 << std::endl;
+//		std::cout << "an2:\t"<< d3  << std::endl;
+//
+//		double expectedValue = sqrt(expectedValueForJackknifeVarianceBasedOnAnalyticExpression(sample, numberOfElements));
+//		double v1 = jackknifeSample.getJackknifeError();
+//		double v2 = sqrt(jackknifeSample.getJackknifeVariance_v2());
+//
+//		pbit(d2);
+//		pbit(expectedValue);
+//		pbit(v1);
+//		pbit(v2);
+//
+//		BOOST_CHECK_CLOSE(v1, expectedValue, 1e-14);
+//		BOOST_CHECK_CLOSE(v2, expectedValue, 1e-14);
+//	}
+
 
 BOOST_AUTO_TEST_SUITE_END()
 

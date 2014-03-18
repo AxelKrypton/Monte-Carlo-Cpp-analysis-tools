@@ -1,6 +1,7 @@
-#include<iostream>
-#include<fstream>
-#include<sstream>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <gmp.h>
 #include "dataSample.hpp"
 
 DataSample::DataSample(bool isJackknifeSample):
@@ -17,6 +18,7 @@ DataSample::DataSample(std::valarray<double> valuesIn, bool isJackknifeSample):
 	initMembers();
 }
 
+//todo: add offset parameter
 DataSample::DataSample(std::string dataFilename, int column, bool isJackknifeSample):
 	isJackknifeSample(isJackknifeSample)
 {
@@ -73,7 +75,7 @@ double DataSample::calcNthMoment(int n)
 double DataSample::calcNthMomentExplicit(int n)
 {
 	std::valarray<double> sampleToNthPower = std::pow(values, double(n));
-	return sampleToNthPower.sum() / numberOfElements;
+	return sampleToNthPower.sum() / (double) numberOfElements;
 }
 
 double DataSample::calcFirstMomentExplicit()
@@ -205,10 +207,22 @@ void DataSample::checkIfSampleIsJackknifeSample()
 		throw std::logic_error("DataSample is not based on jackknife estimate!");
 }
 
+//todo: examine why these two impl. give different results
 double DataSample::getJackknifeVariance()
 {
 	checkIfSampleIsJackknifeSample();
+	return (pow((values - getNthMoment(1)), 2.)).sum() * (numberOfElements  - 1.) / numberOfElements;
+}
+
+double DataSample::getJackknifeVariance_v2()
+{
+	checkIfSampleIsJackknifeSample();
 	return ( getNthMoment(2) - pow(getNthMoment(1),2.) ) * (numberOfElements - 1.);
+}
+
+double DataSample::getJackknifeError()
+{
+	return sqrt(getJackknifeVariance());
 }
 
 double defaultFunction(double in)
