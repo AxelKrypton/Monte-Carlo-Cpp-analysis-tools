@@ -26,8 +26,7 @@ public:
 	int getNumberOfElements();
 	int getUpperLimitForNthMoment();
 	int getLowerLimitForNthMoment();
-	double getMean();
-	double getNthCentralMoment();
+	double getNthCentralMoment(int n);
 	double getNthMoment(int n);
 	DataSample createBinnedDataSampleWithNumberOfBins(int numberOfBins);
 	DataSample createBinnedDataSampleWithBinsize(int binsize);
@@ -43,6 +42,7 @@ public:
 private:
 	double calcNthMoment(int n);
 	double calcNthMomentExplicit(int n);
+	double calcNthCentralMomentExplicit(int n);
 	double calcFirstMomentExplicit();
 	void checkIfNIsValid(int n);
 	void checkIfNumberOfBinsIsValid(int numberOfBins);

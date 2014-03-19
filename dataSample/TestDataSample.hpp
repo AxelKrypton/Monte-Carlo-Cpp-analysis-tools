@@ -43,7 +43,6 @@ std::valarray<double> makeValarrayWithBigAndSmallEntries(int length)
 	{
 		returnValarray[iteration*2] = (double(iteration)) / (length - 1) * 5e6;
 		returnValarray[iteration*2+1] = (double(iteration)) / (length - 1) * 5e-6;
-//		std::cout << returnValarray[iteration*2] << " " << returnValarray[iteration*2 +1] << std::endl;
 	}
 	return returnValarray;
 }
@@ -165,10 +164,10 @@ public:
 class TestDataSampleNthCentralMoment : public TestDataSample
 {
 public:
-	TestDataSampleNthCentralMoment(int length, FillType fillType, double referenceValue) :
+	TestDataSampleNthCentralMoment(int n, int length, FillType fillType, double referenceValue) :
 		TestDataSample(length, fillType, referenceValue)
 	{
-		actualValue = dataSampleInstance->getNthCentralMoment();
+		actualValue = dataSampleInstance->getNthCentralMoment(n);
 	};
 };
 

@@ -330,35 +330,64 @@ BOOST_AUTO_TEST_SUITE(fourthMoment)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(variance)
+BOOST_AUTO_TEST_SUITE(zerothCentralMoment)
 
-	BOOST_AUTO_TEST_CASE(variance1)
+	BOOST_AUTO_TEST_CASE(zerothCentralMoment1)
+	{
+		int numberOfElements = 1e3;
+		double referenceValue = 0.;
+		TestDataSampleNthCentralMoment tester(0, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(firstCentralMoment)
+
+	BOOST_AUTO_TEST_CASE(firstCentralMoment1)
+	{
+		int numberOfElements = 1e3;
+		double referenceValue = 0.;
+		TestDataSampleNthCentralMoment tester(1, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(secondCentralMoment)
+
+	BOOST_AUTO_TEST_CASE(secondCentralMoment1)
 	{
 		int numberOfElements = 1;
 		double referenceValue = 0.;
-		TestDataSampleNthCentralMoment tester(numberOfElements, zeros, referenceValue);
+		TestDataSampleNthCentralMoment tester(2, numberOfElements, zeros, referenceValue);
 	}
 
-	BOOST_AUTO_TEST_CASE(variance2)
+	BOOST_AUTO_TEST_CASE(secondCentralMoment2)
 	{
 		int numberOfElements = 23;
 		double referenceValue = 0.;
-		TestDataSampleNthCentralMoment tester(numberOfElements, ones, referenceValue);
+		TestDataSampleNthCentralMoment tester(2, numberOfElements, ones, referenceValue);
 	}
 
-	BOOST_AUTO_TEST_CASE(variance3)
+	BOOST_AUTO_TEST_CASE(secondCentralMoment3)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 47.91666666666667;
-		TestDataSampleNthCentralMoment tester(numberOfElements, arrayPosition, referenceValue);
+		TestDataSampleNthCentralMoment tester(2, numberOfElements, arrayPosition, referenceValue);
 	}
 
-	//todo: implement some tests with big numbers!
-	BOOST_AUTO_TEST_CASE(variance4)
+	BOOST_AUTO_TEST_CASE(secondCentralMoment4)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 0.0905797101449274;
-		TestDataSampleNthCentralMoment tester(numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
+		TestDataSampleNthCentralMoment tester(2, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
+	}
+
+	//todo: perhaps add tests where the values between 0 and 1 are repeated...
+	BOOST_AUTO_TEST_CASE(secondCentralMoment5)
+	{
+		int numberOfElements = 1e5;
+		double referenceValue = 0.0833350000166668;
+		TestDataSampleNthCentralMoment tester(2, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -394,6 +423,40 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(getNthCentralMoment)
+
+	BOOST_AUTO_TEST_CASE(getNthCentralMomentValidArgument1)
+	{
+		DataSample dataSampleInstance;
+		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
+		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthCentralMoment(highestValueAllowed));
+	}
+
+	BOOST_AUTO_TEST_CASE(getNthCentralMomentValidArgument2)
+	{
+		DataSample dataSampleInstance;
+		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
+		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthCentralMoment(lowestValueAllowed));
+	}
+
+	BOOST_AUTO_TEST_CASE(getNthCentralMomentInvalidArgument1)
+	{
+		DataSample dataSampleInstance;
+		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
+		BOOST_REQUIRE_THROW(dataSampleInstance.getNthCentralMoment(highestValueAllowed + 1), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(getNthCentralMomentInvalidArgument2)
+	{
+		DataSample dataSampleInstance;
+		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
+		BOOST_REQUIRE_THROW(dataSampleInstance.getNthCentralMoment(lowestValueAllowed - 1), std::invalid_argument);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+//todo: add tests for 3. and 4. central moments!
 
 BOOST_AUTO_TEST_SUITE(binning)
 

@@ -91,14 +91,22 @@ double DataSample::calcFirstMomentExplicit()
 	return values.sum() / numberOfElements;
 }
 
-double DataSample::getMean()
+double DataSample::getNthCentralMoment(int n)
 {
-	return getNthMoment(1);
+	if ( n == 0 || n == 1)
+	{
+		return 0.;
+	}
+	else
+	{
+		return calcNthCentralMomentExplicit(n);
+	}
 }
 
-double DataSample::getNthCentralMoment()
+double DataSample::calcNthCentralMomentExplicit(int n)
 {
-	return ( getNthMoment(2) - pow(getNthMoment(1),2.) );
+	checkIfNIsValid(n);
+	return (pow((values - getNthMoment(1)), 2.)).sum()  / numberOfElements;
 }
 
 double DataSample::getNthMoment(int n)
@@ -135,9 +143,9 @@ void DataSample::checkIfNumberOfElementsIsValid(int length)
 {
 	if(length <= 0)
 		throw std::invalid_argument("Cannot create dataSample with zero or less elements!");
+	//todo: think about better warning!
 	if(length > roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid)
 		std::cout << "Warning: the datasize is such that double precision may not be valid anymore (depending on the data)!" << std::endl;
-
 }
 
 void DataSample::checkIfNumberOfBinsIsValid(int numberOfBins)
@@ -182,7 +190,7 @@ DataSample DataSample::performBinning(int numberOfBins, int binsize)
   {
 	  std::valarray<double> sliceOfData = values[std::slice(iteration*binsize, binsize, 1)];
 	  DataSample temporarySample(sliceOfData);
-	  binnedDataSample[iteration] = temporarySample.getMean();
+	  binnedDataSample[iteration] = temporarySample.getNthMoment(1);
   }
   DataSample dataSampleInstance(binnedDataSample);
   return dataSampleInstance;
