@@ -3,24 +3,21 @@
 #include <sstream>
 #include "dataSample.hpp"
 
-DataSample::DataSample(int length, bool isJackknifeSample):
-	isJackknifeSample(isJackknifeSample)
+DataSample::DataSample(int length)
 {
 	checkIfNumberOfElementsIsValid(length);
 	values = std::valarray<double>(length);
 	initMembers();
 }
 
-DataSample::DataSample(std::valarray<double> valuesIn, bool isJackknifeSample):
-	isJackknifeSample(isJackknifeSample)
+DataSample::DataSample(std::valarray<double> valuesIn)
 {
 	values = valuesIn;
 	initMembers();
 	checkIfNumberOfElementsIsValid(numberOfElements);
 }
 
-DataSample::DataSample(std::string dataFilename, int column, int offset, bool isJackknifeSample):
-	isJackknifeSample(isJackknifeSample)
+DataSample::DataSample(std::string dataFilename, int column, int offset)
 {
 	values = readDataFromFile(dataFilename, column, offset);
 	initMembers();
@@ -208,7 +205,7 @@ DataSample DataSample::createJackknifeEstimators()
 	int normalization = getJackknifeNormalization();
 	double sumOfDataSampleElements = values.sum();
 	std::valarray<double> jackknifeEstimators = (sumOfDataSampleElements - values) / normalization;
-	DataSample dataSample(jackknifeEstimators, true);
+	DataSample dataSample(jackknifeEstimators);
 	return dataSample;
 }
 
@@ -219,26 +216,18 @@ DataSample DataSample::applyFunction(double (*function)(double))
 	return dataSample;
 }
 
-void DataSample::checkIfSampleIsJackknifeSample()
-{
-	if ( ! isJackknifeSample )
-		throw std::logic_error("DataSample is not based on jackknife estimate!");
-}
-
 //todo: examine why these two impl. give different results
-double DataSample::getJackknifeVariance()
+double JackknifeDataSample::getJackknifeVariance()
 {
-	checkIfSampleIsJackknifeSample();
 	return (pow((values - getNthMoment(1)), 2.)).sum() * (numberOfElements  - 1.) / numberOfElements;
 }
 
-double DataSample::getJackknifeVariance_v2()
+double JackknifeDataSample::getJackknifeVariance_v2()
 {
-	checkIfSampleIsJackknifeSample();
 	return ( getNthMoment(2) - pow(getNthMoment(1),2.) ) * (numberOfElements - 1.);
 }
 
-double DataSample::getJackknifeError()
+double JackknifeDataSample::getJackknifeError()
 {
 	return sqrt(getJackknifeVariance());
 }

@@ -18,11 +18,10 @@ double defaultFunction(double in);
 class DataSample
 {
 public:
-	//todo: think about creating more constructors because of branches!
-	//todo: create jackknife child of DataSample
-	DataSample(int length = defaultSizeOfDataSample, bool isJackknifeSample = false);
-	DataSample(std::valarray<double> valuesIn, bool isJackknifeSample = false);
-	DataSample(std::string dataFilename, int column = 1, int offset = 0, bool isJackknifeSample = false);
+	DataSample(int length = defaultSizeOfDataSample);
+	DataSample(std::valarray<double> valuesIn);
+	//todo: think about creating two or three distinct constructors
+	DataSample(std::string dataFilename, int column = 1, int offset = 0);
 	int getNumberOfElements();
 	int getUpperLimitForNthMoment();
 	int getLowerLimitForNthMoment();
@@ -33,13 +32,11 @@ public:
 	/**
 	 * Following Berg, equation (2.160).
 	 */
+	//todo: make this return an JackknifeDataSample!
 	DataSample createJackknifeEstimators();
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
-	double getJackknifeVariance();
-	double getJackknifeVariance_v2();
-	double getJackknifeError();
 
-private:
+protected:
 	double calcNthMoment(int n);
 	double calcNthMomentExplicit(int n);
 	double calcNthCentralMomentExplicit(int n);
@@ -48,7 +45,6 @@ private:
 	void checkIfNumberOfBinsIsValid(int numberOfBins);
 	void checkIfBinsizeIsValid(int binsize);
 	void checkIfNumberOfElementsIsValid(int length);
-	void checkIfSampleIsJackknifeSample();
 	void checkIfDatafileExists(std::string filename);
 	void checkIfColumnIsValid(int column);
 	void checkIfOffsetIsValid(int offset);
@@ -67,10 +63,21 @@ private:
 	std::valarray<double> values;
 	std::vector<double> moments;
 	int numberOfElements;
-	bool isJackknifeSample;
 	const static int upperLimitForNthMoment = 4;
 	const static int lowerLimitForNthMoment = 0;
 	const static int defaultSizeOfDataSample = 1;
+};
+
+class JackknifeDataSample: public DataSample
+{
+public:
+	JackknifeDataSample(DataSample sampleIn) :
+		DataSample(sampleIn)
+	{
+	}
+	double getJackknifeVariance();
+	double getJackknifeVariance_v2();
+	double getJackknifeError();
 };
 
 #endif
