@@ -62,7 +62,7 @@ enum FillType { zeros, ones, arrayPosition, entriesSymmetricBetweenZeroAndOne, e
 class TestDataSample
 {
 public:
-  TestDataSample(int length, double referenceValue = 0., FillType fillType = zeros):
+  TestDataSample(int length, FillType fillType = zeros, double referenceValue = 0.):
 		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent), fillType(fillType)
 	{
 	  std::valarray<double> * testValues = initDataSampleBasedOnFillType(length);
@@ -71,7 +71,7 @@ public:
 	  actualValue = 0.;
 	}
 
-	TestDataSample(std::string dataFilename, double referenceValue, int column = 1):
+	TestDataSample(std::string dataFilename, int column = 1, double referenceValue = 0.):
 		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
 	{
 		actualValue = 0.;
@@ -137,13 +137,13 @@ protected:
 class TestDataSampleNthMoment : public TestDataSample
 {
 public:
-	TestDataSampleNthMoment(int n, int length, double referenceValue, FillType fillType) :
-		TestDataSample(length, referenceValue, fillType)
+	TestDataSampleNthMoment(int n, int length, FillType fillType, double referenceValue) :
+		TestDataSample(length, fillType, referenceValue)
 	{
 		actualValue = dataSampleInstance->getNthMoment(n);
 	};
 	TestDataSampleNthMoment(int n, std::string dataFilename, double referenceValue, int column = 1) :
-		TestDataSample(dataFilename, referenceValue, column)
+		TestDataSample(dataFilename, column, referenceValue)
 	{
 		actualValue = dataSampleInstance->getNthMoment(n);
 	};
@@ -153,8 +153,8 @@ public:
 class TestDataSampleNthCentralMoment : public TestDataSample
 {
 public:
-	TestDataSampleNthCentralMoment(int length, double referenceValue, FillType fillType) :
-		TestDataSample(length, referenceValue, fillType)
+	TestDataSampleNthCentralMoment(int length, FillType fillType, double referenceValue) :
+		TestDataSample(length, fillType, referenceValue)
 	{
 		actualValue = dataSampleInstance->getNthCentralMoment();
 	};

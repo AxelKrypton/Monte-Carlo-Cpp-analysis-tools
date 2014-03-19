@@ -124,28 +124,28 @@ BOOST_AUTO_TEST_SUITE(zerothMoment)
 	{
 		int numberOfElements = 1;
 		double referenceValue = 1.;
-		TestDataSampleNthMoment tester(0, numberOfElements, referenceValue, zeros);
+		TestDataSampleNthMoment tester(0, numberOfElements, zeros, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment2)
 	{
 		int numberOfElements = 23;
 		double referenceValue = 1.;
-		TestDataSampleNthMoment tester(0, numberOfElements, referenceValue, ones);
+		TestDataSampleNthMoment tester(0, numberOfElements, ones, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment3)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 1.;
-		TestDataSampleNthMoment tester(0, numberOfElements, referenceValue, arrayPosition);
+		TestDataSampleNthMoment tester(0, numberOfElements, arrayPosition, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment4)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 1.;
-		TestDataSampleNthMoment tester(0, numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
+		TestDataSampleNthMoment tester(0, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -156,28 +156,28 @@ BOOST_AUTO_TEST_SUITE(firstMoment)
 	{
 		int numberOfElements = 1;
 		double referenceValue = 0.;
-		TestDataSampleNthMoment tester(1, numberOfElements, referenceValue, zeros);
+		TestDataSampleNthMoment tester(1, numberOfElements, zeros, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment2)
 	{
 		int numberOfElements = 23;
 		double referenceValue = 1.;
-		TestDataSampleNthMoment tester(1, numberOfElements, referenceValue, ones);
+		TestDataSampleNthMoment tester(1, numberOfElements, ones, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment3)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 11.5;
-		TestDataSampleNthMoment tester(1, numberOfElements, referenceValue, arrayPosition);
+		TestDataSampleNthMoment tester(1, numberOfElements, arrayPosition, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment4)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 0.5;
-		TestDataSampleNthMoment tester(1, numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
+		TestDataSampleNthMoment tester(1, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment5)
@@ -209,28 +209,28 @@ BOOST_AUTO_TEST_SUITE(secondMoment)
 	{
 		int numberOfElements = 1;
 		double referenceValue = 0.;
-		TestDataSampleNthMoment tester(2, numberOfElements, referenceValue, zeros);
+		TestDataSampleNthMoment tester(2, numberOfElements, zeros, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(secondMoment2)
 	{
 		int numberOfElements = 23;
 		double referenceValue = 1.;
-		TestDataSampleNthMoment tester(2, numberOfElements, referenceValue, ones);
+		TestDataSampleNthMoment tester(2, numberOfElements, ones, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(secondMoment3)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 180.166666666667;
-		TestDataSampleNthMoment tester(2, numberOfElements, referenceValue, arrayPosition);
+		TestDataSampleNthMoment tester(2, numberOfElements, arrayPosition, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(secondMoment4)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 0.340579710144927;
-		TestDataSampleNthMoment tester(2, numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
+		TestDataSampleNthMoment tester(2, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -241,28 +241,28 @@ BOOST_AUTO_TEST_SUITE(thirdMoment)
 	{
 		int numberOfElements = 1;
 		double referenceValue = 0.;
-		TestDataSampleNthMoment tester(3, numberOfElements, referenceValue, zeros);
+		TestDataSampleNthMoment tester(3, numberOfElements, zeros, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(thirdMoment2)
 	{
 		int numberOfElements = 23;
 		double referenceValue = 1.;
-		TestDataSampleNthMoment tester(3, numberOfElements, referenceValue, ones);
+		TestDataSampleNthMoment tester(3, numberOfElements, ones, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(thirdMoment3)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 3174.;
-		TestDataSampleNthMoment tester(3, numberOfElements, referenceValue, arrayPosition);
+		TestDataSampleNthMoment tester(3, numberOfElements, arrayPosition, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(thirdMoment4)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 0.260869565217391;
-		TestDataSampleNthMoment tester(3, numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
+		TestDataSampleNthMoment tester(3, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -273,28 +273,28 @@ BOOST_AUTO_TEST_SUITE(fourthMoment)
 	{
 		int numberOfElements = 1;
 		double referenceValue = 0.;
-		TestDataSampleNthMoment tester(4, numberOfElements, referenceValue, zeros);
+		TestDataSampleNthMoment tester(4, numberOfElements, zeros, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(fourthMoment2)
 	{
 		int numberOfElements = 23;
 		double referenceValue = 1.;
-		TestDataSampleNthMoment tester(4, numberOfElements, referenceValue, ones);
+		TestDataSampleNthMoment tester(4, numberOfElements, ones, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(fourthMoment3)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 59635.1666666667;
-		TestDataSampleNthMoment tester(4, numberOfElements, referenceValue, arrayPosition);
+		TestDataSampleNthMoment tester(4, numberOfElements, arrayPosition, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(fourthMoment4)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 0.213103750582176;
-		TestDataSampleNthMoment tester(4, numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
+		TestDataSampleNthMoment tester(4, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -305,21 +305,21 @@ BOOST_AUTO_TEST_SUITE(variance)
 	{
 		int numberOfElements = 1;
 		double referenceValue = 0.;
-		TestDataSampleNthCentralMoment tester(numberOfElements, referenceValue, zeros);
+		TestDataSampleNthCentralMoment tester(numberOfElements, zeros, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(variance2)
 	{
 		int numberOfElements = 23;
 		double referenceValue = 0.;
-		TestDataSampleNthCentralMoment tester(numberOfElements, referenceValue, ones);
+		TestDataSampleNthCentralMoment tester(numberOfElements, ones, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(variance3)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 47.91666666666667;
-		TestDataSampleNthCentralMoment tester(numberOfElements, referenceValue, arrayPosition);
+		TestDataSampleNthCentralMoment tester(numberOfElements, arrayPosition, referenceValue);
 	}
 
 	//todo: implement some tests with big numbers!
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_SUITE(variance)
 	{
 		int numberOfElements = 24;
 		double referenceValue = 0.0905797101449274;
-		TestDataSampleNthCentralMoment tester(numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
+		TestDataSampleNthCentralMoment tester(numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_SUITE(binning)
 
 	void testBinningWithNumberOfBins(int numberOfElements, int numberOfBins, double expectedFirstMoment)
 	{
-		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		TestDataSample testSample(numberOfElements, arrayPosition);
 		DataSample* originalSample = testSample.getDataSample();
 		DataSample binnedSample = originalSample->createBinnedDataSampleWithNumberOfBins(numberOfBins);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
@@ -386,7 +386,7 @@ BOOST_AUTO_TEST_SUITE(binning)
 
 	void testBinningWithBinsize(int numberOfElements, int binsize, double expectedFirstMoment)
 	{
-		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		TestDataSample testSample(numberOfElements, arrayPosition);
 		DataSample* originalSample = testSample.getDataSample();
 		DataSample binnedSample = originalSample->createBinnedDataSampleWithBinsize(binsize);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
@@ -508,7 +508,7 @@ BOOST_AUTO_TEST_SUITE(binning)
 	{
 		int numberOfElements = 27;
 		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements;
-		TestDataSample testSample(numberOfElements, 0., entriesSymmetricBetweenZeroAndOne);
+		TestDataSample testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
 		DataSample* originalSample = testSample.getDataSample();
 		DataSample binnedSample = originalSample->createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(1), binnedSample.getNthMoment(1));
@@ -519,7 +519,7 @@ BOOST_AUTO_TEST_SUITE(binning)
 	{
 		int numberOfElements = 25;
 		int desiredBinsize = 1;
-		TestDataSample testSample(numberOfElements, 0., entriesSymmetricBetweenZeroAndOne);
+		TestDataSample testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
 		DataSample* originalSample = testSample.getDataSample();
 		DataSample binnedSample = originalSample->createBinnedDataSampleWithBinsize(desiredBinsize);
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
@@ -605,7 +605,7 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(jackknifeFirstMoment)
 	{
 		int numberOfElements = 89;
-		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		TestDataSample testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 		DataSample jackknifeSample = sample->createJackknifeEstimators();
 		BOOST_REQUIRE_EQUAL(sample->getNthMoment(1), jackknifeSample.getNthMoment(1));
@@ -621,7 +621,7 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(jackknifeSecondMoment)
 	{
 		int numberOfElements = 45;
-		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		TestDataSample testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 		DataSample jackknifeSample = sample->createJackknifeEstimators();
 		double expectedValue = calcExpectedValueForSecondMomentOfJackknifeEstimatorsBasedOnAnalyticExpression(*sample, numberOfElements);
@@ -636,7 +636,7 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(applyFunction1)
 	{
 		int numberOfElements = 53;
-		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		TestDataSample testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 		DataSample sampleFromFunction = sample->applyFunction();
 		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample->getNthMoment(1), doublePrecisionInPercent);
@@ -645,7 +645,7 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(applyFunction2)
 	{
 		int numberOfElements = 53;
-		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		TestDataSample testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 		DataSample sampleFromFunction = sample->applyFunction(square);
 		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample->getNthMoment(2), doublePrecisionInPercent);
@@ -683,7 +683,7 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(jackknifeVariance4)
 	{
 		int numberOfElements = 43;
-		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		TestDataSample testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 		DataSample jackknifeSample = sample->createJackknifeEstimators();
 		double jackknifeVariance = jackknifeSample.getJackknifeVariance();
