@@ -16,6 +16,7 @@ DataSample::DataSample(std::valarray<double> valuesIn, bool isJackknifeSample):
 {
 	values = valuesIn;
 	initMembers();
+	checkIfNumberOfElementsIsValid(numberOfElements);
 }
 
 DataSample::DataSample(std::string dataFilename, int column, int offset, bool isJackknifeSample):
@@ -23,6 +24,7 @@ DataSample::DataSample(std::string dataFilename, int column, int offset, bool is
 {
 	values = readDataFromFile(dataFilename, column, offset);
 	initMembers();
+	checkIfNumberOfElementsIsValid(numberOfElements);
 }
 
 void DataSample::initMembers()
@@ -56,8 +58,6 @@ void DataSample::checkIfNIsValid(int n)
 {
 	if(n < lowerLimitForNthMoment || n > upperLimitForNthMoment)
 		throw std::invalid_argument("The requested moment is not implemented yet!");
-	if(n > roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid)
-		std::cout << "Warning: the datasize is such that double precision may not be valid anymore (depending on the data)!" << std::endl;
 }
 
 void DataSample::checkIfOffsetIsValid(int offset)
@@ -135,6 +135,9 @@ void DataSample::checkIfNumberOfElementsIsValid(int length)
 {
 	if(length <= 0)
 		throw std::invalid_argument("Cannot create dataSample with zero or less elements!");
+	if(length > roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid)
+		std::cout << "Warning: the datasize is such that double precision may not be valid anymore (depending on the data)!" << std::endl;
+
 }
 
 void DataSample::checkIfNumberOfBinsIsValid(int numberOfBins)
