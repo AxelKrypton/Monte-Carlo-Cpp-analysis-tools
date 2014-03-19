@@ -145,21 +145,21 @@ BOOST_AUTO_TEST_SUITE(zerothMoment)
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment2)
 	{
-		int numberOfElements = 23;
+		int numberOfElements = 23e2;
 		double referenceValue = 1.;
 		TestDataSampleNthMoment tester(0, numberOfElements, ones, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment3)
 	{
-		int numberOfElements = 24;
+		int numberOfElements = 24e3;
 		double referenceValue = 1.;
 		TestDataSampleNthMoment tester(0, numberOfElements, arrayPosition, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment4)
 	{
-		int numberOfElements = 24;
+		int numberOfElements = 24e4;
 		double referenceValue = 1.;
 		TestDataSampleNthMoment tester(0, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
@@ -215,6 +215,20 @@ BOOST_AUTO_TEST_SUITE(firstMoment)
 		std::string fileThatDoesExist = "datafileWithTwoColumns.example";
 		double referenceValue = 1.;
 		TestDataSampleNthMoment tester(1, fileThatDoesExist, referenceValue, 1);
+	}
+
+	BOOST_AUTO_TEST_CASE(firstMoment8)
+	{
+		int numberOfElements = 1e6;
+		double referenceValue = 499999.5;
+		TestDataSampleNthMoment tester(1, numberOfElements, arrayPosition, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(firstMoment9)
+	{
+		int numberOfElements = roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid;
+		double referenceValue = 1250000.00000125;
+		TestDataSampleNthMoment tester(1, numberOfElements, bigAndSmallEntries, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

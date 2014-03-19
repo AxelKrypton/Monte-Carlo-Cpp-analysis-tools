@@ -9,6 +9,8 @@
 #include<vector>
 #include<stdexcept>
 
+const static int roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid = 1e4;
+
 //TODO: move this to better place
 double defaultFunction(double in);
 
@@ -16,6 +18,8 @@ double defaultFunction(double in);
 class DataSample
 {
 public:
+	//todo: think about creating more constructors because of branches!
+	//todo: create jackknife child of DataSample
 	DataSample(int length = defaultSizeOfDataSample, bool isJackknifeSample = false);
 	DataSample(std::valarray<double> valuesIn, bool isJackknifeSample = false);
 	DataSample(std::string dataFilename, int column = 1, int offset = 0, bool isJackknifeSample = false);

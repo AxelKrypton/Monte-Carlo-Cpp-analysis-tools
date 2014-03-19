@@ -11,11 +11,6 @@
  * Arrays proportional to sums over the iteration variable can be evaluated using the triangular numbers,
  * the  square pyramidal numbers or Faulhaber's formula in general.
  */
-std::valarray<double> makeValarrayWithZeros(int length)
-{
-	return std::valarray<double>(length);
-}
-
 std::valarray<double> makeValarrayWithOnes(int length)
 {
 	return std::valarray<double>(1., length);
@@ -37,6 +32,18 @@ std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
 	for (int iteration = 0; iteration < returnValarray.size(); iteration ++)
 	{
 		returnValarray[iteration] = (double(iteration)) / (returnValarray.size() - 1);
+	}
+	return returnValarray;
+}
+
+std::valarray<double> makeValarrayWithBigAndSmallEntries(int length)
+{
+	std::valarray<double> returnValarray(length*2);
+	for (int iteration = 0; iteration < length; iteration ++)
+	{
+		returnValarray[iteration*2] = (double(iteration)) / (length - 1) * 5e6;
+		returnValarray[iteration*2+1] = (double(iteration)) / (length - 1) * 5e-6;
+//		std::cout << returnValarray[iteration*2] << " " << returnValarray[iteration*2 +1] << std::endl;
 	}
 	return returnValarray;
 }
@@ -119,6 +126,11 @@ protected:
 		  else if ( fillType == entriesSymmetricBetweenZeroAndOne )
 		  {
 			  std::valarray<double> tmp = makeValarrayWithEntriesBetweenZeroAndOne(length);
+			  return new std::valarray<double>(tmp);
+		  }
+		  else if ( fillType == bigAndSmallEntries )
+		  {
+			  std::valarray<double> tmp = makeValarrayWithBigAndSmallEntries(length/2);
 			  return new std::valarray<double>(tmp);
 		  }
 		  else

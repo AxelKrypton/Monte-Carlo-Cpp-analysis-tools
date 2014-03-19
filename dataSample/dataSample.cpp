@@ -56,6 +56,8 @@ void DataSample::checkIfNIsValid(int n)
 {
 	if(n < lowerLimitForNthMoment || n > upperLimitForNthMoment)
 		throw std::invalid_argument("The requested moment is not implemented yet!");
+	if(n > roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid)
+		std::cout << "Warning: the datasize is such that double precision may not be valid anymore (depending on the data)!" << std::endl;
 }
 
 void DataSample::checkIfOffsetIsValid(int offset)
@@ -125,7 +127,7 @@ DataSample DataSample::createBinnedDataSampleWithNumberOfBins(int numberOfBins)
 DataSample DataSample::createBinnedDataSampleWithBinsize(int binsize)
 {
 	checkIfBinsizeIsValid(binsize);
-	int numberOfBins = calcBinsize(binsize);
+	int numberOfBins = calcNumberOfBins(binsize);
 	return performBinning(numberOfBins, binsize);
 }
 
