@@ -1,12 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <gmp.h>
 #include "dataSample.hpp"
 
 DataSample::DataSample(int length, bool isJackknifeSample):
 	isJackknifeSample(isJackknifeSample)
 {
+	checkIfNumberOfElementsIsValid(length);
 	values = std::valarray<double>(length);
 	initMembers();
 }
@@ -18,18 +18,16 @@ DataSample::DataSample(std::valarray<double> valuesIn, bool isJackknifeSample):
 	initMembers();
 }
 
-//todo: add offset parameter
-DataSample::DataSample(std::string dataFilename, int column, bool isJackknifeSample):
+DataSample::DataSample(std::string dataFilename, int column, int offset, bool isJackknifeSample):
 	isJackknifeSample(isJackknifeSample)
 {
-	values = readDataFromFile(dataFilename, column);
+	values = readDataFromFile(dataFilename, column, offset);
 	initMembers();
 }
 
 void DataSample::initMembers()
 {
 	numberOfElements = values.size();
-	checkIfNumberOfElementsIsValid();
 	initMoments();
 }
 
@@ -58,6 +56,14 @@ void DataSample::checkIfNIsValid(int n)
 {
 	if(n < lowerLimitForNthMoment || n > upperLimitForNthMoment)
 		throw std::invalid_argument("The requested moment is not implemented yet!");
+}
+
+void DataSample::checkIfOffsetIsValid(int offset)
+{
+	if(offset < 0)
+		throw std::invalid_argument("Offset must be greater than or equal to zero!");
+	if(offset > 0)
+		throw std::invalid_argument("Usage of offset parameter is not implemented yet. Aborting!");
 }
 
 double DataSample::calcNthMoment(int n)
@@ -123,9 +129,9 @@ DataSample DataSample::createBinnedDataSampleWithBinsize(int binsize)
 	return performBinning(numberOfBins, binsize);
 }
 
-void DataSample::checkIfNumberOfElementsIsValid()
+void DataSample::checkIfNumberOfElementsIsValid(int length)
 {
-	if(numberOfElements <= 0)
+	if(length <= 0)
 		throw std::invalid_argument("Cannot create dataSample with zero or less elements!");
 }
 
@@ -184,7 +190,6 @@ int DataSample::getJackknifeNormalization()
 	return numberOfElements - 1;
 }
 
-//todo: refactor
 DataSample DataSample::createJackknifeEstimators()
 {
 	int normalization = getJackknifeNormalization();
@@ -241,7 +246,8 @@ void DataSample::checkIfDatafileExists(std::string filename)
 }
 
 //todo: refactor, perhaps think about column numbering
-std::valarray<double> DataSample::readDataFromFile(std::string filename, int column)
+//todo: implement offset
+std::valarray<double> DataSample::readDataFromFile(std::string filename, int column, int offset)
 {
 	std::ifstream infile;
 	std::string line;
@@ -250,6 +256,7 @@ std::valarray<double> DataSample::readDataFromFile(std::string filename, int col
 
 	checkIfDatafileExists(filename);
 	checkIfColumnIsValid(column);
+	checkIfOffsetIsValid(offset);
 
 	infile.open(filename.c_str());
 

@@ -71,11 +71,11 @@ public:
 	  actualValue = 0.;
 	}
 
-	TestDataSample(std::string dataFilename, int column = 1, double referenceValue = 0.):
+	TestDataSample(std::string dataFilename, int column = 1, int offset = 0, double referenceValue = 0.):
 		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
 	{
 		actualValue = 0.;
-		dataSampleInstance = new DataSample(dataFilename, column);
+		dataSampleInstance = new DataSample(dataFilename, column, offset);
 	}
 
 	~TestDataSample()
@@ -142,8 +142,8 @@ public:
 	{
 		actualValue = dataSampleInstance->getNthMoment(n);
 	};
-	TestDataSampleNthMoment(int n, std::string dataFilename, double referenceValue, int column = 1) :
-		TestDataSample(dataFilename, column, referenceValue)
+	TestDataSampleNthMoment(int n, std::string dataFilename, double referenceValue = 0, int column = 1, int offset = 0.) :
+		TestDataSample(dataFilename, column, offset, referenceValue)
 	{
 		actualValue = dataSampleInstance->getNthMoment(n);
 	};

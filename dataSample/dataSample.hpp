@@ -18,7 +18,7 @@ class DataSample
 public:
 	DataSample(int length = defaultSizeOfDataSample, bool isJackknifeSample = false);
 	DataSample(std::valarray<double> valuesIn, bool isJackknifeSample = false);
-	DataSample(std::string dataFilename, int column = 1, bool isJackknifeSample = false);
+	DataSample(std::string dataFilename, int column = 1, int offset = 0, bool isJackknifeSample = false);
 	int getNumberOfElements();
 	int getUpperLimitForNthMoment();
 	int getLowerLimitForNthMoment();
@@ -43,10 +43,11 @@ private:
 	void checkIfNIsValid(int n);
 	void checkIfNumberOfBinsIsValid(int numberOfBins);
 	void checkIfBinsizeIsValid(int binsize);
-	void checkIfNumberOfElementsIsValid();
+	void checkIfNumberOfElementsIsValid(int length);
 	void checkIfSampleIsJackknifeSample();
 	void checkIfDatafileExists(std::string filename);
 	void checkIfColumnIsValid(int column);
+	void checkIfOffsetIsValid(int offset);
 	int calcBinsize(int numberOfBins);
 	int calcNumberOfBins(int binsize);
 	void initMembers();
@@ -57,7 +58,7 @@ private:
 	 * Following Berg, p.52.
 	 */
 	DataSample performBinning(int numberOfBins, int binsize);
-	std::valarray<double> readDataFromFile(std::string filename, int column);
+	std::valarray<double> readDataFromFile(std::string filename, int column, int offset);
 
 	std::valarray<double> values;
 	std::vector<double> moments;

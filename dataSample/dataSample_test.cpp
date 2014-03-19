@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_SUITE(build)
 	BOOST_AUTO_TEST_CASE(elements2)
 	{
 		int elementsOfTestArray = 0;
-		BOOST_REQUIRE_THROW(TestDataSample dataSampleInstance(elementsOfTestArray), std::invalid_argument);
+		BOOST_REQUIRE_THROW(DataSample dataSampleInstance(elementsOfTestArray), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(elements3)
@@ -114,6 +114,22 @@ BOOST_AUTO_TEST_SUITE(build)
 		DataSample dataSample(fileThatDoesExist);
 		int numberOfElementsInDataSample = dataSample.getNumberOfElements();
 		BOOST_CHECK_EQUAL(linesInFile, numberOfElementsInDataSample);
+	}
+
+	BOOST_AUTO_TEST_CASE(fileWithOffset_invalidArg)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int linesInFile = 1005;
+		int negativeOffset = -1;
+		BOOST_REQUIRE_THROW(DataSample dataSample(fileThatDoesExist, 1, negativeOffset), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(fileWithOffset_notYetImplemented)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int linesInFile = 1005;
+		int validOffset = 1;
+		BOOST_REQUIRE_THROW(DataSample dataSample(fileThatDoesExist, 1, validOffset), std::invalid_argument);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
