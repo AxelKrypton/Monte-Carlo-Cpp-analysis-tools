@@ -379,7 +379,7 @@ BOOST_AUTO_TEST_SUITE(binning)
 	void testBinningWithNumberOfBins(int numberOfElements, int numberOfBins, double expectedFirstMoment)
 	{
 		TestDataSample testSample(numberOfElements, 0., arrayPosition);
-		DataSample* originalSample = testSample.getSample();
+		DataSample* originalSample = testSample.getDataSample();
 		DataSample binnedSample = originalSample->createBinnedDataSampleWithNumberOfBins(numberOfBins);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
 	}
@@ -387,7 +387,7 @@ BOOST_AUTO_TEST_SUITE(binning)
 	void testBinningWithBinsize(int numberOfElements, int binsize, double expectedFirstMoment)
 	{
 		TestDataSample testSample(numberOfElements, 0., arrayPosition);
-		DataSample* originalSample = testSample.getSample();
+		DataSample* originalSample = testSample.getDataSample();
 		DataSample binnedSample = originalSample->createBinnedDataSampleWithBinsize(binsize);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
 	}
@@ -395,8 +395,7 @@ BOOST_AUTO_TEST_SUITE(binning)
 	void testBinningWithNumberOfBins_elements(int numberOfElements, int desiredNumberOfElementsOfBinnedDataSample)
 	{
 		int numberOfBins = numberOfElements / desiredNumberOfElementsOfBinnedDataSample;
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		DataSample originalSample(testValues);
+		DataSample originalSample(numberOfElements);
 		DataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
 		BOOST_CHECK_EQUAL(desiredNumberOfElementsOfBinnedDataSample, binnedSample.getNumberOfElements());
 	}
@@ -404,23 +403,20 @@ BOOST_AUTO_TEST_SUITE(binning)
 	void testBinningWithBinsize_elements(int numberOfElements, int desiredBinsize)
 	{
 		int expectedNumberOfElementsInBinnedDataSample = numberOfElements / desiredBinsize;
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		DataSample originalSample(testValues);
+		DataSample originalSample(numberOfElements);
 		DataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
 		BOOST_CHECK_EQUAL(expectedNumberOfElementsInBinnedDataSample, binnedSample.getNumberOfElements());
 	}
 
 	void testBinningWithNumberOfBins_wrongArgument(int numberOfElements, int numberOfBins)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		DataSample originalSample(testValues);
+		DataSample originalSample(numberOfElements);
 		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithNumberOfBins(numberOfBins), std::invalid_argument);
 	}
 
 	void testBinningWithBinsize_wrongArgument(int numberOfElements, int binsize)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		DataSample originalSample(testValues);
+		DataSample originalSample(numberOfElements);
 		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithBinsize(binsize), std::invalid_argument);
 	}
 
@@ -512,22 +508,22 @@ BOOST_AUTO_TEST_SUITE(binning)
 	{
 		int numberOfElements = 27;
 		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements;
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		DataSample originalSample(testValues);
-		DataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
-		BOOST_CHECK_EQUAL(originalSample.getNthMoment(1), binnedSample.getNthMoment(1));
-		BOOST_CHECK_EQUAL(originalSample.getNthMoment(2), binnedSample.getNthMoment(2));
+		TestDataSample testSample(numberOfElements, 0., entriesSymmetricBetweenZeroAndOne);
+		DataSample* originalSample = testSample.getDataSample();
+		DataSample binnedSample = originalSample->createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
+		BOOST_CHECK_EQUAL(originalSample->getNthMoment(1), binnedSample.getNthMoment(1));
+		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
 	}
 
 	BOOST_AUTO_TEST_CASE(trivialBinning2)
 	{
 		int numberOfElements = 25;
 		int desiredBinsize = 1;
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(numberOfElements);
-		DataSample originalSample(testValues);
-		DataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
-		BOOST_CHECK_EQUAL(originalSample.getNthMoment(2), binnedSample.getNthMoment(2));
-		BOOST_CHECK_EQUAL(originalSample.getNthMoment(2), binnedSample.getNthMoment(2));
+		TestDataSample testSample(numberOfElements, 0., entriesSymmetricBetweenZeroAndOne);
+		DataSample* originalSample = testSample.getDataSample();
+		DataSample binnedSample = originalSample->createBinnedDataSampleWithBinsize(desiredBinsize);
+		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
+		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
 	}
 
 	BOOST_AUTO_TEST_CASE(realBinningWithNumberOfBins1)
@@ -601,8 +597,7 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(jackknifeElements)
 	{
 		int numberOfElements = 37;
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		DataSample sample(testValues);
+		DataSample sample(numberOfElements);
 		DataSample jackknifeSample = sample.createJackknifeEstimators();
 		BOOST_REQUIRE_EQUAL(sample.getNumberOfElements(), jackknifeSample.getNumberOfElements());
 	}
@@ -610,10 +605,10 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(jackknifeFirstMoment)
 	{
 		int numberOfElements = 89;
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		DataSample sample(testValues);
-		DataSample jackknifeSample = sample.createJackknifeEstimators();
-		BOOST_REQUIRE_EQUAL(sample.getNthMoment(1), jackknifeSample.getNthMoment(1));
+		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		DataSample* sample = testSample.getDataSample();
+		DataSample jackknifeSample = sample->createJackknifeEstimators();
+		BOOST_REQUIRE_EQUAL(sample->getNthMoment(1), jackknifeSample.getNthMoment(1));
 	}
 
 	double calcExpectedValueForSecondMomentOfJackknifeEstimatorsBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
@@ -626,10 +621,10 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(jackknifeSecondMoment)
 	{
 		int numberOfElements = 45;
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		DataSample sample(testValues);
-		DataSample jackknifeSample = sample.createJackknifeEstimators();
-		double expectedValue = calcExpectedValueForSecondMomentOfJackknifeEstimatorsBasedOnAnalyticExpression(sample, numberOfElements);
+		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		DataSample* sample = testSample.getDataSample();
+		DataSample jackknifeSample = sample->createJackknifeEstimators();
+		double expectedValue = calcExpectedValueForSecondMomentOfJackknifeEstimatorsBasedOnAnalyticExpression(*sample, numberOfElements);
 		BOOST_CHECK_CLOSE(expectedValue, jackknifeSample.getNthMoment(2), doublePrecisionInPercent);
 	}
 
@@ -641,19 +636,19 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(applyFunction1)
 	{
 		int numberOfElements = 53;
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		DataSample sample(testValues);
-		DataSample sampleFromFunction = sample.applyFunction();
-		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample.getNthMoment(1), doublePrecisionInPercent);
+		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		DataSample* sample = testSample.getDataSample();
+		DataSample sampleFromFunction = sample->applyFunction();
+		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample->getNthMoment(1), doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(applyFunction2)
 	{
 		int numberOfElements = 53;
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		DataSample sample(testValues);
-		DataSample sampleFromFunction = sample.applyFunction(square);
-		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample.getNthMoment(2), doublePrecisionInPercent);
+		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		DataSample* sample = testSample.getDataSample();
+		DataSample sampleFromFunction = sample->applyFunction(square);
+		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample->getNthMoment(2), doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(jackknifeVariance1)
@@ -664,15 +659,15 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 
 	BOOST_AUTO_TEST_CASE(jackknifeVariance2)
 	{
-		DataSample sample;
+		int tooFewElementsForJackknife = 1;
+		DataSample sample(tooFewElementsForJackknife);
 		BOOST_REQUIRE_THROW(sample.createJackknifeEstimators(), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(jackknifeVariance3)
 	{
-		int numberOfElements = 43;
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		DataSample sample(testValues);
+		int enoughElementsForJackknife = 43;
+		DataSample sample(enoughElementsForJackknife);
 		DataSample jackknifeSample = sample.createJackknifeEstimators();
 		BOOST_CHECK_NO_THROW(jackknifeSample.getJackknifeVariance());
 	}
@@ -688,11 +683,11 @@ BOOST_AUTO_TEST_SUITE(jackknife)
 	BOOST_AUTO_TEST_CASE(jackknifeVariance4)
 	{
 		int numberOfElements = 43;
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		DataSample sample(testValues);
-		DataSample jackknifeSample = sample.createJackknifeEstimators();
+		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		DataSample* sample = testSample.getDataSample();
+		DataSample jackknifeSample = sample->createJackknifeEstimators();
 		double jackknifeVariance = jackknifeSample.getJackknifeVariance();
-		double expectedValue = expectedValueForJackknifeVarianceBasedOnAnalyticExpression(sample, numberOfElements);
+		double expectedValue = expectedValueForJackknifeVarianceBasedOnAnalyticExpression(*sample, numberOfElements);
 		BOOST_CHECK_CLOSE(jackknifeVariance, expectedValue, doublePrecisionInPercent);
 	}
 

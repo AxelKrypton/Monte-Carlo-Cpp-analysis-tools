@@ -63,38 +63,12 @@ class TestDataSample
 {
 public:
   TestDataSample(int length, double referenceValue = 0., FillType fillType = zeros):
-		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
+		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent), fillType(fillType)
 	{
-	  std::valarray<double> * testValues;
-	  if ( fillType == zeros )
-	  {
-		  testValues = new std::valarray<double>(length);
-	  }
-	  if ( fillType == ones )
-	  {
-		  std::valarray<double> tmp = makeValarrayWithOnes(length);
-		  testValues = new std::valarray<double>(tmp);
-	  }
-	  if ( fillType == arrayPosition )
-	  {
-		  std::valarray<double> tmp = makeValarrayWithArrayPosition(length);
-		  testValues = new std::valarray<double>(tmp);
-	  }
-	  if ( fillType == entriesSymmetricBetweenZeroAndOne )
-	  {
-		  std::valarray<double> tmp = makeValarrayWithEntriesBetweenZeroAndOne(length);
-		  testValues = new std::valarray<double>(tmp);
-	  }
-	  actualValue = 0.;
+	  std::valarray<double> * testValues = initDataSampleBasedOnFillType(length);
 	  dataSampleInstance = new DataSample(*testValues);
 	  delete testValues;
-	}
-
-	TestDataSample(std::valarray<double> valarrayIn, double referenceValue):
-		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
-	{
-		actualValue = 0.;
-		dataSampleInstance = new DataSample(valarrayIn);
+	  actualValue = 0.;
 	}
 
 	TestDataSample(std::string dataFilename, double referenceValue, int column = 1):
@@ -115,7 +89,7 @@ public:
 		return dataSampleInstance->getNumberOfElements();
 	}
 
-	DataSample* getSample()
+	DataSample* getDataSample()
 	{
 		return dataSampleInstance;
 	}
@@ -126,10 +100,38 @@ protected:
 		BOOST_CHECK_CLOSE(actualValue, referenceValue, testPrecision);
 	}
 
+	std::valarray<double>* initDataSampleBasedOnFillType(int length)
+	{
+		  if ( fillType == zeros )
+		  {
+			  return new std::valarray<double>(length);
+		  }
+		  else if ( fillType == ones )
+		  {
+			  std::valarray<double> tmp = makeValarrayWithOnes(length);
+			  return new std::valarray<double>(tmp);
+		  }
+		  else if ( fillType == arrayPosition )
+		  {
+			  std::valarray<double> tmp = makeValarrayWithArrayPosition(length);
+			  return new std::valarray<double>(tmp);
+		  }
+		  else if ( fillType == entriesSymmetricBetweenZeroAndOne )
+		  {
+			  std::valarray<double> tmp = makeValarrayWithEntriesBetweenZeroAndOne(length);
+			  return new std::valarray<double>(tmp);
+		  }
+		  else
+		  {
+			  throw std::invalid_argument("Unknown fillType selected!");
+		  }
+	}
+
 	DataSample * dataSampleInstance;
 	double referenceValue;
 	double actualValue;
 	double testPrecision;
+	FillType fillType;
 };
 
 class TestDataSampleNthMoment : public TestDataSample

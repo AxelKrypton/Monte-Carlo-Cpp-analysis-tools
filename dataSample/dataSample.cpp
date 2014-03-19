@@ -4,10 +4,10 @@
 #include <gmp.h>
 #include "dataSample.hpp"
 
-DataSample::DataSample(bool isJackknifeSample):
+DataSample::DataSample(int length, bool isJackknifeSample):
 	isJackknifeSample(isJackknifeSample)
 {
-	values = std::valarray<double>(defaultSizeOfDataSample);
+	values = std::valarray<double>(length);
 	initMembers();
 }
 

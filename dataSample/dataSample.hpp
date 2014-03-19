@@ -16,7 +16,7 @@ double defaultFunction(double in);
 class DataSample
 {
 public:
-	DataSample(bool isJackknifeSample = false);
+	DataSample(int length = defaultSizeOfDataSample, bool isJackknifeSample = false);
 	DataSample(std::valarray<double> valuesIn, bool isJackknifeSample = false);
 	DataSample(std::string dataFilename, int column = 1, bool isJackknifeSample = false);
 	int getNumberOfElements();
