@@ -23,7 +23,7 @@ public:
 	int getUpperLimitForNthMoment();
 	int getLowerLimitForNthMoment();
 	double getMean();
-	double getVariance();
+	double getNthCentralMoment();
 	double getNthMoment(int n);
 	DataSample createBinnedDataSampleWithNumberOfBins(int numberOfBins);
 	DataSample createBinnedDataSampleWithBinsize(int binsize);

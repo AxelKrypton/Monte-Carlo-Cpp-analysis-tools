@@ -5,147 +5,15 @@
 
 #include "dataSample.hpp"
 
-// double should be correct up to 15 digits (at least)
-// this means two doubles should be the same up to 14 digits
+/**
+ * double should be correct up to 15 digits (at least)
+ * this means two doubles should be the same relative
+ * to each other up to 14 digits
+ * */
 double doublePrecisionInPercent = 1e-12;
 
 #include <cfloat>
-
-/**
- * Arrays filled with constants have a mean equal to the constant and zero variance.
- * Arrays proportional to sums over the iteration variable can be evaluated using the triangular numbers,
- * the  square pyramidal numbers or Faulhaber's formula in general.
- */
-std::valarray<double> makeValarrayWithZeros(int length)
-{
-	return std::valarray<double>(length);
-}
-
-std::valarray<double> makeValarrayWithOnes(int length)
-{
-	return std::valarray<double>(1., length);
-}
-
-std::valarray<double> makeValarrayWithArrayPosition(int length)
-{
-	std::valarray<double> returnValarray(length);
-	for (int iteration = 0; iteration < returnValarray.size(); iteration ++)
-	{
-		returnValarray[iteration] = iteration;
-	}
-	return returnValarray;
-}
-
-std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
-{
-	std::valarray<double> returnValarray(length);
-	for (int iteration = 0; iteration < returnValarray.size(); iteration ++)
-	{
-		returnValarray[iteration] = (double(iteration)) / (returnValarray.size() - 1);
-	}
-	return returnValarray;
-}
-
-std::valarray<double> makeValarrayWithEntriesBetweenOneAndEight(int length)
-{
-	if (length % 8 != 0)
-		throw std::invalid_argument("length must be multiple of 8!");
-	std::valarray<double> returnValarray(length);
-	for (int iteration = 0; iteration < 8; iteration ++)
-	{
-		for (int iteration2 = 0; iteration2 < length/8; iteration2 ++)
-		{
-			returnValarray[iteration + 8*iteration2] = (double(iteration+1));
-		}
-	}
-	return returnValarray;
-}
-
-//todo: write test for big and small entries
-enum FillType { zeros, ones, arrayPosition, entriesSymmetricBetweenZeroAndOne, entriesBetweenOneAndEight, bigAndSmallEntries };
-
-class TestDataSample
-{
-public:
-  TestDataSample(int length, double referenceValue = 0., FillType fillType = zeros):
-		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
-	{
-	  std::valarray<double> * testValues;
-	  if ( fillType == zeros )
-	  {
-		  testValues = new std::valarray<double>(length);
-	  }
-	  if ( fillType == ones )
-	  {
-		  std::valarray<double> tmp = makeValarrayWithOnes(length);
-		  testValues = new std::valarray<double>(tmp);
-	  }
-	  if ( fillType == arrayPosition )
-	  {
-		  std::valarray<double> tmp = makeValarrayWithArrayPosition(length);
-		  testValues = new std::valarray<double>(tmp);
-	  }
-	  if ( fillType == entriesSymmetricBetweenZeroAndOne )
-	  {
-		  std::valarray<double> tmp = makeValarrayWithEntriesBetweenZeroAndOne(length);
-		  testValues = new std::valarray<double>(tmp);
-	  }
-	  actualValue = 0.;
-	  dataSampleInstance = new DataSample(*testValues);
-	  delete testValues;
-	}
-
-	TestDataSample(std::valarray<double> valarrayIn, double referenceValue):
-		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
-	{
-		actualValue = 0.;
-		dataSampleInstance = new DataSample(valarrayIn);
-	}
-
-	TestDataSample(std::string dataFilename, double referenceValue, int column = 1):
-		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
-	{
-		actualValue = 0.;
-		dataSampleInstance = new DataSample(dataFilename, column);
-	}
-
-	~TestDataSample()
-	{
-		testActualValueAgainstReferenceValue();
-		delete dataSampleInstance;
-	}
-
-	int getNumberOfElements()
-	{
-		return dataSampleInstance->getNumberOfElements();
-	}
-
-protected:
-	void testActualValueAgainstReferenceValue()
-	{
-		BOOST_CHECK_CLOSE(actualValue, referenceValue, testPrecision);
-	}
-
-	DataSample * dataSampleInstance;
-	double referenceValue;
-	double actualValue;
-	double testPrecision;
-};
-
-class TestDataSampleNthMoment : public TestDataSample
-{
-public:
-	TestDataSampleNthMoment(int n, int length, double referenceValue, FillType fillType) :
-		TestDataSample(length, referenceValue, fillType)
-	{
-		actualValue = dataSampleInstance->getNthMoment(n);
-	};
-	TestDataSampleNthMoment(int n, std::string dataFilename, double referenceValue, int column = 1) :
-		TestDataSample(dataFilename, referenceValue, column)
-	{
-		actualValue = dataSampleInstance->getNthMoment(n);
-	};
-};
+#include "TestDataSample.hpp"
 
 BOOST_AUTO_TEST_SUITE(precision)
 
@@ -433,44 +301,33 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(variance)
 
-	class TestDataSampleVariance : public TestDataSample
-	{
-	public:
-		TestDataSampleVariance(std::valarray<double> valarrayIn, double referenceValue) :
-			TestDataSample(valarrayIn, referenceValue)
-		{
-			actualValue = dataSampleInstance->getVariance();
-		};
-	};
-
 	BOOST_AUTO_TEST_CASE(variance1)
 	{
-		std::valarray<double> testValues = makeValarrayWithZeros(1);
+		int numberOfElements = 1;
 		double referenceValue = 0.;
-		TestDataSampleVariance tester(testValues, referenceValue);
+		TestDataSampleNthCentralMoment tester(numberOfElements, referenceValue, zeros);
 	}
 
 	BOOST_AUTO_TEST_CASE(variance2)
 	{
-		std::valarray<double> testValues = makeValarrayWithOnes(23);
+		int numberOfElements = 23;
 		double referenceValue = 0.;
-		TestDataSampleVariance tester(testValues, referenceValue);
+		TestDataSampleNthCentralMoment tester(numberOfElements, referenceValue, ones);
 	}
 
 	BOOST_AUTO_TEST_CASE(variance3)
 	{
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+		int numberOfElements = 24;
 		double referenceValue = 47.91666666666667;
-		TestDataSampleVariance tester(testValues, referenceValue);
+		TestDataSampleNthCentralMoment tester(numberOfElements, referenceValue, arrayPosition);
 	}
 
 	//todo: implement some tests with big numbers!
 	BOOST_AUTO_TEST_CASE(variance4)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		int numberOfElements = 24;
 		double referenceValue = 0.0905797101449274;
-		//		double referenceValue = 0.0833425931070244;//0.0842644320297951;//0.0854700854700854;//0.0905797101449274;
-		TestDataSampleVariance tester(testValues, referenceValue);
+		TestDataSampleNthCentralMoment tester(numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -479,32 +336,28 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 
 	BOOST_AUTO_TEST_CASE(getNthMomentValidArgument1)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
-		DataSample dataSampleInstance(testValues);
+		DataSample dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(highestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentValidArgument2)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
-		DataSample dataSampleInstance(testValues);
+		DataSample dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument1)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
-		DataSample dataSampleInstance(testValues);
+		DataSample dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(highestValueAllowed + 1), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument2)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
-		DataSample dataSampleInstance(testValues);
+		DataSample dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed - 1), std::invalid_argument);
 	}
@@ -525,17 +378,17 @@ BOOST_AUTO_TEST_SUITE(binning)
 
 	void testBinningWithNumberOfBins(int numberOfElements, int numberOfBins, double expectedFirstMoment)
 	{
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		DataSample originalSample(testValues);
-		DataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		DataSample* originalSample = testSample.getSample();
+		DataSample binnedSample = originalSample->createBinnedDataSampleWithNumberOfBins(numberOfBins);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
 	}
 
 	void testBinningWithBinsize(int numberOfElements, int binsize, double expectedFirstMoment)
 	{
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(numberOfElements);
-		DataSample originalSample(testValues);
-		DataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(binsize);
+		TestDataSample testSample(numberOfElements, 0., arrayPosition);
+		DataSample* originalSample = testSample.getSample();
+		DataSample binnedSample = originalSample->createBinnedDataSampleWithBinsize(binsize);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
 	}
 

@@ -88,7 +88,7 @@ double DataSample::getMean()
 	return getNthMoment(1);
 }
 
-double DataSample::getVariance()
+double DataSample::getNthCentralMoment()
 {
 	return ( getNthMoment(2) - pow(getNthMoment(1),2.) );
 }
