@@ -230,6 +230,7 @@ double defaultFunction(double in)
 	return in;
 }
 
+//todo: print filename, perhaps path
 void DataSample::checkIfDatafileExists(std::string filename)
 {
 	std::ifstream file;

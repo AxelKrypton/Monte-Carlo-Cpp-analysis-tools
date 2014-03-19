@@ -12,6 +12,7 @@
 //TODO: move this to better place
 double defaultFunction(double in);
 
+//TODO: implement offset
 class DataSample
 {
 public:

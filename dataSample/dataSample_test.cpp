@@ -61,6 +61,7 @@ std::valarray<double> makeValarrayWithEntriesBetweenOneAndEight(int length)
 	return returnValarray;
 }
 
+//todo: write test for big and small entries
 enum FillType { zeros, ones, arrayPosition, entriesSymmetricBetweenZeroAndOne, entriesBetweenOneAndEight, bigAndSmallEntries };
 
 class TestDataSample
@@ -69,29 +70,29 @@ public:
   TestDataSample(int length, double referenceValue = 0., FillType fillType = zeros):
 		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
 	{
-                std::valarray<double> * testValues;
-		if ( fillType == zeros )
-		{
+	  std::valarray<double> * testValues;
+	  if ( fillType == zeros )
+	  {
 		  testValues = new std::valarray<double>(length);
-		}
-		if ( fillType == ones )
-		  {
-		    std::valarray<double> tmp = makeValarrayWithOnes(length);		    
-		    testValues = new std::valarray<double>(tmp);
-		  }
-		if ( fillType == arrayPosition )
-		  {
-		    std::valarray<double> tmp = makeValarrayWithArrayPosition(length);		    
-		    testValues = new std::valarray<double>(tmp);
-		  }
-		if ( fillType == entriesSymmetricBetweenZeroAndOne )
-		  {
-		    std::valarray<double> tmp = makeValarrayWithEntriesBetweenZeroAndOne(length);		    
-		    testValues = new std::valarray<double>(tmp);
-		  }
-		actualValue = 0.;
-		dataSampleInstance = new DataSample(*testValues);
-		delete testValues;
+	  }
+	  if ( fillType == ones )
+	  {
+		  std::valarray<double> tmp = makeValarrayWithOnes(length);
+		  testValues = new std::valarray<double>(tmp);
+	  }
+	  if ( fillType == arrayPosition )
+	  {
+		  std::valarray<double> tmp = makeValarrayWithArrayPosition(length);
+		  testValues = new std::valarray<double>(tmp);
+	  }
+	  if ( fillType == entriesSymmetricBetweenZeroAndOne )
+	  {
+		  std::valarray<double> tmp = makeValarrayWithEntriesBetweenZeroAndOne(length);
+		  testValues = new std::valarray<double>(tmp);
+	  }
+	  actualValue = 0.;
+	  dataSampleInstance = new DataSample(*testValues);
+	  delete testValues;
 	}
 
 	TestDataSample(std::valarray<double> valarrayIn, double referenceValue):
@@ -131,6 +132,21 @@ protected:
 	double testPrecision;
 };
 
+class TestDataSampleNthMoment : public TestDataSample
+{
+public:
+	TestDataSampleNthMoment(int n, int length, double referenceValue, FillType fillType) :
+		TestDataSample(length, referenceValue, fillType)
+	{
+		actualValue = dataSampleInstance->getNthMoment(n);
+	};
+	TestDataSampleNthMoment(int n, std::string dataFilename, double referenceValue, int column = 1) :
+		TestDataSample(dataFilename, referenceValue, column)
+	{
+		actualValue = dataSampleInstance->getNthMoment(n);
+	};
+};
+
 BOOST_AUTO_TEST_SUITE(precision)
 
 	BOOST_AUTO_TEST_CASE(doublePrecision1)
@@ -166,6 +182,7 @@ BOOST_AUTO_TEST_SUITE(precision)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+//todo: if files are found in subdir can depend on the system!
 BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(build1)
@@ -235,237 +252,181 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(zerothMoment)
 
-	class TestDataSampleZerothMoment : public TestDataSample
-	{
-	public:
-	  TestDataSampleZerothMoment(int length, double referenceValue, FillType fillType) :
-	    TestDataSample(length, referenceValue, fillType)
-		{
-			actualValue = dataSampleInstance->getNthMoment(0);
-		};
-	};
-
 	BOOST_AUTO_TEST_CASE(ZerothMoment1)
 	{
-	        int numberOfElements = 1;
+		int numberOfElements = 1;
 		double referenceValue = 1.;
-		TestDataSampleZerothMoment tester(numberOfElements, referenceValue, zeros);
+		TestDataSampleNthMoment tester(0, numberOfElements, referenceValue, zeros);
 	}
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment2)
 	{
-	        int numberOfElements = 23;
+		int numberOfElements = 23;
 		double referenceValue = 1.;
-		TestDataSampleZerothMoment tester(numberOfElements, referenceValue, ones);
+		TestDataSampleNthMoment tester(0, numberOfElements, referenceValue, ones);
 	}
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment3)
 	{
-	        int numberOfElements = 24;
+		int numberOfElements = 24;
 		double referenceValue = 1.;
-		TestDataSampleZerothMoment tester(numberOfElements, referenceValue, arrayPosition);
+		TestDataSampleNthMoment tester(0, numberOfElements, referenceValue, arrayPosition);
 	}
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment4)
 	{
-	        int numberOfElements = 24;
+		int numberOfElements = 24;
 		double referenceValue = 1.;
-		TestDataSampleZerothMoment tester(numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
+		TestDataSampleNthMoment tester(0, numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(firstMoment)
 
-	class TestDataSampleFirstMoment : public TestDataSample
-	{
-	public:
-		TestDataSampleFirstMoment(std::valarray<double> valarrayIn, double referenceValue) :
-			TestDataSample(valarrayIn, referenceValue)
-		{
-			actualValue = dataSampleInstance->getNthMoment(1);
-		};
-
-		TestDataSampleFirstMoment(std::string dataFilename, double referenceValue, int column = 1) :
-			TestDataSample(dataFilename, referenceValue, column)
-		{
-			actualValue = dataSampleInstance->getNthMoment(1);
-		};
-	};
-
 	BOOST_AUTO_TEST_CASE(firstMoment1)
 	{
-		std::valarray<double> testValues = makeValarrayWithZeros(1);
+		int numberOfElements = 1;
 		double referenceValue = 0.;
-		TestDataSampleFirstMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(1, numberOfElements, referenceValue, zeros);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment2)
 	{
-		std::valarray<double> testValues = makeValarrayWithOnes(23);
+		int numberOfElements = 23;
 		double referenceValue = 1.;
-		TestDataSampleFirstMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(1, numberOfElements, referenceValue, ones);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment3)
 	{
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+		int numberOfElements = 24;
 		double referenceValue = 11.5;
-		TestDataSampleFirstMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(1, numberOfElements, referenceValue, arrayPosition);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment4)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		int numberOfElements = 24;
 		double referenceValue = 0.5;
-		TestDataSampleFirstMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(1, numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment5)
 	{
 		std::string fileThatDoesExist = "datafile.example";
 		double referenceValue = 0.56130529942755358;
-		TestDataSampleFirstMoment tester(fileThatDoesExist, referenceValue);
+		TestDataSampleNthMoment tester(1, fileThatDoesExist, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment6)
 	{
 		std::string fileThatDoesExist = "datafileWithTwoColumns.example";
 		double referenceValue = 0.56130529942755358;
-		TestDataSampleFirstMoment tester(fileThatDoesExist, referenceValue, 2);
+		TestDataSampleNthMoment tester(1, fileThatDoesExist, referenceValue, 2);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment7)
 	{
 		std::string fileThatDoesExist = "datafileWithTwoColumns.example";
 		double referenceValue = 1.;
-		TestDataSampleFirstMoment tester(fileThatDoesExist, referenceValue, 1);
+		TestDataSampleNthMoment tester(1, fileThatDoesExist, referenceValue, 1);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(secondMoment)
 
-	class TestDataSampleSecondMoment : public TestDataSample
-	{
-	public:
-		TestDataSampleSecondMoment(std::valarray<double> valarrayIn, double referenceValue) :
-			TestDataSample(valarrayIn, referenceValue)
-		{
-			actualValue = dataSampleInstance->getNthMoment(2);
-		};
-	};
-
 	BOOST_AUTO_TEST_CASE(secondMoment1)
 	{
-		std::valarray<double> testValues = makeValarrayWithZeros(1);
+		int numberOfElements = 1;
 		double referenceValue = 0.;
-		TestDataSampleSecondMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(2, numberOfElements, referenceValue, zeros);
 	}
 
 	BOOST_AUTO_TEST_CASE(secondMoment2)
 	{
-		std::valarray<double> testValues = makeValarrayWithOnes(23);
+		int numberOfElements = 23;
 		double referenceValue = 1.;
-		TestDataSampleSecondMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(2, numberOfElements, referenceValue, ones);
 	}
 
 	BOOST_AUTO_TEST_CASE(secondMoment3)
 	{
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+		int numberOfElements = 24;
 		double referenceValue = 180.166666666667;
-		TestDataSampleSecondMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(2, numberOfElements, referenceValue, arrayPosition);
 	}
 
 	BOOST_AUTO_TEST_CASE(secondMoment4)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		int numberOfElements = 24;
 		double referenceValue = 0.340579710144927;
-		TestDataSampleSecondMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(2, numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(thirdMoment)
 
-	class TestDataSampleThirdMoment : public TestDataSample
-	{
-	public:
-		TestDataSampleThirdMoment(std::valarray<double> valarrayIn, double referenceValue) :
-			TestDataSample(valarrayIn, referenceValue)
-		{
-			actualValue = dataSampleInstance->getNthMoment(3);
-		};
-	};
-
 	BOOST_AUTO_TEST_CASE(thirdMoment1)
 	{
-		std::valarray<double> testValues = makeValarrayWithZeros(1);
+		int numberOfElements = 1;
 		double referenceValue = 0.;
-		TestDataSampleThirdMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(3, numberOfElements, referenceValue, zeros);
 	}
 
 	BOOST_AUTO_TEST_CASE(thirdMoment2)
 	{
-		std::valarray<double> testValues = makeValarrayWithOnes(23);
+		int numberOfElements = 23;
 		double referenceValue = 1.;
-		TestDataSampleThirdMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(3, numberOfElements, referenceValue, ones);
 	}
 
 	BOOST_AUTO_TEST_CASE(thirdMoment3)
 	{
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+		int numberOfElements = 24;
 		double referenceValue = 3174.;
-		TestDataSampleThirdMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(3, numberOfElements, referenceValue, arrayPosition);
 	}
 
 	BOOST_AUTO_TEST_CASE(thirdMoment4)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		int numberOfElements = 24;
 		double referenceValue = 0.260869565217391;
-		TestDataSampleThirdMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(3, numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(fourthMoment)
 
-	class TestDataSampleFourthMoment : public TestDataSample
-	{
-	public:
-		TestDataSampleFourthMoment(std::valarray<double> valarrayIn, double referenceValue) :
-			TestDataSample(valarrayIn, referenceValue)
-		{
-			actualValue = dataSampleInstance->getNthMoment(4);
-		};
-	};
-
 	BOOST_AUTO_TEST_CASE(fourthMoment1)
 	{
-		std::valarray<double> testValues = makeValarrayWithZeros(1);
+		int numberOfElements = 1;
 		double referenceValue = 0.;
-		TestDataSampleFourthMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(4, numberOfElements, referenceValue, zeros);
 	}
 
 	BOOST_AUTO_TEST_CASE(fourthMoment2)
 	{
-		std::valarray<double> testValues = makeValarrayWithOnes(23);
+		int numberOfElements = 23;
 		double referenceValue = 1.;
-		TestDataSampleFourthMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(4, numberOfElements, referenceValue, ones);
 	}
 
 	BOOST_AUTO_TEST_CASE(fourthMoment3)
 	{
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+		int numberOfElements = 24;
 		double referenceValue = 59635.1666666667;
-		TestDataSampleFourthMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(4, numberOfElements, referenceValue, arrayPosition);
 	}
 
 	BOOST_AUTO_TEST_CASE(fourthMoment4)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+		int numberOfElements = 24;
 		double referenceValue = 0.213103750582176;
-		TestDataSampleFourthMoment tester(testValues, referenceValue);
+		TestDataSampleNthMoment tester(4, numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
