@@ -61,27 +61,64 @@ std::valarray<double> makeValarrayWithEntriesBetweenOneAndEight(int length)
 	return returnValarray;
 }
 
+enum FillType { zeros, ones, arrayPosition, entriesSymmetricBetweenZeroAndOne, entriesBetweenOneAndEight, bigAndSmallEntries };
+
 class TestDataSample
 {
 public:
+  TestDataSample(int length, double referenceValue = 0., FillType fillType = zeros):
+		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
+	{
+                std::valarray<double> * testValues;
+		if ( fillType == zeros )
+		{
+		  testValues = new std::valarray<double>(length);
+		}
+		if ( fillType == ones )
+		  {
+		    std::valarray<double> tmp = makeValarrayWithOnes(length);		    
+		    testValues = new std::valarray<double>(tmp);
+		  }
+		if ( fillType == arrayPosition )
+		  {
+		    std::valarray<double> tmp = makeValarrayWithArrayPosition(length);		    
+		    testValues = new std::valarray<double>(tmp);
+		  }
+		if ( fillType == entriesSymmetricBetweenZeroAndOne )
+		  {
+		    std::valarray<double> tmp = makeValarrayWithEntriesBetweenZeroAndOne(length);		    
+		    testValues = new std::valarray<double>(tmp);
+		  }
+		actualValue = 0.;
+		dataSampleInstance = new DataSample(*testValues);
+		delete testValues;
+	}
+
 	TestDataSample(std::valarray<double> valarrayIn, double referenceValue):
 		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
 	{
-		//todo: need delete here?
+		actualValue = 0.;
 		dataSampleInstance = new DataSample(valarrayIn);
 	}
 
 	TestDataSample(std::string dataFilename, double referenceValue, int column = 1):
 		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
 	{
-		//todo: need delete here?
+		actualValue = 0.;
 		dataSampleInstance = new DataSample(dataFilename, column);
 	}
 
 	~TestDataSample()
 	{
 		testActualValueAgainstReferenceValue();
+		delete dataSampleInstance;
 	}
+
+	int getNumberOfElements()
+	{
+		return dataSampleInstance->getNumberOfElements();
+	}
+
 protected:
 	void testActualValueAgainstReferenceValue()
 	{
@@ -133,11 +170,7 @@ BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(build1)
 	{
-		std::valarray<double> testValues(1);
-		//TODO: check difference between this allocation and x = dataSample(asdf);
-		DataSample * dataSampleInstance;
-		dataSampleInstance = new DataSample(testValues);
-		BOOST_REQUIRE(dataSampleInstance);
+		BOOST_CHECK_NO_THROW(TestDataSample dataSampleInstance(1));
 	}
 
 	BOOST_AUTO_TEST_CASE(build2)
@@ -179,26 +212,21 @@ BOOST_AUTO_TEST_SUITE(build)
 	BOOST_AUTO_TEST_CASE(elements1)
 	{
 		int elementsOfTestArray = 17;
-		std::valarray<double> testValues(elementsOfTestArray);
-
-		DataSample * dataSampleInstance;
-		dataSampleInstance = new DataSample(testValues);
-		int elementsOfDataSample = dataSampleInstance->getNumberOfElements();
-		BOOST_CHECK_EQUAL(elementsOfTestArray, elementsOfDataSample);
+		TestDataSample dataSampleInstance = TestDataSample(elementsOfTestArray);
+		BOOST_CHECK_EQUAL(elementsOfTestArray, dataSampleInstance.getNumberOfElements());
 	}
 
 	BOOST_AUTO_TEST_CASE(elements2)
 	{
 		int elementsOfTestArray = 0;
-		std::valarray<double> testValues(elementsOfTestArray);
-		BOOST_REQUIRE_THROW(DataSample dataSampleInstance(testValues), std::invalid_argument);
+		BOOST_REQUIRE_THROW(TestDataSample dataSampleInstance(elementsOfTestArray), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(elements3)
 	{
 		std::string fileThatDoesExist = "datafile.example";
-		DataSample dataSample(fileThatDoesExist);
 		int linesInFile = 1005;
+		DataSample dataSample(fileThatDoesExist);
 		int numberOfElementsInDataSample = dataSample.getNumberOfElements();
 		BOOST_CHECK_EQUAL(linesInFile, numberOfElementsInDataSample);
 	}
@@ -210,8 +238,8 @@ BOOST_AUTO_TEST_SUITE(zerothMoment)
 	class TestDataSampleZerothMoment : public TestDataSample
 	{
 	public:
-		TestDataSampleZerothMoment(std::valarray<double> valarrayIn, double referenceValue) :
-			TestDataSample(valarrayIn, referenceValue)
+	  TestDataSampleZerothMoment(int length, double referenceValue, FillType fillType) :
+	    TestDataSample(length, referenceValue, fillType)
 		{
 			actualValue = dataSampleInstance->getNthMoment(0);
 		};
@@ -219,35 +247,34 @@ BOOST_AUTO_TEST_SUITE(zerothMoment)
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment1)
 	{
-		std::valarray<double> testValues = makeValarrayWithZeros(1);
+	        int numberOfElements = 1;
 		double referenceValue = 1.;
-		TestDataSampleZerothMoment tester(testValues, referenceValue);
+		TestDataSampleZerothMoment tester(numberOfElements, referenceValue, zeros);
 	}
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment2)
 	{
-		std::valarray<double> testValues = makeValarrayWithOnes(23);
+	        int numberOfElements = 23;
 		double referenceValue = 1.;
-		TestDataSampleZerothMoment tester(testValues, referenceValue);
+		TestDataSampleZerothMoment tester(numberOfElements, referenceValue, ones);
 	}
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment3)
 	{
-		std::valarray<double> testValues = makeValarrayWithArrayPosition(24);
+	        int numberOfElements = 24;
 		double referenceValue = 1.;
-		TestDataSampleZerothMoment tester(testValues, referenceValue);
+		TestDataSampleZerothMoment tester(numberOfElements, referenceValue, arrayPosition);
 	}
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment4)
 	{
-		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
+	        int numberOfElements = 24;
 		double referenceValue = 1.;
-		TestDataSampleZerothMoment tester(testValues, referenceValue);
+		TestDataSampleZerothMoment tester(numberOfElements, referenceValue, entriesSymmetricBetweenZeroAndOne);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
-//todo: make add. tests for mean? This is the same as first moment...
 BOOST_AUTO_TEST_SUITE(firstMoment)
 
 	class TestDataSampleFirstMoment : public TestDataSample
@@ -476,10 +503,12 @@ BOOST_AUTO_TEST_SUITE(variance)
 		TestDataSampleVariance tester(testValues, referenceValue);
 	}
 
+	//todo: implement some tests with big numbers!
 	BOOST_AUTO_TEST_CASE(variance4)
 	{
 		std::valarray<double> testValues = makeValarrayWithEntriesBetweenZeroAndOne(24);
 		double referenceValue = 0.0905797101449274;
+		//		double referenceValue = 0.0833425931070244;//0.0842644320297951;//0.0854700854700854;//0.0905797101449274;
 		TestDataSampleVariance tester(testValues, referenceValue);
 	}
 
