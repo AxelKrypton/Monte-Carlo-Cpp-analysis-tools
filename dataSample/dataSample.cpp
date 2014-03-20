@@ -182,6 +182,7 @@ int DataSample::calcNumberOfBins(int binsize)
 //todo: refactor
 DataSample DataSample::performBinning(int numberOfBins, int binsize)
 {
+std::cout << numberOfBins << " " << binsize << std::endl;
   std::valarray<double> binnedDataSample(numberOfBins);
   for(int iteration = 0; iteration < numberOfBins; iteration++)
   {
@@ -191,6 +192,11 @@ DataSample DataSample::performBinning(int numberOfBins, int binsize)
   }
   DataSample dataSampleInstance(binnedDataSample);
   return dataSampleInstance;
+}
+
+double defaultFunction(double in)
+{
+	return in;
 }
 
 DataSample DataSample::applyFunction(double (*function)(double))
@@ -269,11 +275,6 @@ double JackknifeDataSample::getJackknifeVariance_v2()
 double JackknifeDataSample::getJackknifeError()
 {
 	return sqrt(getJackknifeVariance());
-}
-
-double defaultFunction(double in)
-{
-	return in;
 }
 
 int JackknifeDataSample::getJackknifeNormalization()

@@ -66,7 +66,9 @@ class JackknifeDataSample: public DataSample
 {
 public:
 	/**
-	 * Following Berg, equation (2.160).
+	 * Following BA Berg,
+	 * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
+	 * equation (2.160).
 	 */
 	JackknifeDataSample(DataSample sampleIn) :
 		DataSample(sampleIn)
