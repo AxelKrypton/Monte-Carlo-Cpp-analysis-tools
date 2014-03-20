@@ -30,6 +30,8 @@ public:
 	DataSample createBinnedDataSampleWithNumberOfBins(int numberOfBins);
 	DataSample createBinnedDataSampleWithBinsize(int binsize);
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
+	DataSample createShiftedDataSample(int order, double shift);
+	double sum();
 
 protected:
 	double calcNthMoment(int n);
@@ -46,6 +48,7 @@ protected:
 	int calcBinsize(int numberOfBins);
 	int calcNumberOfBins(int binsize);
 	void initMembers();
+	//todo: init central moments and create member variable for that...
 	void initMoments();
 	int getNumberOfMoments();
 	/**
@@ -86,6 +89,41 @@ public:
 
 private:
 	int getJackknifeNormalization();
+	void checkIfJackknifeCanBePerformed();
+};
+
+//todo: generalise this to binsize
+class JackknifeDataSampleWithBinning: public JackknifeDataSample
+{
+public:
+	JackknifeDataSampleWithBinning(DataSample sampleIn, int numberOfBins) :
+		JackknifeDataSample(sampleIn)
+	{
+		checkIfJackknifeCanBePerformed(numberOfBins);
+		double wholeSum = values.sum();
+		int binsize = calcBinsize(numberOfBins);
+		std::valarray<double> binnedDataSample(numberOfBins);
+		for(int iteration = 0; iteration < numberOfBins; iteration++)
+		{
+			std::valarray<double> tmp = values[std::slice(iteration*binsize, binsize, 1)];
+			double partSum = tmp.sum();
+			binnedDataSample[iteration] = (wholeSum - partSum) / (sampleIn.getNumberOfElements() - binsize);
+		}
+		values = binnedDataSample;
+
+//		for(int i = 0; i<values.size(); i++)
+//		{
+//			std::cout << values[i] << std::endl;
+//		}
+
+		numberOfElements = binnedDataSample.size();
+		//todo: this is necessary because otherwise the moments from the above sample are returned
+		//       as they are calculated in the constructor -> This must be done on demand!
+		initMoments();
+		std::cout << getNthMoment(1) << std::endl;
+	}
+private:
+	void checkIfJackknifeCanBePerformed(int n);
 };
 
 #endif

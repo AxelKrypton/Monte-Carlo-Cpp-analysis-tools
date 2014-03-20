@@ -100,10 +100,20 @@ double DataSample::getNthCentralMoment(int n)
 	}
 }
 
+DataSample DataSample::createShiftedDataSample(int order, double shift)
+{
+	return DataSample( pow((values - shift), double(order)) );
+}
+
+double DataSample::sum()
+{
+	return values.sum();
+}
+
 double DataSample::calcNthCentralMomentExplicit(int n)
 {
 	checkIfNIsValid(n);
-	return (pow((values - getNthMoment(1)), 2.)).sum()  / numberOfElements;
+	return (createShiftedDataSample(2, getNthMoment(1))).sum()  / numberOfElements;
 }
 
 double DataSample::getNthMoment(int n)
@@ -182,7 +192,6 @@ int DataSample::calcNumberOfBins(int binsize)
 //todo: refactor
 DataSample DataSample::performBinning(int numberOfBins, int binsize)
 {
-std::cout << numberOfBins << " " << binsize << std::endl;
   std::valarray<double> binnedDataSample(numberOfBins);
   for(int iteration = 0; iteration < numberOfBins; iteration++)
   {
@@ -277,10 +286,20 @@ double JackknifeDataSample::getJackknifeError()
 	return sqrt(getJackknifeVariance());
 }
 
-int JackknifeDataSample::getJackknifeNormalization()
+void JackknifeDataSample::checkIfJackknifeCanBePerformed()
 {
 	if(numberOfElements <= 1)
 		throw std::invalid_argument("Cannot create jackknifeEstimators from one or less elements!");
+}
+
+int JackknifeDataSample::getJackknifeNormalization()
+{
+	checkIfJackknifeCanBePerformed();
 	return numberOfElements - 1;
 }
 
+void JackknifeDataSampleWithBinning::checkIfJackknifeCanBePerformed(int n)
+{
+	if(n <= 1)
+		throw std::invalid_argument("Cannot create jackknifeEstimators from one or less elements!");
+}
