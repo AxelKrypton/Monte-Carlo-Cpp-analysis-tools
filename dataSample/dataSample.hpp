@@ -65,16 +65,37 @@ protected:
 	const static int defaultSizeOfDataSample = 1;
 };
 
-class JackknifeDataSample: public DataSample
+/**
+ * Jackknife estimators.
+ * Following BA Berg,
+ * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
+ * equation (2.160).
+ */
+
+class JackknifeEstimators: public DataSample
 {
 public:
-	/**
-	 * Following BA Berg,
-	 * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
-	 * equation (2.160).
-	 */
-	JackknifeDataSample(DataSample sampleIn) :
+
+	JackknifeEstimators(DataSample sampleIn) :
 		DataSample(sampleIn)
+	{
+		checkIfJackknifeCanBePerformed();
+	};
+
+	double getJackknifeVariance();
+	double getJackknifeVariance_v2();
+	double getJackknifeError();
+
+protected:
+	int getJackknifeNormalization();
+	void checkIfJackknifeCanBePerformed();
+};
+
+class JackknifeEstimatorsFromBinnedDataSample: public JackknifeEstimators
+{
+public:
+	JackknifeEstimatorsFromBinnedDataSample(DataSample sampleIn) :
+		JackknifeEstimators(sampleIn)
 	{
 		int normalization = getJackknifeNormalization();
 		double sumOfDataSampleElements = values.sum();
@@ -83,44 +104,43 @@ public:
 		//       as they are calculated in the constructor -> This must be done on demand!
 		initMoments();
 	}
-	double getJackknifeVariance();
-	double getJackknifeVariance_v2();
-	double getJackknifeError();
-
-private:
-	int getJackknifeNormalization();
-	void checkIfJackknifeCanBePerformed();
 };
 
 //todo: generalise this to binsize
-class JackknifeDataSampleWithBinning: public JackknifeDataSample
+class JackknifeDataSampleWithBinning: public JackknifeEstimators
 {
 public:
 	JackknifeDataSampleWithBinning(DataSample sampleIn, int numberOfBins) :
-		JackknifeDataSample(sampleIn)
+		JackknifeEstimators(sampleIn)
 	{
 		checkIfJackknifeCanBePerformed(numberOfBins);
-		double wholeSum = values.sum();
+		double wholeSum = sampleIn.sum();
+		std::cout << std::scientific << wholeSum << std::endl;
 		int binsize = calcBinsize(numberOfBins);
 		std::valarray<double> binnedDataSample(numberOfBins);
 		for(int iteration = 0; iteration < numberOfBins; iteration++)
 		{
-			std::valarray<double> tmp = values[std::slice(iteration*binsize, binsize, 1)];
-			double partSum = tmp.sum();
+			double partSum=0.;
+			for (int j = 0; j< binsize; j++){
+				partSum += values[iteration*binsize + j];
+			}
+//			std::valarray<double> tmp = values[std::slice(iteration*binsize, binsize, 1)];
+//			double partSum = tmp.sum();
+//			std::cout << std::scientific << wholeSum << " "<< partSum << std::endl;
 			binnedDataSample[iteration] = (wholeSum - partSum) / (sampleIn.getNumberOfElements() - binsize);
 		}
 		values = binnedDataSample;
-
-//		for(int i = 0; i<values.size(); i++)
-//		{
-//			std::cout << values[i] << std::endl;
-//		}
 
 		numberOfElements = binnedDataSample.size();
 		//todo: this is necessary because otherwise the moments from the above sample are returned
 		//       as they are calculated in the constructor -> This must be done on demand!
 		initMoments();
 		std::cout << getNthMoment(1) << std::endl;
+
+//		for (int i = 0; i< numberOfElements; i++)
+//		{
+//			std::cout << std::scientific << values[i]<< std::endl;
+//		}
 	}
 private:
 	void checkIfJackknifeCanBePerformed(int n);
