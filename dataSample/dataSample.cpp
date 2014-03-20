@@ -298,7 +298,7 @@ int JackknifeEstimators::getJackknifeNormalization()
 	return numberOfElements - 1;
 }
 
-void JackknifeDataSampleWithBinning::checkIfJackknifeCanBePerformed(int n)
+void JackknifeEstimatorsFromBinning::checkIfJackknifeCanBePerformed(int n)
 {
 	if(n <= 1)
 		throw std::invalid_argument("Cannot create jackknifeEstimators from one or less elements!");

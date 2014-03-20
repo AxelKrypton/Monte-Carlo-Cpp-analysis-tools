@@ -107,26 +107,21 @@ public:
 };
 
 //todo: generalise this to binsize
-class JackknifeDataSampleWithBinning: public JackknifeEstimators
+//todo: think about better name
+class JackknifeEstimatorsFromBinning: public JackknifeEstimators
 {
 public:
-	JackknifeDataSampleWithBinning(DataSample sampleIn, int numberOfBins) :
+	JackknifeEstimatorsFromBinning(DataSample sampleIn, int numberOfBins) :
 		JackknifeEstimators(sampleIn)
 	{
 		checkIfJackknifeCanBePerformed(numberOfBins);
 		double wholeSum = sampleIn.sum();
-		std::cout << std::scientific << wholeSum << std::endl;
 		int binsize = calcBinsize(numberOfBins);
 		std::valarray<double> binnedDataSample(numberOfBins);
 		for(int iteration = 0; iteration < numberOfBins; iteration++)
 		{
-			double partSum=0.;
-			for (int j = 0; j< binsize; j++){
-				partSum += values[iteration*binsize + j];
-			}
-//			std::valarray<double> tmp = values[std::slice(iteration*binsize, binsize, 1)];
-//			double partSum = tmp.sum();
-//			std::cout << std::scientific << wholeSum << " "<< partSum << std::endl;
+			std::valarray<double> tmp = values[std::slice(iteration*binsize, binsize, 1)];
+			double partSum = tmp.sum();
 			binnedDataSample[iteration] = (wholeSum - partSum) / (sampleIn.getNumberOfElements() - binsize);
 		}
 		values = binnedDataSample;
@@ -135,13 +130,8 @@ public:
 		//todo: this is necessary because otherwise the moments from the above sample are returned
 		//       as they are calculated in the constructor -> This must be done on demand!
 		initMoments();
-		std::cout << getNthMoment(1) << std::endl;
-
-//		for (int i = 0; i< numberOfElements; i++)
-//		{
-//			std::cout << std::scientific << values[i]<< std::endl;
-//		}
 	}
+
 private:
 	void checkIfJackknifeCanBePerformed(int n);
 };
