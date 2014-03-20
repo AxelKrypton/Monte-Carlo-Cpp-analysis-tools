@@ -29,11 +29,6 @@ public:
 	double getNthMoment(int n);
 	DataSample createBinnedDataSampleWithNumberOfBins(int numberOfBins);
 	DataSample createBinnedDataSampleWithBinsize(int binsize);
-	/**
-	 * Following Berg, equation (2.160).
-	 */
-	//todo: make this return an JackknifeDataSample!
-	DataSample createJackknifeEstimators();
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
 
 protected:
@@ -53,7 +48,6 @@ protected:
 	void initMembers();
 	void initMoments();
 	int getNumberOfMoments();
-	int getJackknifeNormalization();
 	/**
 	 * Following Berg, p.52.
 	 */
@@ -71,13 +65,25 @@ protected:
 class JackknifeDataSample: public DataSample
 {
 public:
+	/**
+	 * Following Berg, equation (2.160).
+	 */
 	JackknifeDataSample(DataSample sampleIn) :
 		DataSample(sampleIn)
 	{
+		int normalization = getJackknifeNormalization();
+		double sumOfDataSampleElements = values.sum();
+		values = (sumOfDataSampleElements - values) / normalization;
+		//todo: this is necessary because otherwise the moments from the above sample are returned
+		//       as they are calculated in the constructor -> This must be done on demand!
+		initMoments();
 	}
 	double getJackknifeVariance();
 	double getJackknifeVariance_v2();
 	double getJackknifeError();
+
+private:
+	int getJackknifeNormalization();
 };
 
 #endif

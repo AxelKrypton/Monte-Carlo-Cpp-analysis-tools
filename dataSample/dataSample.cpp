@@ -193,48 +193,11 @@ DataSample DataSample::performBinning(int numberOfBins, int binsize)
   return dataSampleInstance;
 }
 
-int DataSample::getJackknifeNormalization()
-{
-	if(numberOfElements <= 1)
-		throw std::invalid_argument("Cannot create jackknifeEstimators from one or less elements!");
-	return numberOfElements - 1;
-}
-
-DataSample DataSample::createJackknifeEstimators()
-{
-	int normalization = getJackknifeNormalization();
-	double sumOfDataSampleElements = values.sum();
-	std::valarray<double> jackknifeEstimators = (sumOfDataSampleElements - values) / normalization;
-	DataSample dataSample(jackknifeEstimators);
-	return dataSample;
-}
-
 DataSample DataSample::applyFunction(double (*function)(double))
 {
 	std::valarray<double> functionAppliedToArray = values.apply(function);
 	DataSample dataSample(functionAppliedToArray);
 	return dataSample;
-}
-
-//todo: examine why these two impl. give different results
-double JackknifeDataSample::getJackknifeVariance()
-{
-	return (pow((values - getNthMoment(1)), 2.)).sum() * (numberOfElements  - 1.) / numberOfElements;
-}
-
-double JackknifeDataSample::getJackknifeVariance_v2()
-{
-	return ( getNthMoment(2) - pow(getNthMoment(1),2.) ) * (numberOfElements - 1.);
-}
-
-double JackknifeDataSample::getJackknifeError()
-{
-	return sqrt(getJackknifeVariance());
-}
-
-double defaultFunction(double in)
-{
-	return in;
 }
 
 //todo: print filename, perhaps path
@@ -290,3 +253,33 @@ std::valarray<double> DataSample::readDataFromFile(std::string filename, int col
 
 	return std::valarray<double>(data.data(), data.size());
 }
+
+
+//todo: examine why these two impl. give different results
+double JackknifeDataSample::getJackknifeVariance()
+{
+	return (pow((values - getNthMoment(1)), 2.)).sum() * (numberOfElements  - 1.) / numberOfElements;
+}
+
+double JackknifeDataSample::getJackknifeVariance_v2()
+{
+	return ( getNthMoment(2) - pow(getNthMoment(1),2.) ) * (numberOfElements - 1.);
+}
+
+double JackknifeDataSample::getJackknifeError()
+{
+	return sqrt(getJackknifeVariance());
+}
+
+double defaultFunction(double in)
+{
+	return in;
+}
+
+int JackknifeDataSample::getJackknifeNormalization()
+{
+	if(numberOfElements <= 1)
+		throw std::invalid_argument("Cannot create jackknifeEstimators from one or less elements!");
+	return numberOfElements - 1;
+}
+
