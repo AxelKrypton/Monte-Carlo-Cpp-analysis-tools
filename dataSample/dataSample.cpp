@@ -33,12 +33,8 @@ void DataSample::initMembers()
 void DataSample::initMoments()
 {
 	int numberOfMoments = getNumberOfMoments();
-	moments = std::vector<double>(numberOfMoments,0);
-	//todo: calc moments on demand...
-	for (int iteration = 0; iteration < moments.size(); iteration++)
-	{
-		moments[iteration] = calcNthMoment(iteration);
-	}
+	moments = std::vector<Moment>(numberOfMoments);
+	centralMoments = std::vector<Moment>(numberOfMoments);
 }
 
 int DataSample::getNumberOfMoments()
@@ -63,6 +59,16 @@ void DataSample::checkIfOffsetIsValid(int offset)
 		throw std::invalid_argument("Offset must be greater than or equal to zero!");
 	if(offset > 0)
 		throw std::invalid_argument("Usage of offset parameter is not implemented yet. Aborting!");
+}
+
+double DataSample::getNthMoment(int n)
+{
+	checkIfNIsValid(n);
+	if (!moments[n].calculated)
+	{
+		moments[n].set(calcNthMoment(n));
+	}
+	return moments[n].value;
 }
 
 double DataSample::calcNthMoment(int n)
@@ -90,6 +96,16 @@ double DataSample::calcFirstMomentExplicit()
 
 double DataSample::getNthCentralMoment(int n)
 {
+	checkIfNIsValid(n);
+	if (!centralMoments[n].calculated)
+	{
+		centralMoments[n].set(calcNthCentralMoment(n));
+	}
+	return centralMoments[n].value;
+}
+
+double DataSample::calcNthCentralMoment(int n)
+{
 	if ( n == 0 || n == 1)
 	{
 		return 0.;
@@ -100,6 +116,11 @@ double DataSample::getNthCentralMoment(int n)
 	}
 }
 
+double DataSample::calcNthCentralMomentExplicit(int n)
+{
+	return (createShiftedDataSample(2, getNthMoment(1))).sum()  / numberOfElements;
+}
+
 DataSample DataSample::createShiftedDataSample(int order, double shift)
 {
 	return DataSample( pow((values - shift), double(order)) );
@@ -108,18 +129,6 @@ DataSample DataSample::createShiftedDataSample(int order, double shift)
 double DataSample::sum()
 {
 	return values.sum();
-}
-
-double DataSample::calcNthCentralMomentExplicit(int n)
-{
-	checkIfNIsValid(n);
-	return (createShiftedDataSample(2, getNthMoment(1))).sum()  / numberOfElements;
-}
-
-double DataSample::getNthMoment(int n)
-{
-	checkIfNIsValid(n);
-	return moments[n];
 }
 
 int DataSample::getUpperLimitForNthMoment()

@@ -14,6 +14,25 @@ const static int roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid 
 //TODO: move this to better place
 double defaultFunction(double in);
 
+class Moment
+{
+public:
+	Moment()
+	{
+		calculated = false;
+		value = 0.;
+	}
+
+	void set(double valueIn)
+	{
+		value = valueIn;
+		calculated = true;
+	};
+
+	bool calculated;
+	double value;
+};
+
 //TODO: implement offset
 class DataSample
 {
@@ -36,6 +55,7 @@ public:
 protected:
 	double calcNthMoment(int n);
 	double calcNthMomentExplicit(int n);
+	double calcNthCentralMoment(int n);
 	double calcNthCentralMomentExplicit(int n);
 	double calcFirstMomentExplicit();
 	void checkIfNIsValid(int n);
@@ -58,7 +78,8 @@ protected:
 	std::valarray<double> readDataFromFile(std::string filename, int column, int offset);
 
 	std::valarray<double> values;
-	std::vector<double> moments;
+	std::vector<Moment> moments;
+	std::vector<Moment> centralMoments;
 	int numberOfElements;
 	const static int upperLimitForNthMoment = 4;
 	const static int lowerLimitForNthMoment = 0;
