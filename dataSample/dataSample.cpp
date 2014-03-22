@@ -179,19 +179,30 @@ void DataSample::checkIfColumnIsValid(int column)
 
 int DataSample::calcBinsize(int numberOfBins)
 {
+	int discardedElements = numberOfElements % numberOfBins;
+	if (discardedElements != 0)
+	{
+		std::cout << "Warning: numberOfBins is not a multiple of numberOfElements!" << std::endl;
+		std::cout << discardedElements << " elements are discarded!" << std::endl;
+	}
 	return numberOfElements / numberOfBins;
 }
 
 int DataSample::calcNumberOfBins(int binsize)
 {
-	if (numberOfElements % binsize != 0)
+	int discardedElements = numberOfElements % binsize;
+	if (discardedElements != 0)
+	{
 		std::cout << "Warning: binsize is not a multiple of numberOfElements!" << std::endl;
+		std::cout << discardedElements << " elements are discarded!" << std::endl;
+	}
 	return numberOfElements / binsize;
 }
 
 //todo: refactor
 DataSample DataSample::performBinning(int numberOfBins, int binsize)
 {
+	std::cout << "perform binning with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
   std::valarray<double> binnedDataSample(numberOfBins);
   for(int iteration = 0; iteration < numberOfBins; iteration++)
   {
@@ -260,6 +271,7 @@ std::valarray<double> DataSample::readDataFromFile(std::string filename, int col
 		}
 	}
 	//todo: this is not covered in a test yet...
+	//Note: this happens for example if an empty line is contained in the file
 	if(!(infile.peek() == EOF && infile.eof()) || infile.bad())
 	{
 		throw std::runtime_error("Error reading datafile");

@@ -115,8 +115,11 @@ public:
 		JackknifeEstimators(sampleIn)
 	{
 		checkIfJackknifeCanBePerformed(numberOfBins);
+		//todo: this is the sum over the whole sample, not only the binned one!!
 		double wholeSum = sampleIn.sum();
 		int binsize = calcBinsize(numberOfBins);
+		std::cout << "create binned jackknife estimators with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
+
 		std::valarray<double> binnedDataSample(numberOfBins);
 		for(int iteration = 0; iteration < numberOfBins; iteration++)
 		{
