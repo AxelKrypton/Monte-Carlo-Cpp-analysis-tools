@@ -330,3 +330,24 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinning)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsExplicitAgainstCombinedMethod)
+
+BOOST_AUTO_TEST_CASE(jackknifeEstimatorsFromBinningWithNumberOfBins_varianceError2)
+{
+	std::string fileThatDoesExist = "datafile2.example";
+	int numberOfBins = 50;
+
+	DataSample sample(fileThatDoesExist);
+	DataSample varSample = sample.createShiftedDataSample(2, sample.getNthMoment(1));
+	JackknifeEstimatorsFromBinning jackSample1(varSample, numberOfBins);
+	DataSample binnedSample = varSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+	JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample);
+
+	double varianceError1 = jackSample1.getJackknifeError();
+	double varianceError2 = jackSample2.getJackknifeError();
+
+	BOOST_CHECK_CLOSE(varianceError1, varianceError2, doublePrecisionInPercent);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+

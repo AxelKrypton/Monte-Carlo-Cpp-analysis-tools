@@ -25,7 +25,6 @@ public:
 	};
 
 	double getJackknifeVariance();
-	double getJackknifeVariance_v2();
 	double getJackknifeError();
 
 protected:

@@ -6,12 +6,6 @@ double JackknifeEstimators::getJackknifeVariance()
 	return (pow((values - getNthMoment(1)), 2.)).sum() * (numberOfElements  - 1.) / numberOfElements;
 }
 
-//todo: remove!
-double JackknifeEstimators::getJackknifeVariance_v2()
-{
-	return ( getNthMoment(2) - pow(getNthMoment(1),2.) ) * (numberOfElements - 1.);
-}
-
 double JackknifeEstimators::getJackknifeError()
 {
 	return sqrt(getJackknifeVariance());
