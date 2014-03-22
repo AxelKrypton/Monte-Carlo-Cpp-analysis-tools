@@ -5,6 +5,12 @@
 #ifndef TESTDATASAMPLE_HPP_
 #define TESTDATASAMPLE_HPP_
 
+/**
+ * double should be correct up to 15 digits (at least)
+ * this means two doubles should be the same relative
+ * to each other up to 14 digits
+ * */
+double doublePrecisionInPercent = 1e-12;
 
 /**
  * Arrays filled with constants have a mean equal to the constant and zero variance.
