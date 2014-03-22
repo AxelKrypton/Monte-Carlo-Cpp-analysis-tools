@@ -71,7 +71,9 @@ protected:
  * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
  * equation (2.160).
  */
-
+//todo: check which version of jackknife is correct (whole sum or binned whole sum)
+//todo: in case, replace all reference values accordingly!
+//todo: In any case, it seems as if the precision can be replaced by double precision here!
 class JackknifeEstimators: public DataSample
 {
 public:
