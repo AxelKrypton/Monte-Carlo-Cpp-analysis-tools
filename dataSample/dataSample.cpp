@@ -3,13 +3,6 @@
 #include <sstream>
 #include "dataSample.hpp"
 
-void DataSample::setValues(std::valarray<double> valuesIn)
-{
-	values = valuesIn;
-	numberOfElements = valuesIn.size();
-	checkIfNumberOfElementsIsValid(numberOfElements);
-}
-
 DataSample::DataSample(int length)
 {
 	setValues(std::valarray<double>(length));
@@ -28,35 +21,18 @@ DataSample::DataSample(std::string dataFilename, int column, int offset)
 	initMoments();
 }
 
+void DataSample::setValues(std::valarray<double> valuesIn)
+{
+	checkIfNumberOfElementsIsValid(valuesIn.size());
+	values = valuesIn;
+	numberOfElements = valuesIn.size();
+}
+
 void DataSample::initMoments()
 {
 	int numberOfMoments = getNumberOfMoments();
 	moments = std::vector<Moment>(numberOfMoments);
 	centralMoments = std::vector<Moment>(numberOfMoments);
-}
-
-int DataSample::getNumberOfMoments()
-{
-	return upperLimitForNthMoment - lowerLimitForNthMoment + 1;
-}
-
-int DataSample::getNumberOfElements()
-{
-	return numberOfElements;
-}
-
-void DataSample::checkIfNIsValid(int n)
-{
-	if(n < lowerLimitForNthMoment || n > upperLimitForNthMoment)
-		throw std::invalid_argument("The requested moment is not implemented yet!");
-}
-
-void DataSample::checkIfOffsetIsValid(int offset)
-{
-	if(offset < 0)
-		throw std::invalid_argument("Offset must be greater than or equal to zero!");
-	if(offset > 0)
-		throw std::invalid_argument("Usage of offset parameter is not implemented yet. Aborting!");
 }
 
 double DataSample::getNthMoment(int n)
@@ -129,6 +105,16 @@ double DataSample::sum()
 	return values.sum();
 }
 
+int DataSample::getNumberOfMoments()
+{
+	return upperLimitForNthMoment - lowerLimitForNthMoment + 1;
+}
+
+int DataSample::getNumberOfElements()
+{
+	return numberOfElements;
+}
+
 int DataSample::getUpperLimitForNthMoment()
 {
 	return upperLimitForNthMoment;
@@ -151,6 +137,20 @@ DataSample DataSample::createBinnedDataSampleWithBinsize(int binsize)
 	checkIfBinsizeIsValid(binsize);
 	int numberOfBins = calcNumberOfBins(binsize);
 	return performBinning(numberOfBins, binsize);
+}
+
+void DataSample::checkIfNIsValid(int n)
+{
+	if(n < lowerLimitForNthMoment || n > upperLimitForNthMoment)
+		throw std::invalid_argument("The requested moment is not implemented yet!");
+}
+
+void DataSample::checkIfOffsetIsValid(int offset)
+{
+	if(offset < 0)
+		throw std::invalid_argument("Offset must be greater than or equal to zero!");
+	if(offset > 0)
+		throw std::invalid_argument("Usage of offset parameter is not implemented yet. Aborting!");
 }
 
 void DataSample::checkIfNumberOfElementsIsValid(int length)
