@@ -52,25 +52,28 @@ public:
 class JackknifeEstimatorsFromBinning: public JackknifeEstimators
 {
 public:
-	JackknifeEstimatorsFromBinning(DataSample sampleIn, int numberOfBins) :
-		JackknifeEstimators(sampleIn)
+	std::valarray<double> createJackknifeEstimatorsWithBinning(DataSample sampleIn, int numberOfBins, int binsize)
 	{
-		checkIfJackknifeCanBePerformed(numberOfBins);
 		//todo: this is the sum over the whole sample, not only the binned one!!
 		double wholeSum = sampleIn.sum();
-		int binsize = calcBinsize(numberOfBins);
 		std::cout << "create binned jackknife estimators with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
-
 		std::valarray<double> binnedDataSample(numberOfBins);
-		for(int iteration = 0; iteration < numberOfBins; iteration++)
+		for (int iteration = 0; iteration < numberOfBins; iteration++)
 		{
-			std::valarray<double> tmp = values[std::slice(iteration*binsize, binsize, 1)];
+			std::valarray<double> tmp = values[std::slice(iteration * binsize,	binsize, 1)];
 			double partSum = tmp.sum();
 			binnedDataSample[iteration] = (wholeSum - partSum) / (sampleIn.getNumberOfElements() - binsize);
 		}
-		values = binnedDataSample;
+		return binnedDataSample;
+	}
 
-		numberOfElements = binnedDataSample.size();
+	JackknifeEstimatorsFromBinning(DataSample sampleIn, int numberOfBins) :
+			JackknifeEstimators(sampleIn)
+	{
+		checkIfJackknifeCanBePerformed(numberOfBins);
+		int binsize = calcBinsize(numberOfBins);
+		values = createJackknifeEstimatorsWithBinning(sampleIn, numberOfBins, binsize);
+		numberOfElements = values.size();
 		//todo: this is necessary because otherwise the moments from the above sample are returned
 		//       as they are calculated in the constructor -> This must be done on demand!
 		initMoments();

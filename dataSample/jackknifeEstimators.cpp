@@ -1,9 +1,8 @@
 #include "jackknifeEstimators.hpp"
 
-//todo: refactor
 double JackknifeEstimators::getJackknifeVariance()
 {
-	return (pow((values - getNthMoment(1)), 2.)).sum() * (numberOfElements  - 1.) / numberOfElements;
+	return ( createShiftedDataSample(2, getNthMoment(1)) ).sum() * (numberOfElements  - 1.) / numberOfElements;
 }
 
 double JackknifeEstimators::getJackknifeError()
