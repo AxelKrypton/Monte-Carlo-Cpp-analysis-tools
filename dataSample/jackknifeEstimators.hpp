@@ -21,7 +21,7 @@ public:
 	JackknifeEstimators(DataSample sampleIn) :
 		DataSample(sampleIn)
 	{
-		checkIfJackknifeCanBePerformed();
+		checkIfJackknifeCanBePerformed(numberOfElements);
 	};
 
 	double getJackknifeVariance();
@@ -29,7 +29,7 @@ public:
 
 protected:
 	int getJackknifeNormalization();
-	void checkIfJackknifeCanBePerformed();
+	void checkIfJackknifeCanBePerformed(int n);
 };
 
 class JackknifeEstimatorsFromBinnedDataSample: public JackknifeEstimators
@@ -39,11 +39,8 @@ public:
 		JackknifeEstimators(sampleIn)
 	{
 		int normalization = getJackknifeNormalization();
-		double sumOfDataSampleElements = values.sum();
+		double sumOfDataSampleElements = sampleIn.sum();
 		values = (sumOfDataSampleElements - values) / normalization;
-		//todo: this is necessary because otherwise the moments from the above sample are returned
-		//       as they are calculated in the constructor -> This must be done on demand!
-		initMoments();
 	}
 };
 
@@ -74,15 +71,7 @@ public:
 		int binsize = calcBinsize(numberOfBins);
 		values = createJackknifeEstimatorsWithBinning(sampleIn, numberOfBins, binsize);
 		numberOfElements = values.size();
-		//todo: this is necessary because otherwise the moments from the above sample are returned
-		//       as they are calculated in the constructor -> This must be done on demand!
-		initMoments();
 	}
-
-private:
-	void checkIfJackknifeCanBePerformed(int n);
 };
-
-
 
 #endif /* JACKKNIFEESTIMATORS_HPP_ */

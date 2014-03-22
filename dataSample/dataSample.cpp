@@ -3,30 +3,28 @@
 #include <sstream>
 #include "dataSample.hpp"
 
+void DataSample::setValues(std::valarray<double> valuesIn)
+{
+	values = valuesIn;
+	numberOfElements = valuesIn.size();
+	checkIfNumberOfElementsIsValid(numberOfElements);
+}
+
 DataSample::DataSample(int length)
 {
-	checkIfNumberOfElementsIsValid(length);
-	values = std::valarray<double>(length);
-	initMembers();
+	setValues(std::valarray<double>(length));
+	initMoments();
 }
 
 DataSample::DataSample(std::valarray<double> valuesIn)
 {
-	values = valuesIn;
-	initMembers();
-	checkIfNumberOfElementsIsValid(numberOfElements);
+	setValues(valuesIn);
+	initMoments();
 }
 
 DataSample::DataSample(std::string dataFilename, int column, int offset)
 {
-	values = readDataFromFile(dataFilename, column, offset);
-	initMembers();
-	checkIfNumberOfElementsIsValid(numberOfElements);
-}
-
-void DataSample::initMembers()
-{
-	numberOfElements = values.size();
+	setValues(readDataFromFile(dataFilename, column, offset));
 	initMoments();
 }
 

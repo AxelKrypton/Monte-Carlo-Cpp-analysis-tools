@@ -53,6 +53,7 @@ public:
 	double sum();
 
 protected:
+	void setValues(std::valarray<double> valuesIn);
 	double calcNthMoment(int n);
 	double calcNthMomentExplicit(int n);
 	double calcNthCentralMoment(int n);
@@ -67,7 +68,6 @@ protected:
 	void checkIfOffsetIsValid(int offset);
 	int calcBinsize(int numberOfBins);
 	int calcNumberOfBins(int binsize);
-	void initMembers();
 	//todo: init central moments and create member variable for that...
 	void initMoments();
 	int getNumberOfMoments();

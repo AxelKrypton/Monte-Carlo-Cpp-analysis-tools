@@ -2,7 +2,7 @@
 
 double JackknifeEstimators::getJackknifeVariance()
 {
-	return ( createShiftedDataSample(2, getNthMoment(1)) ).sum() * (numberOfElements  - 1.) / numberOfElements;
+	return ( createShiftedDataSample(2, getNthMoment(1)) ).getNthMoment(1) * getJackknifeNormalization();
 }
 
 double JackknifeEstimators::getJackknifeError()
@@ -10,19 +10,13 @@ double JackknifeEstimators::getJackknifeError()
 	return sqrt(getJackknifeVariance());
 }
 
-void JackknifeEstimators::checkIfJackknifeCanBePerformed()
-{
-	if(numberOfElements <= 1)
-		throw std::invalid_argument("Cannot create jackknifeEstimators from one or less elements!");
-}
-
 int JackknifeEstimators::getJackknifeNormalization()
 {
-	checkIfJackknifeCanBePerformed();
+	checkIfJackknifeCanBePerformed(numberOfElements);
 	return numberOfElements - 1;
 }
 
-void JackknifeEstimatorsFromBinning::checkIfJackknifeCanBePerformed(int n)
+void JackknifeEstimators::checkIfJackknifeCanBePerformed(int n)
 {
 	if(n <= 1)
 		throw std::invalid_argument("Cannot create jackknifeEstimators from one or less elements!");
