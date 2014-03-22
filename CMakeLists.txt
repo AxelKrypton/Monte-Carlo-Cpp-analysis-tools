@@ -17,6 +17,10 @@ add_subdirectory(dataSample)
 include_directories(${StATools_SOURCE_DIR}/dataSample)
 link_directories(${StATools_BINARY_DIR}/dataSample)
 
+add_subdirectory(FileContainer)
+include_directories(${StATools_SOURCE_DIR}/FileContainer)
+link_directories(${StATools_BINARY_DIR}/FileContainer)
+
 add_executable(dataAnalysis dataAnalysis.cpp)
 target_link_libraries(dataAnalysis dataSample)
 
