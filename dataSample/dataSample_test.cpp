@@ -128,6 +128,27 @@ BOOST_AUTO_TEST_SUITE(build)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(operators)
+
+	BOOST_AUTO_TEST_CASE(access)
+	{
+		int numberOfElements = 10;
+		DataSample sample(numberOfElements);
+		BOOST_REQUIRE_EQUAL(sample[numberOfElements-1], 0);
+	}
+
+	BOOST_AUTO_TEST_CASE(set)
+	{
+		int numberOfElements = 10;
+		double someValue = 1.23456789;
+		int index = numberOfElements/2;
+		DataSample sample(numberOfElements);
+		sample[index] = someValue;
+		BOOST_REQUIRE_EQUAL(sample[index], someValue);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(zerothMoment)
 
 	BOOST_AUTO_TEST_CASE(ZerothMoment1)

@@ -51,6 +51,7 @@ public:
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
 	DataSample createShiftedDataSample(int order, double shift);
 	double sum();
+	double& operator[](size_t index);
 
 protected:
 	void setValues(std::valarray<double> valuesIn);

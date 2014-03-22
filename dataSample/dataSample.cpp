@@ -105,6 +105,11 @@ double DataSample::sum()
 	return values.sum();
 }
 
+double& DataSample::operator[](size_t index)
+{
+	return values[index];
+}
+
 int DataSample::getNumberOfMoments()
 {
 	return upperLimitForNthMoment - lowerLimitForNthMoment + 1;
