@@ -8,25 +8,26 @@
 
 BOOST_AUTO_TEST_SUITE(build)
 
-	BOOST_AUTO_TEST_CASE(build1){
+	BOOST_AUTO_TEST_CASE(build1)
+	{
 		std::vector<std::string> notExistingFile;
 		notExistingFile.push_back("FileThatDoesNotExist");
 		BOOST_REQUIRE_THROW(FileContainer fileContainer(notExistingFile), std::invalid_argument);
 	}
-	BOOST_AUTO_TEST_CASE(build2){
+	BOOST_AUTO_TEST_CASE(build2)
+	{
 		std::vector<std::string> ExistingFile;
 		ExistingFile.push_back("input_existing_file");
 		BOOST_REQUIRE_NO_THROW(FileContainer fileContainer(ExistingFile));
 	}
-	BOOST_AUTO_TEST_CASE(build3){
+	BOOST_AUTO_TEST_CASE(build3)
+	{
 		std::vector<std::string> OutputFile;
 		OutputFile.push_back("FileOutputForBuildTest");
 		BOOST_REQUIRE_NO_THROW(FileContainer fileContainer(OutputFile, false));
 	}
 
-
 BOOST_AUTO_TEST_SUITE_END()
-
 
 BOOST_AUTO_TEST_SUITE(getOpenFile)
 
