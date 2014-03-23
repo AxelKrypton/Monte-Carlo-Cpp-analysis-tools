@@ -4,6 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "dataSample.hpp"
+#include "dataSampleAnalyzer.hpp"
 
 #include <cfloat>
 #include "TestDataSample.hpp"

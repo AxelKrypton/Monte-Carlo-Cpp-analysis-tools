@@ -1,5 +1,6 @@
 add_library(dataAnalysisUtilities
 	dataSample.cpp
+	dataSampleAnalyzer.cpp
 	jackknifeEstimators.cpp
 )
 

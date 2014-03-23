@@ -13,7 +13,7 @@
 #ifndef JACKKNIFEESTIMATORS_HPP_
 #define JACKKNIFEESTIMATORS_HPP_
 
-#include "dataSample.hpp"
+#include "dataSampleAnalyzer.hpp"
 #include <iostream>
 
 class JackknifeEstimators: public DataSampleAnalyzer
