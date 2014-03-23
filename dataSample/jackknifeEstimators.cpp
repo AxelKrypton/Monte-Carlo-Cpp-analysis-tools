@@ -8,6 +8,7 @@ JackknifeEstimators(sampleIn)
 	values = (sumOfDataSampleElements - values) / normalization;
 }
 
+//todo: replace references and calls of std::valarray by DataSample
 std::valarray<double> JackknifeEstimatorsFromBinning::createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize)
 {
 	//todo: this is the sum over the whole sample, not only the binned one!!
@@ -31,7 +32,6 @@ JackknifeEstimatorsFromBinning::JackknifeEstimatorsFromBinning(DataSampleAnalyze
 	setValues( createJackknifeEstimatorsWithBinning(sampleIn, numberOfBins, binsize) );
 }
 
-//todo: refactor
 double JackknifeEstimators::getJackknifeVariance()
 {
 	DataSampleAnalyzer tmp ( shiftAndPow(2, getNthMoment(1)) );
