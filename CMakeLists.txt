@@ -22,6 +22,6 @@ include_directories(${StATools_SOURCE_DIR}/FileContainer)
 link_directories(${StATools_BINARY_DIR}/FileContainer)
 
 add_executable(dataAnalysis dataAnalysis.cpp)
-target_link_libraries(dataAnalysis dataSample)
+target_link_libraries(dataAnalysis dataAnalysisUtilities)
 
 # add_library(StATools dataSample)

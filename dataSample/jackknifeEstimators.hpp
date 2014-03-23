@@ -16,12 +16,12 @@
 #include "dataSample.hpp"
 #include <iostream>
 
-class JackknifeEstimators: public DataSample
+class JackknifeEstimators: public DataSampleAnalyzer
 {
 public:
 
-	JackknifeEstimators(DataSample sampleIn) :
-		DataSample(sampleIn)
+	JackknifeEstimators(DataSampleAnalyzer sampleIn) :
+		DataSampleAnalyzer(sampleIn)
 	{
 		checkIfJackknifeCanBePerformed(numberOfElements);
 	};
@@ -37,14 +37,14 @@ protected:
 class JackknifeEstimatorsFromBinnedDataSample: public JackknifeEstimators
 {
 public:
-	JackknifeEstimatorsFromBinnedDataSample(DataSample sampleIn);
+	JackknifeEstimatorsFromBinnedDataSample(DataSampleAnalyzer sampleIn);
 };
 
 class JackknifeEstimatorsFromBinning: public JackknifeEstimators
 {
 public:
-	JackknifeEstimatorsFromBinning(DataSample sampleIn, int numberOfBins);
-	std::valarray<double> createJackknifeEstimatorsWithBinning(DataSample sampleIn, int numberOfBins, int binsize);
+	JackknifeEstimatorsFromBinning(DataSampleAnalyzer sampleIn, int numberOfBins);
+	std::valarray<double> createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize);
 };
 
 #endif /* JACKKNIFEESTIMATORS_HPP_ */

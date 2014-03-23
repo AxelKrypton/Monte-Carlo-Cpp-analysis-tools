@@ -1,6 +1,6 @@
 #include "jackknifeEstimators.hpp"
 
-JackknifeEstimatorsFromBinnedDataSample::JackknifeEstimatorsFromBinnedDataSample(DataSample sampleIn) :
+JackknifeEstimatorsFromBinnedDataSample::JackknifeEstimatorsFromBinnedDataSample(DataSampleAnalyzer sampleIn) :
 JackknifeEstimators(sampleIn)
 {
 	int normalization = getJackknifeNormalization();
@@ -8,7 +8,7 @@ JackknifeEstimators(sampleIn)
 	values = (sumOfDataSampleElements - values) / normalization;
 }
 
-std::valarray<double> JackknifeEstimatorsFromBinning::createJackknifeEstimatorsWithBinning(DataSample sampleIn, int numberOfBins, int binsize)
+std::valarray<double> JackknifeEstimatorsFromBinning::createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize)
 {
 	//todo: this is the sum over the whole sample, not only the binned one!!
 	double wholeSum = sampleIn.sum();
@@ -23,7 +23,7 @@ std::valarray<double> JackknifeEstimatorsFromBinning::createJackknifeEstimatorsW
 	return binnedDataSample;
 }
 
-JackknifeEstimatorsFromBinning::JackknifeEstimatorsFromBinning(DataSample sampleIn, int numberOfBins) :
+JackknifeEstimatorsFromBinning::JackknifeEstimatorsFromBinning(DataSampleAnalyzer sampleIn, int numberOfBins) :
 	JackknifeEstimators(sampleIn)
 {
 	checkIfJackknifeCanBePerformed(numberOfBins);
@@ -31,9 +31,11 @@ JackknifeEstimatorsFromBinning::JackknifeEstimatorsFromBinning(DataSample sample
 	setValues( createJackknifeEstimatorsWithBinning(sampleIn, numberOfBins, binsize) );
 }
 
+//todo: refactor
 double JackknifeEstimators::getJackknifeVariance()
 {
-	return ( createShiftedDataSample(2, getNthMoment(1)) ).getNthMoment(1) * getJackknifeNormalization();
+	DataSampleAnalyzer tmp ( createShiftedDataSample(2, getNthMoment(1)) );
+	return tmp.getNthMoment(1) * getJackknifeNormalization();
 }
 
 double JackknifeEstimators::getJackknifeError()

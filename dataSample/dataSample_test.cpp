@@ -4,7 +4,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "dataSample.hpp"
-#include "jackknifeEstimators.hpp"
 
 #include <cfloat>
 #include "TestDataSample.hpp"
@@ -411,28 +410,28 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 
 	BOOST_AUTO_TEST_CASE(getNthMomentValidArgument1)
 	{
-		DataSample dataSampleInstance;
+		DataSampleAnalyzer dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(highestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentValidArgument2)
 	{
-		DataSample dataSampleInstance;
+		DataSampleAnalyzer dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument1)
 	{
-		DataSample dataSampleInstance;
+		DataSampleAnalyzer dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(highestValueAllowed + 1), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument2)
 	{
-		DataSample dataSampleInstance;
+		DataSampleAnalyzer dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed - 1), std::invalid_argument);
 	}
@@ -443,28 +442,28 @@ BOOST_AUTO_TEST_SUITE(getNthCentralMoment)
 
 	BOOST_AUTO_TEST_CASE(getNthCentralMomentValidArgument1)
 	{
-		DataSample dataSampleInstance;
+		DataSampleAnalyzer dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthCentralMoment(highestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthCentralMomentValidArgument2)
 	{
-		DataSample dataSampleInstance;
+		DataSampleAnalyzer dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthCentralMoment(lowestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthCentralMomentInvalidArgument1)
 	{
-		DataSample dataSampleInstance;
+		DataSampleAnalyzer dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthCentralMoment(highestValueAllowed + 1), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthCentralMomentInvalidArgument2)
 	{
-		DataSample dataSampleInstance;
+		DataSampleAnalyzer dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthCentralMoment(lowestValueAllowed - 1), std::invalid_argument);
 	}
@@ -488,44 +487,44 @@ BOOST_AUTO_TEST_SUITE(binning)
 	void testBinningWithNumberOfBins(int numberOfElements, int numberOfBins, double expectedFirstMoment)
 	{
 		TestDataSample testSample(numberOfElements, arrayPosition);
-		DataSample* originalSample = testSample.getDataSample();
-		DataSample binnedSample = originalSample->createBinnedDataSampleWithNumberOfBins(numberOfBins);
+		DataSampleAnalyzer* originalSample = testSample.getDataSample();
+		DataSampleAnalyzer binnedSample(originalSample->createBinnedDataSampleWithNumberOfBins(numberOfBins));
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
 	}
 
 	void testBinningWithBinsize(int numberOfElements, int binsize, double expectedFirstMoment)
 	{
 		TestDataSample testSample(numberOfElements, arrayPosition);
-		DataSample* originalSample = testSample.getDataSample();
-		DataSample binnedSample = originalSample->createBinnedDataSampleWithBinsize(binsize);
+		DataSampleAnalyzer* originalSample = testSample.getDataSample();
+		DataSampleAnalyzer binnedSample = originalSample->createBinnedDataSampleWithBinsize(binsize);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
 	}
 
 	void testBinningWithNumberOfBins_elements(int numberOfElements, int desiredNumberOfElementsOfBinnedDataSample)
 	{
 		int numberOfBins = numberOfElements / desiredNumberOfElementsOfBinnedDataSample;
-		DataSample originalSample(numberOfElements);
-		DataSample binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
+		DataSampleAnalyzer originalSample(numberOfElements);
+		DataSampleAnalyzer binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
 		BOOST_CHECK_EQUAL(desiredNumberOfElementsOfBinnedDataSample, binnedSample.getNumberOfElements());
 	}
 
 	void testBinningWithBinsize_elements(int numberOfElements, int desiredBinsize)
 	{
 		int expectedNumberOfElementsInBinnedDataSample = numberOfElements / desiredBinsize;
-		DataSample originalSample(numberOfElements);
-		DataSample binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
+		DataSampleAnalyzer originalSample(numberOfElements);
+		DataSampleAnalyzer binnedSample = originalSample.createBinnedDataSampleWithBinsize(desiredBinsize);
 		BOOST_CHECK_EQUAL(expectedNumberOfElementsInBinnedDataSample, binnedSample.getNumberOfElements());
 	}
 
 	void testBinningWithNumberOfBins_wrongArgument(int numberOfElements, int numberOfBins)
 	{
-		DataSample originalSample(numberOfElements);
+		DataSampleAnalyzer originalSample(numberOfElements);
 		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithNumberOfBins(numberOfBins), std::invalid_argument);
 	}
 
 	void testBinningWithBinsize_wrongArgument(int numberOfElements, int binsize)
 	{
-		DataSample originalSample(numberOfElements);
+		DataSampleAnalyzer originalSample(numberOfElements);
 		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithBinsize(binsize), std::invalid_argument);
 	}
 
@@ -618,8 +617,8 @@ BOOST_AUTO_TEST_SUITE(binning)
 		int numberOfElements = 27;
 		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements;
 		TestDataSample testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
-		DataSample* originalSample = testSample.getDataSample();
-		DataSample binnedSample = originalSample->createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
+		DataSampleAnalyzer* originalSample = testSample.getDataSample();
+		DataSampleAnalyzer binnedSample = originalSample->createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(1), binnedSample.getNthMoment(1));
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
 	}
@@ -629,8 +628,8 @@ BOOST_AUTO_TEST_SUITE(binning)
 		int numberOfElements = 25;
 		int desiredBinsize = 1;
 		TestDataSample testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
-		DataSample* originalSample = testSample.getDataSample();
-		DataSample binnedSample = originalSample->createBinnedDataSampleWithBinsize(desiredBinsize);
+		DataSampleAnalyzer* originalSample = testSample.getDataSample();
+		DataSampleAnalyzer binnedSample = originalSample->createBinnedDataSampleWithBinsize(desiredBinsize);
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
 	}
@@ -705,11 +704,12 @@ BOOST_AUTO_TEST_SUITE(binning)
 		int binsize = 10;
 		int numberOfBins = 2;
 		std::string filename = "datafile3.example";
-		DataSample tmp (filename);
-		DataSample binnedSample = tmp.createBinnedDataSampleWithBinsize(binsize);
+		DataSampleAnalyzer tmp (filename);
+
+		DataSampleAnalyzer binnedSample(tmp.createBinnedDataSampleWithBinsize(binsize));
 		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), 1., doublePrecisionInPercent);
 
-		DataSample binnedSample2 = tmp.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+		DataSampleAnalyzer binnedSample2 = tmp.createBinnedDataSampleWithNumberOfBins(numberOfBins);
 		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), binnedSample2.getNthMoment(1), doublePrecisionInPercent);
 	}
 
@@ -719,9 +719,9 @@ BOOST_AUTO_TEST_SUITE(binning)
 		int desiredBinsize = 100;
 		int desiredNumberOfBins = 10;
 		std::string filename = "datafile2.example";
-		DataSample tmp (filename);
-		DataSample binnedSample = tmp.createBinnedDataSampleWithBinsize(desiredBinsize);
-		DataSample binnedSample2 = tmp.createBinnedDataSampleWithNumberOfBins(desiredNumberOfBins);
+		DataSampleAnalyzer tmp (filename);
+		DataSampleAnalyzer binnedSample = tmp.createBinnedDataSampleWithBinsize(desiredBinsize);
+		DataSampleAnalyzer binnedSample2 = tmp.createBinnedDataSampleWithNumberOfBins(desiredNumberOfBins);
 		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), binnedSample2.getNthMoment(1), doublePrecisionInPercent);
 		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(2), binnedSample2.getNthMoment(2), doublePrecisionInPercent);
 	}
@@ -732,9 +732,9 @@ BOOST_AUTO_TEST_SUITE(binning)
 		int desiredBinsize = 10;
 		int desiredNumberOfBins = 100;
 		std::string filename = "datafile2.example";
-		DataSample tmp (filename);
-		DataSample binnedSample = tmp.createBinnedDataSampleWithBinsize(desiredBinsize);
-		DataSample binnedSample2 = tmp.createBinnedDataSampleWithNumberOfBins(desiredNumberOfBins);
+		DataSampleAnalyzer tmp (filename);
+		DataSampleAnalyzer binnedSample = tmp.createBinnedDataSampleWithBinsize(desiredBinsize);
+		DataSampleAnalyzer binnedSample2 = tmp.createBinnedDataSampleWithNumberOfBins(desiredNumberOfBins);
 		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), binnedSample2.getNthMoment(1), doublePrecisionInPercent);
 		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(2), binnedSample2.getNthMoment(2), doublePrecisionInPercent);
 	}
@@ -754,15 +754,15 @@ BOOST_AUTO_TEST_SUITE(applyFunction)
 		TestDataSample testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 		DataSample sampleFromFunction = sample->applyFunction();
-		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample->getNthMoment(1), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sampleFromFunction.sum(), sample->sum(), doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(applyFunction2)
 	{
 		int numberOfElements = 53;
 		TestDataSample testSample(numberOfElements, arrayPosition);
-		DataSample* sample = testSample.getDataSample();
-		DataSample sampleFromFunction = sample->applyFunction(square);
+		DataSampleAnalyzer* sample = testSample.getDataSample();
+		DataSampleAnalyzer sampleFromFunction = sample->applyFunction(square);
 		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample->getNthMoment(2), doublePrecisionInPercent);
 	}
 
