@@ -4,10 +4,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include "dataSample.hpp"
-#include "dataSampleAnalyzer.hpp"
 
 #include <cfloat>
-#include "TestDataSample.hpp"
+#include "dataSampleTestUtilities.hpp"
 
 BOOST_AUTO_TEST_SUITE(precision)
 
@@ -44,7 +43,6 @@ BOOST_AUTO_TEST_SUITE(precision)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-//todo: if files are found in subdir can depend on the system!
 BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(build1)
@@ -137,7 +135,7 @@ BOOST_AUTO_TEST_SUITE(operators)
 		BOOST_REQUIRE_EQUAL(sample[numberOfElements-1], 0);
 	}
 
-	BOOST_AUTO_TEST_CASE(set)
+	BOOST_AUTO_TEST_CASE(setSpecificValue)
 	{
 		int numberOfElements = 10;
 		double someValue = 1.23456789;
@@ -159,19 +157,18 @@ BOOST_AUTO_TEST_SUITE(applyFunction)
 	BOOST_AUTO_TEST_CASE(applyFunction1)
 	{
 		int numberOfElements = 53;
-		TestDataSample testSample(numberOfElements, arrayPosition);
-		DataSample* sample = testSample.getDataSample();
-		DataSample sampleFromFunction = sample->applyFunction();
-		BOOST_CHECK_CLOSE(sampleFromFunction.sum(), sample->sum(), doublePrecisionInPercent);
+		DataSample sample(makeValarrayWithArrayPosition(numberOfElements));
+		DataSample sampleFromFunction = sample.applyFunction();
+		BOOST_CHECK_CLOSE(sampleFromFunction.sum(), sample.sum(), doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(applyFunction2)
 	{
 		int numberOfElements = 53;
-		TestDataSample testSample(numberOfElements, arrayPosition);
-		DataSampleAnalyzer* sample = testSample.getDataSample();
-		DataSampleAnalyzer sampleFromFunction = sample->applyFunction(square);
-		BOOST_CHECK_CLOSE(sampleFromFunction.getNthMoment(1), sample->getNthMoment(2), doublePrecisionInPercent);
+		DataSample sample(makeValarrayWithArrayPosition(numberOfElements));
+		DataSample sampleSquared(makeValarrayWithSquaredArrayPosition(numberOfElements));
+		DataSample sampleFromFunction = sample.applyFunction(square);
+		BOOST_CHECK_CLOSE(sampleFromFunction.sum(), sampleSquared.sum(), doublePrecisionInPercent);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
