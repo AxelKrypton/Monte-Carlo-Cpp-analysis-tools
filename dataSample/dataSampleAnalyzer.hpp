@@ -74,6 +74,8 @@ protected:
 	void checkIfNIsValid(int n);
 	void checkIfNumberOfBinsIsValid(int numberOfBins);
 	void checkIfBinsizeIsValid(int binsize);
+	void checkDiscardedElements(int valueIn, std::string descriptionIn);
+	void checkIfBinningParameterIsValid(int valueIn, std::string descriptionIn);
 
 	std::vector<Moment> moments;
 	std::vector<Moment> centralMoments;

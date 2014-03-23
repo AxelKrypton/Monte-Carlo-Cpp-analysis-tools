@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "dataSampleAnalyzer.hpp"
 
 void DataSampleAnalyzer::initMoments()
@@ -38,7 +39,7 @@ double DataSampleAnalyzer::calcNthMomentExplicit(int n)
 
 double DataSampleAnalyzer::calcFirstMomentExplicit()
 {
-	return values.sum() / numberOfElements;
+	return sum() / numberOfElements;
 }
 
 double DataSampleAnalyzer::getNthCentralMoment(int n)
@@ -68,26 +69,25 @@ double DataSampleAnalyzer::calcNthCentralMomentExplicit(int n)
 	return (createShiftedDataSample(2, getNthMoment(1))).sum()  / numberOfElements;
 }
 
+void DataSampleAnalyzer::checkDiscardedElements(int valueIn, std::string descriptionIn)
+{
+	int discardedElements = numberOfElements % valueIn;
+	if (discardedElements != 0)
+	{
+		std::cout << "Warning: " << descriptionIn << " is not a multiple of numberOfElements!" << std::endl;
+		std::cout << discardedElements<< " elements are discarded!" << std::endl;
+	}
+}
 
 int DataSampleAnalyzer::calcBinsize(int numberOfBins)
 {
-	int discardedElements = numberOfElements % numberOfBins;
-	if (discardedElements != 0)
-	{
-		std::cout << "Warning: numberOfBins is not a multiple of numberOfElements!" << std::endl;
-		std::cout << discardedElements << " elements are discarded!" << std::endl;
-	}
+	checkDiscardedElements(numberOfBins, "numberOfBins");
 	return numberOfElements / numberOfBins;
 }
 
 int DataSampleAnalyzer::calcNumberOfBins(int binsize)
 {
-	int discardedElements = numberOfElements % binsize;
-	if (discardedElements != 0)
-	{
-		std::cout << "Warning: binsize is not a multiple of numberOfElements!" << std::endl;
-		std::cout << discardedElements << " elements are discarded!" << std::endl;
-	}
+	checkDiscardedElements(binsize, "binsize");
 	return numberOfElements / binsize;
 }
 
@@ -95,21 +95,20 @@ int DataSampleAnalyzer::calcNumberOfBins(int binsize)
 DataSample DataSampleAnalyzer::performBinning(int numberOfBins, int binsize)
 {
 	std::cout << "perform binning with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
-  std::valarray<double> binnedDataSample(numberOfBins);
-  for(int iteration = 0; iteration < numberOfBins; iteration++)
-  {
-	  std::valarray<double> sliceOfData = values[std::slice(iteration*binsize, binsize, 1)];
-	  DataSampleAnalyzer temporarySample(sliceOfData);
-	  binnedDataSample[iteration] = temporarySample.getNthMoment(1);
-  }
-  DataSample dataSampleInstance(binnedDataSample);
-  return dataSampleInstance;
+	std::valarray<double> binnedDataSample(numberOfBins);
+	for(int iteration = 0; iteration < numberOfBins; iteration++)
+	{
+		std::valarray<double> sliceOfData = values[std::slice(iteration*binsize, binsize, 1)];
+		DataSampleAnalyzer temporarySample(sliceOfData);
+		binnedDataSample[iteration] = temporarySample.getNthMoment(1);
+	}
+	DataSample dataSampleInstance(binnedDataSample);
+	return dataSampleInstance;
 }
 int DataSampleAnalyzer::getNumberOfMoments()
 {
 	return upperLimitForNthMoment - lowerLimitForNthMoment + 1;
 }
-
 
 int DataSampleAnalyzer::getUpperLimitForNthMoment()
 {
@@ -140,18 +139,21 @@ void DataSampleAnalyzer::checkIfNIsValid(int n)
 	if(n < lowerLimitForNthMoment || n > upperLimitForNthMoment)
 		throw std::invalid_argument("The requested moment is not implemented yet!");
 }
+
+void DataSampleAnalyzer::checkIfBinningParameterIsValid(int valueIn, std::string descriptionIn)
+{
+	if(valueIn <= 0)
+		throw std::invalid_argument("Cannot perform binning with " +  descriptionIn + " zero or less!");
+	if(valueIn > numberOfElements)
+		throw std::invalid_argument("Cannot perform binning with " + descriptionIn + " bigger than number of datapoints!");
+}
+
 void DataSampleAnalyzer::checkIfNumberOfBinsIsValid(int numberOfBins)
 {
-	if(numberOfBins <= 0)
-		throw std::invalid_argument("Cannot perform binning with zero or less bins!");
-	if(numberOfBins > numberOfElements)
-		throw std::invalid_argument("Cannot perform binning with number of bins bigger than number of datapoints!");
+	checkIfBinningParameterIsValid(numberOfBins, "numberOfBins");
 }
 
 void DataSampleAnalyzer::checkIfBinsizeIsValid(int binsize)
 {
-	if(binsize <= 0)
-		throw std::invalid_argument("Cannot perform binning with binsize of zero or less!");
-	if(binsize > numberOfElements)
-		throw std::invalid_argument("Cannot perform binning with binsize bigger than number of datapoints!");
+	checkIfBinningParameterIsValid(binsize, "binsize");
 }
