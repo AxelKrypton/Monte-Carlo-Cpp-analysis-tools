@@ -124,9 +124,17 @@ BOOST_AUTO_TEST_SUITE(build)
 		BOOST_REQUIRE_THROW(DataSample dataSample(fileThatDoesExist, 1, validOffset), std::invalid_argument);
 	}
 
+	BOOST_AUTO_TEST_CASE(copyConstructor)
+	{
+		int numberOfElements = 253;
+		DataSample sample1(numberOfElements);
+		DataSample sample2(sample1);
+		BOOST_CHECK_EQUAL(sample1.getNumberOfElements(), sample2.getNumberOfElements());
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(operators)
+BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 
 	BOOST_AUTO_TEST_CASE(access)
 	{
@@ -143,6 +151,122 @@ BOOST_AUTO_TEST_SUITE(operators)
 		DataSample sample(numberOfElements);
 		sample[index] = someValue;
 		BOOST_REQUIRE_EQUAL(sample[index], someValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(powerFunction)
+	{
+		int numberOfElements = 213;
+		DataSample sample(makeValarrayWithArrayPosition(numberOfElements));
+		DataSample sampleSquared(makeValarrayWithSquaredArrayPosition(numberOfElements));
+		DataSample sampleSquared2 = sample.pow(2);
+		BOOST_CHECK_CLOSE(sampleSquared2.sum(), sampleSquared.sum(), doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(shiftAndPower1)
+	{
+		int numberOfElements = 311;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample shifted = sample.shiftAndPow(1, 0.);
+		BOOST_CHECK_CLOSE(sample.sum(), shifted.sum(), doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(shiftAndPower2)
+	{
+		int numberOfElements = 311;
+		double expectedValue = 311.;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample shifted = sample.shiftAndPow(0, 0.);
+		BOOST_CHECK_CLOSE(expectedValue, shifted.sum(), doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(shiftAndPower3)
+	{
+		int numberOfElements = 311;
+		double expectedValue = 0.;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample shifted = sample.shiftAndPow(1, 1.);
+		BOOST_CHECK_CLOSE(expectedValue, shifted.sum(), doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(shiftAndPower4)
+	{
+		int numberOfElements = 415;
+		DataSample sample(makeValarrayWithArrayPosition(numberOfElements));
+		DataSample shifted = sample.shiftAndPow(2, 0.);
+		DataSample sample2(makeValarrayWithSquaredArrayPosition(numberOfElements));
+		BOOST_CHECK_CLOSE(sample2.sum(), shifted.sum(), doublePrecisionInPercent);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(slice)
+
+	void testSampleSliceInvalidArgument(int numberOfElements, int start, int size, int stride)
+	{
+		DataSample sample(makeValarrayWithArrayPosition(numberOfElements));
+		BOOST_REQUIRE_THROW(sample.sampleSlice(start, size, stride), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument_1)
+	{
+		int numberOfElements = 111;
+		testSampleSliceInvalidArgument(numberOfElements, -1, numberOfElements, 1);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument_2)
+	{
+		int numberOfElements = 64;
+		testSampleSliceInvalidArgument(numberOfElements, numberOfElements, numberOfElements, 1);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument_3)
+	{
+		int numberOfElements = 53;
+		testSampleSliceInvalidArgument(numberOfElements, 0, 0, 1);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument_4)
+	{
+		int numberOfElements = 66;
+		testSampleSliceInvalidArgument(numberOfElements, 0, numberOfElements+1, 1);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument_5)
+	{
+		int numberOfElements = 93;
+		testSampleSliceInvalidArgument(numberOfElements, 0, numberOfElements, 0);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument_6)
+	{
+		int numberOfElements = 77;
+		testSampleSliceInvalidArgument(numberOfElements, 0, numberOfElements, numberOfElements);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument_7)
+	{
+		int numberOfElements = 88;
+		testSampleSliceInvalidArgument(numberOfElements, 0, numberOfElements, 2);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument_8)
+	{
+		int numberOfElements = 55;
+		testSampleSliceInvalidArgument(numberOfElements, 0, 1, numberOfElements);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument_9)
+	{
+		int numberOfElements = 66;
+		testSampleSliceInvalidArgument(numberOfElements, 1, numberOfElements, 1);
+	}
+
+	BOOST_AUTO_TEST_CASE(slice)
+	{
+		int numberOfElements = 66;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2 = sample.sampleSlice(0, numberOfElements/2, 2);
+		BOOST_REQUIRE_CLOSE(sample.sum()/2., sample2.sum(), doublePrecisionInPercent);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

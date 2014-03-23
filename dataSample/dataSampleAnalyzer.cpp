@@ -33,8 +33,7 @@ double DataSampleAnalyzer::calcNthMoment(int n)
 
 double DataSampleAnalyzer::calcNthMomentExplicit(int n)
 {
-	std::valarray<double> sampleToNthPower = std::pow(values, double(n));
-	return sampleToNthPower.sum() / (double) numberOfElements;
+	return (pow(n)).sum() / (double) numberOfElements;
 }
 
 double DataSampleAnalyzer::calcFirstMomentExplicit()
@@ -66,7 +65,7 @@ double DataSampleAnalyzer::calcNthCentralMoment(int n)
 
 double DataSampleAnalyzer::calcNthCentralMomentExplicit(int n)
 {
-	return (createShiftedDataSample(2, getNthMoment(1))).sum()  / numberOfElements;
+	return (shiftAndPow(2, getNthMoment(1))).sum()  / numberOfElements;
 }
 
 void DataSampleAnalyzer::checkDiscardedElements(int valueIn, std::string descriptionIn)
@@ -91,19 +90,15 @@ int DataSampleAnalyzer::calcNumberOfBins(int binsize)
 	return numberOfElements / binsize;
 }
 
-//todo: refactor
 DataSample DataSampleAnalyzer::performBinning(int numberOfBins, int binsize)
 {
 	std::cout << "perform binning with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
-	std::valarray<double> binnedDataSample(numberOfBins);
+	DataSample binnedDataSample(numberOfBins);
 	for(int iteration = 0; iteration < numberOfBins; iteration++)
 	{
-		std::valarray<double> sliceOfData = values[std::slice(iteration*binsize, binsize, 1)];
-		DataSampleAnalyzer temporarySample(sliceOfData);
-		binnedDataSample[iteration] = temporarySample.getNthMoment(1);
+		binnedDataSample[iteration] = DataSampleAnalyzer(sampleSlice(iteration*binsize, binsize, 1)).getNthMoment(1);
 	}
-	DataSample dataSampleInstance(binnedDataSample);
-	return dataSampleInstance;
+	return binnedDataSample;
 }
 int DataSampleAnalyzer::getNumberOfMoments()
 {

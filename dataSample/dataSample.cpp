@@ -25,9 +25,14 @@ void DataSample::setValues(std::valarray<double> valuesIn)
 	numberOfElements = valuesIn.size();
 }
 
-DataSample DataSample::createShiftedDataSample(int order, double shift)
+DataSample 	DataSample::pow(int n)
 {
-	return DataSample( pow((values - shift), double(order)) );
+	return DataSample( std::pow(values, double(n)) );
+}
+
+DataSample DataSample::shiftAndPow(int n, double shift)
+{
+	return DataSample( std::pow((values - shift), double(n)) );
 }
 
 double DataSample::sum()
@@ -81,13 +86,12 @@ DataSample DataSample::applyFunction(double (*function)(double))
 	return dataSample;
 }
 
-//todo: print filename, perhaps path
 void DataSample::checkIfDatafileExists(std::string filename)
 {
 	std::ifstream file;
 	file.open(filename.c_str());
 	if ( !file.is_open() )
-		throw std::invalid_argument("Given file does not exist!");
+		throw std::invalid_argument("Given file \"" + filename + "\" does not exist!");
 	file.close();
 }
 
@@ -136,3 +140,20 @@ std::valarray<double> DataSample::readDataFromFile(std::string filename, int col
 	return std::valarray<double>(data.data(), data.size());
 }
 
+void DataSample::checkSliceParameters(int start, int size, int stride)
+{
+	if( start < 0 || start >= numberOfElements)
+		throw std::invalid_argument("sampleSlice parameter \"start\" must be between 0 and (number of datapoints -1)!");
+	if( size < 1 || size > numberOfElements)
+		throw std::invalid_argument("sampleSlice parameter \"size\" must be between 1 and number of datapoints!");
+	if( stride < 1 || stride >= numberOfElements)
+		throw std::invalid_argument("sampleSlice parameter \"stride\" must be between 1 and number of datapoints!");
+	if( (start + (stride*size) ) > numberOfElements)
+		throw std::invalid_argument("product of sampleSlice parameters \"slice\" and \"stride\" must be between 1 and number of datapoints!");
+}
+
+DataSample DataSample::sampleSlice(int start, int size, int stride)
+{
+	checkSliceParameters(start, size, stride);
+	return DataSample(values[std::slice(start, size, stride	)]);
+}

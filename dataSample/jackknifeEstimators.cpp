@@ -34,7 +34,7 @@ JackknifeEstimatorsFromBinning::JackknifeEstimatorsFromBinning(DataSampleAnalyze
 //todo: refactor
 double JackknifeEstimators::getJackknifeVariance()
 {
-	DataSampleAnalyzer tmp ( createShiftedDataSample(2, getNthMoment(1)) );
+	DataSampleAnalyzer tmp ( shiftAndPow(2, getNthMoment(1)) );
 	return tmp.getNthMoment(1) * getJackknifeNormalization();
 }
 
