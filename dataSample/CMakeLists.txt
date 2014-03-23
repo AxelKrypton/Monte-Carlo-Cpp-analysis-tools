@@ -14,6 +14,10 @@ add_executable(dataSample_test dataSample_test.cpp)
 target_link_libraries(dataSample_test dataAnalysisUtilities ${Boost_LIBRARIES})
 add_test(dataSample dataSample_test)
 
+add_executable(dataSampleAnalyzer_test dataSampleAnalyzer_test.cpp)
+target_link_libraries(dataSampleAnalyzer_test dataAnalysisUtilities ${Boost_LIBRARIES})
+add_test(dataSampleAnalyzer dataSampleAnalyzer_test)
+
 # todo: the macro does not work here, jackknifeEstimators is not a library
 #add_unit_test(jackknifeEstimators jackknifeEstimators_test)
 add_executable(jackknifeEstimators_test jackknifeEstimators_test.cpp)
