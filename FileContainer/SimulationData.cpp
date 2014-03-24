@@ -1,78 +1,80 @@
 #include "SimulationData.hpp"
 
-SimulationMetaData::SimulationMetaData(std::vector<double> simulationParametersIn) :
-	simulationParameters(simulationParametersIn)
+SimulationData::SimulationData(std::vector<double> simulationParametersIn, std::string filenameIn) :
+	simulationParameters(simulationParametersIn), datafileName(filenameIn)
 {
 	numberOfSimulationParameters = simulationParametersIn.size();
-	datafileName = "dummy.data";
+	//todo: move to own fct.
+	int replaceWithFilename = 1;
+	for (int i = 0; i< numberOfSimulationParameters; i++)
+	{
+		//todo: add column to constructor
+		// similar to:
+		// int column = i+1;
+		simulationRawData.push_back(DataSample(replaceWithFilename));
+	}
+
 }
 
-void SimulationMetaData::checkIndex(int index)
+void SimulationData::checkIndex(int index)
 {
-	if (index <0 || index >= numberOfSimulationParameters )
+	if (index < 0 || index >= numberOfSimulationParameters )
 		throw(std::invalid_argument("index must be greater than or equal to zero and smaller then the number of simulation points!"));
 }
 
-double& SimulationMetaData::operator[](int index)
+//todo: this should return the DataSample!
+double& SimulationData::operator[](int index)
 {
 	checkIndex(index);
 	return simulationParameters[index];
 }
 
-SimulationData::SimulationData()
+SimulationDataContainer::SimulationDataContainer()
 {
 	throw std::invalid_argument("SimulationData needs input file for construction!");
 }
 
-SimulationData::SimulationData(std::string informationFile)
+SimulationDataContainer::SimulationDataContainer(std::string informationFile)
 {
 	checkIfDatafileExists(informationFile);
 	extractInformationFromFile(informationFile);
 }
 
-//perhaps this should give the DataSample!
-SimulationMetaData& SimulationData::operator[](int index)
+SimulationData& SimulationDataContainer::operator[](int index)
 {
 	checkIndex(index);
-	return simulationMetaData[index];
+	return simulationData[index];
 }
 
-int SimulationData::getNumberOfDatafiles()
+int SimulationDataContainer::getNumberOfDatafiles()
 {
 	return numberOfDatafiles;
 }
 
-int SimulationData::getNumberOfSimulationParameters()
+int SimulationDataContainer::getNumberOfSimulationParameters()
 {
 	return numberOfSimulationParameters;
 }
 
-void SimulationData::checkIndex(int index)
+void SimulationDataContainer::checkIndex(int index)
 {
 	if (index <0 || index >= numberOfSimulationParameters )
 		throw(std::invalid_argument("index must be greater than or equal to zero and smaller then the number of datafiles!"));
 }
 
-void SimulationData::extractInformationFromFile(std::string fileIn)
+void SimulationDataContainer::extractInformationFromFile(std::string fileIn)
 {
 	numberOfDatafiles = 10;
 	numberOfSimulationParameters = 5;
-	//todo: add filename
+	std::string datafileName = "dummy.data";
 	std::vector<double> parametersToGetOutOfFile(numberOfSimulationParameters);
 	for (int i = 0; i< numberOfDatafiles; i++)
 	{
-		simulationMetaData.push_back(SimulationMetaData(parametersToGetOutOfFile));
-	}
-	//todo: move to own fct.
-	for (int i = 0; i< numberOfDatafiles; i++)
-	{
-		std::string filename = simulationMetaData[i].datafileName;
-		int replaceWithFilename = 1;
-		simulationRawData.push_back(DataSample(replaceWithFilename));
+		simulationData.push_back(SimulationData(parametersToGetOutOfFile, datafileName));
 	}
 }
 
-void SimulationData::checkIfDatafileExists(std::string filename)
+void SimulationDataContainer::checkIfDatafileExists(std::string filename)
 {
 	std::ifstream file;
 	file.open(filename.c_str());

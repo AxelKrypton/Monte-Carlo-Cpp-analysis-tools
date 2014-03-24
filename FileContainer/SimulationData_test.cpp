@@ -8,26 +8,26 @@ BOOST_AUTO_TEST_SUITE(simulationData)
 
 	BOOST_AUTO_TEST_CASE(build1)
 	{
-		BOOST_REQUIRE_THROW(SimulationData simData , std::invalid_argument);
+		BOOST_REQUIRE_THROW(SimulationDataContainer simData , std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(build2)
 	{
 		std::string fileThatDoesNotExist = "fileThatShouldNotBe";
-		BOOST_REQUIRE_THROW(SimulationData simData(fileThatDoesNotExist) , std::invalid_argument);
+		BOOST_REQUIRE_THROW(SimulationDataContainer simData(fileThatDoesNotExist) , std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(build3)
 	{
 		std::string fileThatDoesExist = "simulationData.example";
-		BOOST_CHECK_NO_THROW(SimulationData simData(fileThatDoesExist));
+		BOOST_CHECK_NO_THROW(SimulationDataContainer simData(fileThatDoesExist));
 	}
 
 	BOOST_AUTO_TEST_CASE(build4)
 	{
 		std::string fileThatDoesExist = "simulationData.example";
 		int numberOfDataFilesGivenInInputFile = 10;
-		SimulationData simData(fileThatDoesExist);
+		SimulationDataContainer simData(fileThatDoesExist);
 		BOOST_REQUIRE_EQUAL(simData.getNumberOfDatafiles(), numberOfDataFilesGivenInInputFile);
 	}
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_SUITE(simulationData)
 		std::string fileThatDoesExist = "simulationData.example";
 		int numberOfDataFilesGivenInInputFile = 10;
 		int numberOfSimulationParametersGivenInInputFile = 5;
-		SimulationData simData(fileThatDoesExist);
+		SimulationDataContainer simData(fileThatDoesExist);
 		BOOST_REQUIRE_EQUAL(simData.getNumberOfSimulationParameters(), numberOfSimulationParametersGivenInInputFile);
 	}
 
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_SUITE(simulationData)
 		std::string fileThatDoesExist = "simulationData.example";
 		int numberOfDataFilesGivenInInputFile = 10;
 		int numberOfSimulationParametersGivenInInputFile = 5;
-		SimulationData simData(fileThatDoesExist);
+		SimulationDataContainer simData(fileThatDoesExist);
 		BOOST_REQUIRE_EQUAL(simData.getNumberOfSimulationParameters(), numberOfSimulationParametersGivenInInputFile);
 	}
 
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(simulationData)
 	{
 		std::string fileThatDoesExist = "simulationData.example";
 		int numberOfDataFilesGivenInInputFile = 10;
-		SimulationData simData(fileThatDoesExist);
+		SimulationDataContainer simData(fileThatDoesExist);
 		BOOST_REQUIRE_THROW(simData[-1], std::invalid_argument);
 	}
 
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_SUITE(simulationData)
 	{
 		std::string fileThatDoesExist = "simulationData.example";
 		int numberOfDataFilesGivenInInputFile = 10;
-		SimulationData simData(fileThatDoesExist);
+		SimulationDataContainer simData(fileThatDoesExist);
 		BOOST_REQUIRE_THROW(simData[numberOfDataFilesGivenInInputFile+1], std::invalid_argument);
 	}
 
@@ -69,8 +69,8 @@ BOOST_AUTO_TEST_SUITE(simulationData)
 	{
 		std::string fileThatDoesExist = "simulationData.example";
 		int numberOfDataFilesGivenInInputFile = 10;
-		SimulationData simData(fileThatDoesExist);
-		SimulationMetaData meta = simData[0];
+		SimulationDataContainer simData(fileThatDoesExist);
+		SimulationData meta = simData[0];
 		BOOST_REQUIRE_THROW(meta[-1], std::invalid_argument);
 	}
 
@@ -79,8 +79,8 @@ BOOST_AUTO_TEST_SUITE(simulationData)
 		std::string fileThatDoesExist = "simulationData.example";
 		int numberOfDataFilesGivenInInputFile = 10;
 		int numberOfSimulationParametersGivenInInputFile = 5;
-		SimulationData simData(fileThatDoesExist);
-		SimulationMetaData meta = simData[0];
+		SimulationDataContainer simData(fileThatDoesExist);
+		SimulationData meta = simData[0];
 		BOOST_REQUIRE_THROW(meta[numberOfSimulationParametersGivenInInputFile+1], std::invalid_argument);
 	}
 
@@ -89,8 +89,8 @@ BOOST_AUTO_TEST_SUITE(simulationData)
 		std::string fileThatDoesExist = "simulationData.example";
 		int numberOfDataFilesGivenInInputFile = 10;
 		int numberOfSimulationParametersGivenInInputFile = 5;
-		SimulationData simData(fileThatDoesExist);
-		SimulationMetaData meta = simData[0];
+		SimulationDataContainer simData(fileThatDoesExist);
+		SimulationData meta = simData[0];
 		BOOST_REQUIRE_EQUAL(meta[0], 0.);
 	}
 

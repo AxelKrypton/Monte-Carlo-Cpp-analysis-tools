@@ -5,6 +5,7 @@ add_library(FileContainer
 
 #This is to copy a file to the build directory
 configure_file(input_existing_file input_existing_file COPYONLY)
+configure_file(simulationData.example simulationData.example COPYONLY)
 
 add_unit_test(FileContainer FileContainer FileContainer_test)
 #add_unit_test(SimulationData FileContainer SimulationData_test)
