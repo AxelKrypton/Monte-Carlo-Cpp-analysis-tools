@@ -1,0 +1,14 @@
+add_library(dataAnalysisUtilities
+	dataSample.cpp
+	dataSampleAnalyzer.cpp
+	jackknifeEstimators.cpp
+)
+
+configure_file(datafile.example datafile.example COPYONLY)
+configure_file(datafile2.example datafile2.example COPYONLY)
+configure_file(datafile3.example datafile3.example COPYONLY)
+configure_file(datafileWithTwoColumns.example datafileWithTwoColumns.example)
+
+add_unit_test(dataSample dataSample_test)
+add_unit_test(dataSampleAnalyzer dataSampleAnalyzer_test)
+add_unit_test(jackknifeEstimators jackknifeEstimators_test)
