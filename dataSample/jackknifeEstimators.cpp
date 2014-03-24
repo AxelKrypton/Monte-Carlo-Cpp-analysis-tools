@@ -11,7 +11,7 @@ JackknifeEstimators(sampleIn)
 	values = (sumOfDataSampleElements - values) / normalization;
 }
 
-DataSample JackknifeEstimatorsFromBinning::createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize)
+DataSample JackknifeEstimators::createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize)
 {
 	std::cout << "create binned jackknife estimators with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
 
@@ -28,11 +28,19 @@ DataSample JackknifeEstimatorsFromBinning::createJackknifeEstimatorsWithBinning(
 	return binnedDataSample;
 }
 
-JackknifeEstimatorsFromBinning::JackknifeEstimatorsFromBinning(DataSampleAnalyzer sampleIn, int numberOfBins) :
+JackknifeEstimatorsFromBinningWithNumberOfBins::JackknifeEstimatorsFromBinningWithNumberOfBins(DataSampleAnalyzer sampleIn, int numberOfBins) :
 	JackknifeEstimators(sampleIn)
 {
 	checkIfJackknifeCanBePerformed(numberOfBins);
 	int binsize = calcBinsize(numberOfBins);
+	setValues( createJackknifeEstimatorsWithBinning(sampleIn, numberOfBins, binsize) );
+}
+
+JackknifeEstimatorsFromBinningWithBinsize::JackknifeEstimatorsFromBinningWithBinsize(DataSampleAnalyzer sampleIn, int binsize) :
+	JackknifeEstimators(sampleIn)
+{
+	checkIfJackknifeCanBePerformedWithBinsize(binsize);
+	int numberOfBins = calcBinsize(binsize);
 	setValues( createJackknifeEstimatorsWithBinning(sampleIn, numberOfBins, binsize) );
 }
 
@@ -55,6 +63,12 @@ int JackknifeEstimators::getJackknifeNormalization()
 
 void JackknifeEstimators::checkIfJackknifeCanBePerformed(int n)
 {
-	if(n <= 1)
-		throw std::invalid_argument("Cannot create jackknifeEstimators from one or less elements!");
+	if(n <= 1 || n > numberOfElements)
+		throw std::invalid_argument("Cannot create jackknifeEstimators with these parameters!");
+}
+
+void JackknifeEstimatorsFromBinningWithBinsize::checkIfJackknifeCanBePerformedWithBinsize(int binsize)
+{
+	if(binsize < 1 || binsize >= numberOfElements)
+		throw std::invalid_argument("Cannot create jackknifeEstimators with this binsize!");
 }
