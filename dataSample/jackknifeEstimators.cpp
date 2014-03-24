@@ -5,21 +5,25 @@ JackknifeEstimators(sampleIn)
 {
 	int normalization = getJackknifeNormalization();
 	double sumOfDataSampleElements = sampleIn.sum();
+	//todo: this should be moved into DataSample functionality like
+	// setValues( shift(sum).divide(-1./normalization));
+	//to hide explicit values here...
 	values = (sumOfDataSampleElements - values) / normalization;
 }
 
-//todo: replace references and calls of std::valarray by DataSample
-std::valarray<double> JackknifeEstimatorsFromBinning::createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize)
+DataSample JackknifeEstimatorsFromBinning::createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize)
 {
-	//todo: this is the sum over the whole sample, not only the binned one!!
-	double wholeSum = sampleIn.sum();
 	std::cout << "create binned jackknife estimators with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
-	std::valarray<double> binnedDataSample(numberOfBins);
+
+	DataSample cutSample = sampleSlice(0, binsize*numberOfBins, 1);
+	double sumOfAllElementsInBinnedSample = cutSample.sum();
+	int numberOfElementsInBinndedSample = cutSample.getNumberOfElements();
+
+	DataSample binnedDataSample(numberOfBins);
 	for (int iteration = 0; iteration < numberOfBins; iteration++)
 	{
-		std::valarray<double> tmp = values[std::slice(iteration * binsize,	binsize, 1)];
-		double partSum = tmp.sum();
-		binnedDataSample[iteration] = (wholeSum - partSum) / (sampleIn.getNumberOfElements() - binsize);
+		double sumOfAllElementsInBin = ( sampleSlice(iteration * binsize,	binsize, 1) ).sum();
+		binnedDataSample[iteration] = (sumOfAllElementsInBinnedSample - sumOfAllElementsInBin) / (numberOfElementsInBinndedSample - binsize);
 	}
 	return binnedDataSample;
 }

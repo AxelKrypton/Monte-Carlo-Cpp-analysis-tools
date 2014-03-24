@@ -3,6 +3,7 @@
 #define BOOST_TEST_MODULE dataSample
 #include <boost/test/unit_test.hpp>
 
+#include <iostream>
 #include "jackknifeEstimators.hpp"
 
 #include "TestDataSample.hpp"
@@ -142,12 +143,10 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 	BOOST_AUTO_TEST_CASE(withBinsize_meanError2)
 	{
 		std::string fileThatDoesExist = "datafile.example";
-		double precisionOfDataInFileInPercent = 1e-10;
 		int binsize = 100;
 		double expectedValue = 1.1564370727055974e-03;
-//		double expectedValue = 1.15015003710525849E-003; // from original reference prog
 
-		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedValue, precisionOfDataInFileInPercent);
+		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedValue, doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(withBinsize_meanError3)
@@ -176,7 +175,6 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 		double precisionOfDataInFileInPercent = 1e-10;
 		int numberOfBins = 10;
 		double expectedValue = 1.1564370727055974e-03;
-//		double expectedValue = 1.15015003710525849E-003; // from original reference prog
 
 		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
 	}
@@ -226,7 +224,6 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 		int numberOfBins = 10;
 		double precisionOfDataInFileInPercent = 1e-10;
 		double expectedValue = 1.0424604327986017e-05;
-//		double expectedValue = 1.03497402364638056E-005; //from original ref. prog
 
 		checkVarianceErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
 	}
@@ -276,28 +273,29 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinning)
 	{
 		std::string fileThatDoesExist = "datafile.example";
 		int numberOfBins = 1005;
+		double precisionOfDataInFileInPercent = 1e-10;
 		double expectedValue = 3.44121381077520906E-004;
 
-		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, doublePrecisionInPercent);
+		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(meanError2)
 	{
 		std::string fileThatDoesExist = "datafile.example";
 		int numberOfBins = 10;
-//		double expectedValue = 1.15015003710525849E-003; //error with mean of whole sample
-		double expectedValue = 1.1500479176078319e-03; //error with mean of binned sample
-
-		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, doublePrecisionInPercent);
+		double precisionOfDataInFileInPercent = 1e-10;
+		double expectedValue = 1.1564370727055974e-03;
+		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(meanError3)
 	{
 		std::string fileThatDoesExist = "datafile2.example";
 		int numberOfBins = 10;
+		double precisionOfDataInFileInPercent = 1e-10;
 		double expectedValue = 1.14688734781786292E-003;
 
-		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, doublePrecisionInPercent);
+		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
 	}
 
 	void checkVarianceErrorWithNumberOfBins(std::string file, int numberOfBins, double expectedValue, double testPrecision)
@@ -313,8 +311,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinning)
 		std::string fileThatDoesExist = "datafile.example";
 		int numberOfBins = 10;
 		double precisionOfDataInFileInPercent = 1e-10;
-//		double expectedValue = 1.03670140981304127E-005; //error with mean of whole sample, orig. ref. prog.
-		double expectedValue = 1.0367009828936363e-05; //error with mean of binned sample
+		double expectedValue = 1.0424604327986017e-05;
 
 		checkVarianceErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, doublePrecisionInPercent);
 	}

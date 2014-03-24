@@ -44,7 +44,7 @@ class JackknifeEstimatorsFromBinning: public JackknifeEstimators
 {
 public:
 	JackknifeEstimatorsFromBinning(DataSampleAnalyzer sampleIn, int numberOfBins);
-	std::valarray<double> createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize);
+	DataSample createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize);
 };
 
 #endif /* JACKKNIFEESTIMATORS_HPP_ */
