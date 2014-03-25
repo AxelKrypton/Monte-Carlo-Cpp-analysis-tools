@@ -22,7 +22,6 @@ public:
 	double value;
 };
 
-//todo: think about better name!
 class DataSampleAnalyzer: public DataSample
 {
 public:
@@ -59,7 +58,10 @@ public:
 
 protected:
 	/**
-	 * Following Berg, p.52.
+	 * Binning.
+	 * Following BA Berg,
+	 * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
+	 * p.52.
 	 */
 	DataSample performBinning(int numberOfBins, int binsize);
 	int getNumberOfMoments();

@@ -8,7 +8,7 @@ JackknifeEstimators(sampleIn)
 	setValues( shift(sumOfDataSampleElements)* (-1./normalization) );
 }
 
-DataSample JackknifeEstimators::createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize)
+DataSample JackknifeEstimators::createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize)
 {
 	std::cout << "create binned jackknife estimators with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
 
@@ -30,7 +30,7 @@ JackknifeEstimatorsFromBinningWithNumberOfBins::JackknifeEstimatorsFromBinningWi
 {
 	checkIfJackknifeCanBePerformed(numberOfBins);
 	int binsize = calcBinsize(numberOfBins);
-	setValues( createJackknifeEstimatorsWithBinning(sampleIn, numberOfBins, binsize) );
+	setValues( createJackknifeEstimatorsWithBinning(numberOfBins, binsize) );
 }
 
 JackknifeEstimatorsFromBinningWithBinsize::JackknifeEstimatorsFromBinningWithBinsize(DataSampleAnalyzer sampleIn, int binsize) :
@@ -38,7 +38,7 @@ JackknifeEstimatorsFromBinningWithBinsize::JackknifeEstimatorsFromBinningWithBin
 {
 	checkIfJackknifeCanBePerformedWithBinsize(binsize);
 	int numberOfBins = calcBinsize(binsize);
-	setValues( createJackknifeEstimatorsWithBinning(sampleIn, numberOfBins, binsize) );
+	setValues( createJackknifeEstimatorsWithBinning(numberOfBins, binsize) );
 }
 
 double JackknifeEstimators::getJackknifeVariance()
