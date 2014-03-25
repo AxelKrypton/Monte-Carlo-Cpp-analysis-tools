@@ -137,7 +137,6 @@ BOOST_AUTO_TEST_SUITE(build)
 	BOOST_AUTO_TEST_CASE(fileWithOffset_invalidArg)
 	{
 		std::string fileThatDoesExist = "datafile.example";
-		int linesInFile = 1005;
 		int negativeOffset = -1;
 		BOOST_REQUIRE_THROW(DataSample dataSample(fileThatDoesExist, 1, negativeOffset), std::invalid_argument);
 	}
