@@ -32,6 +32,7 @@ public:
 protected:
 	int getJackknifeNormalization();
 	void checkIfJackknifeCanBePerformed(int n);
+	DataSample createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize);
 };
 
 class JackknifeEstimatorsFromBinnedDataSample: public JackknifeEstimators
@@ -40,11 +41,18 @@ public:
 	JackknifeEstimatorsFromBinnedDataSample(DataSampleAnalyzer sampleIn);
 };
 
-class JackknifeEstimatorsFromBinning: public JackknifeEstimators
+class JackknifeEstimatorsFromBinningWithNumberOfBins: public JackknifeEstimators
 {
 public:
-	JackknifeEstimatorsFromBinning(DataSampleAnalyzer sampleIn, int numberOfBins);
-	std::valarray<double> createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize);
+	JackknifeEstimatorsFromBinningWithNumberOfBins(DataSampleAnalyzer sampleIn, int numberOfBins);
+};
+
+class JackknifeEstimatorsFromBinningWithBinsize: public JackknifeEstimators
+{
+public:
+	JackknifeEstimatorsFromBinningWithBinsize(DataSampleAnalyzer sampleIn, int numberOfBins);
+private:
+	void checkIfJackknifeCanBePerformedWithBinsize(int binsize);
 };
 
 #endif /* JACKKNIFEESTIMATORS_HPP_ */

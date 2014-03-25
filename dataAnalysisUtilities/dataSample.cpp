@@ -25,6 +25,12 @@ void DataSample::setValues(std::valarray<double> valuesIn)
 	numberOfElements = valuesIn.size();
 }
 
+void DataSample::setValues(DataSample sampleIn)
+{
+	numberOfElements = sampleIn.getNumberOfElements();
+	values = sampleIn.values;
+}
+
 DataSample 	DataSample::pow(int n)
 {
 	return DataSample( std::pow(values, double(n)) );

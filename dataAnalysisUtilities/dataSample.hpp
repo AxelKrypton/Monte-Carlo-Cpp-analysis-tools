@@ -33,6 +33,7 @@ public:
 
 protected:
 	void setValues(std::valarray<double> valuesIn);
+	void setValues(DataSample sampleIn);
 	void checkIfNumberOfElementsIsValid(int length);
 	void checkIfDatafileExists(std::string filename);
 	void checkIfColumnIsValid(int column);
