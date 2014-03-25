@@ -43,6 +43,11 @@ DataSample DataSample::shiftAndPow(int n, double shift)
 	return DataSample( std::pow((values - shift), double(n)) );
 }
 
+DataSample DataSample::shift(double shift)
+{
+	return DataSample( (values - shift) );
+}
+
 double DataSample::sum()
 {
 	return values.sum();
@@ -51,6 +56,11 @@ double DataSample::sum()
 double& DataSample::operator[](size_t index)
 {
 	return values[index];
+}
+
+DataSample DataSample::operator*(double factor)
+{
+	return DataSample(values * factor);
 }
 
 

@@ -26,10 +26,12 @@ public:
 	int getNumberOfElements();
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
 	DataSample shiftAndPow(int n, double shift);
-	double sum();
-	double& operator[](size_t index);
+	DataSample shift(double shift);
+	DataSample operator*(double factor);
 	DataSample pow(int n);
 	DataSample sampleSlice(int start, int size, int stride);
+	double sum();
+	double& operator[](size_t index);
 
 protected:
 	void setValues(std::valarray<double> valuesIn);

@@ -248,6 +248,38 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_CHECK_CLOSE(sample2.sum(), shifted.sum(), doublePrecisionInPercent);
 	}
 
+	BOOST_AUTO_TEST_CASE(shift1)
+	{
+		int numberOfElements = 333;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample shifted = sample.shift(0.);
+		BOOST_REQUIRE_EQUAL(shifted.sum(), numberOfElements);
+	}
+
+	BOOST_AUTO_TEST_CASE(shift2)
+	{
+		int numberOfElements = 333;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample shifted = sample.shift(1.);
+		BOOST_REQUIRE_EQUAL(shifted.sum(), 0.);
+	}
+
+	BOOST_AUTO_TEST_CASE(mulitply1)
+	{
+		int numberOfElements = 432;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample multiplied = sample*0.;
+		BOOST_REQUIRE_EQUAL(multiplied.sum(), 0.);
+	}
+
+	BOOST_AUTO_TEST_CASE(mulitply2)
+	{
+		int numberOfElements = 432;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample multiplied = sample*(1./numberOfElements);
+		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1., doublePrecisionInPercent);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(slice)

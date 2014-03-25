@@ -5,10 +5,7 @@ JackknifeEstimators(sampleIn)
 {
 	int normalization = getJackknifeNormalization();
 	double sumOfDataSampleElements = sampleIn.sum();
-	//todo: this should be moved into DataSample functionality like
-	// setValues( shift(sum).divide(-1./normalization));
-	//to hide explicit values here...
-	values = (sumOfDataSampleElements - values) / normalization;
+	setValues( shift(sumOfDataSampleElements)* (-1./normalization) );
 }
 
 DataSample JackknifeEstimators::createJackknifeEstimatorsWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins, int binsize)
