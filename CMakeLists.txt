@@ -30,7 +30,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 ## NOTE: So far they are empty, but they can be useful in future
 set_abs_paths(StAT_FILES 
 )
-set(StAT_USED_LIBS
+set(StAT_USED_LIBS ${Boost_LIBRARIES}
 )
 
 ## Create the main library StAT
@@ -47,5 +47,5 @@ target_link_libraries(StAT ${StAT_USED_LIBS})
 #set_target_properties(StAT PROPERTIES LINK_INTERFACE_MULTIPLICITY 4)
 
 ## The actual executables (frontends)
-add_executable(dataAnalysis dataAnalysis.cpp)
+add_executable(dataAnalysis executables/dataAnalysis.cpp)
 target_link_libraries(dataAnalysis StAT)
