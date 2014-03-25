@@ -2,15 +2,20 @@
 #define SIMULATIONDATA_HPP_
 
 #include <vector>
+#include <map>
 #include "../dataAnalysisUtilities/dataSample.hpp"
 
 class SimulationData
 {
 public:
 	SimulationData(std::vector<double> simulationParametersIn, std::string filenameIn);
-	double& operator[](int index);
+	SimulationData(std::map<std::string, double> simulationParametersIn, std::string filenameIn);
+	//double& operator[](int index);
 
-	std::vector<double> simulationParameters;
+	int getNumberOfSimulationParameters();
+
+	//std::vector<double> simulationParameters;
+	std::map<std::string, double> simulationParameters;
 	std::vector<DataSample> simulationRawData;
 	std::string datafileName;
 	int numberOfSimulationParameters;

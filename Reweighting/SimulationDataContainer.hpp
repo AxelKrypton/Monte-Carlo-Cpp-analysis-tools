@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <fstream>
+#include <sstream>
 
 #include "SimulationData.hpp"
 
@@ -16,14 +17,10 @@ public:
 	SimulationData& operator[](int index);
 
 private:
-	int numberOfSimulationParameters; //<-- this with map can be different from file to file (in principle)
 	std::vector<SimulationData> simulationDataSet;
 
-	void checkIndex(int index);
-	//todo: implement
-	void extractInformationFromFile(std::string fileIn);
-	//todo: this exists also in DataSample
-	void checkIfDatafileExists(std::string filename);
+	void extractInformationFromFile(std::string fileIn,
+	    std::vector<std::string>& DataFilename, std::vector<std::map<std::string, double> >& dataParameters);
 };
 
 #endif /* SIMULATIONCONTAINERDATA_HPP_ */

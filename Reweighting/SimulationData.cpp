@@ -1,7 +1,7 @@
 #include "SimulationData.hpp"
 
 SimulationData::SimulationData(std::vector<double> simulationParametersIn, std::string filenameIn) :
-	simulationParameters(simulationParametersIn), datafileName(filenameIn)
+	datafileName(filenameIn)
 {
 	numberOfSimulationParameters = simulationParametersIn.size();
 	//todo: move to own fct.
@@ -16,6 +16,17 @@ SimulationData::SimulationData(std::vector<double> simulationParametersIn, std::
 
 }
 
+SimulationData::SimulationData(std::map<std::string, double> simulationParametersIn, std::string filenameIn) :
+	simulationParameters(simulationParametersIn), datafileName(filenameIn)
+{
+	//todo: read in data
+}
+
+int SimulationData::getNumberOfSimulationParameters()
+{
+	return simulationParameters.size();
+}
+
 void SimulationData::checkIndex(int index)
 {
 	if (index < 0 || index >= numberOfSimulationParameters )
@@ -23,10 +34,10 @@ void SimulationData::checkIndex(int index)
 }
 
 //todo: this should return the DataSample!
-double& SimulationData::operator[](int index)
-{
-	checkIndex(index);
-	return simulationParameters[index];
-}
+//double& SimulationData::operator[](int index)
+//{
+//	checkIndex(index);
+//	return simulationParameters[index];
+//}
 
 
