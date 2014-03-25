@@ -26,20 +26,19 @@ public:
 	int getNumberOfElements();
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
 	DataSample shiftAndPow(int n, double shift);
-	double sum();
-	double& operator[](size_t index);
+	DataSample shift(double shift);
+	DataSample operator*(double factor);
 	DataSample pow(int n);
 	DataSample sampleSlice(int start, int size, int stride);
+	double sum();
+	double& operator[](size_t index);
 
 protected:
 	void setValues(std::valarray<double> valuesIn);
 	void setValues(DataSample sampleIn);
 	void checkIfNumberOfElementsIsValid(int length);
-	void checkIfDatafileExists(std::string filename);
-	void checkIfColumnIsValid(int column);
-	void checkIfOffsetIsValid(int offset);
 	void checkSliceParameters(int start, int size, int stride);
-	std::valarray<double> readDataFromFile(std::string filename, int column, int offset);
+	DataSample readDataFromFile(std::string filename, int column, int offset);
 
 	std::valarray<double> values;
 	int numberOfElements;

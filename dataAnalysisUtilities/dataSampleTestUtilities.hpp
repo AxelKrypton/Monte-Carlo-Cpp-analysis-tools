@@ -21,7 +21,7 @@ std::valarray<double> makeValarrayWithOnes(int length)
 std::valarray<double> makeValarrayWithArrayPosition(int length)
 {
 	std::valarray<double> returnValarray(length);
-	for (int iteration = 0; iteration < returnValarray.size(); iteration ++)
+	for (int iteration = 0; iteration < (int) returnValarray.size(); iteration ++)
 	{
 		returnValarray[iteration] = iteration;
 	}
@@ -31,7 +31,7 @@ std::valarray<double> makeValarrayWithArrayPosition(int length)
 std::valarray<double> makeValarrayWithSquaredArrayPosition(int length)
 {
 	std::valarray<double> returnValarray(length);
-	for (int iteration = 0; iteration < returnValarray.size(); iteration ++)
+	for (int iteration = 0; iteration < (int) returnValarray.size(); iteration ++)
 	{
 		returnValarray[iteration] = iteration*iteration;
 	}
@@ -41,7 +41,7 @@ std::valarray<double> makeValarrayWithSquaredArrayPosition(int length)
 std::valarray<double> makeValarrayWithEntriesBetweenZeroAndOne(int length)
 {
 	std::valarray<double> returnValarray(length);
-	for (int iteration = 0; iteration < returnValarray.size(); iteration ++)
+	for (int iteration = 0; iteration <  (int) returnValarray.size(); iteration ++)
 	{
 		returnValarray[iteration] = (double(iteration)) / (returnValarray.size() - 1);
 	}

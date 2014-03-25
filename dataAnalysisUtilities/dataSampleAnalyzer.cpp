@@ -65,7 +65,7 @@ double DataSampleAnalyzer::calcNthCentralMoment(int n)
 
 double DataSampleAnalyzer::calcNthCentralMomentExplicit(int n)
 {
-	return (shiftAndPow(2, getNthMoment(1))).sum()  / numberOfElements;
+	return (shiftAndPow(n, getNthMoment(1))).sum()  / numberOfElements;
 }
 
 void DataSampleAnalyzer::checkDiscardedElements(int valueIn, std::string descriptionIn)

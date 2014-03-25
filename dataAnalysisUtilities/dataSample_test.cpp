@@ -77,13 +77,39 @@ BOOST_AUTO_TEST_SUITE(build)
 	BOOST_AUTO_TEST_CASE(build6)
 	{
 		std::string fileThatHasOnlyOneColumn = "datafile.example";
-		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatHasOnlyOneColumn, 2), std::runtime_error);
+		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatHasOnlyOneColumn, 2), std::logic_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build7)
 	{
 		std::string fileThatHasTwoColumns = "datafileWithTwoColumns.example";
 		BOOST_CHECK_NO_THROW( DataSample dataSample(fileThatHasTwoColumns, 2));
+	}
+
+	BOOST_AUTO_TEST_CASE(build_emptyFile1)
+	{
+		std::string emptyFile = "emptyFile.example";
+		BOOST_REQUIRE_THROW( DataSample dataSample(emptyFile), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(build_emptyFile2)
+	{
+		std::string fileThatHasEmptyLine = "fileWithEmptyLine.example";
+		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatHasEmptyLine), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(build_commentFile)
+	{
+		std::string fileThatHasOnlyComment = "fileWithComment.example";
+		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatHasOnlyComment), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(build_invalidFile)
+	{
+		std::string fileThatHasInvalidLine = "fileWithBrokenLine.example";
+		int validElementsInFile = 3;
+		DataSample dataSample(fileThatHasInvalidLine);
+		BOOST_REQUIRE_EQUAL( dataSample.getNumberOfElements(), validElementsInFile);
 	}
 
 	BOOST_AUTO_TEST_CASE(elements1)
@@ -111,17 +137,8 @@ BOOST_AUTO_TEST_SUITE(build)
 	BOOST_AUTO_TEST_CASE(fileWithOffset_invalidArg)
 	{
 		std::string fileThatDoesExist = "datafile.example";
-		int linesInFile = 1005;
 		int negativeOffset = -1;
 		BOOST_REQUIRE_THROW(DataSample dataSample(fileThatDoesExist, 1, negativeOffset), std::invalid_argument);
-	}
-
-	BOOST_AUTO_TEST_CASE(fileWithOffset_notYetImplemented)
-	{
-		std::string fileThatDoesExist = "datafile.example";
-		int linesInFile = 1005;
-		int validOffset = 1;
-		BOOST_REQUIRE_THROW(DataSample dataSample(fileThatDoesExist, 1, validOffset), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(copyConstructor)
@@ -130,6 +147,39 @@ BOOST_AUTO_TEST_SUITE(build)
 		DataSample sample1(numberOfElements);
 		DataSample sample2(sample1);
 		BOOST_CHECK_EQUAL(sample1.getNumberOfElements(), sample2.getNumberOfElements());
+	}
+
+	BOOST_AUTO_TEST_CASE(offset_emptyFile1)
+	{
+		std::string emptyFile = "emptyFile.example";
+		int tooLargeOffset = 1;
+		BOOST_REQUIRE_THROW( DataSample dataSample(emptyFile, 1, tooLargeOffset), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(offset_tooLarge)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int linesInFile = 1005;
+		int tooLargeOffset = linesInFile;
+		BOOST_REQUIRE_THROW(DataSample dataSample(fileThatDoesExist, 1, tooLargeOffset), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(offset1)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int linesInFile = 1005;
+		int offset = 456;
+		DataSample dataSample(fileThatDoesExist, 1, offset);
+		BOOST_REQUIRE_EQUAL(dataSample.getNumberOfElements(), linesInFile - offset);
+	}
+
+	BOOST_AUTO_TEST_CASE(offset2)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int linesInFile = 1005;
+		int offset = 0;
+		DataSample dataSample(fileThatDoesExist, 1, offset);
+		BOOST_REQUIRE_EQUAL(dataSample.getNumberOfElements(), linesInFile);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -195,6 +245,38 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSample shifted = sample.shiftAndPow(2, 0.);
 		DataSample sample2(makeValarrayWithSquaredArrayPosition(numberOfElements));
 		BOOST_CHECK_CLOSE(sample2.sum(), shifted.sum(), doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(shift1)
+	{
+		int numberOfElements = 333;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample shifted = sample.shift(0.);
+		BOOST_REQUIRE_EQUAL(shifted.sum(), numberOfElements);
+	}
+
+	BOOST_AUTO_TEST_CASE(shift2)
+	{
+		int numberOfElements = 333;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample shifted = sample.shift(1.);
+		BOOST_REQUIRE_EQUAL(shifted.sum(), 0.);
+	}
+
+	BOOST_AUTO_TEST_CASE(mulitply1)
+	{
+		int numberOfElements = 432;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample multiplied = sample*0.;
+		BOOST_REQUIRE_EQUAL(multiplied.sum(), 0.);
+	}
+
+	BOOST_AUTO_TEST_CASE(mulitply2)
+	{
+		int numberOfElements = 432;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample multiplied = sample*(1./numberOfElements);
+		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1., doublePrecisionInPercent);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

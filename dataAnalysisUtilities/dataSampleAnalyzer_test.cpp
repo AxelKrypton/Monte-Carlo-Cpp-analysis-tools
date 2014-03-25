@@ -363,7 +363,6 @@ BOOST_AUTO_TEST_SUITE(binning)
 
 	void testBinningWithNumberOfBins_elements(int numberOfElements, int desiredNumberOfElementsOfBinnedDataSample)
 	{
-		int numberOfBins = numberOfElements / desiredNumberOfElementsOfBinnedDataSample;
 		DataSampleAnalyzer originalSample(numberOfElements);
 		DataSampleAnalyzer binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
 		BOOST_CHECK_EQUAL(desiredNumberOfElementsOfBinnedDataSample, binnedSample.getNumberOfElements());
