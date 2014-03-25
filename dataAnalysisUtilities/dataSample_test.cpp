@@ -77,13 +77,39 @@ BOOST_AUTO_TEST_SUITE(build)
 	BOOST_AUTO_TEST_CASE(build6)
 	{
 		std::string fileThatHasOnlyOneColumn = "datafile.example";
-		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatHasOnlyOneColumn, 2), std::runtime_error);
+		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatHasOnlyOneColumn, 2), std::logic_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build7)
 	{
 		std::string fileThatHasTwoColumns = "datafileWithTwoColumns.example";
 		BOOST_CHECK_NO_THROW( DataSample dataSample(fileThatHasTwoColumns, 2));
+	}
+
+	BOOST_AUTO_TEST_CASE(build_emptyFile1)
+	{
+		std::string emptyFile = "emptyFile.example";
+		BOOST_REQUIRE_THROW( DataSample dataSample(emptyFile), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(build_emptyFile2)
+	{
+		std::string fileThatHasEmptyLine = "fileWithEmptyLine.example";
+		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatHasEmptyLine), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(build_commentFile)
+	{
+		std::string fileThatHasOnlyComment = "fileWithComment.example";
+		BOOST_REQUIRE_THROW( DataSample dataSample(fileThatHasOnlyComment), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(build_invalidFile)
+	{
+		std::string fileThatHasInvalidLine = "fileWithBrokenLine.example";
+		int validElementsInFile = 3;
+		DataSample dataSample(fileThatHasInvalidLine);
+		BOOST_REQUIRE_EQUAL( dataSample.getNumberOfElements(), validElementsInFile);
 	}
 
 	BOOST_AUTO_TEST_CASE(elements1)

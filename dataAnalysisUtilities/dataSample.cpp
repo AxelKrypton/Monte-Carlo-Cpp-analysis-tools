@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
 #include "dataSample.hpp"
 
 DataSample::DataSample(int length)
@@ -57,14 +58,6 @@ int DataSample::getNumberOfElements()
 	return numberOfElements;
 }
 
-void DataSample::checkIfOffsetIsValid(int offset)
-{
-	if(offset < 0)
-		throw std::invalid_argument("Offset must be greater than or equal to zero!");
-	if(offset > 0)
-		throw std::invalid_argument("Usage of offset parameter is not implemented yet. Aborting!");
-}
-
 void DataSample::checkIfNumberOfElementsIsValid(int length)
 {
 	if(length <= 0)
@@ -72,12 +65,6 @@ void DataSample::checkIfNumberOfElementsIsValid(int length)
 	//todo: think about better warning!
 	if(length > roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid)
 		std::cout << "Warning: the datasize is such that double precision may not be valid anymore (depending on the data)!" << std::endl;
-}
-
-void DataSample::checkIfColumnIsValid(int column)
-{
-	if(column <= 0)
-		throw std::invalid_argument("Numbers of columns must be bigger than zero!");
 }
 
 double defaultFunction(double in)
@@ -92,13 +79,27 @@ DataSample DataSample::applyFunction(double (*function)(double))
 	return dataSample;
 }
 
-void DataSample::checkIfDatafileExists(std::string filename)
+static void checkIfDatafileExists(std::string filename)
 {
 	std::ifstream file;
 	file.open(filename.c_str());
 	if ( !file.is_open() )
 		throw std::invalid_argument("Given file \"" + filename + "\" does not exist!");
 	file.close();
+}
+
+static void checkIfColumnIsValid(int column)
+{
+	if(column <= 0)
+		throw std::invalid_argument("Number of column must be bigger than zero!");
+}
+
+static void checkIfOffsetIsValid(int offset)
+{
+	if(offset < 0)
+		throw std::invalid_argument("Offset must be greater than or equal to zero!");
+	if(offset > 0)
+		throw std::invalid_argument("Usage of offset parameter is not implemented yet. Aborting!");
 }
 
 //todo: refactor, perhaps think about column numbering
@@ -108,7 +109,7 @@ std::valarray<double> DataSample::readDataFromFile(std::string filename, int col
 	std::ifstream infile;
 	std::string line;
 	std::vector<double> data;
-	double aux;
+	double currentNumber;
 
 	checkIfDatafileExists(filename);
 	checkIfColumnIsValid(column);
@@ -118,31 +119,34 @@ std::valarray<double> DataSample::readDataFromFile(std::string filename, int col
 
 	while (std::getline(infile, line))
 	{
-		if(line[0] != '#') //ignore lines beginning by # since they are comments for gnuplot
+		if(line[0] != '#' && !( line.empty() ) ) //ignore comment or empty lines
 		{
 			std::stringstream ss(line);
 			for(int i=0; i<column; i++)
 			{
-				if(ss >> aux)
+				if(ss >> currentNumber)
 				{
 					if(i==column-1)
-						data.push_back(aux);
-				}
-				else
-				{
-					throw std::runtime_error("Error reading datafile");
+						data.push_back(currentNumber);
 				}
 			}
 		}
 	}
+
 	//todo: this is not covered in a test yet...
-	//Note: this happens for example if an empty line is contained in the file
 	if(!(infile.peek() == EOF && infile.eof()) || infile.bad())
 	{
 		throw std::runtime_error("Error reading datafile");
 	}
+
 	infile.close();
 
+	if(data.size() == 0)
+	{
+		std::ostringstream ss ;
+		ss << column;
+		throw std::logic_error("datafile \"" + filename + "\", does not contain valid data in column " + ss.str() + "!");
+	}
 	return std::valarray<double>(data.data(), data.size());
 }
 

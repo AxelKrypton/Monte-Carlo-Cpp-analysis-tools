@@ -35,9 +35,6 @@ protected:
 	void setValues(std::valarray<double> valuesIn);
 	void setValues(DataSample sampleIn);
 	void checkIfNumberOfElementsIsValid(int length);
-	void checkIfDatafileExists(std::string filename);
-	void checkIfColumnIsValid(int column);
-	void checkIfOffsetIsValid(int offset);
 	void checkSliceParameters(int start, int size, int stride);
 	std::valarray<double> readDataFromFile(std::string filename, int column, int offset);
 
