@@ -23,9 +23,11 @@
 # LIB name of the library to link to
 # The test is expected to have only one source
 # file called EXE.cpp and will be linked automatically
+# ARGN includes all the arguments passed to the macro beyond EXE
+#      and they should all be libraries needed by the executable
 macro(add_unit_test NAME EXE)
 	add_executable("${EXE}" "${EXE}.cpp")
-	target_link_libraries("${EXE}" StAT)
+	target_link_libraries("${EXE}" ${ARGN} ${Boost_LIBRARIES})
 	add_test("${NAME}" "${EXE}")
 endmacro()
 

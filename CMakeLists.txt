@@ -15,10 +15,10 @@ find_package(Boost REQUIRED COMPONENTS regex filesystem system program_options u
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 ## These two variables are needed to create the main library StAT
+## NOTE: So far they are empty, but they can be useful in future
 set_abs_paths(StAT_FILES 
 )
 set(StAT_USED_LIBS
-	${Boost_LIBRARIES}
 )
 
 ## Create the main library StAT

@@ -3,25 +3,21 @@
 
 #include <stdexcept>
 #include <fstream>
-#include <valarray>
 
-//todo: move class to own file!
-//#include "../dataSample/dataSample.hpp"
 #include "SimulationData.hpp"
 
 class SimulationDataContainer
 {
 public:
 	SimulationDataContainer();
-	SimulationDataContainer(std::string informationFile);
+	SimulationDataContainer(std::string configurationFile);
 	int getNumberOfDatafiles();
-	int getNumberOfSimulationParameters();
+	int getNumberOfSimulationParameters(int fileNumber);
 	SimulationData& operator[](int index);
 
 private:
-	int numberOfDatafiles;
-	int numberOfSimulationParameters;
-	std::vector<SimulationData> simulationData;
+	int numberOfSimulationParameters; //<-- this with map can be different from file to file (in principle)
+	std::vector<SimulationData> simulationDataSet;
 
 	void checkIndex(int index);
 	//todo: implement

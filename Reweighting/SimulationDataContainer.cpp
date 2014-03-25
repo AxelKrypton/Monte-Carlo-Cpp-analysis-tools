@@ -14,17 +14,18 @@ SimulationDataContainer::SimulationDataContainer(std::string informationFile)
 SimulationData& SimulationDataContainer::operator[](int index)
 {
 	checkIndex(index);
-	return simulationData[index];
+	return simulationDataSet[index];
 }
 
 int SimulationDataContainer::getNumberOfDatafiles()
 {
-	return numberOfDatafiles;
+	return simulationDataSet.size();
 }
 
-int SimulationDataContainer::getNumberOfSimulationParameters()
+int SimulationDataContainer::getNumberOfSimulationParameters(int fileNumber)
 {
-	return numberOfSimulationParameters;
+	return 0;
+	//return simulationDataSet[fileNumber].Getxxx;
 }
 
 void SimulationDataContainer::checkIndex(int index)
@@ -35,13 +36,11 @@ void SimulationDataContainer::checkIndex(int index)
 
 void SimulationDataContainer::extractInformationFromFile(std::string fileIn)
 {
-	numberOfDatafiles = 10;
-	numberOfSimulationParameters = 5;
 	std::string datafileName = "dummy.data";
-	std::vector<double> parametersToGetOutOfFile(numberOfSimulationParameters);
-	for (int i = 0; i< numberOfDatafiles; i++)
+	std::vector<double> parametersToGetOutOfFile(5);
+	for (int i = 0; i<10; i++)
 	{
-		simulationData.push_back(SimulationData(parametersToGetOutOfFile, datafileName));
+		simulationDataSet.push_back(SimulationData(parametersToGetOutOfFile, datafileName));
 	}
 }
 
