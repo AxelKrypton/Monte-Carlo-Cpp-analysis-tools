@@ -11,6 +11,18 @@ enable_testing()
 ## Enable Dashboard
 include(CTest)
 
+# compiler settings
+if(CMAKE_COMPILER_IS_GNUCXX)
+	set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Wdisabled-optimization")
+	set(CMAKE_CXX_FLAGS_DEBUG     "-g -O0 -fno-reorder-blocks -fno-schedule-insns -fno-inline")
+	set(CMAKE_CXX_FLAGS_DEBUGFULL "-g3 -fno-linline")
+endif(CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_COMPILER_IS_GNUCC)
+	set(CMAKE_C_FLAGS             "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -Wc++-compat -Wdisabled-optimization -std=c99")
+	set(CMAKE_C_FLAGS_DEBUG       "-g -O0 -fno-reorder-blocks -fno-schedule-insns -fno-inline")
+	set(CMAKE_C_FLAGS_DEBUGFULL   "-g3 -fno-linline")
+endif(CMAKE_COMPILER_IS_GNUCC)
+
 find_package(Boost REQUIRED COMPONENTS regex filesystem system program_options unit_test_framework)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
