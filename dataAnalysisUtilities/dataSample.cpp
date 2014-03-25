@@ -104,50 +104,90 @@ static void checkIfOffsetIsValid(int offset)
 
 //todo: refactor, perhaps think about column numbering
 //todo: implement offset
-std::valarray<double> DataSample::readDataFromFile(std::string filename, int column, int offset)
+class FileReader
 {
-	std::ifstream infile;
-	std::string line;
-	std::vector<double> data;
-	double currentNumber;
-
-	checkIfDatafileExists(filename);
-	checkIfColumnIsValid(column);
-	checkIfOffsetIsValid(offset);
-
-	infile.open(filename.c_str());
-
-	while (std::getline(infile, line))
+public:
+	FileReader()
 	{
-		if(line[0] != '#' && !( line.empty() ) ) //ignore comment or empty lines
+		throw std::invalid_argument("Need input file to create FileReader!");
+	}
+	FileReader(std::string filename, int column, int offset):
+		filename(filename), column(column), offset(offset)
+	{
+		checkIfDatafileExists(filename);
+		checkIfColumnIsValid(column);
+		checkIfOffsetIsValid(offset);
+
+		infile.open(filename.c_str());
+	}
+
+	~FileReader()
+	{
+		infile.close();
+	}
+
+	DataSample readDataFromFile()
+	{
+		while (std::getline(infile, line))
 		{
-			std::stringstream ss(line);
-			for(int i=0; i<column; i++)
+			if(line[0] != '#' && !( line.empty() ) ) //ignore comment or empty lines
 			{
-				if(ss >> currentNumber)
-				{
-					if(i==column-1)
-						data.push_back(currentNumber);
-				}
+				extractContentFromLine();
+			}
+		}
+
+		checkOnFileStreamError();
+		checkIfReadWasSuccessful();
+		return DataSample( std::valarray<double>(data.data(), data.size()) );
+	}
+
+private:
+	void checkIfReadWasSuccessful()
+	{
+		if(data.size() == 0)
+		{
+			std::ostringstream ss ;
+			ss << column;
+			throw std::logic_error("datafile \"" + filename + "\", does not contain valid data in column " + ss.str() + "!");
+		}
+	}
+
+	void checkOnFileStreamError()
+	{
+		//todo: this is not covered in a test yet...
+		if(!(infile.peek() == EOF && infile.eof()) || infile.bad())
+		{
+			throw std::runtime_error("Error reading datafile");
+		}
+	}
+
+	void extractContentFromLine()
+	{
+		double currentNumber = 0.;
+		std::stringstream ss (line);
+		for(int i=0; i<column; i++)
+		{
+			if(ss >> currentNumber)
+			{
+				if(i==column-1)
+					data.push_back(currentNumber);
 			}
 		}
 	}
 
-	//todo: this is not covered in a test yet...
-	if(!(infile.peek() == EOF && infile.eof()) || infile.bad())
-	{
-		throw std::runtime_error("Error reading datafile");
-	}
+	std::ifstream infile;
+	std::string line;
+	std::string filename;
+	std::vector<double> data;
+	double currentNumber;
+	int column;
+	int offset;
+};
 
-	infile.close();
-
-	if(data.size() == 0)
-	{
-		std::ostringstream ss ;
-		ss << column;
-		throw std::logic_error("datafile \"" + filename + "\", does not contain valid data in column " + ss.str() + "!");
-	}
-	return std::valarray<double>(data.data(), data.size());
+DataSample DataSample::readDataFromFile(std::string filename, int column, int offset)
+{
+	FileReader reader(filename, column, offset);
+	return reader.readDataFromFile();
 }
 
 void DataSample::checkSliceParameters(int start, int size, int stride)

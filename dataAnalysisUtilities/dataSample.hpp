@@ -36,7 +36,7 @@ protected:
 	void setValues(DataSample sampleIn);
 	void checkIfNumberOfElementsIsValid(int length);
 	void checkSliceParameters(int start, int size, int stride);
-	std::valarray<double> readDataFromFile(std::string filename, int column, int offset);
+	DataSample readDataFromFile(std::string filename, int column, int offset);
 
 	std::valarray<double> values;
 	int numberOfElements;
