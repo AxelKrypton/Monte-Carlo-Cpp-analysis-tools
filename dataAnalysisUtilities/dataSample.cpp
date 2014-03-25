@@ -98,12 +98,8 @@ static void checkIfOffsetIsValid(int offset)
 {
 	if(offset < 0)
 		throw std::invalid_argument("Offset must be greater than or equal to zero!");
-	if(offset > 0)
-		throw std::invalid_argument("Usage of offset parameter is not implemented yet. Aborting!");
 }
 
-//todo: refactor, perhaps think about column numbering
-//todo: implement offset
 class FileReader
 {
 public:
@@ -112,7 +108,7 @@ public:
 		throw std::invalid_argument("Need input file to create FileReader!");
 	}
 	FileReader(std::string filename, int column, int offset):
-		filename(filename), column(column), offset(offset)
+		filename(filename), column(column), offset(offset), lineCounter(0)
 	{
 		checkIfDatafileExists(filename);
 		checkIfColumnIsValid(column);
@@ -132,7 +128,9 @@ public:
 		{
 			if(line[0] != '#' && !( line.empty() ) ) //ignore comment or empty lines
 			{
-				extractContentFromLine();
+				if (!(lineCounter < offset))
+					extractContentFromLine();
+				lineCounter++;
 			}
 		}
 
@@ -182,6 +180,7 @@ private:
 	double currentNumber;
 	int column;
 	int offset;
+	int lineCounter;
 };
 
 DataSample DataSample::readDataFromFile(std::string filename, int column, int offset)
@@ -205,5 +204,5 @@ void DataSample::checkSliceParameters(int start, int size, int stride)
 DataSample DataSample::sampleSlice(int start, int size, int stride)
 {
 	checkSliceParameters(start, size, stride);
-	return DataSample(values[std::slice(start, size, stride	)]);
+	return DataSample(values[std::slice(start, size, stride)]);
 }

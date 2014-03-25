@@ -142,20 +142,45 @@ BOOST_AUTO_TEST_SUITE(build)
 		BOOST_REQUIRE_THROW(DataSample dataSample(fileThatDoesExist, 1, negativeOffset), std::invalid_argument);
 	}
 
-	BOOST_AUTO_TEST_CASE(fileWithOffset_notYetImplemented)
-	{
-		std::string fileThatDoesExist = "datafile.example";
-		int linesInFile = 1005;
-		int validOffset = 1;
-		BOOST_REQUIRE_THROW(DataSample dataSample(fileThatDoesExist, 1, validOffset), std::invalid_argument);
-	}
-
 	BOOST_AUTO_TEST_CASE(copyConstructor)
 	{
 		int numberOfElements = 253;
 		DataSample sample1(numberOfElements);
 		DataSample sample2(sample1);
 		BOOST_CHECK_EQUAL(sample1.getNumberOfElements(), sample2.getNumberOfElements());
+	}
+
+	BOOST_AUTO_TEST_CASE(offset_emptyFile1)
+	{
+		std::string emptyFile = "emptyFile.example";
+		int tooLargeOffset = 1;
+		BOOST_REQUIRE_THROW( DataSample dataSample(emptyFile, 1, tooLargeOffset), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(offset_tooLarge)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int linesInFile = 1005;
+		int tooLargeOffset = linesInFile;
+		BOOST_REQUIRE_THROW(DataSample dataSample(fileThatDoesExist, 1, tooLargeOffset), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(offset1)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int linesInFile = 1005;
+		int offset = 456;
+		DataSample dataSample(fileThatDoesExist, 1, offset);
+		BOOST_REQUIRE_EQUAL(dataSample.getNumberOfElements(), linesInFile - offset);
+	}
+
+	BOOST_AUTO_TEST_CASE(offset2)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int linesInFile = 1005;
+		int offset = 0;
+		DataSample dataSample(fileThatDoesExist, 1, offset);
+		BOOST_REQUIRE_EQUAL(dataSample.getNumberOfElements(), linesInFile);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
