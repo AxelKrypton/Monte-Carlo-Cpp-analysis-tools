@@ -86,6 +86,37 @@ int main(int argc, char ** argv)
 		cout << scientific << varSample.getNthMoment(1) << "\t" << jackSample.getJackknifeError() << endl;
 	}
 
+	//calc skewness and error
+	if(true)
+	{
+		DataSampleAnalyzer sample(file);
+		double x3 = sample.getNthCentralMoment(3);
+		double x2 = sample.getNthCentralMoment(2);
+
+		double skewness = x3 / pow(sqrt(x2),3.);
+
+		double error = -1.;
+
+		cout << "Skewness\t\tError" << endl;
+		cout << scientific << skewness << "\t" << error << endl;
+	}
+
+	//calc kurtosis and error
+	if(true)
+	{
+		DataSampleAnalyzer sample(file);
+		double x4 = sample.getNthCentralMoment(4);
+		double x2 = sample.getNthCentralMoment(2);
+
+		//todo: think about different definition (-3)
+		double kurtosis = x4 / (x2 * x2);
+
+		double error = -1.;
+
+		cout << "Kurtosis\t\tError" << endl;
+		cout << scientific << kurtosis << "\t" << error << endl;
+	}
+
 
   return 0;
 }
