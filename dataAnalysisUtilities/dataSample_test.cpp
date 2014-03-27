@@ -295,7 +295,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_REQUIRE_THROW(DataSample multiplied = sample1 * sample2, std::invalid_argument);
 	}
 
-	BOOST_AUTO_TEST_CASE(mulitplication_wholeSample_compound)
+	BOOST_AUTO_TEST_CASE(multiplication_wholeSample_compound)
 	{
 		int numberOfElements = 432;
 		DataSample sample1(makeValarrayWithOnes(numberOfElements));
@@ -305,18 +305,17 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_REQUIRE_CLOSE(sample1.sum(), 1, doublePrecisionInPercent);
 	}
 
-	BOOST_AUTO_TEST_CASE(mulitplication_wholeSample)
+	BOOST_AUTO_TEST_CASE(multiplication_wholeSample)
 	{
 		int numberOfElements = 432;
 		DataSample sample1(makeValarrayWithOnes(numberOfElements));
 		DataSample sample2(makeValarrayWithOnes(numberOfElements));
-		//todo: add operator *=
-		sample2 = sample2 * (1./numberOfElements);
+		sample2 /= numberOfElements;
 		DataSample multiplied = sample1 * sample2;
 		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1, doublePrecisionInPercent);
 	}
 
-	BOOST_AUTO_TEST_CASE(mulitplication_wholeSample_invalidArgument)
+	BOOST_AUTO_TEST_CASE(multiplication_wholeSample_invalidArgument)
 	{
 		int numberOfElements = 432;
 		DataSample sample1(makeValarrayWithOnes(numberOfElements));
@@ -329,6 +328,39 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 66;
 		DataSample sample(makeValarrayWithOnes(numberOfElements));
 		BOOST_REQUIRE_THROW(DataSample divided = sample/0., std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(division_compound_invalidArgument)
+	{
+		int numberOfElements = 432;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		BOOST_REQUIRE_THROW(sample /= 0., std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(division_compound)
+	{
+		int numberOfElements = 432;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		sample /= numberOfElements;
+		BOOST_CHECK_CLOSE(sample.sum(), 1., doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(division_wholeSample_compound_invalidArgument)
+	{
+		int numberOfElements = 432;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements + 1));
+		BOOST_REQUIRE_THROW(sample1 /= sample2, std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(division_wholeSample_compound)
+	{
+		int numberOfElements = 55;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements));
+		sample2 *= numberOfElements;
+		sample1 /= sample2;
+		BOOST_REQUIRE_CLOSE(sample1.sum(), 1, doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(division)
@@ -347,15 +379,15 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_REQUIRE_THROW(DataSample divided = sample1 / sample2, std::invalid_argument);
 	}
 
-//	BOOST_AUTO_TEST_CASE(division_wholeSample)
-//	{
-//		int numberOfElements = 432;
-//		DataSample sample1(makeValarrayWithOnes(numberOfElements));
-//		DataSample sample2(makeValarrayWithOnes(numberOfElements));
-//		sample2 /= (1./numberOfElements);
-//		DataSample divided = sample1 / sample2;
-//
-//	}
+	BOOST_AUTO_TEST_CASE(division_wholeSample)
+	{
+		int numberOfElements = 432;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements));
+		sample2 /= (1./numberOfElements);
+		DataSample divided = sample1 / sample2;
+		BOOST_REQUIRE_CLOSE(divided.sum(), 1., doublePrecisionInPercent);
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 

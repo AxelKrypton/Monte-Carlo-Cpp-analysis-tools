@@ -85,7 +85,6 @@ DataSample& DataSample::operator*=(DataSample sampleIn)
 	return *this;
 }
 
-//const?
 DataSample operator*(DataSample lhs, DataSample rhs)
 {
 	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
@@ -93,7 +92,6 @@ DataSample operator*(DataSample lhs, DataSample rhs)
 	return lhs;
 }
 
-//todo: needs test
 DataSample& DataSample::operator/=(double factor)
 {
 	checkDivisionFactor(factor);
@@ -101,9 +99,9 @@ DataSample& DataSample::operator/=(double factor)
 	return *this;
 }
 
-//todo: needs test
 DataSample& DataSample::operator/=(DataSample sampleIn)
 {
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
 	values /= sampleIn.values;
 	return *this;
 }
