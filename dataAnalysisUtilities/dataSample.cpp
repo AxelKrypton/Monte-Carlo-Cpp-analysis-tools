@@ -15,9 +15,9 @@ DataSample::DataSample(std::valarray<double> valuesIn)
 	setValues(valuesIn);
 }
 
-DataSample::DataSample(std::string dataFilename, int column, int offset)
+DataSample::DataSample(std::string dataFilename, int column, int offset, bool* isAnyEntryBad)
 {
-	setValues(readDataFromFile(dataFilename, column, offset));
+	setValues(readDataFromFile(dataFilename, column, offset, isAnyEntryBad));
 }
 
 void DataSample::setValues(std::valarray<double> valuesIn)
@@ -90,10 +90,10 @@ DataSample DataSample::applyFunction(double (*function)(double))
 	return dataSample;
 }
 
-DataSample DataSample::readDataFromFile(std::string filename, int column, int offset)
+DataSample DataSample::readDataFromFile(std::string filename, int column, int offset, bool* isAnyEntryBad)
 {
 	FileReader reader(filename, column, offset);
-	return reader.readDataFromFile();
+	return reader.readDataFromFile(isAnyEntryBad);
 }
 
 void DataSample::checkSliceParameters(int start, int size, int stride)

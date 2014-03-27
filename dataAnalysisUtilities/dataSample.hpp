@@ -22,7 +22,7 @@ public:
 	DataSample(int length = defaultSizeOfDataSample);
 	DataSample(std::valarray<double> valuesIn);
 	//todo: think about creating two or three distinct constructors
-	DataSample(std::string dataFilename, int column = 1, int offset = 0);
+	DataSample(std::string dataFilename, int column = 1, int offset = 0, bool* isAnyEntryBad = NULL);
 	int getNumberOfElements();
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
 	DataSample shiftAndPow(int n, double shift);
@@ -38,7 +38,7 @@ protected:
 	void setValues(DataSample sampleIn);
 	void checkIfNumberOfElementsIsValid(int length);
 	void checkSliceParameters(int start, int size, int stride);
-	DataSample readDataFromFile(std::string filename, int column, int offset);
+	DataSample readDataFromFile(std::string filename, int column, int offset, bool* isAnyEntryBad = NULL);
 
 	std::valarray<double> values;
 	int numberOfElements;
