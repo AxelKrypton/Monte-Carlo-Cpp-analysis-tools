@@ -93,23 +93,50 @@ int main(int argc, char ** argv)
 	if(true)
 	{
 		DataSampleAnalyzer sample(file);
+		double x3 = sample.getNthCentralMoment(3);
+		double x2 = sample.getNthCentralMoment(2);
+
 		DataSampleAnalyzer thirdCentralMoment = (sample - sample.getNthMoment(1))^3;
 		DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1))^2;
 
-		DataSample binnedSample1 = thirdCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-		DataSample binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+		DataSampleAnalyzer binnedSample1 = thirdCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+		DataSampleAnalyzer binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+
+		double x3_2 = binnedSample1.getNthMoment(1);
+		double x2_2 = binnedSample2.getNthMoment(1);
 
 		JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
 		JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
 
-		JackknifeEstimators skewnessSamples( jackSample1 / jackSample2 );
+		JackknifeEstimators skewnessSample( jackSample1 / jackSample2 );
 
+		std::cout << "central moments of original sample:" << std::endl;
+		std::cout << x3 << " " << x2 << std::endl;
 
-		double skewness = jackSample1.getNthMoment(1) / jackSample2.getNthMoment(2);
-		double error = -1.;
+		std::cout << "means of binned sample:" << std::endl;
+		std::cout << x3_2 << " " << x2_2 << std::endl;
+
+		double mean1 = jackSample1.getNthMoment(1);
+		double mean2 = jackSample2.getNthMoment(1);
+		double var1 = jackSample1.getNthCentralMoment(2);
+		double var2 = jackSample2.getNthCentralMoment(2);
+
+		std::cout << "means of jackknife estimators" << std::endl;
+		std::cout << mean1 << " " << mean2 << std::endl;
+		std::cout << var1 << " " << var2 << std::endl;
+
+		//need sqrt for mean2!!!
+		double skewness = mean1 / mean2;
+		double error = sqrt( fabs(var1 / mean2 / mean2) + fabs(var2 * mean1 / mean2 / mean2 / mean2 / mean2) );
+		double unbiasedError = error*(double(numberOfBins)/double(numberOfBins-1));
+
+		double skewness2 = skewnessSample.getNthMoment(1);
+		double error2 = skewnessSample.getJackknifeError();
 
 		cout << "Skewness\t\tError" << endl;
 		cout << scientific << skewness << "\t" << error << endl;
+		cout << scientific << "\t\t" << unbiasedError << endl;
+		cout << scientific << skewness2 << "\t" << error2 << endl;
 	}
 
 	//calc kurtosis and error
