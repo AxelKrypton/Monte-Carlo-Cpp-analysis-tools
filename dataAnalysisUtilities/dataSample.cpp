@@ -106,6 +106,12 @@ DataSample& DataSample::operator/=(DataSample sampleIn)
 	return *this;
 }
 
+DataSample& DataSample::operator^=(int n)
+{
+	values = std::pow(values, double(n));
+	return *this;
+}
+
 DataSample operator*(DataSample sampleIn, double factor)
 {
 	sampleIn *= factor;
@@ -123,6 +129,11 @@ DataSample operator/(DataSample sampleIn, double factor)
 {
 	checkDivisionFactor(factor);
 	return sampleIn /= factor;
+}
+
+DataSample operator^(DataSample sampleIn, int n)
+{
+	return sampleIn ^= n;
 }
 
 int DataSample::getNumberOfElements()
