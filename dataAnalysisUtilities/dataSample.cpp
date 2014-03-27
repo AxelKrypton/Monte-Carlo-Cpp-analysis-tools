@@ -64,11 +64,6 @@ DataSample& DataSample::operator*=(double factor)
 	return *this;
 }
 
-DataSample DataSample::operator*(double factor)
-{
-	return DataSample(values * factor);
-}
-
 static void checkDivisionFactor(double factorIn)
 {
 	if(factorIn == 0.)
@@ -83,28 +78,36 @@ DataSample DataSample::operator/(double factor)
 	return DataSample(values * factor);
 }
 
-void DataSample::checkNumberOfElements(int numberIn)
+void checkNumberOfElements(int lhs, int rhs)
 {
-	if (numberIn != numberOfElements)
+	if (lhs != rhs)
 		throw std::invalid_argument("DataSamples have different number of elements!");
 }
 
 DataSample& DataSample::operator*=(DataSample sampleIn)
 {
-	checkNumberOfElements(sampleIn.getNumberOfElements());
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
 	values *= sampleIn.values;
 	return *this;
 }
 
-DataSample DataSample::operator*(DataSample sampleIn)
+//const?
+DataSample operator*(DataSample lhs, DataSample rhs)
 {
-	checkNumberOfElements(sampleIn.getNumberOfElements());
-	return DataSample(values * sampleIn.values);
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs *= rhs;
+	return lhs;
+}
+
+DataSample operator*(DataSample sampleIn, double factor)
+{
+	sampleIn *= factor;
+	return sampleIn;
 }
 
 DataSample DataSample::operator/(DataSample sampleIn)
 {
-	checkNumberOfElements(sampleIn.getNumberOfElements());
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
 	return DataSample(values / sampleIn.values);
 }
 
