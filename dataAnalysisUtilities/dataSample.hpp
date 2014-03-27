@@ -15,7 +15,6 @@ const static int roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid 
 //TODO: move this to better place
 double defaultFunction(double in);
 
-//TODO: implement offset
 class DataSample
 {
 public:
@@ -27,8 +26,12 @@ public:
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
 	DataSample shiftAndPow(int n, double shift);
 	DataSample shift(double shift);
+	DataSample& operator*=(double factor);
 	DataSample operator*(double factor);
+	DataSample& operator*=(DataSample sampleIn);
 	DataSample operator*(DataSample sampleIn);
+	DataSample operator/(double factor);
+	DataSample operator/(DataSample sampleIn);
 	DataSample pow(int n);
 	DataSample sampleSlice(int start, int size, int stride);
 	double sum();

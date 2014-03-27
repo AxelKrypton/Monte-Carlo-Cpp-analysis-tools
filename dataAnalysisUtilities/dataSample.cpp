@@ -58,8 +58,28 @@ double& DataSample::operator[](size_t index)
 	return values[index];
 }
 
+DataSample& DataSample::operator*=(double factor)
+{
+	values *= factor;
+	return *this;
+}
+
 DataSample DataSample::operator*(double factor)
 {
+	return DataSample(values * factor);
+}
+
+static void checkDivisionFactor(double factorIn)
+{
+	if(factorIn == 0.)
+	{
+		throw std::invalid_argument("Cannot divide by zero!");
+	}
+}
+
+DataSample DataSample::operator/(double factor)
+{
+	checkDivisionFactor(factor);
 	return DataSample(values * factor);
 }
 
@@ -69,10 +89,23 @@ void DataSample::checkNumberOfElements(int numberIn)
 		throw std::invalid_argument("DataSamples have different number of elements!");
 }
 
+DataSample& DataSample::operator*=(DataSample sampleIn)
+{
+	checkNumberOfElements(sampleIn.getNumberOfElements());
+	values *= sampleIn.values;
+	return *this;
+}
+
 DataSample DataSample::operator*(DataSample sampleIn)
 {
 	checkNumberOfElements(sampleIn.getNumberOfElements());
 	return DataSample(values * sampleIn.values);
+}
+
+DataSample DataSample::operator/(DataSample sampleIn)
+{
+	checkNumberOfElements(sampleIn.getNumberOfElements());
+	return DataSample(values / sampleIn.values);
 }
 
 int DataSample::getNumberOfElements()
