@@ -335,7 +335,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 	{
 		int numberOfElements = 66;
 		DataSample sample(makeValarrayWithOnes(numberOfElements));
-		DataSample divided = sample/ (1./numberOfElements);
+		DataSample divided = sample/ numberOfElements;
 		BOOST_REQUIRE_CLOSE(divided.sum(), 1., doublePrecisionInPercent);
 	}
 

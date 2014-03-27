@@ -29,8 +29,8 @@ public:
 	//todo: make the arg. constant?
 	DataSample& operator*=(double factor);
 	DataSample& operator*=(DataSample sampleIn);
-	DataSample operator/(double factor);
-	DataSample operator/(DataSample sampleIn);
+	DataSample& operator/=(double factor);
+	DataSample& operator/=(DataSample sampleIn);
 	DataSample pow(int n);
 	DataSample sampleSlice(int start, int size, int stride);
 	double sum();
@@ -50,5 +50,7 @@ protected:
 
 DataSample operator*(DataSample sampleIn, double factor);
 DataSample operator*(DataSample lhs, DataSample rhs);
+DataSample operator/(DataSample sampleIn, double factor);
+DataSample operator/(DataSample lhs, DataSample rhs);
 
 #endif

@@ -72,12 +72,6 @@ static void checkDivisionFactor(double factorIn)
 	}
 }
 
-DataSample DataSample::operator/(double factor)
-{
-	checkDivisionFactor(factor);
-	return DataSample(values * factor);
-}
-
 void checkNumberOfElements(int lhs, int rhs)
 {
 	if (lhs != rhs)
@@ -99,16 +93,38 @@ DataSample operator*(DataSample lhs, DataSample rhs)
 	return lhs;
 }
 
+//todo: needs test
+DataSample& DataSample::operator/=(double factor)
+{
+	checkDivisionFactor(factor);
+	values /= factor;
+	return *this;
+}
+
+//todo: needs test
+DataSample& DataSample::operator/=(DataSample sampleIn)
+{
+	values /= sampleIn.values;
+	return *this;
+}
+
 DataSample operator*(DataSample sampleIn, double factor)
 {
 	sampleIn *= factor;
 	return sampleIn;
 }
 
-DataSample DataSample::operator/(DataSample sampleIn)
+DataSample operator/(DataSample lhs, DataSample rhs)
 {
-	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
-	return DataSample(values / sampleIn.values);
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs/=rhs;
+	return lhs;
+}
+
+DataSample operator/(DataSample sampleIn, double factor)
+{
+	checkDivisionFactor(factor);
+	return sampleIn /= factor;
 }
 
 int DataSample::getNumberOfElements()
