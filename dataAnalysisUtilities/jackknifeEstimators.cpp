@@ -43,7 +43,7 @@ JackknifeEstimatorsFromBinningWithBinsize::JackknifeEstimatorsFromBinningWithBin
 
 double JackknifeEstimators::getJackknifeVariance()
 {
-	DataSampleAnalyzer tmp ( shiftAndPow(2, getNthMoment(1)) );
+	DataSampleAnalyzer tmp ( (*this - getNthMoment(1) )^( (double(2)) )  );
 	return tmp.getNthMoment(1) * getJackknifeNormalization();
 }
 

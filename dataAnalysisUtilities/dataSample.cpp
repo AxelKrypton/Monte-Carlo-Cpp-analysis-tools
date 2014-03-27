@@ -47,11 +47,6 @@ void checkNumberOfElements(int lhs, int rhs)
 		throw std::invalid_argument("DataSamples have different number of elements!");
 }
 
-DataSample DataSample::shiftAndPow(int n, double shift)
-{
-	return DataSample( std::pow((values - shift), double(n)) );
-}
-
 double DataSample::sum()
 {
 	return values.sum();

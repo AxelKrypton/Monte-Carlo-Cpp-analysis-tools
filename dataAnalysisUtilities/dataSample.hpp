@@ -25,7 +25,6 @@ public:
 	//todo: make the args and fcts. constant where possible
 	int getNumberOfElements();
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
-	DataSample shiftAndPow(int n, double shift);
 	DataSample& operator+=(double factor);
 	DataSample& operator+=(DataSample sampleIn);
 	DataSample& operator-=(double factor);

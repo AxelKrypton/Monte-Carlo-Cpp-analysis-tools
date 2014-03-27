@@ -325,7 +325,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 	{
 		int numberOfElements = 311;
 		DataSample sample(makeValarrayWithOnes(numberOfElements));
-		DataSample shifted = sample.shiftAndPow(1, 0.);
+		DataSample shifted = (sample - 0.)^1;
 		BOOST_CHECK_CLOSE(sample.sum(), shifted.sum(), doublePrecisionInPercent);
 	}
 
@@ -334,7 +334,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 311;
 		double expectedValue = 311.;
 		DataSample sample(makeValarrayWithOnes(numberOfElements));
-		DataSample shifted = sample.shiftAndPow(0, 0.);
+		DataSample shifted = (sample - 0.)^0;
 		BOOST_CHECK_CLOSE(expectedValue, shifted.sum(), doublePrecisionInPercent);
 	}
 
@@ -343,7 +343,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 311;
 		double expectedValue = 0.;
 		DataSample sample(makeValarrayWithOnes(numberOfElements));
-		DataSample shifted = sample.shiftAndPow(1, 1.);
+		DataSample shifted = ( sample -1.)^1;
 		BOOST_CHECK_CLOSE(expectedValue, shifted.sum(), doublePrecisionInPercent);
 	}
 
@@ -351,7 +351,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 	{
 		int numberOfElements = 415;
 		DataSample sample(makeValarrayWithArrayPosition(numberOfElements));
-		DataSample shifted = sample.shiftAndPow(2, 0.);
+		DataSample shifted = (sample - 0.)^2;
 		DataSample sample2(makeValarrayWithSquaredArrayPosition(numberOfElements));
 		BOOST_CHECK_CLOSE(sample2.sum(), shifted.sum(), doublePrecisionInPercent);
 	}
