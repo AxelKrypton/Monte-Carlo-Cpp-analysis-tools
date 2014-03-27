@@ -1,3 +1,7 @@
+#include <stdexcept>
+#include <fstream>
+#include <sstream>
+
 #include "SimulationDataContainer.hpp"
 
 
@@ -8,7 +12,7 @@ static bool isAnyMapEmpty(std::vector<std::map<std::string, double> >);
 
 SimulationDataContainer::SimulationDataContainer()
 {
-	throw std::invalid_argument("SimulationData needs input file for construction!");
+	throw std::invalid_argument("SimulationDataContainer needs input file for construction!");
 }
 
 SimulationDataContainer::SimulationDataContainer(std::string informationFile)
