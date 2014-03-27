@@ -78,23 +78,34 @@ int main(int argc, char ** argv)
 	if(true)
 	{
 		DataSampleAnalyzer sample(file);
-		DataSampleAnalyzer varSample = sample.shiftAndPow(2, sample.getNthMoment(1));
-		DataSample binnedSample = varSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+
+		DataSampleAnalyzer varianceSample = ( sample - sample.getNthMoment(1))^2;
+
+		DataSample binnedSample = varianceSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+
 		JackknifeEstimatorsFromBinnedDataSample jackSample(binnedSample);
 
 		cout << "Variance\t\tError" << endl;
-		cout << scientific << varSample.getNthMoment(1) << "\t" << jackSample.getJackknifeError() << endl;
+		cout << scientific << varianceSample.getNthMoment(1) << "\t" << jackSample.getJackknifeError() << endl;
 	}
 
 	//calc skewness and error
 	if(true)
 	{
 		DataSampleAnalyzer sample(file);
-		double x3 = sample.getNthCentralMoment(3);
-		double x2 = sample.getNthCentralMoment(2);
+		DataSampleAnalyzer thirdCentralMoment = (sample - sample.getNthMoment(1))^3;
+		DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1))^2;
 
-		double skewness = x3 / pow(sqrt(x2),3.);
+		DataSample binnedSample1 = thirdCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+		DataSample binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
 
+		JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
+		JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
+
+		JackknifeEstimators skewnessSamples( jackSample1 / jackSample2 );
+
+
+		double skewness = jackSample1.getNthMoment(1) / jackSample2.getNthMoment(2);
 		double error = -1.;
 
 		cout << "Skewness\t\tError" << endl;
