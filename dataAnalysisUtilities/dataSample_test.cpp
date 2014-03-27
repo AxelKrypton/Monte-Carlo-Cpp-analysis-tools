@@ -211,6 +211,14 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_CHECK_CLOSE(sample.sum(), 3.*numberOfElements, doublePrecisionInPercent);
 	}
 
+	BOOST_AUTO_TEST_CASE(addition_wholeSample_compound_invalidArgument)
+	{
+		int numberOfElements = 532;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements + 1));
+		BOOST_REQUIRE_THROW(sample1 += sample2, std::invalid_argument);
+	}
+
 	BOOST_AUTO_TEST_CASE(addition_wholeSample_compound)
 	{
 		int numberOfElements = 888;
@@ -228,6 +236,14 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_CHECK_CLOSE(sample2.sum(), 2.*numberOfElements, doublePrecisionInPercent);
 	}
 
+	BOOST_AUTO_TEST_CASE(addition_wholeSample_invalidArgument)
+	{
+		int numberOfElements = 532;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements + 1));
+		BOOST_REQUIRE_THROW(DataSample sample3 = sample1 + sample2, std::invalid_argument);
+	}
+
 	BOOST_AUTO_TEST_CASE(addition_wholeSample)
 	{
 		int numberOfElements = 777;
@@ -235,6 +251,56 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSample sample2(makeValarrayWithOnes(numberOfElements));
 		DataSample sample3 = sample1 + sample2;
 		BOOST_CHECK_CLOSE(sample3.sum(), 2.*numberOfElements, doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(subtraction_compound)
+	{
+		int numberOfElements = 999;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		sample -= 1.;
+		BOOST_CHECK_CLOSE(sample.sum(), 0., doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(subtraction_wholeSample_compound)
+	{
+		int numberOfElements = 222;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements));
+		sample1 -= sample2;
+		BOOST_CHECK_CLOSE(sample1.sum(), 0., doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(subtraction_wholeSample_compound_invalidArgument)
+	{
+		int numberOfElements = 123;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements + 1));
+		BOOST_REQUIRE_THROW(sample1 -= sample2, std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(subtraction)
+	{
+		int numberOfElements = 345;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2 = sample1 - 1.;
+		BOOST_CHECK_CLOSE(sample2.sum(), 0., doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(subtraction_wholeSample_invalidArgument)
+	{
+		int numberOfElements = 184;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements + 1));
+		BOOST_REQUIRE_THROW(DataSample sample3 = sample1 - sample2, std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(subtraction_wholeSample)
+	{
+		int numberOfElements = 777;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements));
+		DataSample sample3 = sample1 - sample2;
+		BOOST_CHECK_CLOSE(sample3.sum(), 0., doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(powerFunction_compound)

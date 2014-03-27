@@ -29,6 +29,8 @@ public:
 	DataSample shift(double shift);
 	DataSample& operator+=(double factor);
 	DataSample& operator+=(DataSample sampleIn);
+	DataSample& operator-=(double factor);
+	DataSample& operator-=(DataSample sampleIn);
 	DataSample& operator*=(double factor);
 	DataSample& operator*=(DataSample sampleIn);
 	DataSample& operator/=(double factor);
@@ -52,6 +54,8 @@ protected:
 
 DataSample operator+(DataSample sampleIn, double factor);
 DataSample operator+(DataSample lhs, DataSample rhs);
+DataSample operator-(DataSample sampleIn, double factor);
+DataSample operator-(DataSample lhs, DataSample rhs);
 DataSample operator*(DataSample sampleIn, double factor);
 DataSample operator*(DataSample lhs, DataSample rhs);
 DataSample operator/(DataSample sampleIn, double factor);

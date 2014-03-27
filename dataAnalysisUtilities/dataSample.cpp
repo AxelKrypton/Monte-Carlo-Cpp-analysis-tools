@@ -80,6 +80,19 @@ DataSample& DataSample::operator+=(DataSample sampleIn)
 	return *this;
 }
 
+DataSample& DataSample::operator-=(double factor)
+{
+	values -= factor;
+	return *this;
+}
+
+DataSample& DataSample::operator-=(DataSample sampleIn)
+{
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+	values -= sampleIn.values;
+	return *this;
+}
+
 DataSample& DataSample::operator*=(double factor)
 {
 	values *= factor;
@@ -103,6 +116,19 @@ DataSample operator+(DataSample lhs, DataSample rhs)
 {
 	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
 	lhs += rhs;
+	return lhs;
+}
+
+DataSample operator-(DataSample sampleIn, double factor)
+{
+	sampleIn -= factor;
+	return sampleIn;
+}
+
+DataSample operator-(DataSample lhs, DataSample rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs -= rhs;
 	return lhs;
 }
 
