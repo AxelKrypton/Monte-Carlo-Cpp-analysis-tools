@@ -28,6 +28,7 @@ public:
 	DataSample shiftAndPow(int n, double shift);
 	DataSample shift(double shift);
 	DataSample operator*(double factor);
+	DataSample operator*(DataSample sampleIn);
 	DataSample pow(int n);
 	DataSample sampleSlice(int start, int size, int stride);
 	double sum();
@@ -38,6 +39,7 @@ protected:
 	void setValues(DataSample sampleIn);
 	void checkIfNumberOfElementsIsValid(int length);
 	void checkSliceParameters(int start, int size, int stride);
+	void checkNumberOfElements(int numberIn);
 	DataSample readDataFromFile(std::string filename, int column, int offset);
 
 	std::valarray<double> values;

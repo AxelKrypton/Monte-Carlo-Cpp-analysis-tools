@@ -279,6 +279,25 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1., doublePrecisionInPercent);
 	}
 
+	BOOST_AUTO_TEST_CASE(mulitply_wholeSample)
+	{
+		int numberOfElements = 432;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements));
+		//todo: add operator *=
+		sample2 = sample2 * (1./numberOfElements);
+		DataSample multiplied = sample1 * sample2;
+		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1, doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(mulitply_invalidArgument)
+	{
+		int numberOfElements = 432;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements + 1));
+		BOOST_REQUIRE_THROW(DataSample multiplied = sample1 * sample2, std::invalid_argument);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(slice)

@@ -63,6 +63,17 @@ DataSample DataSample::operator*(double factor)
 	return DataSample(values * factor);
 }
 
+void DataSample::checkNumberOfElements(int numberIn)
+{
+	if (numberIn != numberOfElements)
+		throw std::invalid_argument("DataSamples have different number of elements!");
+}
+
+DataSample DataSample::operator*(DataSample sampleIn)
+{
+	checkNumberOfElements(sampleIn.getNumberOfElements());
+	return DataSample(values * sampleIn.values);
+}
 
 int DataSample::getNumberOfElements()
 {
@@ -113,3 +124,4 @@ DataSample DataSample::sampleSlice(int start, int size, int stride)
 	checkSliceParameters(start, size, stride);
 	return DataSample(values[std::slice(start, size, stride)]);
 }
+
