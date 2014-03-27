@@ -203,6 +203,40 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_REQUIRE_EQUAL(sample[index], someValue);
 	}
 
+	BOOST_AUTO_TEST_CASE(addition_compound)
+	{
+		int numberOfElements = 999;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		sample += 2.;
+		BOOST_CHECK_CLOSE(sample.sum(), 3.*numberOfElements, doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(addition_wholeSample_compound)
+	{
+		int numberOfElements = 888;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements));
+		sample1 += sample2;
+		BOOST_CHECK_CLOSE(sample1.sum(), 2.*numberOfElements, doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(addition)
+	{
+		int numberOfElements = 666;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2 = sample1 + 1.;
+		BOOST_CHECK_CLOSE(sample2.sum(), 2.*numberOfElements, doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(addition_wholeSample)
+	{
+		int numberOfElements = 777;
+		DataSample sample1(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2(makeValarrayWithOnes(numberOfElements));
+		DataSample sample3 = sample1 + sample2;
+		BOOST_CHECK_CLOSE(sample3.sum(), 2.*numberOfElements, doublePrecisionInPercent);
+	}
+
 	BOOST_AUTO_TEST_CASE(powerFunction_compound)
 	{
 		int numberOfElements = 213;

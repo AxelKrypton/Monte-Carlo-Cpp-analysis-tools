@@ -27,6 +27,8 @@ public:
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
 	DataSample shiftAndPow(int n, double shift);
 	DataSample shift(double shift);
+	DataSample& operator+=(double factor);
+	DataSample& operator+=(DataSample sampleIn);
 	DataSample& operator*=(double factor);
 	DataSample& operator*=(DataSample sampleIn);
 	DataSample& operator/=(double factor);
@@ -48,6 +50,8 @@ protected:
 	const static int defaultSizeOfDataSample = 1;
 };
 
+DataSample operator+(DataSample sampleIn, double factor);
+DataSample operator+(DataSample lhs, DataSample rhs);
 DataSample operator*(DataSample sampleIn, double factor);
 DataSample operator*(DataSample lhs, DataSample rhs);
 DataSample operator/(DataSample sampleIn, double factor);

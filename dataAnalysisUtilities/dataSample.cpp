@@ -33,6 +33,20 @@ void DataSample::setValues(DataSample sampleIn)
 	values = sampleIn.values;
 }
 
+static void checkDivisionFactor(double factorIn)
+{
+	if(factorIn == 0.)
+	{
+		throw std::invalid_argument("Cannot divide by zero!");
+	}
+}
+
+void checkNumberOfElements(int lhs, int rhs)
+{
+	if (lhs != rhs)
+		throw std::invalid_argument("DataSamples have different number of elements!");
+}
+
 DataSample DataSample::shiftAndPow(int n, double shift)
 {
 	return DataSample( std::pow((values - shift), double(n)) );
@@ -53,24 +67,23 @@ double& DataSample::operator[](size_t index)
 	return values[index];
 }
 
+DataSample& DataSample::operator+=(double factor)
+{
+	values += factor;
+	return *this;
+}
+
+DataSample& DataSample::operator+=(DataSample sampleIn)
+{
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+	values += sampleIn.values;
+	return *this;
+}
+
 DataSample& DataSample::operator*=(double factor)
 {
 	values *= factor;
 	return *this;
-}
-
-static void checkDivisionFactor(double factorIn)
-{
-	if(factorIn == 0.)
-	{
-		throw std::invalid_argument("Cannot divide by zero!");
-	}
-}
-
-void checkNumberOfElements(int lhs, int rhs)
-{
-	if (lhs != rhs)
-		throw std::invalid_argument("DataSamples have different number of elements!");
 }
 
 DataSample& DataSample::operator*=(DataSample sampleIn)
@@ -78,6 +91,19 @@ DataSample& DataSample::operator*=(DataSample sampleIn)
 	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
 	values *= sampleIn.values;
 	return *this;
+}
+
+DataSample operator+(DataSample sampleIn, double factor)
+{
+	sampleIn += factor;
+	return sampleIn;
+}
+
+DataSample operator+(DataSample lhs, DataSample rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs += rhs;
+	return lhs;
 }
 
 DataSample operator*(DataSample lhs, DataSample rhs)
