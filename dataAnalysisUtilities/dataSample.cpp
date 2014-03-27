@@ -33,11 +33,6 @@ void DataSample::setValues(DataSample sampleIn)
 	values = sampleIn.values;
 }
 
-DataSample 	DataSample::pow(int n)
-{
-	return DataSample( std::pow(values, double(n)) );
-}
-
 DataSample DataSample::shiftAndPow(int n, double shift)
 {
 	return DataSample( std::pow((values - shift), double(n)) );

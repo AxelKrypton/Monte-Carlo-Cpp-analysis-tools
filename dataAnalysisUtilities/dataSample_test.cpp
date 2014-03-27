@@ -203,15 +203,6 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_REQUIRE_EQUAL(sample[index], someValue);
 	}
 
-	BOOST_AUTO_TEST_CASE(powerFunction)
-	{
-		int numberOfElements = 213;
-		DataSample sample(makeValarrayWithArrayPosition(numberOfElements));
-		DataSample sampleSquared(makeValarrayWithSquaredArrayPosition(numberOfElements));
-		DataSample sampleSquared2 = sample.pow(2);
-		BOOST_CHECK_CLOSE(sampleSquared2.sum(), sampleSquared.sum(), doublePrecisionInPercent);
-	}
-
 	BOOST_AUTO_TEST_CASE(powerFunction_compound)
 	{
 		int numberOfElements = 213;
@@ -221,7 +212,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_CHECK_CLOSE(sample.sum(), sampleSquared.sum(), doublePrecisionInPercent);
 	}
 
-	BOOST_AUTO_TEST_CASE(powerFunction2)
+	BOOST_AUTO_TEST_CASE(powerFunction)
 	{
 		int numberOfElements = 213;
 		DataSample sample(makeValarrayWithArrayPosition(numberOfElements));

@@ -33,7 +33,7 @@ double DataSampleAnalyzer::calcNthMoment(int n)
 
 double DataSampleAnalyzer::calcNthMomentExplicit(int n)
 {
-	return (pow(n)).sum() / (double) numberOfElements;
+	return (*this^n).sum() / (double) numberOfElements;
 }
 
 double DataSampleAnalyzer::calcFirstMomentExplicit()
