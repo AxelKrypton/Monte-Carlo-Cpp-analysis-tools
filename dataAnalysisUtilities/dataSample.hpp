@@ -26,7 +26,6 @@ public:
 	int getNumberOfElements();
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
 	DataSample shiftAndPow(int n, double shift);
-	DataSample shift(double shift);
 	DataSample& operator+=(double factor);
 	DataSample& operator+=(DataSample sampleIn);
 	DataSample& operator-=(double factor);

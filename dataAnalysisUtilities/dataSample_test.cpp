@@ -356,22 +356,6 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_CHECK_CLOSE(sample2.sum(), shifted.sum(), doublePrecisionInPercent);
 	}
 
-	BOOST_AUTO_TEST_CASE(shift1)
-	{
-		int numberOfElements = 333;
-		DataSample sample(makeValarrayWithOnes(numberOfElements));
-		DataSample shifted = sample.shift(0.);
-		BOOST_REQUIRE_EQUAL(shifted.sum(), numberOfElements);
-	}
-
-	BOOST_AUTO_TEST_CASE(shift2)
-	{
-		int numberOfElements = 333;
-		DataSample sample(makeValarrayWithOnes(numberOfElements));
-		DataSample shifted = sample.shift(1.);
-		BOOST_REQUIRE_EQUAL(shifted.sum(), 0.);
-	}
-
 	BOOST_AUTO_TEST_CASE(mulitplication_compound)
 	{
 		int numberOfElements = 432;

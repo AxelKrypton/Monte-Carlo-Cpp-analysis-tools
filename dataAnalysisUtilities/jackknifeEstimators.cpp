@@ -5,7 +5,7 @@ JackknifeEstimators(sampleIn)
 {
 	int normalization = getJackknifeNormalization();
 	double sumOfDataSampleElements = sampleIn.sum();
-	setValues( shift(sumOfDataSampleElements)* (-1./normalization) );
+	setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
 }
 
 DataSample JackknifeEstimators::createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize)

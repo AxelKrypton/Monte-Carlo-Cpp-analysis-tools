@@ -52,11 +52,6 @@ DataSample DataSample::shiftAndPow(int n, double shift)
 	return DataSample( std::pow((values - shift), double(n)) );
 }
 
-DataSample DataSample::shift(double shift)
-{
-	return DataSample( (values - shift) );
-}
-
 double DataSample::sum()
 {
 	return values.sum();
