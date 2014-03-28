@@ -8,19 +8,18 @@
 class SimulationData
 {
 public:
-	SimulationData(std::vector<double> simulationParametersIn, std::string filenameIn);
+	SimulationData();
 	SimulationData(std::map<std::string, double> simulationParametersIn, std::string filenameIn);
-	//double& operator[](int index);
 
 	int getNumberOfSimulationParameters();
+	int getNumberOfDataSample();
+	double getParameterValue(std::string parameterName);
+	DataSample& operator[](int index);
 
-	//std::vector<double> simulationParameters;
-	std::map<std::string, double> simulationParameters;
-	std::vector<DataSample> simulationRawData;
-	std::string datafileName;
-	int numberOfSimulationParameters;
 private:
-	void checkIndex(int index);
+	std::map<std::string, double> simulationParameters;
+	std::string datafileName;
+	std::vector<DataSample> simulationRawData;
 };
 
 #endif /* SIMULATIONDATA_HPP_ */
