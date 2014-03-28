@@ -1,11 +1,15 @@
 #include <stdexcept>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 #include "SimulationDataContainer.hpp"
 
 
 static void checkIfDatafileExists(std::string);
+static bool isLastEntryPresentMoreThanOnce(std::vector<std::string>);
+static bool isLastMapPresentMoreThanOnce(std::vector<std::map<std::string, double> >);
+static bool mapCompare(const std::map<std::string, double>&, const std::map<std::string, double>&);
 static bool isAnyMapEmpty(std::vector<std::map<std::string, double> >);
 
 /*****************************************************************************************/
@@ -63,6 +67,10 @@ void SimulationDataContainer::extractInformationFromFile(std::string fileIn,
 			(ss >> auxForFilename) ? dataFilenames.push_back(auxForFilename)
 					               : throw std::runtime_error("Error reading datafile \"" + fileIn + "\"");
 
+			if(isLastEntryPresentMoreThanOnce(dataFilenames)){
+					throw std::invalid_argument("Configuration file \"" + fileIn + "\" contains the datafile \"" + dataFilenames.back() + "\" more than once!");
+			}
+
 			while(ss.good() && (ss.str().substr(ss.tellg())).find_first_not_of(" \t\n") != std::string::npos){
 				if(ss >> auxForParameterName >> auxForParameterValue)
 					auxMap[auxForParameterName] = auxForParameterValue;
@@ -71,6 +79,8 @@ void SimulationDataContainer::extractInformationFromFile(std::string fileIn,
 			}
 
 			dataParameters.push_back(auxMap);
+			if(isLastMapPresentMoreThanOnce(dataParameters))
+				throw std::logic_error("Files with same parameters cannot be accumulated, yet!");
 		}
 	}
 	if(!(infile.peek() == EOF && infile.eof()) || infile.bad())
@@ -89,6 +99,22 @@ void checkIfDatafileExists(std::string filename){
 	if ( !file.is_open() )
 		throw std::invalid_argument("Given file \"" + filename + "\" does not exist!");
 	file.close();
+}
+
+static bool isLastEntryPresentMoreThanOnce(std::vector<std::string> filenames){
+	return (filenames.size() > 1) && (std::find(filenames.begin(), filenames.end()-1, filenames.back()) != filenames.end()-1);
+}
+
+static bool isLastMapPresentMoreThanOnce(std::vector<std::map<std::string, double> > parameters){
+	for(size_t i = 0; i<parameters.size()-1; i++){
+		if(mapCompare(parameters[i], parameters.back()))
+			return true;
+	}
+	return false;
+}
+
+static bool mapCompare (const std::map<std::string, double>& lhs, const std::map<std::string, double>& rhs) {
+    return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
 static bool isAnyMapEmpty(std::vector<std::map<std::string, double> > dataParameters){

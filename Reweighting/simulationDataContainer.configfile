@@ -1,4 +1,4 @@
-input_test_file_1	 beta 4.0	chem_pot_im 0.7
+input_test_file_1	 beta 4.0	chem_pot_im 0.7		magnetic_field -1.e12
 	#Line to be ignored
-input_test_file_2	 beta 4.5	chem_pot_im 1.0 	#ignored_par 3.14	
-input_test_file_3	 beta 4.5	chem_pot_im 1.3
+input_test_file_2	 beta 4.5	chem_pot_im 1.0 	magnetic_field -5.e12	#ignored_par 3.14	
+input_test_file_3	 beta 4.5	chem_pot_im 1.3		magnetic_field -1.e13

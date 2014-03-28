@@ -1,6 +1,7 @@
 add_library(Reweighting 
 	SimulationData.cpp
 	SimulationDataContainer.cpp
+	Reweighter.cpp
 )
 #target_link_libraries(Reweighting dataAnalysisUtilities)
 
@@ -12,6 +13,10 @@ configure_file(input_test_file_3 input_test_file_3 COPYONLY)
 configure_file(wrong_configfile_1 wrong_configfile_1 COPYONLY)
 configure_file(wrong_configfile_2 wrong_configfile_2 COPYONLY)
 configure_file(wrong_configfile_3 wrong_configfile_3 COPYONLY)
+configure_file(wrong_configfile_4 wrong_configfile_4 COPYONLY)
+configure_file(wrong_configfile_5 wrong_configfile_5 COPYONLY)
+configure_file(wrong_configfile_6 wrong_configfile_6 COPYONLY)
+configure_file(wrong_configfile_7 wrong_configfile_7 COPYONLY)
 configure_file(wrong_inputfile_1 wrong_inputfile_1 COPYONLY)
 configure_file(wrong_inputfile_2 wrong_inputfile_2 COPYONLY)
 configure_file(wrong_inputfile_3 wrong_inputfile_3 COPYONLY)
@@ -20,3 +25,4 @@ configure_file(wrong_inputfile_5 wrong_inputfile_5 COPYONLY)
 
 add_unit_test(SimulationData SimulationData_test Reweighting dataAnalysisUtilities)
 add_unit_test(SimulationDataContainer SimulationDataContainer_test Reweighting dataAnalysisUtilities)
+add_unit_test(Reweighter Reweighter_test Reweighting dataAnalysisUtilities)
