@@ -5,7 +5,7 @@ JackknifeEstimators(sampleIn)
 {
 	int normalization = getJackknifeNormalization();
 	double sumOfDataSampleElements = sampleIn.sum();
-	setValues( shift(sumOfDataSampleElements)* (-1./normalization) );
+	setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
 }
 
 DataSample JackknifeEstimators::createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize)
@@ -43,7 +43,7 @@ JackknifeEstimatorsFromBinningWithBinsize::JackknifeEstimatorsFromBinningWithBin
 
 double JackknifeEstimators::getJackknifeVariance()
 {
-	DataSampleAnalyzer tmp ( shiftAndPow(2, getNthMoment(1)) );
+	DataSampleAnalyzer tmp ( (*this - getNthMoment(1) )^( (double(2)) )  );
 	return tmp.getNthMoment(1) * getJackknifeNormalization();
 }
 

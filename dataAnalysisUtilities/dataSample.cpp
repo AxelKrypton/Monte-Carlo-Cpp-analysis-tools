@@ -33,19 +33,18 @@ void DataSample::setValues(DataSample sampleIn)
 	values = sampleIn.values;
 }
 
-DataSample 	DataSample::pow(int n)
+static void checkDivisionFactor(double factorIn)
 {
-	return DataSample( std::pow(values, double(n)) );
+	if(factorIn == 0.)
+	{
+		throw std::invalid_argument("Cannot divide by zero!");
+	}
 }
 
-DataSample DataSample::shiftAndPow(int n, double shift)
+void checkNumberOfElements(int lhs, int rhs)
 {
-	return DataSample( std::pow((values - shift), double(n)) );
-}
-
-DataSample DataSample::shift(double shift)
-{
-	return DataSample( (values - shift) );
+	if (lhs != rhs)
+		throw std::invalid_argument("DataSamples have different number of elements!");
 }
 
 double DataSample::sum()
@@ -58,11 +57,121 @@ double& DataSample::operator[](size_t index)
 	return values[index];
 }
 
-DataSample DataSample::operator*(double factor)
+DataSample& DataSample::operator+=(double factor)
 {
-	return DataSample(values * factor);
+	values += factor;
+	return *this;
 }
 
+DataSample& DataSample::operator+=(DataSample sampleIn)
+{
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+	values += sampleIn.values;
+	return *this;
+}
+
+DataSample& DataSample::operator-=(double factor)
+{
+	values -= factor;
+	return *this;
+}
+
+DataSample& DataSample::operator-=(DataSample sampleIn)
+{
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+	values -= sampleIn.values;
+	return *this;
+}
+
+DataSample& DataSample::operator*=(double factor)
+{
+	values *= factor;
+	return *this;
+}
+
+DataSample& DataSample::operator*=(DataSample sampleIn)
+{
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+	values *= sampleIn.values;
+	return *this;
+}
+
+DataSample operator+(DataSample sampleIn, double factor)
+{
+	sampleIn += factor;
+	return sampleIn;
+}
+
+DataSample operator+(DataSample lhs, DataSample rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs += rhs;
+	return lhs;
+}
+
+DataSample operator-(DataSample sampleIn, double factor)
+{
+	sampleIn -= factor;
+	return sampleIn;
+}
+
+DataSample operator-(DataSample lhs, DataSample rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs -= rhs;
+	return lhs;
+}
+
+DataSample operator*(DataSample lhs, DataSample rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs *= rhs;
+	return lhs;
+}
+
+DataSample& DataSample::operator/=(double factor)
+{
+	checkDivisionFactor(factor);
+	values /= factor;
+	return *this;
+}
+
+DataSample& DataSample::operator/=(DataSample sampleIn)
+{
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+	values /= sampleIn.values;
+	return *this;
+}
+
+DataSample& DataSample::operator^=(int n)
+{
+	values = std::pow(values, double(n));
+	return *this;
+}
+
+DataSample operator*(DataSample sampleIn, double factor)
+{
+	sampleIn *= factor;
+	return sampleIn;
+}
+
+DataSample operator/(DataSample lhs, DataSample rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs/=rhs;
+	return lhs;
+}
+
+DataSample operator/(DataSample sampleIn, double factor)
+{
+	checkDivisionFactor(factor);
+	return sampleIn /= factor;
+}
+
+DataSample operator^(DataSample sampleIn, int n)
+{
+	return sampleIn ^= n;
+}
 
 int DataSample::getNumberOfElements()
 {
@@ -113,3 +222,4 @@ DataSample DataSample::sampleSlice(int start, int size, int stride)
 	checkSliceParameters(start, size, stride);
 	return DataSample(values[std::slice(start, size, stride)]);
 }
+

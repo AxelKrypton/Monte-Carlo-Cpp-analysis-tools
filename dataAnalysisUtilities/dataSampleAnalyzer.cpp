@@ -33,7 +33,7 @@ double DataSampleAnalyzer::calcNthMoment(int n)
 
 double DataSampleAnalyzer::calcNthMomentExplicit(int n)
 {
-	return (pow(n)).sum() / (double) numberOfElements;
+	return (*this^n).sum() / (double) numberOfElements;
 }
 
 double DataSampleAnalyzer::calcFirstMomentExplicit()
@@ -65,7 +65,7 @@ double DataSampleAnalyzer::calcNthCentralMoment(int n)
 
 double DataSampleAnalyzer::calcNthCentralMomentExplicit(int n)
 {
-	return (shiftAndPow(n, getNthMoment(1))).sum()  / numberOfElements;
+	return ( (*this - getNthMoment(1) )^( (double(n)) )  ).sum()  / numberOfElements;
 }
 
 void DataSampleAnalyzer::checkDiscardedElements(int valueIn, std::string descriptionIn)

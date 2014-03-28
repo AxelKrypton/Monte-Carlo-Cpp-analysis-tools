@@ -78,12 +78,15 @@ int main(int argc, char ** argv)
 	if(true)
 	{
 		DataSampleAnalyzer sample(file);
-		DataSampleAnalyzer varSample = sample.shiftAndPow(2, sample.getNthMoment(1));
-		DataSample binnedSample = varSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+
+		DataSampleAnalyzer varianceSample = ( sample - sample.getNthMoment(1))^2;
+
+		DataSample binnedSample = varianceSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+
 		JackknifeEstimatorsFromBinnedDataSample jackSample(binnedSample);
 
 		cout << "Variance\t\tError" << endl;
-		cout << scientific << varSample.getNthMoment(1) << "\t" << jackSample.getJackknifeError() << endl;
+		cout << scientific << varianceSample.getNthMoment(1) << "\t" << jackSample.getJackknifeError() << endl;
 	}
 
 	//calc skewness and error
@@ -93,12 +96,51 @@ int main(int argc, char ** argv)
 		double x3 = sample.getNthCentralMoment(3);
 		double x2 = sample.getNthCentralMoment(2);
 
-		double skewness = x3 / pow(sqrt(x2),3.);
+		double skewnessBasic = x3/sqrt(x2);
 
-		double error = -1.;
+		DataSampleAnalyzer thirdCentralMoment = (sample - sample.getNthMoment(1))^3;
+		//todo: have to define sqrt i guess!, otherwise this is one!
+		DataSampleAnalyzer secondCentralMoment = ((sample - sample.getNthMoment(1))^2);
 
-		cout << "Skewness\t\tError" << endl;
-		cout << scientific << skewness << "\t" << error << endl;
+		DataSampleAnalyzer binnedSample1 = thirdCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+		DataSampleAnalyzer binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+
+		double x3_2 = binnedSample1.getNthMoment(1);
+		double x2_2 = binnedSample2.getNthMoment(1);
+
+		JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
+		JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
+
+		JackknifeEstimators skewnessSample( jackSample1 / jackSample2 );
+
+		std::cout << "central moments of original sample:" << std::endl;
+		std::cout << x3 << " " << x2 << std::endl;
+
+		std::cout << "means of binned sample:" << std::endl;
+		std::cout << x3_2 << " " << x2_2 << std::endl;
+
+		double mean1 = jackSample1.getNthMoment(1);
+		double mean2 = jackSample2.getNthMoment(1);
+		double var1 = jackSample1.getNthCentralMoment(2);
+		double var2 = jackSample2.getNthCentralMoment(2);
+
+		std::cout << "means of jackknife estimators" << std::endl;
+		std::cout << mean1 << " " << mean2 << std::endl;
+		std::cout << var1 << " " << var2 << std::endl;
+
+		double skewness = mean1 / sqrt(mean2);
+		double firstDerivative = fabs( 1./sqrt(mean2) );
+		double secondDerivative = fabs( mean1/2.*pow(mean2, -3./2.) );
+		double error = sqrt( var1 * firstDerivative + var2 * secondDerivative );
+		double unbiasedError = error*(double(numberOfBins)/double(numberOfBins-1));
+
+		double skewness2 = skewnessSample.getNthMoment(1);
+		double error2 = skewnessSample.getJackknifeError();
+
+		cout << "\t\tSkewness\t\tError" << endl;
+		cout << "NaiveEstimate:\t" << scientific << skewnessBasic << "\t" << unbiasedError <<  endl;
+		cout << "jackRatio:\t" << scientific << skewness << "\t" << error << endl;
+		cout << "jackMean:\t" << scientific << skewness2 << "\t" << error2 << endl;
 	}
 
 	//calc kurtosis and error
