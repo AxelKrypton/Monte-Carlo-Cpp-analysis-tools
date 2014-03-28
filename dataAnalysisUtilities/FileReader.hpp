@@ -81,7 +81,10 @@ private:
 		{
 			std::ostringstream ss ;
 			ss << column;
-			throw std::logic_error("datafile \"" + filename + "\", does not contain valid data in column " + ss.str() + "!");
+			if(anyBadEntry)
+				throw std::invalid_argument("datafile \"" + filename + "\", does not contain valid data in column " + ss.str() + "!");
+			else
+				throw std::out_of_range("datafile \"" + filename + "\", does not contain column " + ss.str() + "!");
 		}
 	}
 
