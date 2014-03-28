@@ -15,7 +15,7 @@ SimulationData::SimulationData()
 	throw std::invalid_argument("SimulationData needs input file for construction!");
 }
 
-SimulationData::SimulationData(std::map<std::string, double> simulationParametersIn, std::string filenameIn) :
+SimulationData::SimulationData(std::map<std::string, double> simulationParametersIn, std::string filenameIn, const int offset) :
 	simulationParameters(simulationParametersIn), datafileName(filenameIn)
 {
 	if(simulationParametersIn.size() == 0)
@@ -25,7 +25,7 @@ SimulationData::SimulationData(std::map<std::string, double> simulationParameter
 		for(int i=0; ; i++){
 			bool charInLine;
 			try{
-				simulationRawData.push_back(DataSample(filenameIn, i+1, 0, &charInLine)); //todo: implement offset?!?
+				simulationRawData.push_back(DataSample(filenameIn, i+1, offset, &charInLine));
 				/*
 				 * Note: if in a column are present only invalid data, the above push_back throw an exception
 				 *       and the rest of the try is skipped. Furthermore one cannot rely on the value of charInLine

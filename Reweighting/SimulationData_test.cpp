@@ -82,6 +82,17 @@ BOOST_AUTO_TEST_SUITE(build)
 		BOOST_REQUIRE_NO_THROW(SimulationData simData(filledMap, fileThatDoesExist));
 	}
 
+	BOOST_AUTO_TEST_CASE(build11)
+	{
+		std::string fileThatDoesExist = "input_test_file_1";
+		std::map<std::string, double> filledMap;
+		filledMap["beta"] = 4.0;
+		const int offset = 1;
+		SimulationData simData(filledMap, fileThatDoesExist, offset);
+		const int numberOfDataRead = 2;
+		BOOST_REQUIRE_EQUAL(simData[0].getNumberOfElements(), numberOfDataRead);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

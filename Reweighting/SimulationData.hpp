@@ -9,7 +9,7 @@ class SimulationData
 {
 public:
 	SimulationData();
-	SimulationData(std::map<std::string, double> simulationParametersIn, std::string filenameIn);
+	SimulationData(std::map<std::string, double> simulationParametersIn, std::string filenameIn, const int offset = 0);
 
 	int getNumberOfSimulationParameters();
 	int getNumberOfDataSample();
