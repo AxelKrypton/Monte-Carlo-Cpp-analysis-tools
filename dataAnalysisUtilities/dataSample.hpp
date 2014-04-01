@@ -34,6 +34,7 @@ public:
 	DataSample& operator/=(double factor);
 	DataSample& operator/=(DataSample sampleIn);
 	DataSample& operator^=(int n);
+	DataSample& operator^=(double n);
 	DataSample sampleSlice(int start, int size, int stride);
 	double sum();
 	double& operator[](size_t index);
@@ -59,5 +60,6 @@ DataSample operator*(DataSample lhs, DataSample rhs);
 DataSample operator/(DataSample sampleIn, double factor);
 DataSample operator/(DataSample lhs, DataSample rhs);
 DataSample operator^(DataSample sampleIn, int n);
+DataSample operator^(DataSample sampleIn, double n);
 
 #endif

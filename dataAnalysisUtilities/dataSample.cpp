@@ -149,6 +149,12 @@ DataSample& DataSample::operator^=(int n)
 	return *this;
 }
 
+DataSample& DataSample::operator^=(double n)
+{
+	values = std::pow(values, n);
+	return *this;
+}
+
 DataSample operator*(DataSample sampleIn, double factor)
 {
 	sampleIn *= factor;
@@ -169,6 +175,11 @@ DataSample operator/(DataSample sampleIn, double factor)
 }
 
 DataSample operator^(DataSample sampleIn, int n)
+{
+	return sampleIn ^= n;
+}
+
+DataSample operator^(DataSample sampleIn, double n)
 {
 	return sampleIn ^= n;
 }

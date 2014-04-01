@@ -321,6 +321,24 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_CHECK_CLOSE(sampleSquared2.sum(), sampleSquared.sum(), doublePrecisionInPercent);
 	}
 
+	BOOST_AUTO_TEST_CASE(powerFunctionDouble_compound)
+	{
+		int numberOfElements = 213;
+		DataSample sample(makeValarrayWithArrayPosition(numberOfElements));
+		DataSample sampleSquared(makeValarrayWithSquaredArrayPosition(numberOfElements));
+		sampleSquared ^= 0.5;
+		BOOST_CHECK_CLOSE(sample.sum(), sampleSquared.sum(), doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(powerFunctionDouble)
+	{
+		int numberOfElements = 213;
+		DataSample sample(makeValarrayWithArrayPosition(numberOfElements));
+		DataSample sampleSquared(makeValarrayWithSquaredArrayPosition(numberOfElements));
+		DataSample rooted = sampleSquared ^ 0.5;
+		BOOST_CHECK_CLOSE(sample.sum(), rooted.sum(), doublePrecisionInPercent);
+	}
+
 	BOOST_AUTO_TEST_CASE(shiftAndPower1)
 	{
 		int numberOfElements = 311;
