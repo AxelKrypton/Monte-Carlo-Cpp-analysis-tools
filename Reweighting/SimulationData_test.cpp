@@ -132,6 +132,17 @@ BOOST_AUTO_TEST_SUITE(getters)
 		BOOST_REQUIRE_THROW(simData.getParameterValue("log_Z"), std::out_of_range);
 	}
 
+	BOOST_AUTO_TEST_CASE(getters4)
+	{
+		std::string fileThatDoesExist = "input_test_file_1";
+		std::map<std::string, double> filledMap;
+		filledMap["beta"] = 4.0;
+		filledMap["chem_pot_im"] = 1.047;
+		SimulationData simData(filledMap, fileThatDoesExist);
+		std::map<std::string, double> gottenMap = simData.getSimulationParameters();
+		BOOST_REQUIRE((filledMap.size() == gottenMap.size()) && std::equal(filledMap.begin(), filledMap.end(), gottenMap.begin()));
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

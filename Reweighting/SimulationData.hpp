@@ -14,6 +14,7 @@ public:
 	int getNumberOfSimulationParameters();
 	int getNumberOfDataSample();
 	double getParameterValue(std::string parameterName);
+	std::map<std::string, double> getSimulationParameters();
 	DataSample& operator[](int index);
 
 private:

@@ -47,8 +47,7 @@ SimulationData::SimulationData(std::map<std::string, double> simulationParameter
 }
 
 
-int SimulationData::getNumberOfSimulationParameters()
-{
+int SimulationData::getNumberOfSimulationParameters() {
 	return simulationParameters.size();
 }
 
@@ -57,6 +56,10 @@ int SimulationData::getNumberOfDataSample(){
 	return simulationRawData.size();
 }
 
+
+std::map<std::string, double> SimulationData::getSimulationParameters(){
+	return simulationParameters;
+}
 
 double SimulationData::getParameterValue(std::string parameterName)
 {
