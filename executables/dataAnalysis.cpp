@@ -215,7 +215,7 @@ int main(int argc, char ** argv)
 		cout << "JackEstimate:\t" << scientific << skewness << "\t" << error <<  endl;
 	}
 
-	//another version:
+	//worsed estimate: take f(x_i) first
 	if(analyseSkewness)
 	{
 		/**
@@ -238,131 +238,6 @@ int main(int argc, char ** argv)
 
 		cout << "\t\tSkewness\t\tError" << endl;
 		cout << "JackEstimate2:\t" << scientific << skewness << "\t" << error <<  endl;
-	}
-
-	//first version including multiple methods
-	if(false)
-	{
-		/**
-		 * Skewness gamma_1 is defined as:
-		 *   gamma_1 = <(x-mu)^3> / <(x-mu)^2>^(3/2)
-		 */
-		DataSampleAnalyzer sample(file);
-		double x3 = sample.getNthCentralMoment(3);
-		double x2 = sample.getNthCentralMoment(2);
-
-		double skewnessBasic = x3/pow(x2, 3./2.);
-
-		DataSampleAnalyzer thirdCentralMoment  = (sample - sample.getNthMoment(1))^3;
-		DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1))^2;
-
-		DataSampleAnalyzer binnedSample1 = thirdCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-		DataSampleAnalyzer binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-
-		double x3_2 = binnedSample1.getNthMoment(1);
-		double x2_2 = binnedSample2.getNthMoment(1);
-
-		JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
-		JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
-
-		std::cout << "central moments of original sample:" << std::endl;
-		std::cout << x3 << " " << x2 << std::endl;
-
-		std::cout << "means of binned sample:" << std::endl;
-		std::cout << x3_2 << " " << x2_2 << std::endl;
-
-		double mean1 = jackSample1.getNthMoment(1);
-		double mean2 = jackSample2.getNthMoment(1);
-		double var1 = jackSample1.getNthCentralMoment(2);
-		double var2 = jackSample2.getNthCentralMoment(2);
-
-		std::cout << "means of jackknife estimators" << std::endl;
-		std::cout << mean1 << " " << mean2 << std::endl;
-		std::cout << var1 << " " << var2 << std::endl;
-
-		double skewness = mean1 / pow(mean2, 3./2.);
-		double firstDerivative = fabs( 1./pow(mean2, 3./2.) );
-		double secondDerivative = fabs( -3.*mean1/2.*pow(mean2, -5./2.) );
-		double error = sqrt( var1 * firstDerivative + var2 * secondDerivative );
-		double unbiasedError = error*(double(numberOfBins)/double(numberOfBins-1));
-
-		//		JackknifeEstimators skewnessSample( jackSample1 / jackSample2 );
-				JackknifeEstimators skewnessSample( jackSample1 / pow(mean2, 3./2.) );
-
-		double skewness2 = skewnessSample.getNthMoment(1);
-		double error2 = skewnessSample.getJackknifeError();
-
-		JackknifeEstimatorsFromBinnedDataSample skewnessSample2( skewnessSample );
-
-		double skewness3 = skewnessSample2.getNthMoment(1);
-		double error3 = skewnessSample2.getJackknifeError();
-
-		cout << "\t\tSkewness\t\tError" << endl;
-		cout << "NaiveEstimate:\t" << scientific << skewnessBasic << "\t" << unbiasedError <<  endl;
-		cout << "jackRatio:\t" << scientific << skewness << "\t" << error << endl;
-		cout << "jackMean:\t" << scientific << skewness2 << "\t" << error2 << endl;
-		cout << "jackMean2:\t" << scientific << skewness3 << "\t" << error3 << endl;
-	}
-
-	//calc skewness and error, v2
-	if(false)
-	{
-		cout << "Skewness v2:" << endl;
-
-		DataSampleAnalyzer sample(file);
-		double x2 = sample.getNthCentralMoment(2);
-		int numberOfElements = sample.getNumberOfElements();
-		double unbiasedSampleVariance = sqrt( double(numberOfElements)/double(numberOfElements-1)*x2 );
-		double unbiasedSampleMean = sample.getNthMoment(1);
-		double sigmaThree = pow(unbiasedSampleVariance, 3./2.);
-
-		DataSampleAnalyzer binnedSample = sample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-		JackknifeEstimatorsFromBinnedDataSample jackSample(binnedSample);
-
-		cout << jackSample.getNthMoment(1) << endl;
-		cout << unbiasedSampleMean << endl;
-		cout << sigmaThree << endl;
-
-		JackknifeEstimators skewnessSample ( ( (jackSample - unbiasedSampleMean)^3 ) / sigmaThree ) ;
-
-		cout << skewnessSample.getNthMoment(1) << endl;
-
-		for(int i = 0; i<numberOfBins; i++)
-		{
-			cout << skewnessSample[i] << endl;
-		}
-
-		double skewness = skewnessSample.getNthMoment(1);
-		double skewnessError = skewnessSample.getJackknifeError();
-
-		cout << "\t\tSkewness\t\tError" << endl;
-		cout << "jack:\t\t" << scientific << skewness << "\t" << skewnessError << endl;
-	}
-
-	//calc skewness and error, v3
-	if(false)
-	{
-		cout << "Skewness v3:" << endl;
-
-		DataSampleAnalyzer sample(file);
-		double x2 = sample.getNthCentralMoment(2);
-		int numberOfElements = sample.getNumberOfElements();
-		double unbiasedSampleVariance = sqrt( double(numberOfElements)/double(numberOfElements-1)*x2 );
-		double unbiasedSampleMean = sample.getNthMoment(1);
-		double sigmaThree = pow(unbiasedSampleVariance, 3./2.);
-
-		DataSampleAnalyzer skewnessSample = ( sample -  unbiasedSampleMean );
-
-		DataSampleAnalyzer binnedSample = skewnessSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-		JackknifeEstimatorsFromBinnedDataSample jackSample(binnedSample);
-
-		JackknifeEstimators skewnessSample2 ( ( (jackSample)^3 ) / sigmaThree );
-
-		double skewness = skewnessSample2.getNthMoment(1);
-		double skewnessError = skewnessSample2.getJackknifeError();
-
-		cout << "\t\tSkewness\t\tError" << endl;
-		cout << "jack:\t\t" << scientific << skewness << "\t" << skewnessError << endl;
 	}
 
 	bool analyseKurtosis = true;
@@ -500,67 +375,6 @@ int main(int argc, char ** argv)
 		cout << "\t\tBinder\t\tError" << endl;
 		cout << "JackEstimate2:\t" << scientific << skewness << "\t" << error <<  endl;
 	}
-
-	//calc kurtosis and error
-	if(false)
-	{
-		/**
-		 * Following Wikipedia:
-		 * 4. Standardized Moment: beta2 = < (x - mu)^4 > / <(x-mu)^2>^2
-		 * Kurtosis = beta2 - 3
-		 */
-
-		DataSampleAnalyzer sample(file);
-		double x4 = sample.getNthCentralMoment(4);
-		double x2 = sample.getNthCentralMoment(2);
-
-		double fourthStandardizedMomentBasic = x4/pow(x2, 2.);
-		//todo: think about different definition (-3)
-		double kurtosisBasic = fourthStandardizedMomentBasic - 3.;
-
-		DataSampleAnalyzer fourthCentralMoment  = (sample - sample.getNthMoment(1))^4;
-		DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1))^2;
-
-		DataSampleAnalyzer binnedSample1 = fourthCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-		DataSampleAnalyzer binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-
-		JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
-		JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
-
-		double mean1 = jackSample1.getNthMoment(1);
-		double mean2 = jackSample2.getNthMoment(1);
-		double var1 = jackSample1.getNthCentralMoment(2);
-		double var2 = jackSample2.getNthCentralMoment(2);
-
-		std::cout << "means of jackknife estimators" << std::endl;
-		std::cout << mean1 << " " << mean2 << std::endl;
-		std::cout << var1 << " " << var2 << std::endl;
-
-		double fourthStandardizedMoment = mean1 / pow(mean2, 2.);
-		double firstDerivative = fabs( 1./pow(mean2, 3./2.) );
-		double secondDerivative = fabs( -2.*mean1*pow(mean2, -3.) );
-		double error = sqrt( var1 * firstDerivative + var2 * secondDerivative );
-		double unbiasedError = error*(double(numberOfBins)/double(numberOfBins-1));
-
-		JackknifeEstimators binderSample( jackSample1 / pow(mean2, 2.) );
-
-		double binder = binderSample.getNthMoment(1);
-		double binderError = binderSample.getJackknifeError();
-
-		JackknifeEstimatorsFromBinnedDataSample binderSample2( binderSample );
-
-		double binder2 = binderSample2.getNthMoment(1);
-		double binderError2 = binderSample2.getJackknifeError();
-
-		cout << "\t\t\"Binder\"\t\tError" << endl;
-		cout << scientific << "Naive:\t\t" << fourthStandardizedMomentBasic << "\t" << error << endl;
-		cout << scientific << "JackMean:\t" << binder << "\t" << binderError << endl;
-		cout << scientific << "JackMean2:\t" << binder2 << "\t" << binderError2 << endl;
-
-		cout << "Kurtosis\t\tError" << endl;
-		cout << scientific << kurtosisBasic << "\t" << error << endl;
-	}
-
 
   return 0;
 }
