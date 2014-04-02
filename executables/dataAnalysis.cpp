@@ -4,6 +4,52 @@ namespace po = boost::program_options;
 
 #include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
 
+//todo: remove this again
+using namespace std;
+
+//todo: make this a fct. of DataSample or put it in a namespace!
+//todo: enlarge for binsize..
+std::pair<double,double> calcMeanAndErrorOfDataSampleWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins)
+{
+	DataSampleAnalyzer binnedSample = sampleIn.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+	double mean = binnedSample.getNthMoment(1);
+	/**
+	 * unbiased estimate of variance of the sample is
+	 *   n/(n-1) * biasedEstimator(varianceOfSample)
+	 * and the estimate of the variance of the mean of the sample is always:
+	 *   varianceEstimator(sample) / n
+	 * because of the central limit theorem.
+	 * Note that for the mean the unbiased variance yields
+	 * the same error as jackknifing.
+	 */
+	int n = binnedSample.getNumberOfElements();
+	double error = sqrt(1. / double(n - 1) * binnedSample.getNthCentralMoment(2));
+	return std::pair <double, double> (mean, error);
+}
+
+void calcMean(std::string & file, int & numberOfBins)
+{
+    cout << "Analyse mean..." << endl;
+    DataSample sample(file);
+
+    std::pair<double,double> meanAndError = calcMeanAndErrorOfDataSampleWithBinning(sample, numberOfBins);
+
+    cout << "Mean\t\tError" << endl;
+    cout << scientific << meanAndError.first << "\t" << meanAndError.second << endl;
+}
+
+void calcVariance(std::string & file, int & numberOfBins)
+{
+    cout << "Analyse variance..." << endl;
+    DataSampleAnalyzer sample(file);
+    DataSampleAnalyzer varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
+
+    std::pair<double,double> meanAndError = calcMeanAndErrorOfDataSampleWithBinning(varianceSample, numberOfBins);
+
+    cout << "Variance\t\tError" << endl;
+    cout << scientific << meanAndError.first << "\t" << meanAndError.second << endl;
+}
+
 int main(int argc, char ** argv)
 {
 	//todo: add try-catch block
@@ -47,7 +93,6 @@ int main(int argc, char ** argv)
 
 	po::notify(vm);
 
-	using namespace std;
 	cout << "###############################" << endl;
 	cout << "Options:" << endl;
 	cout << "###############################" << endl;
@@ -77,52 +122,12 @@ int main(int argc, char ** argv)
 
 	if(analyseMean)
 	{
-		cout << "Analyse mean..." << endl;
-
-		DataSampleAnalyzer sample(file);
-		DataSampleAnalyzer binnedSample = sample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-
-		double mean = binnedSample.getNthMoment(1);
-
-		//todo: make this a fct. of DataSample!
-		/**
-		 * unbiased estimate of variance of the sample is
-		 *   n/(n-1) * biasedEstimator(varianceOfSample)
-		 * and the estimate of the variance of the mean of the sample is always:
-		 *   varianceEstimator(sample) / n
-		 * because of the central limit theorem.
-		 */
-		int n = binnedSample.getNumberOfElements();
-		double error =  sqrt( 1. / double(n-1) * binnedSample.getNthCentralMoment(2) );
-
-		cout << "Mean\t\tError" << endl;
-		cout << scientific << mean << "\t" << error << endl;
+	    calcMean(file, numberOfBins);
 	}
 
 	if(analyseVariance)
 	{
-		cout << "Analyse variance..." << endl;
-
-		DataSampleAnalyzer sample(file);
-
-		DataSampleAnalyzer varianceSample = ( sample - sample.getNthMoment(1))^2;
-
-		DataSampleAnalyzer binnedSample = varianceSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-
-		double variance = binnedSample.getNthMoment(1);
-		//todo: make this a fct. of DataSample!
-		/**
-		 * unbiased estimate of variance of the sample is
-		 *   n/(n-1) * biasedEstimator(varianceOfSample)
-		 * and the estimate of the variance of the mean of the sample is always:
-		 *   varianceEstimator(sample) / n
-		 * because of the central limit theorem.
-		 */
-		//todo: this equals numberOfBins!
-		int n = binnedSample.getNumberOfElements();
-		double error = sqrt( 1. / double(n-1) * binnedSample.getNthCentralMoment(2) );
-		cout << "Variance\t\tError" << endl;
-		cout << scientific << variance << "\t" << error << endl;
+		calcVariance(file, numberOfBins);
 	}
 
 
