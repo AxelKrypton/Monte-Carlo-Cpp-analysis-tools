@@ -14,6 +14,11 @@ int main(int argc, char ** argv)
 	bool calcAutocorrelation;
 	int offset;
 	std::string file;
+	bool analyseMean = true;
+	bool analyseVariance = true;
+	bool analyseSkewness = true;
+	bool analyseKurtosis = true;
+	std::string defaultFile = "";
 
 	po::options_description desc("Generic options");
 	po::variables_map vm;
@@ -21,8 +26,12 @@ int main(int argc, char ** argv)
 	//todo: find out why short names gives parsing error!
 	desc.add_options()
 		("help,h", "Produce this help message")
-		("datafile,f", po::value<std::string>(&file)->default_value(""), "File containing data")
+		("datafile,f", po::value<std::string>(&file)->default_value(defaultFile), "File containing data")
 		("offset,o", po::value<int>(&offset)->default_value(0), "Discard first <offset> values of data")
+		("analyseMean", po::value<bool>(&analyseMean)->default_value(true), "Analyse data for mean")
+		("analyseVariance", po::value<bool>(&analyseVariance)->default_value(true), "Analyse data for variance")
+		("analyseSkewness", po::value<bool>(&analyseSkewness)->default_value(true), "Analyse data for skewness")
+		("analyseKurtosis", po::value<bool>(&analyseKurtosis)->default_value(true), "Analyse data for kurtosis/binder-cumulant")
 		("useBinning", po::value<bool>(&useBinning)->default_value(true), "Use binning on data")
 		("numberOfBins,nb", po::value<int>(&numberOfBins)->default_value(10), "Number of bins")
 		("binsize,bs", po::value<int>(&binsize)->default_value(100), "Size of bin")
@@ -44,6 +53,8 @@ int main(int argc, char ** argv)
 	cout << "###############################" << endl;
 	cout << "Datafile:\t" << file << endl;
 	cout << "Offset:\t" << offset << endl;
+	//todo: add output of observables which are analyzed
+	cout << "###############################" << endl;
 	if (useBinning)
 	{
 		cout << "binsize:\t" << binsize << endl;
@@ -55,8 +66,7 @@ int main(int argc, char ** argv)
 		cout << "Calculate estimate on autocorrelation" << endl;
 	cout << "###############################" << endl;
 
-	//todo: make "" a (constant) string object
-	if (file == "")
+	if (file == defaultFile)
 		return 0;
 
 	if (calcAutocorrelation)
@@ -65,7 +75,6 @@ int main(int argc, char ** argv)
 		return 0;
 	}
 
-	bool analyseMean = true;
 	if(analyseMean)
 	{
 		cout << "Analyse mean..." << endl;
@@ -90,7 +99,6 @@ int main(int argc, char ** argv)
 		cout << scientific << mean << "\t" << error << endl;
 	}
 
-	bool analyseVariance = true;
 	if(analyseVariance)
 	{
 		cout << "Analyse variance..." << endl;
@@ -117,7 +125,6 @@ int main(int argc, char ** argv)
 		cout << scientific << variance << "\t" << error << endl;
 	}
 
-	bool analyseSkewness = true;
 
 	//naive version:
 	if(analyseSkewness)
@@ -239,8 +246,6 @@ int main(int argc, char ** argv)
 		cout << "\t\tSkewness\t\tError" << endl;
 		cout << "JackEstimate2:\t" << scientific << skewness << "\t" << error <<  endl;
 	}
-
-	bool analyseKurtosis = true;
 
 	//naive version:
 	if(analyseKurtosis)
