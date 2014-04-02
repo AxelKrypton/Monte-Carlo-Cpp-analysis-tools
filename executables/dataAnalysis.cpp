@@ -65,7 +65,7 @@ int main(int argc, char ** argv)
 		return 0;
 	}
 
-	bool analyseMean = false;
+	bool analyseMean = true;
 	if(analyseMean)
 	{
 		cout << "Analyse mean..." << endl;
@@ -90,7 +90,7 @@ int main(int argc, char ** argv)
 		cout << scientific << mean << "\t" << error << endl;
 	}
 
-	bool analyseVariance = false;
+	bool analyseVariance = true;
 	if(analyseVariance)
 	{
 		cout << "Analyse variance..." << endl;
@@ -117,7 +117,7 @@ int main(int argc, char ** argv)
 		cout << scientific << variance << "\t" << error << endl;
 	}
 
-	bool analyseSkewness = false;
+	bool analyseSkewness = true;
 
 	//naive version:
 	if(analyseSkewness)
@@ -213,6 +213,31 @@ int main(int argc, char ** argv)
 
 		cout << "\t\tSkewness\t\tError" << endl;
 		cout << "JackEstimate:\t" << scientific << skewness << "\t" << error <<  endl;
+	}
+
+	//another version:
+	if(analyseSkewness)
+	{
+		/**
+		 * Skewness gamma_1 is defined as:
+		 *   gamma_1 = <(x-mu)^3> / <(x-mu)^2>^(3/2)
+		 */
+		DataSampleAnalyzer sample(file);
+
+		DataSampleAnalyzer thirdCentralMoment  = (sample - sample.getNthMoment(1))^3;
+		DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1))^2;
+
+		JackknifeEstimators skewnessSample( thirdCentralMoment / ( secondCentralMoment^(3./2) ) );
+
+		DataSampleAnalyzer binnedSample = thirdCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+
+		JackknifeEstimatorsFromBinnedDataSample jackSample(binnedSample);
+
+		double skewness = jackSample.getNthMoment(1);
+		double error = jackSample.getJackknifeError();
+
+		cout << "\t\tSkewness\t\tError" << endl;
+		cout << "JackEstimate2:\t" << scientific << skewness << "\t" << error <<  endl;
 	}
 
 	//first version including multiple methods
@@ -445,6 +470,35 @@ int main(int argc, char ** argv)
 
 		cout << "\t\tBinder\t\tError" << endl;
 		cout << "JackEstimate:\t" << scientific << skewness << "\t" << error <<  endl;
+	}
+
+	//worsed estimate: take f(x_i) first
+	//here, the jackknife error should be the same as the std. unbiased one.
+	if(analyseKurtosis)
+	{
+		/**
+		 * The Fourth Std. Moment beta_2 is defined as:
+		 *   beta_2 = <(x-mu)^4> / <(x-mu)^2>^2
+		 * This is also referred to as "Binder-cumulant"
+		 * The Kurtosis gamma_2 is defined as:
+		 *   gamma_2 = beta_2 - 3
+		 */
+		DataSampleAnalyzer sample(file);
+
+		DataSampleAnalyzer fourthCentralMoment  = (sample - sample.getNthMoment(1))^4;
+		DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1))^2;
+
+		JackknifeEstimators kurtosisSample( fourthCentralMoment / ( secondCentralMoment^2 ) );
+
+		DataSampleAnalyzer binnedSample = fourthCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+
+		JackknifeEstimatorsFromBinnedDataSample jackSample(binnedSample);
+
+		double skewness = jackSample.getNthMoment(1);
+		double error = jackSample.getJackknifeError();
+
+		cout << "\t\tBinder\t\tError" << endl;
+		cout << "JackEstimate2:\t" << scientific << skewness << "\t" << error <<  endl;
 	}
 
 	//calc kurtosis and error
