@@ -1,0 +1,3 @@
+input_test_file_1	chem_pot_im 1	 beta 4.5	Magnetic_field 0.3
+input_test_file_2	chem_pot_im 2	 Beta 4.5	Magnetic_field 0.3
+input_test_file_3	chem_pot_im 3	 BETA 4.5	Magnetic_field 0.3

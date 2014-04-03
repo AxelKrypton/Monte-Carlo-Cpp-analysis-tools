@@ -5,25 +5,12 @@ add_library(Reweighting
 )
 #target_link_libraries(Reweighting dataAnalysisUtilities)
 
-#This is to copy a file to the build directory
-configure_file(simulationDataContainer.configfile simulationDataContainer.configfile COPYONLY)
-configure_file(input_test_file_1 input_test_file_1 COPYONLY)
-configure_file(input_test_file_2 input_test_file_2 COPYONLY)
-configure_file(input_test_file_3 input_test_file_3 COPYONLY)
-configure_file(wrong_configfile_1 wrong_configfile_1 COPYONLY)
-configure_file(wrong_configfile_2 wrong_configfile_2 COPYONLY)
-configure_file(wrong_configfile_3 wrong_configfile_3 COPYONLY)
-configure_file(wrong_configfile_4 wrong_configfile_4 COPYONLY)
-configure_file(wrong_configfile_5 wrong_configfile_5 COPYONLY)
-configure_file(wrong_configfile_6 wrong_configfile_6 COPYONLY)
-configure_file(wrong_configfile_7 wrong_configfile_7 COPYONLY)
-configure_file(wrong_configfile_8 wrong_configfile_8 COPYONLY)
-configure_file(wrong_configfile_9 wrong_configfile_9 COPYONLY)
-configure_file(wrong_inputfile_1 wrong_inputfile_1 COPYONLY)
-configure_file(wrong_inputfile_2 wrong_inputfile_2 COPYONLY)
-configure_file(wrong_inputfile_3 wrong_inputfile_3 COPYONLY)
-configure_file(wrong_inputfile_4 wrong_inputfile_4 COPYONLY)
-configure_file(wrong_inputfile_5 wrong_inputfile_5 COPYONLY)
+#This is to copy a files to the build directory
+add_custom_target(ReweightingFiles ALL
+				  COMMAND ${CMAKE_COMMAND} -E copy_directory
+                  ${CMAKE_SOURCE_DIR}/Reweighting/GeneralTestFiles $<TARGET_FILE_DIR:Reweighting>/GeneralTestFiles
+                  COMMAND ${CMAKE_COMMAND} -E copy_directory
+                  ${CMAKE_SOURCE_DIR}/Reweighting/RealTestData $<TARGET_FILE_DIR:Reweighting>/RealTestData)
 
 add_unit_test(SimulationData SimulationData_test Reweighting dataAnalysisUtilities)
 add_unit_test(SimulationDataContainer SimulationDataContainer_test Reweighting dataAnalysisUtilities)

@@ -54,3 +54,6 @@ macro(add_modules DEST MODULE)
 	endforeach()
 	target_link_libraries(${DEST} ${_MODULES})
 endmacro()
+
+
+

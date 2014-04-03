@@ -14,10 +14,10 @@ BOOST_AUTO_TEST_SUITE(build)
 	BOOST_AUTO_TEST_CASE(build2)
 	{
 		std::string fileThatDoesNotExist = "fileThatShouldNotBe";
-		std::string fileThatDoesExistButWrong1 = "wrong_configfile_3"; //wrong structure
-		std::string fileThatDoesExistButWrong2 = "wrong_configfile_4"; //correct structure but with two identical set of parameters
-		std::string fileThatDoesExistButWrong3 = "wrong_configfile_5"; //correct structure but with two identical filenames
-		std::string fileThatDoesExistButWrong4 = "wrong_configfile_6"; //correct structure but with not existing file inside
+		std::string fileThatDoesExistButWrong1 = "GeneralTestFiles/wrong_configfile_3"; //wrong structure
+		std::string fileThatDoesExistButWrong2 = "GeneralTestFiles/wrong_configfile_4"; //correct structure but with two identical set of parameters
+		std::string fileThatDoesExistButWrong3 = "GeneralTestFiles/wrong_configfile_5"; //correct structure but with two identical filenames
+		std::string fileThatDoesExistButWrong4 = "GeneralTestFiles/wrong_configfile_6"; //correct structure but with not existing file inside
 		BOOST_REQUIRE_THROW(Reweighter reweighter(fileThatDoesNotExist), std::exception);
 		BOOST_REQUIRE_THROW(Reweighter reweighter(fileThatDoesExistButWrong1), std::exception);
 		BOOST_REQUIRE_THROW(Reweighter reweighter(fileThatDoesExistButWrong2), std::exception);
@@ -27,9 +27,9 @@ BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(build3)
 	{
-		std::string fileThatDoesExistButWrong1 = "wrong_configfile_7"; //correct structure but with datafile with wrong number of columns
-		std::string fileThatDoesExistButWrong2 = "wrong_configfile_8"; //correct structure but with different parameters name in two lines
-		std::string fileThatDoesExistButWrong3 = "wrong_configfile_9"; //correct structure but with logZ as parameter
+		std::string fileThatDoesExistButWrong1 = "GeneralTestFiles/wrong_configfile_7"; //correct structure but with datafile with wrong number of columns
+		std::string fileThatDoesExistButWrong2 = "GeneralTestFiles/wrong_configfile_8"; //correct structure but with different parameters name in two lines
+		std::string fileThatDoesExistButWrong3 = "GeneralTestFiles/wrong_configfile_9"; //correct structure but with logZ as parameter
 		BOOST_REQUIRE_THROW(Reweighter reweighter(fileThatDoesExistButWrong1), std::logic_error);
 		BOOST_REQUIRE_THROW(Reweighter reweighter(fileThatDoesExistButWrong2), std::invalid_argument);
 		BOOST_REQUIRE_THROW(Reweighter reweighter(fileThatDoesExistButWrong3), std::logic_error);
@@ -37,14 +37,14 @@ BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(build4)
 	{
-		std::string fileThatDoesExist = "simulationDataContainer.configfile";
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
 		Reweighter reweighter(fileThatDoesExist);
 		BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist));
 	}
 
 	BOOST_AUTO_TEST_CASE(build5)
 	{
-		std::string fileThatDoesExist = "simulationDataContainer.configfile";
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints;
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_SUITE(getters)
 
 	BOOST_AUTO_TEST_CASE(getters1)
 	{
-		std::string fileThatDoesExist = "simulationDataContainer.configfile";
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
 		Reweighter* reweighter = new Reweighter(fileThatDoesExist);
 		std::vector<std::vector<double> > refParameters;
 		double refLine1[3] = {4.0, 0.7, -1.e12};
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_SUITE(getters)
 
 	BOOST_AUTO_TEST_CASE(getters2)
 	{
-		std::string fileThatDoesExist = "simulationDataContainer.configfile";
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(3, 2);
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_SUITE(getters)
 
 	BOOST_AUTO_TEST_CASE(getters3)
 	{
-		std::string fileThatDoesExist = "simulationDataContainer.configfile";
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(3, 4);
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_SUITE(setters)
 
 	BOOST_AUTO_TEST_CASE(setters1)
 	{
-		std::string fileThatDoesExist = "simulationDataContainer.configfile";
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(3, 4);
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_SUITE(setters)
 
 	BOOST_AUTO_TEST_CASE(setters2)
 	{
-		std::string fileThatDoesExist = "simulationDataContainer.configfile";
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(3, 4);
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_SUITE(setters)
 
 	BOOST_AUTO_TEST_CASE(setters3)
 	{
-		std::string fileThatDoesExist = "simulationDataContainer.configfile";
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(3, 4);
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -190,8 +190,13 @@ BOOST_AUTO_TEST_SUITE(setters)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-
-
+//BOOST_AUTO_TEST_SUITE(reweight)
+//
+//	BOOST_AUTO_TEST_CASE(){
+//
+//	}
+//
+//BOOST_AUTO_TEST_SUITE_END()
 
 
 
