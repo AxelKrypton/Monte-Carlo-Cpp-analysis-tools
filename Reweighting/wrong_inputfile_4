@@ -1,4 +1,0 @@
-1.0	input_test_file_1	 beta 4.0	chem_pot_im 0.7
-	#Line to be ignored
-2.0 	input_test_file_2	 beta 4.5	chem_pot_im 1.0 	#ignored_par 3.14	
-3.0	input_test_file_3	 beta 4.5	chem_pot_im 1.3
