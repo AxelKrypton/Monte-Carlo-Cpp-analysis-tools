@@ -6,20 +6,30 @@
 class Reweighter {
 public:
 	Reweighter();
-	Reweighter(std::string configurationFileIn);
+	Reweighter(std::string configurationFileIn, double precisionToCalculateLogZ = 1.e-7);
 	Reweighter(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
-			     std::vector<unsigned int>  newNumberOfPointsOfParametersIn);
+			     std::vector<unsigned int>  newNumberOfPointsOfParametersIn, double precisionToCalculateLogZ = 1.e-7);
 	//Getters
 	std::vector<std::vector<double> > getValuesOfSimulationParameters();
 	std::vector<std::vector<double> > getValuesOfNewParameters();
-	double getNumberOfNewPoints();
+	int getNumberOfNewPoints();
+	std::vector<double> getLogZAtSimulatedPoints();
+	std::vector<double> getLogZAtNewPoints();
+	double getPrecisionToCalculateLogZ();
 	//Setters
 	void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn);
 	void setNewNumberOfPoints(std::vector<unsigned int> newNumberOfPointsOfParametersIn);
 	void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
 			                 std::vector<unsigned int> newNumberOfPointsOfParametersIn);
+	void setPrecisionToCalculateLogZ(double precisionToCalculateLogZ);
 	//Other functionalities
 
+protected:
+	/*
+	 * Note: These protected functions should be private, but we leave them public for testing purposes
+	 */
+	std::vector<double> calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated);
+	void calculateLogZAtSimulatedPoints();
 
 private:
 	/*
@@ -72,6 +82,7 @@ private:
 	 */
 	std::vector<std::pair<double, double> >  newRangesOfParameters;
 	std::vector<unsigned int>  newNumberOfPointsOfParameters;
+	double precisionOfIterativeProcedureToCalculateLogZ;
 };
 
 
