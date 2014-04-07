@@ -7,6 +7,11 @@ namespace po = boost::program_options;
 //todo: remove this again
 using namespace std;
 
+void calcAutocorrelation(std::string file)
+{
+	throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
+}
+
 //todo: make this a fct. of DataSample or put it in a namespace!
 //todo: enlarge for binsize..
 std::pair<double,double> calcMeanAndErrorOfDataSampleWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins)
@@ -95,9 +100,11 @@ void calcKurtosis(std::string file, int numberOfBins)
     cout << "JackEstimate:\t" << scientific << skewness << "\t" << error << endl;
 }
 
+//todo: move to own file
 class parameters
 {
 public:
+	struct parse_aborted {};
 	int binsize;
 	int numberOfBins;
 	bool useBinning;
@@ -137,12 +144,16 @@ public:
 
 		if(vm.count("help")) { // see http://stackoverflow.com/questions/5395503/required-and-optional-arguments-using-boost-library-program-options as to why this is done before po::notifiy(vm)
 			std::cout << desc << '\n';
-			//todo: throw more suited exception
-			throw std::exception();
+			throw parameters::parse_aborted();
 		}
 
 		po::notify(vm);
+		printParameters();
+	}
 
+private:
+	void printParameters()
+	{
 		cout << "###############################" << endl;
 		cout << "Options:" << endl;
 		cout << "###############################" << endl;
@@ -160,29 +171,34 @@ public:
 		if (calcAutocorrelation)
 			cout << "Calculate estimate on autocorrelation" << endl;
 		cout << "###############################" << endl;
-
 	}
 };
 
 void dataAnalysis(parameters params)
 {
 	if (params.file == params.defaultFile)
+	{
 		throw std::invalid_argument("No datafile given. Aborting!");
+	}
 
 	if (params.calcAutocorrelation)
 	{
-		throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
+		calcAutocorrelation(params.file);
 	}
-    if(params.analyseMean){
+    if(params.analyseMean)
+    {
         calcMean(params.file, params.numberOfBins);
     }
-    if(params.analyseVariance){
+    if(params.analyseVariance)
+    {
         calcVariance(params.file, params.numberOfBins);
     }
-    if(params.analyseSkewness){
+    if(params.analyseSkewness)
+    {
         calcSkewness(params.file, params.numberOfBins);
     }
-    if(params.analyseKurtosis){
+    if(params.analyseKurtosis)
+    {
         calcKurtosis(params.file, params.numberOfBins);
     }
 }
@@ -194,9 +210,14 @@ int main(int argc, char ** argv)
 		parameters params(argc, argv);
 	    dataAnalysis(params);
 	}
+	//todo: move catch block into own function?
 	catch ( const std::exception &e)
 	{
 		cout << e.what() << endl;
+	}
+	catch(parameters::parse_aborted)
+	{
+		//do nothing in this case...
 	}
 	catch (...)
 	{
