@@ -118,6 +118,7 @@ public:
 		po::variables_map vm;
 
 		//todo: find out why short names gives parsing error!
+		//todo: add positional operator for data file!
 		desc.add_options()
 			("help,h", "Produce this help message")
 			("datafile,f", po::value<std::string>(&file)->default_value(defaultFile), "File containing data")
@@ -163,40 +164,44 @@ public:
 	}
 };
 
-int main(int argc, char ** argv)
+void dataAnalysis(parameters params)
 {
-	parameters params(argc, argv);
-
-	//todo: add try-catch block
-
 	if (params.file == params.defaultFile)
-		return 0;
+		throw std::invalid_argument("No datafile given. Aborting!");
 
 	if (params.calcAutocorrelation)
 	{
-		cout << "Autocorrelation is not implemented yet. Aborting!" << endl;
-		return 0;
+		throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
 	}
+    if(params.analyseMean){
+        calcMean(params.file, params.numberOfBins);
+    }
+    if(params.analyseVariance){
+        calcVariance(params.file, params.numberOfBins);
+    }
+    if(params.analyseSkewness){
+        calcSkewness(params.file, params.numberOfBins);
+    }
+    if(params.analyseKurtosis){
+        calcKurtosis(params.file, params.numberOfBins);
+    }
+}
 
-	if(params.analyseMean)
+int main(int argc, char ** argv)
+{
+	try
 	{
-	    calcMean(params.file, params.numberOfBins);
+		parameters params(argc, argv);
+	    dataAnalysis(params);
 	}
-
-	if(params.analyseVariance)
+	catch ( const std::exception &e)
 	{
-		calcVariance(params.file, params.numberOfBins);
+		cout << e.what() << endl;
 	}
-
-	if(params.analyseSkewness)
+	catch (...)
 	{
-	    calcSkewness(params.file, params.numberOfBins);
+		cout << "Caught non-standard exception!";
 	}
 
-	if(params.analyseKurtosis)
-	{
-	    calcKurtosis(params.file, params.numberOfBins);
-	}
-
-  return 0;
+    return 0;
 }
