@@ -87,7 +87,7 @@ void calcKurtosis(std::string file, int numberOfBins)
     DataSampleAnalyzer binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
     JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
     JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
-    //this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
+    //this calculates x_i / y_i^2, where x_i and y_i are the jackknife estimators of the fourth and second moment
     JackknifeEstimators kurtosisSample(jackSample1 / (jackSample2 ^ 2));
     double skewness = kurtosisSample.getNthMoment(1);
     double error = kurtosisSample.getJackknifeError();
@@ -95,43 +95,44 @@ void calcKurtosis(std::string file, int numberOfBins)
     std::cout << "JackEstimate:\t" << scientific << skewness << "\t" << error << std::endl;
 }
 
-
-
-void dataAnalysis(parameters params)
+class dataAnalyzer
 {
-	if (params.file == params.defaultFile)
+public:
+	dataAnalyzer(parameters paramsIn):
+		params(paramsIn)
 	{
-		throw std::invalid_argument("No datafile given. Aborting!");
-	}
+		if (params.calcAutocorrelation)
+		{
+			calcAutocorrelation(params.file);
+		}
+	    if(params.analyseMean)
+	    {
+	        calcMean(params.file, params.numberOfBins);
+	    }
+	    if(params.analyseVariance)
+	    {
+	        calcVariance(params.file, params.numberOfBins);
+	    }
+	    if(params.analyseSkewness)
+	    {
+	        calcSkewness(params.file, params.numberOfBins);
+	    }
+	    if(params.analyseKurtosis)
+	    {
+	        calcKurtosis(params.file, params.numberOfBins);
+	    }
+	};
 
-	if (params.calcAutocorrelation)
-	{
-		calcAutocorrelation(params.file);
-	}
-    if(params.analyseMean)
-    {
-        calcMean(params.file, params.numberOfBins);
-    }
-    if(params.analyseVariance)
-    {
-        calcVariance(params.file, params.numberOfBins);
-    }
-    if(params.analyseSkewness)
-    {
-        calcSkewness(params.file, params.numberOfBins);
-    }
-    if(params.analyseKurtosis)
-    {
-        calcKurtosis(params.file, params.numberOfBins);
-    }
-}
+private:
+	parameters params;
+};
 
 int main(int argc, char ** argv)
 {
 	try
 	{
 		parameters params(argc, argv);
-	    dataAnalysis(params);
+	    dataAnalyzer analyzer(params);
 	}
 	//todo: move catch block into own function?
 	catch ( const std::exception &e)

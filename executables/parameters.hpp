@@ -1,6 +1,8 @@
 #ifndef PARAMETERS_HPP_
 #define PARAMETERS_HPP_
 
+//todo: make own .cpp file plus tests
+
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 namespace po = boost::program_options;
@@ -56,6 +58,11 @@ public:
 
 		po::notify(vm);
 		printParameters();
+
+		if (file == defaultFile)
+		{
+			throw std::invalid_argument("No datafile given. Aborting!");
+		}
 	}
 
 private:

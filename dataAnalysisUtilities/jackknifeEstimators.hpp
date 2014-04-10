@@ -11,6 +11,8 @@
 #include "dataSampleAnalyzer.hpp"
 #include <iostream>
 
+//todo: add fcts. for mean and error
+//todo: overload constructor to add function
 class JackknifeEstimators: public DataSampleAnalyzer
 {
 public:
