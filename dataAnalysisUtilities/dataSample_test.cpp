@@ -574,6 +574,63 @@ BOOST_AUTO_TEST_SUITE(slice)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(deleteElement)
+
+	BOOST_AUTO_TEST_CASE(invalidArgument1)
+	{
+		int numberOfElements = 35;
+		int elementToRemove = numberOfElements;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		BOOST_REQUIRE_THROW(sample.removeIthElement(elementToRemove), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument2)
+	{
+		int numberOfElements = 35;
+		int elementToRemove = -1;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		BOOST_REQUIRE_THROW(sample.removeIthElement(elementToRemove), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(numberOfElements)
+	{
+		int numberOfElements = 41;
+		int elementToRemove = 0;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2 = sample.removeIthElement(elementToRemove);
+		BOOST_REQUIRE_EQUAL(sample2.getNumberOfElements(), numberOfElements - 1);
+	}
+
+	BOOST_AUTO_TEST_CASE(removeElement1)
+	{
+		int numberOfElements = 52;
+		int elementToRemove = 0;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2 = sample.removeIthElement(elementToRemove);
+		BOOST_REQUIRE_EQUAL(sample2.sum(), sample.sum() - 1);
+	}
+
+	BOOST_AUTO_TEST_CASE(removeElement2)
+	{
+		int numberOfElements = 65;
+		int elementToRemove = 45;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		DataSample sample2 = sample.removeIthElement(elementToRemove);
+		BOOST_REQUIRE_EQUAL(sample2.sum(), sample.sum() - 1);
+	}
+
+	BOOST_AUTO_TEST_CASE(removeElement3)
+	{
+		int numberOfElements = 165;
+		int elementToRemove = 33;
+		DataSample sample(makeValarrayWithOnes(numberOfElements));
+		sample[elementToRemove] *= 1000;
+		DataSample sample2 = sample.removeIthElement(elementToRemove);
+		BOOST_REQUIRE_EQUAL(sample2.sum(), sample.sum() - 1000);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(applyFunction)
 
 	double square(double in)

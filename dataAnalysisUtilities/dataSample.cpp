@@ -234,3 +234,26 @@ DataSample DataSample::sampleSlice(int start, int size, int stride)
 	return DataSample(values[std::slice(start, size, stride)]);
 }
 
+static void checkRemoveParameter(int position, int numberOfElements)
+{
+	if (position < 0 || position >= numberOfElements)
+			throw std::invalid_argument("Can only remove element greater than or equal to zero and smaller than the number of entries!");
+}
+
+DataSample DataSample::removeIthElement(int i)
+{
+	checkRemoveParameter(i, numberOfElements);
+	DataSample tmp(numberOfElements - 1);
+	for (int iteration = 0; iteration < numberOfElements; iteration ++)
+	{
+		if (iteration == i)
+		{
+			continue;
+		}
+		int index = (iteration < i) ? iteration : iteration - 1;
+
+		tmp[index] = values[iteration];
+	}
+	return tmp;
+}
+

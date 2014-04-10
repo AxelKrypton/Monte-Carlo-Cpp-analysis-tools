@@ -38,6 +38,7 @@ public:
 	DataSample sampleSlice(int start, int size, int stride);
 	double sum();
 	double& operator[](size_t index);
+	DataSample removeIthElement(int i);
 
 protected:
 	void setValues(std::valarray<double> valuesIn);
