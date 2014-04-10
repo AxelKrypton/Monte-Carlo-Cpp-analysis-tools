@@ -15,16 +15,27 @@ class JackknifeEstimators: public DataSampleAnalyzer
 {
 public:
 
+	JackknifeEstimators(int numberOfElementsIn) :
+		DataSampleAnalyzer(numberOfElementsIn)
+	{
+		checkIfJackknifeCanBePerformed(numberOfElements);
+		DataSample tmp = calculatePseudoValues();
+		setValues(tmp);
+	};
+
 	JackknifeEstimators(DataSampleAnalyzer sampleIn) :
 		DataSampleAnalyzer(sampleIn)
 	{
 		checkIfJackknifeCanBePerformed(numberOfElements);
+		DataSample tmp = calculatePseudoValues();
+		setValues(tmp);
 	};
 
 	double getJackknifeVariance();
 	double getJackknifeError();
 
 protected:
+	DataSample calculatePseudoValues();
 	int getJackknifeNormalization();
 	void checkIfJackknifeCanBePerformed(int n);
 	DataSample createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize);

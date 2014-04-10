@@ -17,6 +17,12 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimators)
 		BOOST_CHECK_NO_THROW(JackknifeEstimators jackSample(sample));
 	}
 
+	BOOST_AUTO_TEST_CASE(build2)
+	{
+		int enoughElementsForJackknife = 573;
+		BOOST_CHECK_NO_THROW( JackknifeEstimators jackSample(enoughElementsForJackknife) );
+	}
+
 	BOOST_AUTO_TEST_CASE(buildInvalidArgument)
 	{
 		int tooFewElementsForJackknife = 1;
