@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_SUITE(zerothCentralMoment)
 	BOOST_AUTO_TEST_CASE(zerothCentralMoment1)
 	{
 		int numberOfElements = 1e3;
-		double referenceValue = 0.;
+		double referenceValue = 1.;
 		TestDataSampleNthCentralMoment tester(0, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
@@ -601,6 +601,11 @@ BOOST_AUTO_TEST_SUITE(binning)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(binning)
+
+
+
+BOOST_AUTO_TEST_SUITE_END()
 
 
 

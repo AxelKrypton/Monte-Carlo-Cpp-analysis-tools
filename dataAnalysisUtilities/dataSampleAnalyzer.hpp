@@ -59,7 +59,7 @@ public:
 protected:
 	/**
 	 * Binning.
-	 * Following BA Berg,
+	 * Following B.A. Berg,
 	 * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
 	 * p.52.
 	 */
