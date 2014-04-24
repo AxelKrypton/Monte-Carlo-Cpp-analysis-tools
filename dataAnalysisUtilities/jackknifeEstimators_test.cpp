@@ -40,6 +40,8 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimators)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+//todo: go through and delete/modify tests
+
 BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 
 	BOOST_AUTO_TEST_CASE(build_invalidArgument)
