@@ -48,3 +48,23 @@ void BinnedDataSampleFromNumberOfBins::calcBinsize(int elementsOfSample)
 	checkDiscardedElements(numberOfBins, "numberOfBins", elementsOfSample);
 	binsize = elementsOfSample / numberOfBins;
 }
+
+void BinnedDataSampleFromBinsize::checkIfBinsizeIsValid(int elementsOfSample)
+{
+	checkIfBinningParameterIsValid_toberenamed(binsize, "binsize", elementsOfSample);
+}
+
+void BinnedDataSampleFromBinsize::calcNumberOfBins(int elementsOfSample)
+{
+	checkDiscardedElements(binsize, "binsize", elementsOfSample);
+	numberOfBins = elementsOfSample / binsize;
+}
+
+BinnedDataSampleFromBinsize::BinnedDataSampleFromBinsize(DataSample sampleIn, int binsizeIn)
+{
+	binsize = binsizeIn;
+	checkIfBinsizeIsValid(sampleIn.getNumberOfElements());
+	calcNumberOfBins(sampleIn.getNumberOfElements());
+	setValues(performBinning(sampleIn));
+}
+

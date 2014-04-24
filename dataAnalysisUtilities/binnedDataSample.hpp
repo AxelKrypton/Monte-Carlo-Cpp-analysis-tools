@@ -26,8 +26,18 @@ public:
 	BinnedDataSampleFromNumberOfBins(DataSample sampleIn, int numberOfBinsIn);
 
 protected:
-	void checkIfNumberOfBinsIsValid(int);
+	void checkIfNumberOfBinsIsValid(int elementsOfSample);
 	void calcBinsize(int elementsOfSample);
+};
+
+class BinnedDataSampleFromBinsize : public BinnedDataSample
+{
+public:
+	BinnedDataSampleFromBinsize(DataSample sampleIn, int binsize);
+
+protected:
+	void checkIfBinsizeIsValid(int elementsOfSample);
+	void calcNumberOfBins(int elementsOfSample);
 };
 
 #endif /* BINNEDDATASAMPLE_HPP_ */
