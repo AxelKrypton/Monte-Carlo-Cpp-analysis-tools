@@ -29,7 +29,8 @@ BinnedDataSampleFromNumberOfBins::BinnedDataSampleFromNumberOfBins(DataSample sa
 	setValues(performBinning(sampleIn));
 }
 
-static void checkIfBinningParameterIsValid(int valueIn, std::string descriptionIn, int numberOfElements)
+//todo: rename again!
+static void checkIfBinningParameterIsValid_toberenamed(int valueIn, std::string descriptionIn, int numberOfElements)
 {
 	if(valueIn <= 0)
 		throw std::invalid_argument("Cannot perform binning with " +  descriptionIn + " zero or less!");
@@ -39,7 +40,7 @@ static void checkIfBinningParameterIsValid(int valueIn, std::string descriptionI
 
 void BinnedDataSampleFromNumberOfBins::checkIfNumberOfBinsIsValid(int elementsOfSample)
 {
-	checkIfBinningParameterIsValid(numberOfBins, "numberOfBins", elementsOfSample);
+	checkIfBinningParameterIsValid_toberenamed(numberOfBins, "numberOfBins", elementsOfSample);
 }
 
 void BinnedDataSampleFromNumberOfBins::calcBinsize(int elementsOfSample)

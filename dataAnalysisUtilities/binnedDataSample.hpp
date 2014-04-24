@@ -3,7 +3,7 @@
 
 #include "dataSampleAnalyzer.hpp"
 
-class BinnedDataSample : public DataSample
+class BinnedDataSample : public DataSampleAnalyzer
 {
 protected:
 

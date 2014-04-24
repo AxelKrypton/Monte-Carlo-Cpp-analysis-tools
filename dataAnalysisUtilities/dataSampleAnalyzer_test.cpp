@@ -345,27 +345,12 @@ BOOST_AUTO_TEST_SUITE(binning)
 	 * leaving out the number of elements that "fall" away during binning.
 	 */
 
-	void testBinningWithNumberOfBins(int numberOfElements, int numberOfBins, double expectedFirstMoment)
-	{
-		TestDataSample testSample(numberOfElements, arrayPosition);
-		DataSampleAnalyzer* originalSample = testSample.getDataSample();
-		DataSampleAnalyzer binnedSample(originalSample->createBinnedDataSampleWithNumberOfBins(numberOfBins));
-		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
-	}
-
 	void testBinningWithBinsize(int numberOfElements, int binsize, double expectedFirstMoment)
 	{
 		TestDataSample testSample(numberOfElements, arrayPosition);
 		DataSampleAnalyzer* originalSample = testSample.getDataSample();
 		DataSampleAnalyzer binnedSample = originalSample->createBinnedDataSampleWithBinsize(binsize);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
-	}
-
-	void testBinningWithNumberOfBins_elements(int numberOfElements, int desiredNumberOfElementsOfBinnedDataSample)
-	{
-		DataSampleAnalyzer originalSample(numberOfElements);
-		DataSampleAnalyzer binnedSample = originalSample.createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
-		BOOST_CHECK_EQUAL(desiredNumberOfElementsOfBinnedDataSample, binnedSample.getNumberOfElements());
 	}
 
 	void testBinningWithBinsize_elements(int numberOfElements, int desiredBinsize)
@@ -376,37 +361,10 @@ BOOST_AUTO_TEST_SUITE(binning)
 		BOOST_CHECK_EQUAL(expectedNumberOfElementsInBinnedDataSample, binnedSample.getNumberOfElements());
 	}
 
-	void testBinningWithNumberOfBins_wrongArgument(int numberOfElements, int numberOfBins)
-	{
-		DataSampleAnalyzer originalSample(numberOfElements);
-		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithNumberOfBins(numberOfBins), std::invalid_argument);
-	}
-
 	void testBinningWithBinsize_wrongArgument(int numberOfElements, int binsize)
 	{
 		DataSampleAnalyzer originalSample(numberOfElements);
 		BOOST_REQUIRE_THROW(originalSample.createBinnedDataSampleWithBinsize(binsize), std::invalid_argument);
-	}
-
-	BOOST_AUTO_TEST_CASE(binningWrongArgument1)
-	{
-		int numberOfElements = 27;
-		int numberOfBins = 0;
-		testBinningWithNumberOfBins_wrongArgument(numberOfElements, numberOfBins);
-	}
-
-	BOOST_AUTO_TEST_CASE(binningWrongArgument2)
-	{
-		int numberOfElements = 33;
-		int negativeNumber = - numberOfElements;
-		testBinningWithNumberOfBins_wrongArgument(numberOfElements, negativeNumber);
-	}
-
-	BOOST_AUTO_TEST_CASE(binningWrongArgument3)
-	{
-		int numberOfElements = 13;
-		int numberThatIsTooBig = numberOfElements + 1;
-		testBinningWithNumberOfBins_wrongArgument(numberOfElements, numberThatIsTooBig);
 	}
 
 	BOOST_AUTO_TEST_CASE(binningWrongArgument4)
@@ -430,27 +388,6 @@ BOOST_AUTO_TEST_SUITE(binning)
 		testBinningWithBinsize_wrongArgument(numberOfElements, negativeNumber);
 	}
 
-	BOOST_AUTO_TEST_CASE(binningWithNumberOfBins1)
-	{
-		int numberOfElements = 27;
-		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements;
-		testBinningWithNumberOfBins_elements(numberOfElements, desiredNumberOfElementsOfBinnedDataSample);
-	}
-
-	BOOST_AUTO_TEST_CASE(binningWithNumberOfBins2)
-	{
-		int numberOfElements = 23;
-		int desiredNumberOfElementsOfBinnedDataSample = 1;
-		testBinningWithNumberOfBins_elements(numberOfElements, desiredNumberOfElementsOfBinnedDataSample);
-	}
-
-	BOOST_AUTO_TEST_CASE(binningWithNumberOfBins3)
-	{
-		int numberOfElements = 25;
-		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements/2.;
-		testBinningWithNumberOfBins_elements(numberOfElements, desiredNumberOfElementsOfBinnedDataSample);
-	}
-
 	BOOST_AUTO_TEST_CASE(binningWithBinsize1)
 	{
 		int numberOfElements = 25;
@@ -472,17 +409,6 @@ BOOST_AUTO_TEST_SUITE(binning)
 		testBinningWithBinsize_elements(numberOfElements, desiredBinsize);
 	}
 
-	BOOST_AUTO_TEST_CASE(trivialBinning1)
-	{
-		int numberOfElements = 27;
-		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements;
-		TestDataSample testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
-		DataSampleAnalyzer* originalSample = testSample.getDataSample();
-		DataSampleAnalyzer binnedSample = originalSample->createBinnedDataSampleWithNumberOfBins(desiredNumberOfElementsOfBinnedDataSample);
-		BOOST_CHECK_EQUAL(originalSample->getNthMoment(1), binnedSample.getNthMoment(1));
-		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
-	}
-
 	BOOST_AUTO_TEST_CASE(trivialBinning2)
 	{
 		int numberOfElements = 25;
@@ -492,38 +418,6 @@ BOOST_AUTO_TEST_SUITE(binning)
 		DataSampleAnalyzer binnedSample = originalSample->createBinnedDataSampleWithBinsize(desiredBinsize);
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
-	}
-
-	BOOST_AUTO_TEST_CASE(realBinningWithNumberOfBins1)
-	{
-		int evenNumberOfElements = 24;
-		int evenDesiredNumberOfElementsOfBinnedDataSample = 12;
-		double expectedFirstMoment = 11.5;
-		testBinningWithNumberOfBins(evenNumberOfElements, evenDesiredNumberOfElementsOfBinnedDataSample, expectedFirstMoment);
-	}
-
-	BOOST_AUTO_TEST_CASE(realBinningWithNumberOfBins2)
-	{
-		int oddNumberOfElements = 25;
-		int evenDesiredNumberOfElementsOfBinnedDataSample = 12;
-		double expectedFirstMoment = 11.5;
-		testBinningWithNumberOfBins(oddNumberOfElements, evenDesiredNumberOfElementsOfBinnedDataSample, expectedFirstMoment);
-	}
-
-	BOOST_AUTO_TEST_CASE(realBinningWithNumberOfBins3)
-	{
-		int evenNumberOfElements = 26;
-		int oddDesiredNumberOfElementsOfBinnedDataSample = 11;
-		double expectedFirstMoment = 10.5;
-		testBinningWithNumberOfBins(evenNumberOfElements, oddDesiredNumberOfElementsOfBinnedDataSample, expectedFirstMoment);
-	}
-
-	BOOST_AUTO_TEST_CASE(realBinningWithNumberOfBins4)
-	{
-		int oddNumberOfElements = 29;
-		int oddDesiredNumberOfElementsOfBinnedDataSample = 9;
-		double expectedFirstMoment = 13.;
-		testBinningWithNumberOfBins(oddNumberOfElements, oddDesiredNumberOfElementsOfBinnedDataSample, expectedFirstMoment);
 	}
 
 	BOOST_AUTO_TEST_CASE(realBinningWithBinsize1)
