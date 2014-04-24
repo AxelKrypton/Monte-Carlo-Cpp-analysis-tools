@@ -22,6 +22,8 @@ public:
 	double value;
 };
 
+//todo: remove all binning functionality, this is at the moment interlinked with the jackknife estimator class
+
 class DataSampleAnalyzer: public DataSample
 {
 public:

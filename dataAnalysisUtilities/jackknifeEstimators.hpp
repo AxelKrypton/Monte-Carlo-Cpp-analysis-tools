@@ -40,6 +40,7 @@ protected:
 	DataSample calculatePseudoValues();
 	int getJackknifeNormalization();
 	void checkIfJackknifeCanBePerformed(int n);
+	//todo: is this simply blocked binning and not jackknifing?
 	DataSample createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize);
 };
 
