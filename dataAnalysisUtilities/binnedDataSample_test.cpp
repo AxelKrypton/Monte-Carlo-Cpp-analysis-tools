@@ -266,3 +266,53 @@ BOOST_AUTO_TEST_SUITE(withBinsize_binning)
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(binningWithBinsizeAndNumberOfBins)
+
+	BOOST_AUTO_TEST_CASE(test1)
+	{
+		//file has 21 entries, first 20 are 1, last one is zero
+		int binsize = 10;
+		int numberOfBins = 2;
+		std::string filename = "datafile3.example";
+
+		DataSample tmp (filename);
+		BinnedDataSampleFromBinsize binnedSample(tmp, binsize);
+		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), 1., doublePrecisionInPercent);
+		BinnedDataSampleFromNumberOfBins binnedSample2 (tmp, numberOfBins);
+		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), binnedSample2.getNthMoment(1), doublePrecisionInPercent);
+	}
+
+	static void testBinningWithBinsizeAndNumberOfBins(std::string filename, int desiredBinsize, int desiredNumberOfBins)
+	{
+		DataSample tmp (filename);
+		BinnedDataSampleFromBinsize binnedSample (tmp, desiredBinsize);
+		BinnedDataSampleFromNumberOfBins binnedSample2 (tmp, desiredNumberOfBins);
+		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), binnedSample2.getNthMoment(1), doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(2), binnedSample2.getNthMoment(2), doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(test2)
+	{
+		//file has 1000 non-trivial entries
+		int desiredBinsize = 100;
+		int desiredNumberOfBins = 10;
+		std::string filename = "datafile2.example";
+
+		testBinningWithBinsizeAndNumberOfBins(filename, desiredBinsize, desiredNumberOfBins);
+	}
+
+	BOOST_AUTO_TEST_CASE(test3)
+	{
+		//file has 1000 non-trivial entries
+		int desiredBinsize = 10;
+		int desiredNumberOfBins = 100;
+		std::string filename = "datafile2.example";
+
+		testBinningWithBinsizeAndNumberOfBins(filename, desiredBinsize, desiredNumberOfBins);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+
