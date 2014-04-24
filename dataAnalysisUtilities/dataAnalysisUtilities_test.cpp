@@ -60,3 +60,96 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
+
+	static void checkMeanErrorWithBinsize(std::string file, int binsize, double expectedValue, double testPrecision)
+	{
+		DataSampleAnalyzer sample(file);
+		MeanAndError meanAndError = calcMeanAndErrorOfDataSampleWithBinningFromBinsize(sample, binsize);
+		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
+	}
+
+	BOOST_AUTO_TEST_CASE(error1)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int binsize = 1;
+		double precisionOfDataInFileInPercent = 1e-10;
+		double expectedError = 3.44121381077520906E-004;
+
+		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedError, precisionOfDataInFileInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(error2)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int binsize = 100;
+		double precisionOfDataInFileInPercent = 1e-10;
+		double expectedError = 1.1564370727055974e-03;
+
+		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedError, precisionOfDataInFileInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(error3)
+	{
+		std::string fileThatDoesExist = "datafile2.example";
+		double precisionOfDataInFileInPercent = 1e-10;
+		int binsize = 100;
+		double expectedValue = 1.14688734781786292E-003;
+
+		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedValue, precisionOfDataInFileInPercent);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
+
+	static void checkMeanErrorWithNumberOfBins(std::string file, int numberOfBins, double expectedValue, double testPrecision)
+	{
+		DataSampleAnalyzer sample(file);
+		MeanAndError meanAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(sample, numberOfBins);
+		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
+	}
+
+	BOOST_AUTO_TEST_CASE(error1)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		int numberOfBins = 1005;
+		double precisionOfDataInFileInPercent = 1e-10;
+		double expectedValue = 3.44121381077520906E-004;
+
+		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(error2)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		double precisionOfDataInFileInPercent = 1e-10;
+		int numberOfBins = 10;
+		double expectedValue = 1.1564370727055974e-03;
+
+		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(error3)
+	{
+		std::string fileThatDoesExist = "datafile2.example";
+		double precisionOfDataInFileInPercent = 1e-10;
+		int numberOfBins = 10;
+		double expectedValue = 1.14688734781786292E-003;
+
+		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(error4)
+	{
+		std::string fileThatDoesExist = "datafile2.example";
+		double precisionOfDataInFileInPercent = 1e-10;
+		int numberOfBins = 100;
+		double expectedValue = 8.02188322114928275E-004;
+
+		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+

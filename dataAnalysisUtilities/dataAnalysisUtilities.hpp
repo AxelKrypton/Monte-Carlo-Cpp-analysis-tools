@@ -19,28 +19,6 @@ public:
 	double error;
 };
 
-
-
-//todo: make this a fct. of DataSample or put it in a namespace!
-//todo: enlarge for binsize..
-std::pair<double,double> calcMeanAndErrorOfDataSampleWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins)
-{
-	DataSampleAnalyzer binnedSample = sampleIn.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-	double mean = binnedSample.getNthMoment(1);
-	/**
-	 * unbiased estimate of variance of the sample is
-	 *   n/(n-1) * biasedEstimator(varianceOfSample)
-	 * and the estimate of the variance of the mean of the sample is always:
-	 *   varianceEstimator(sample) / n
-	 * because of the central limit theorem.
-	 * Note that for the mean the unbiased variance yields
-	 * the same error as jackknifing.
-	 */
-	int n = binnedSample.getNumberOfElements();
-	double error = sqrt(1. / double(n - 1) * binnedSample.getNthCentralMoment(2));
-	return std::pair <double, double> (mean, error);
-}
-
 static double meanOfDataSample(DataSampleAnalyzer sampleIn)
 {
 	return sampleIn.getNthMoment(1);
@@ -72,6 +50,30 @@ MeanAndError calcMeanAndErrorOfDataSample(DataSample sampleIn)
 
 	mean = meanOfDataSample(tmp);
 	error = sqrt( unbiasedVarianceOfMean(tmp) );
+
+	return MeanAndError(mean, error);
+}
+
+MeanAndError calcMeanAndErrorOfDataSampleWithBinningFromBinsize(DataSample sampleIn, int binsize)
+{
+	BinnedDataSampleFromBinsize binnedSample (sampleIn, binsize);
+	double mean;
+	double error;
+
+	mean = meanOfDataSample(binnedSample);
+	error = sqrt( unbiasedVarianceOfMean(binnedSample) );
+
+	return MeanAndError(mean, error);
+}
+
+MeanAndError calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(DataSample sampleIn, int numberOfBins)
+{
+	BinnedDataSampleFromNumberOfBins binnedSample (sampleIn, numberOfBins);
+	double mean;
+	double error;
+
+	mean = meanOfDataSample(binnedSample);
+	error = sqrt( unbiasedVarianceOfMean(binnedSample) );
 
 	return MeanAndError(mean, error);
 }
