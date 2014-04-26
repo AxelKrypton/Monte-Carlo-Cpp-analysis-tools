@@ -1,10 +1,9 @@
 
 #include "parameters.hpp"
-//todo: this include should not be necessary in the end
-#include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 
-//todo: perhaps make a common sample object that is passed as pointer to save memory allocation stuff
+//todo: perhaps make a common sample object that is passed as pointer or call by reference to save memory allocation stuff
+//todo: naming is bad, one should have: dataAnalyzer -> DataSampleAnalyzer, DataSampleAnalyzer -> DataSample, DataSample -> DataSampleBasic or so!
 
 class AnalyzerWrapper
 {
@@ -24,13 +23,13 @@ protected:
 	EstimateAndError estimateAndError;
 };
 
+//todo: in all classes here: implement usage of binsize or no binning
 class MeanAnalyzer : public AnalyzerWrapper
 {
 public:
-	MeanAnalyzer(std::string & file, int & numberOfBins):
+	MeanAnalyzer(DataSampleAnalyzer sample, int & numberOfBins):
 		AnalyzerWrapper("Mean")
 	{
-	    DataSample sample(file);
 	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(sample, numberOfBins);
 	}
 };
@@ -38,10 +37,9 @@ public:
 class VarianceAnalyzer : public AnalyzerWrapper
 {
 public:
-	VarianceAnalyzer(std::string & file, int & numberOfBins):
+	VarianceAnalyzer(DataSampleAnalyzer sample, int & numberOfBins):
 		AnalyzerWrapper("Variance")
 	{
-	    DataSampleAnalyzer sample(file);
 	    DataSampleAnalyzer varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
 
 	    //todo: replace with dedicated function
@@ -49,61 +47,13 @@ public:
 	}
 };
 
-//todo: work over this
-static EstimateAndError calcSkewness(DataSampleAnalyzer sample, int & numberOfBins)
-{
-    /**
-     * Skewness gamma_1 is defined as:
-     *   gamma_1 = <(x-mu)^3> / <(x-mu)^2>^(3/2)
-     */
-    DataSampleAnalyzer thirdCentralMoment = (sample - sample.getNthMoment(1)) ^ 3;
-    DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
-    DataSampleAnalyzer binnedSample1 = thirdCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-    DataSampleAnalyzer binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-    JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
-    JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
-    //this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
-    JackknifeEstimators skewnessSample(jackSample1 / (jackSample2 ^ (3. / 2)));
-    double skewness = skewnessSample.getNthMoment(1);
-    double error = skewnessSample.getJackknifeError();
-
-    return EstimateAndError(skewness, error);
-}
-
-//todo: work over this
-//todo: repair: this is acutally binder, rename? print also kurtosis?
-static EstimateAndError calcKurtosis(DataSampleAnalyzer sample, int numberOfBins)
-{
-    /**
-		 * The Fourth Std. Moment beta_2 is defined as:
-		 *   beta_2 = <(x-mu)^4> / <(x-mu)^2>^2
-		 * This is also referred to as "Binder-cumulant"
-		 * The Kurtosis gamma_2 is defined as:
-		 *   gamma_2 = beta_2 - 3
-		 */
-    DataSampleAnalyzer fourthCentralMoment = (sample - sample.getNthMoment(1)) ^ 4;
-    DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
-    DataSampleAnalyzer binnedSample1 = fourthCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-    DataSampleAnalyzer binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-    JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
-    JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
-    //this calculates x_i / y_i^2, where x_i and y_i are the jackknife estimators of the fourth and second moment
-    JackknifeEstimators kurtosisSample(jackSample1 / (jackSample2 ^ 2));
-    double skewness = kurtosisSample.getNthMoment(1);
-    double error = kurtosisSample.getJackknifeError();
-
-    return EstimateAndError(skewness, error);
-}
-
 class SkewnessAnalyzer : public AnalyzerWrapper
 {
 public:
-	SkewnessAnalyzer(std::string & file, int & numberOfBins):
+	SkewnessAnalyzer(DataSampleAnalyzer sample, int & numberOfBins):
 		AnalyzerWrapper("Skewness")
 	{
-	    DataSampleAnalyzer sample(file);
-
-	    //todo: replace with dedicated function
+		//todo: replace with dedicated function
 	    estimateAndError = calcSkewness(sample, numberOfBins);
 	}
 };
@@ -111,11 +61,9 @@ public:
 class KurtosisAnalyzer : public AnalyzerWrapper
 {
 public:
-	KurtosisAnalyzer(std::string & file, int & numberOfBins):
+	KurtosisAnalyzer(DataSampleAnalyzer sample, int & numberOfBins):
 		AnalyzerWrapper("Kurtosis")
 	{
-	    DataSampleAnalyzer sample(file);
-
 	    //todo: replace with dedicated function
 	    estimateAndError = calcKurtosis(sample, numberOfBins);
 	}
@@ -124,38 +72,41 @@ public:
 class AutocorrelationAnalyzer : public AnalyzerWrapper
 {
 public:
-	AutocorrelationAnalyzer(std::string & file):
+	AutocorrelationAnalyzer(DataSampleAnalyzer sample):
 		AnalyzerWrapper("Autocorrelation")
 	{
 		throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
+
 	}
 };
 
 class dataAnalyzer
 {
 public:
-	dataAnalyzer(parameters paramsIn):
+	dataAnalyzer(DataSampleAnalyzer &sample, parameters paramsIn):
 		params(paramsIn)
 	{
 		if (params.calcAutocorrelation)
 		{
-			AutocorrelationAnalyzer(params.file);
+			//I dont know why I need a name for the object here and not below
+			//If I do not have that, I get a compiler error that AutocorrelationAnalyzer() is called!
+			AutocorrelationAnalyzer tmp(sample);
 		}
 	    if(params.analyseMean)
 	    {
-	        MeanAnalyzer(params.file, params.numberOfBins);
+	        MeanAnalyzer(sample, params.numberOfBins);
 	    }
 	    if(params.analyseVariance)
 	    {
-	        VarianceAnalyzer(params.file, params.numberOfBins);
+	        VarianceAnalyzer(sample, params.numberOfBins);
 	    }
 	    if(params.analyseSkewness)
 	    {
-	        SkewnessAnalyzer(params.file, params.numberOfBins);
+	        SkewnessAnalyzer(sample, params.numberOfBins);
 	    }
 	    if(params.analyseKurtosis)
 	    {
-	        KurtosisAnalyzer(params.file, params.numberOfBins);
+	        KurtosisAnalyzer(sample, params.numberOfBins);
 	    }
 	};
 
@@ -168,7 +119,8 @@ int main(int argc, char ** argv)
 	try
 	{
 		parameters params(argc, argv);
-	    dataAnalyzer analyzer(params);
+		DataSampleAnalyzer dataSample(params.file);
+	    dataAnalyzer analyzer(dataSample, params);
 	}
 	//todo: move catch block into own function?
 	catch ( const std::exception &e)
