@@ -13,7 +13,7 @@ protected:
 	 * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
 	 * p.52.
 	 */
-	DataSample performBinning(DataSample sampleIn);
+	DataSampleBasic performBinning(DataSampleBasic sampleIn);
 	void checkDiscardedElements(int valueIn, std::string descriptionIn, int elementsOfSample);
 
 	int numberOfBins;
@@ -23,7 +23,7 @@ protected:
 class BinnedDataSampleFromNumberOfBins : public BinnedDataSample
 {
 public:
-	BinnedDataSampleFromNumberOfBins(DataSample sampleIn, int numberOfBinsIn);
+	BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn);
 
 protected:
 	void checkIfNumberOfBinsIsValid(int elementsOfSample);
@@ -33,7 +33,7 @@ protected:
 class BinnedDataSampleFromBinsize : public BinnedDataSample
 {
 public:
-	BinnedDataSampleFromBinsize(DataSample sampleIn, int binsize);
+	BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsize);
 
 protected:
 	void checkIfBinsizeIsValid(int elementsOfSample);

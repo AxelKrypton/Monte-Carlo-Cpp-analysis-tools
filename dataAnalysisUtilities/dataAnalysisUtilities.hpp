@@ -48,7 +48,7 @@ static double unbiasedVarianceOfMean(DataSampleAnalyzer sampleIn)
 }
 
 //todo: refactor: code duplication up to the actual sample used!
-EstimateAndError calcMeanAndErrorOfDataSample(DataSample sampleIn)
+EstimateAndError calcMeanAndErrorOfDataSample(DataSampleBasic sampleIn)
 {
 	DataSampleAnalyzer tmp(sampleIn);
 	double mean;
@@ -60,7 +60,7 @@ EstimateAndError calcMeanAndErrorOfDataSample(DataSample sampleIn)
 	return EstimateAndError(mean, error);
 }
 
-EstimateAndError calcMeanAndErrorOfDataSampleWithBinningFromBinsize(DataSample sampleIn, int binsize)
+EstimateAndError calcMeanAndErrorOfDataSampleWithBinningFromBinsize(DataSampleBasic sampleIn, int binsize)
 {
 	BinnedDataSampleFromBinsize binnedSample (sampleIn, binsize);
 	double mean;
@@ -72,7 +72,7 @@ EstimateAndError calcMeanAndErrorOfDataSampleWithBinningFromBinsize(DataSample s
 	return EstimateAndError(mean, error);
 }
 
-EstimateAndError calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(DataSample sampleIn, int numberOfBins)
+EstimateAndError calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBins)
 {
 	BinnedDataSampleFromNumberOfBins binnedSample (sampleIn, numberOfBins);
 	double mean;
@@ -102,7 +102,7 @@ static double unbiasedErrorOfVariance(DataSampleAnalyzer sampleIn)
 	return sqrt( unbiasedVarianceOfMean(varianceSample) );
 }
 
-EstimateAndError calcVarianceAndErrorOfDataSample(DataSample sampleIn)
+EstimateAndError calcVarianceAndErrorOfDataSample(DataSampleBasic sampleIn)
 {
 	DataSampleAnalyzer sample(sampleIn);
 	double variance;

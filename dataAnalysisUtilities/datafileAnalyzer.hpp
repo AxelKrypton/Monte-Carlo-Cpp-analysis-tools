@@ -1,6 +1,5 @@
 /*
  * datafileAnalyser.hpp
- * Functionality to analyze a given datafile.
  * No direct tests are implemented as all classes rely
  * on functionality of other classes.
  */

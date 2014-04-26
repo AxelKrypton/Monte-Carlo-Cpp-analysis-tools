@@ -13,13 +13,13 @@ BOOST_AUTO_TEST_SUITE(withNumberOfBins_build)
 	{
 		int numberOfElements = 543;
 		int numberOfBins = 1;
-		DataSample sample(numberOfElements);
+		DataSampleBasic sample(numberOfElements);
 		BOOST_CHECK_NO_THROW(BinnedDataSampleFromNumberOfBins binnedSample(sample, numberOfBins) );
 	}
 
 	static void testBinningWithNumberOfBins_wrongArgument(int numberOfElements, int numberOfBins)
 	{
-		DataSample sample(numberOfElements);
+		DataSampleBasic sample(numberOfElements);
 		BOOST_REQUIRE_THROW(BinnedDataSampleFromNumberOfBins binnedSample(sample, numberOfBins), std::invalid_argument);
 	}
 
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_SUITE(withNumberOfBins_build)
 
 	static void testBinningWithNumberOfBins_elements(int numberOfElements, int desiredNumberOfElementsOfBinnedDataSample)
 	{
-		DataSample sample(numberOfElements);
+		DataSampleBasic sample(numberOfElements);
 		BinnedDataSampleFromNumberOfBins binnedSample(sample, desiredNumberOfElementsOfBinnedDataSample);
 		BOOST_CHECK_EQUAL(desiredNumberOfElementsOfBinnedDataSample, binnedSample.getNumberOfElements());
 	}
@@ -141,13 +141,13 @@ BOOST_AUTO_TEST_SUITE(withBinsize_build)
 	{
 		int numberOfElements = 927;
 		int binsize = 1;
-		DataSample sample(numberOfElements);
+		DataSampleBasic sample(numberOfElements);
 		BOOST_CHECK_NO_THROW(BinnedDataSampleFromBinsize binnedSample(sample, binsize) );
 	}
 
 	static void testBinningWithBinsize_wrongArgument(int numberOfElements, int binsize)
 	{
-		DataSample originalSample(numberOfElements);
+		DataSampleBasic originalSample(numberOfElements);
 		BOOST_REQUIRE_THROW(BinnedDataSampleFromBinsize(originalSample, binsize), std::invalid_argument);
 	}
 
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_SUITE(withBinsize_build)
 	static void testBinningWithBinsize_elements(int numberOfElements, int desiredBinsize)
 	{
 		int expectedNumberOfElementsInBinnedDataSample = numberOfElements / desiredBinsize;
-		DataSample originalSample(numberOfElements);
+		DataSampleBasic originalSample(numberOfElements);
 		BinnedDataSampleFromBinsize binnedSample (originalSample, desiredBinsize);
 		BOOST_CHECK_EQUAL(expectedNumberOfElementsInBinnedDataSample, binnedSample.getNumberOfElements());
 	}
@@ -276,7 +276,7 @@ BOOST_AUTO_TEST_SUITE(binningWithBinsizeAndNumberOfBins)
 		int numberOfBins = 2;
 		std::string filename = "datafile3.example";
 
-		DataSample tmp (filename);
+		DataSampleBasic tmp (filename);
 		BinnedDataSampleFromBinsize binnedSample(tmp, binsize);
 		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), 1., doublePrecisionInPercent);
 		BinnedDataSampleFromNumberOfBins binnedSample2 (tmp, numberOfBins);
@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_SUITE(binningWithBinsizeAndNumberOfBins)
 
 	static void testBinningWithBinsizeAndNumberOfBins(std::string filename, int desiredBinsize, int desiredNumberOfBins)
 	{
-		DataSample tmp (filename);
+		DataSampleBasic tmp (filename);
 		BinnedDataSampleFromBinsize binnedSample (tmp, desiredBinsize);
 		BinnedDataSampleFromNumberOfBins binnedSample2 (tmp, desiredNumberOfBins);
 		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), binnedSample2.getNthMoment(1), doublePrecisionInPercent);

@@ -21,7 +21,7 @@ public:
 		DataSampleAnalyzer(numberOfElementsIn)
 	{
 		checkIfJackknifeCanBePerformed(numberOfElements);
-		DataSample tmp = calculatePseudoValues();
+		DataSampleBasic tmp = calculatePseudoValues();
 		setValues(tmp);
 	};
 
@@ -29,7 +29,7 @@ public:
 		DataSampleAnalyzer(sampleIn)
 	{
 		checkIfJackknifeCanBePerformed(numberOfElements);
-		DataSample tmp = calculatePseudoValues();
+		DataSampleBasic tmp = calculatePseudoValues();
 		setValues(tmp);
 	};
 
@@ -37,11 +37,11 @@ public:
 	double getJackknifeError();
 
 protected:
-	DataSample calculatePseudoValues();
+	DataSampleBasic calculatePseudoValues();
 	int getJackknifeNormalization();
 	void checkIfJackknifeCanBePerformed(int n);
 	//todo: is this simply blocked binning and not jackknifing?
-	DataSample createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize);
+	DataSampleBasic createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize);
 };
 
 class JackknifeEstimatorsFromBinnedDataSample: public JackknifeEstimators

@@ -1,9 +1,9 @@
 #include "binnedDataSample.hpp"
 
-DataSample BinnedDataSample::performBinning(DataSample sampleIn)
+DataSampleBasic BinnedDataSample::performBinning(DataSampleBasic sampleIn)
 {
 	std::cout << "perform binning with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
-	DataSample binnedDataSample(numberOfBins);
+	DataSampleBasic binnedDataSample(numberOfBins);
 	for(int iteration = 0; iteration < numberOfBins; iteration++)
 	{
 		binnedDataSample[iteration] = DataSampleAnalyzer(sampleIn.sampleSlice(iteration*binsize, binsize, 1)).getNthMoment(1);
@@ -21,7 +21,7 @@ void BinnedDataSample::checkDiscardedElements(int valueIn, std::string descripti
 	}
 }
 
-BinnedDataSampleFromNumberOfBins::BinnedDataSampleFromNumberOfBins(DataSample sampleIn, int numberOfBinsIn)
+BinnedDataSampleFromNumberOfBins::BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn)
 {
 	numberOfBins = numberOfBinsIn;
 	checkIfNumberOfBinsIsValid(sampleIn.getNumberOfElements());
@@ -60,7 +60,7 @@ void BinnedDataSampleFromBinsize::calcNumberOfBins(int elementsOfSample)
 	numberOfBins = elementsOfSample / binsize;
 }
 
-BinnedDataSampleFromBinsize::BinnedDataSampleFromBinsize(DataSample sampleIn, int binsizeIn)
+BinnedDataSampleFromBinsize::BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsizeIn)
 {
 	binsize = binsizeIn;
 	checkIfBinsizeIsValid(sampleIn.getNumberOfElements());

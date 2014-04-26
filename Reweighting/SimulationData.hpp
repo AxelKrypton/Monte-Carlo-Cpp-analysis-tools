@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <map>
-#include "../dataAnalysisUtilities/dataSample.hpp"
+#include "../dataAnalysisUtilities/DataSampleBasic.hpp"
 
 class SimulationData
 {
@@ -14,12 +14,12 @@ public:
 	int getNumberOfSimulationParameters();
 	int getNumberOfDataSample();
 	double getParameterValue(std::string parameterName);
-	DataSample& operator[](int index);
+	DataSampleBasic& operator[](int index);
 
 private:
 	std::map<std::string, double> simulationParameters;
 	std::string datafileName;
-	std::vector<DataSample> simulationRawData;
+	std::vector<DataSampleBasic> simulationRawData;
 };
 
 #endif /* SIMULATIONDATA_HPP_ */

@@ -1,5 +1,5 @@
 add_library(dataAnalysisUtilities
-	dataSample.cpp
+	DataSampleBasic.cpp
 	dataSampleAnalyzer.cpp
 	binnedDataSample.cpp
 	jackknifeEstimators.cpp
@@ -16,7 +16,7 @@ configure_file(fileWithBrokenLine.example fileWithBrokenLine.example COPYONLY)
 configure_file(fileWithComment.example fileWithComment.example COPYONLY)
 configure_file(fileWithEmptyLine.example fileWithEmptyLine.example COPYONLY)
 
-add_unit_test(dataSample dataSample_test dataAnalysisUtilities)
+add_unit_test(dataSampleBasic DataSampleBasic_test dataAnalysisUtilities)
 add_unit_test(dataSampleAnalyzer dataSampleAnalyzer_test dataAnalysisUtilities)
 add_unit_test(binnedDataSample binnedDataSample_test dataAnalysisUtilities)
 add_unit_test(jackknifeEstimators jackknifeEstimators_test dataAnalysisUtilities)

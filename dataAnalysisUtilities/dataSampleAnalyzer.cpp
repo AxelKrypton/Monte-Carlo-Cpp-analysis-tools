@@ -94,10 +94,10 @@ int DataSampleAnalyzer::calcNumberOfBins(int binsize)
 	return numberOfElements / binsize;
 }
 
-DataSample DataSampleAnalyzer::performBinning(int numberOfBins, int binsize)
+DataSampleBasic DataSampleAnalyzer::performBinning(int numberOfBins, int binsize)
 {
 	std::cout << "perform binning with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
-	DataSample binnedDataSample(numberOfBins);
+	DataSampleBasic binnedDataSample(numberOfBins);
 	for(int iteration = 0; iteration < numberOfBins; iteration++)
 	{
 		binnedDataSample[iteration] = DataSampleAnalyzer(sampleSlice(iteration*binsize, binsize, 1)).getNthMoment(1);
@@ -119,14 +119,14 @@ int DataSampleAnalyzer::getLowerLimitForNthMoment()
 	return lowerLimitForNthMoment;
 }
 
-DataSample DataSampleAnalyzer::createBinnedDataSampleWithNumberOfBins(int numberOfBins)
+DataSampleBasic DataSampleAnalyzer::createBinnedDataSampleWithNumberOfBins(int numberOfBins)
 {
 	checkIfNumberOfBinsIsValid(numberOfBins);
 	int binsize = calcBinsize(numberOfBins);
 	return performBinning(numberOfBins, binsize);
 }
 
-DataSample DataSampleAnalyzer::createBinnedDataSampleWithBinsize(int binsize)
+DataSampleBasic DataSampleAnalyzer::createBinnedDataSampleWithBinsize(int binsize)
 {
 	checkIfBinsizeIsValid(binsize);
 	int numberOfBins = calcNumberOfBins(binsize);

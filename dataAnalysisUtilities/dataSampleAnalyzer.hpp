@@ -1,7 +1,7 @@
 #ifndef DATASAMPLEANALYZER_HPP_
 #define DATASAMPLEANALYZER_HPP_
 
-#include "dataSample.hpp"
+#include "DataSampleBasic.hpp"
 
 class Moment
 {
@@ -24,37 +24,37 @@ public:
 
 //todo: remove all binning functionality, this is at the moment interlinked with the jackknife estimator class
 
-class DataSampleAnalyzer: public DataSample
+class DataSampleAnalyzer: public DataSampleBasic
 {
 public:
-	DataSampleAnalyzer(DataSample sampleIn):
-		DataSample(sampleIn)
+	DataSampleAnalyzer(DataSampleBasic sampleIn):
+		DataSampleBasic(sampleIn)
 	{
 		initMoments();
 	}
 
 	DataSampleAnalyzer(int length = defaultSizeOfDataSample):
-		DataSample(length)
+		DataSampleBasic(length)
 	{
 		initMoments();
 	}
 
 	DataSampleAnalyzer(std::valarray<double> valuesIn):
-		DataSample(valuesIn)
+		DataSampleBasic(valuesIn)
 	{
 		initMoments();
 	}
 
 	DataSampleAnalyzer(std::string dataFilename, int column = 1, int offset = 0):
-		DataSample(dataFilename, column, offset)
+		DataSampleBasic(dataFilename, column, offset)
 	{
 		initMoments();
 	}
 
 	double getNthCentralMoment(int n);
 	double getNthMoment(int n);
-	DataSample createBinnedDataSampleWithNumberOfBins(int numberOfBins);
-	DataSample createBinnedDataSampleWithBinsize(int binsize);
+	DataSampleBasic createBinnedDataSampleWithNumberOfBins(int numberOfBins);
+	DataSampleBasic createBinnedDataSampleWithBinsize(int binsize);
 	int getUpperLimitForNthMoment();
 	int getLowerLimitForNthMoment();
 
@@ -65,7 +65,7 @@ protected:
 	 * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
 	 * p.52.
 	 */
-	DataSample performBinning(int numberOfBins, int binsize);
+	DataSampleBasic performBinning(int numberOfBins, int binsize);
 	int getNumberOfMoments();
 	int calcBinsize(int numberOfBins);
 	int calcNumberOfBins(int binsize);

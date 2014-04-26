@@ -23,10 +23,10 @@ void JackknifeEstimators::checkIfJackknifeCanBePerformed(int n)
 		throw std::invalid_argument("Cannot create jackknifeEstimators with these parameters!");
 }
 
-DataSample JackknifeEstimators::calculatePseudoValues()
+DataSampleBasic JackknifeEstimators::calculatePseudoValues()
 {
 	//this is for f(X) = Mean(X)
-	DataSample tmp(numberOfElements);
+	DataSampleBasic tmp(numberOfElements);
 	double mean = calcNthMoment(1);
 
 	for (int iteration = 0; iteration < numberOfElements; iteration++)
@@ -46,15 +46,15 @@ DataSample JackknifeEstimators::calculatePseudoValues()
 	return tmp;
 }
 
-DataSample JackknifeEstimators::createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize)
+DataSampleBasic JackknifeEstimators::createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize)
 {
 	std::cout << "create binned jackknife estimators with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
 
-	DataSample cutSample = sampleSlice(0, binsize*numberOfBins, 1);
+	DataSampleBasic cutSample = sampleSlice(0, binsize*numberOfBins, 1);
 	double sumOfAllElementsInBinnedSample = cutSample.sum();
 	int numberOfElementsInBinndedSample = cutSample.getNumberOfElements();
 
-	DataSample binnedDataSample(numberOfBins);
+	DataSampleBasic binnedDataSample(numberOfBins);
 	for (int iteration = 0; iteration < numberOfBins; iteration++)
 	{
 		double sumOfAllElementsInBin = ( sampleSlice(iteration * binsize,	binsize, 1) ).sum();
