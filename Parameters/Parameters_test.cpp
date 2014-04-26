@@ -2,6 +2,7 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE dataSample
 #include <boost/test/unit_test.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "Parameters.hpp"
 
@@ -98,16 +99,95 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(setArguments)
 
-BOOST_AUTO_TEST_CASE(filename)
-{
-	int numberOfArguments = 2;
-	std::string filename = "someName";
-	std::string filenameArgument = "-f" + filename;
-	const char * arguments[] = {"foo", filenameArgument.c_str()};
-	Parameters parameters(numberOfArguments, arguments);
+	BOOST_AUTO_TEST_CASE(filename1)
+	{
+		int numberOfArguments = 2;
+		std::string filename = "someName";
+		std::string filenameArgument = "-f" + filename;
+		const char * arguments[] = {"foo", filenameArgument.c_str()};
+		Parameters parameters(numberOfArguments, arguments);
 
-	BOOST_CHECK(filename == parameters.file);
-}
+		BOOST_CHECK(filename == parameters.file);
+	}
+
+	BOOST_AUTO_TEST_CASE(filename2)
+	{
+		int numberOfArguments = 2;
+		std::string filename = "someName";
+		std::string filenameArgument = "--file=" + filename;
+		const char * arguments[] = {"foo", filenameArgument.c_str()};
+		Parameters parameters(numberOfArguments, arguments);
+
+		BOOST_CHECK(filename == parameters.file);
+	}
+
+//int binsize;
+//int numberOfBins;
+//int offset;
+//bool useBinning;
+//bool calcAutocorrelation;
+//bool analyzeMean;
+//bool analyzeVariance;
+//bool analyzeSkewness;
+//bool analyzeKurtosis;
+
+	static Parameters createParametersForArgumentSettingCheck_longOption(std::string argumentName, int newValue)
+	{
+		std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+		return Parameters(numberOfArguments, arguments);
+	}
+
+	static Parameters createParametersForArgumentSettingCheck_shortOption(std::string argumentName, int newValue)
+	{
+		std::string argument = argumentName + boost::lexical_cast<std::string>(newValue);
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+		return Parameters(numberOfArguments, arguments);
+	}
+
+	BOOST_AUTO_TEST_CASE(binsize1)
+	{
+		int newValue = 999;
+		std::string argumentName = "--binsize";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).binsize);
+	}
+
+	BOOST_AUTO_TEST_CASE(binsize2)
+	{
+		int newValue = 999;
+		std::string argumentName = "-b";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).binsize);
+	}
+
+	BOOST_AUTO_TEST_CASE(numberOfBins1)
+	{
+		int newValue = 999;
+		std::string argumentName = "--numberOfBins";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).numberOfBins);
+	}
+
+	BOOST_AUTO_TEST_CASE(numberOfBins2)
+	{
+		int newValue = 999;
+		std::string argumentName = "-n";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).numberOfBins);
+	}
+
+	BOOST_AUTO_TEST_CASE(offset1)
+	{
+		int newValue = 999;
+		std::string argumentName = "--offset";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).offset);
+	}
+
+	BOOST_AUTO_TEST_CASE(offset2)
+	{
+		int newValue = 999;
+		std::string argumentName = "-o";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).offset);
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
