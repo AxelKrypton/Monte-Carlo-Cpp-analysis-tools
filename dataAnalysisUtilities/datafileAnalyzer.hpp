@@ -8,8 +8,7 @@
 #ifndef DATAFILEANALYZER_HPP_
 #define DATAFILEANALYZER_HPP_
 
-//todo: move to own directory
-#include "../executables/parameters.hpp"
+#include "../Parameters/Parameters.hpp"
 #include "dataAnalysisUtilities.hpp"
 
 //todo: perhaps make a common sample object that is passed as pointer or call by reference to save memory allocation stuff

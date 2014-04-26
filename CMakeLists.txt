@@ -38,6 +38,7 @@ add_library(StAT ${StAT_FILES})
 
 ## Add to StAT each sub-directory linking it to the StAT library (see Macros.cmake in cmake folder)
 add_modules(StAT
+	Parameters
 	dataAnalysisUtilities
 	Reweighting
 )
