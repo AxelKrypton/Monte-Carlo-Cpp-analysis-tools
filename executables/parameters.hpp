@@ -35,6 +35,7 @@ public:
 
 		//todo: find out why short names gives parsing error!
 		//todo: add positional operator for data file!
+		//todo: bool should not have to be set!
 		desc.add_options()
 			("help,h", "Produce this help message")
 			("datafile,f", po::value<std::string>(&file)->default_value(defaultFile), "File containing data")
@@ -46,7 +47,7 @@ public:
 			("useBinning", po::value<bool>(&useBinning)->default_value(true), "Use binning on data")
 			("numberOfBins,nb", po::value<int>(&numberOfBins)->default_value(10), "Number of bins")
 			("binsize,bs", po::value<int>(&binsize)->default_value(100), "Size of bin")
-			("calcAutocorrelation,ac", po::value<bool>(&calcAutocorrelation)->default_value(false), "Estimate autocorrelation of data data")
+			("calcAutocorrelation,a", po::value<bool>(&calcAutocorrelation)->default_value(false), "Estimate autocorrelation of data")
 		;
 
 		po::store(po::parse_command_line(argc, argv, desc), vm);

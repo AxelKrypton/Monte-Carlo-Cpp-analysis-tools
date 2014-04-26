@@ -6,12 +6,6 @@
 
 //todo: perhaps make a common sample object that is passed as pointer to save memory allocation stuff
 
-//todo: move this into own class
-void calcAutocorrelation(std::string file)
-{
-	throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
-}
-
 class AnalyzerWrapper
 {
 protected:
@@ -55,13 +49,13 @@ public:
 	}
 };
 
-void calcSkewness(std::string & file, int & numberOfBins)
+//todo: work over this
+static EstimateAndError calcSkewness(DataSampleAnalyzer sample, int & numberOfBins)
 {
     /**
      * Skewness gamma_1 is defined as:
      *   gamma_1 = <(x-mu)^3> / <(x-mu)^2>^(3/2)
      */
-    DataSampleAnalyzer sample(file);
     DataSampleAnalyzer thirdCentralMoment = (sample - sample.getNthMoment(1)) ^ 3;
     DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
     DataSampleAnalyzer binnedSample1 = thirdCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
@@ -72,11 +66,13 @@ void calcSkewness(std::string & file, int & numberOfBins)
     JackknifeEstimators skewnessSample(jackSample1 / (jackSample2 ^ (3. / 2)));
     double skewness = skewnessSample.getNthMoment(1);
     double error = skewnessSample.getJackknifeError();
-    std::cout << "\t\tSkewness\t\tError" << std::endl;
-    std::cout << "JackEstimate:\t" << scientific << skewness << "\t" << error << std::endl;
+
+    return EstimateAndError(skewness, error);
 }
 
-void calcKurtosis(std::string file, int numberOfBins)
+//todo: work over this
+//todo: repair: this is acutally binder, rename? print also kurtosis?
+static EstimateAndError calcKurtosis(DataSampleAnalyzer sample, int numberOfBins)
 {
     /**
 		 * The Fourth Std. Moment beta_2 is defined as:
@@ -85,7 +81,6 @@ void calcKurtosis(std::string file, int numberOfBins)
 		 * The Kurtosis gamma_2 is defined as:
 		 *   gamma_2 = beta_2 - 3
 		 */
-    DataSampleAnalyzer sample(file);
     DataSampleAnalyzer fourthCentralMoment = (sample - sample.getNthMoment(1)) ^ 4;
     DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
     DataSampleAnalyzer binnedSample1 = fourthCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
@@ -96,9 +91,45 @@ void calcKurtosis(std::string file, int numberOfBins)
     JackknifeEstimators kurtosisSample(jackSample1 / (jackSample2 ^ 2));
     double skewness = kurtosisSample.getNthMoment(1);
     double error = kurtosisSample.getJackknifeError();
-    std::cout << "\t\tBinder\t\tError" << std::endl;
-    std::cout << "JackEstimate:\t" << scientific << skewness << "\t" << error << std::endl;
+
+    return EstimateAndError(skewness, error);
 }
+
+class SkewnessAnalyzer : public AnalyzerWrapper
+{
+public:
+	SkewnessAnalyzer(std::string & file, int & numberOfBins):
+		AnalyzerWrapper("Skewness")
+	{
+	    DataSampleAnalyzer sample(file);
+
+	    //todo: replace with dedicated function
+	    estimateAndError = calcSkewness(sample, numberOfBins);
+	}
+};
+
+class KurtosisAnalyzer : public AnalyzerWrapper
+{
+public:
+	KurtosisAnalyzer(std::string & file, int & numberOfBins):
+		AnalyzerWrapper("Kurtosis")
+	{
+	    DataSampleAnalyzer sample(file);
+
+	    //todo: replace with dedicated function
+	    estimateAndError = calcKurtosis(sample, numberOfBins);
+	}
+};
+
+class AutocorrelationAnalyzer : public AnalyzerWrapper
+{
+public:
+	AutocorrelationAnalyzer(std::string & file):
+		AnalyzerWrapper("Autocorrelation")
+	{
+		throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
+	}
+};
 
 class dataAnalyzer
 {
@@ -108,7 +139,7 @@ public:
 	{
 		if (params.calcAutocorrelation)
 		{
-			calcAutocorrelation(params.file);
+			AutocorrelationAnalyzer(params.file);
 		}
 	    if(params.analyseMean)
 	    {
@@ -120,11 +151,11 @@ public:
 	    }
 	    if(params.analyseSkewness)
 	    {
-	        calcSkewness(params.file, params.numberOfBins);
+	        SkewnessAnalyzer(params.file, params.numberOfBins);
 	    }
 	    if(params.analyseKurtosis)
 	    {
-	        calcKurtosis(params.file, params.numberOfBins);
+	        KurtosisAnalyzer(params.file, params.numberOfBins);
 	    }
 	};
 
