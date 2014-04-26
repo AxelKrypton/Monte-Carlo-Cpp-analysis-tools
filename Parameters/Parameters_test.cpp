@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_SUITE(build)
 	{
 		int numberOfArguments = 1;
 		char * argumentWithoutFile[] = {"foo"};
-		BOOST_REQUIRE_THROW(parameters params(numberOfArguments, argumentWithoutFile), std::invalid_argument );
+		BOOST_REQUIRE_THROW(Parameters params(numberOfArguments, argumentWithoutFile), std::invalid_argument );
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

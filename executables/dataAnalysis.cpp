@@ -4,15 +4,15 @@ int main(int argc, char ** argv)
 {
 	try
 	{
-		parameters params(argc, argv);
-	    DatafileAnalyzer analyzer(params.file, params);
+		Parameters parameters(argc, argv);
+	    DatafileAnalyzer analyzer(parameters.file, parameters);
 	}
 	//todo: move catch block into own function?
 	catch ( const std::exception &e)
 	{
 		std::cout << e.what() << std::endl;
 	}
-	catch(parameters::parse_aborted)
+	catch(Parameters::parse_aborted)
 	{
 		//do nothing in this case...
 	}

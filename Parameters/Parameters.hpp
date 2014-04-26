@@ -1,17 +1,13 @@
 #ifndef PARAMETERS_HPP_
 #define PARAMETERS_HPP_
 
-#include <boost/program_options.hpp>
-#include <boost/algorithm/string.hpp>
-namespace po = boost::program_options;
+#include "iostream"
 
-//todo: remove this again
-using namespace std;
-
-//todo: rename to Parameters
-class parameters
+class Parameters
 {
 public:
+	Parameters(int argc, char ** argv);
+
 	struct parse_aborted {};
 	int binsize;
 	int numberOfBins;
@@ -23,12 +19,11 @@ public:
 	bool analyseVariance;
 	bool analyseSkewness;
 	bool analyseKurtosis;
-	std::string defaultFile;
-
-	parameters(int argc, char ** argv);
 
 private:
 	void printParameters();
+
+	std::string defaultFile;
 };
 
 #endif /* PARAMETERS_HPP_ */

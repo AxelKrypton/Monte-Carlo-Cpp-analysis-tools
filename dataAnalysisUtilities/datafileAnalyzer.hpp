@@ -25,7 +25,7 @@ protected:
 	~AnalyzerWrapper()
 	{
 	    std::cout << "# " << estimateName << "\t\tError" << std::endl;
-	    std::cout << scientific << estimateAndError.estimate << "\t" << estimateAndError.error << std::endl;
+	    std::cout << std::scientific << estimateAndError.estimate << "\t" << estimateAndError.error << std::endl;
 	}
 
 	std::string estimateName;
@@ -36,45 +36,45 @@ protected:
 class MeanAnalyzer : public AnalyzerWrapper
 {
 public:
-	MeanAnalyzer(DataSampleAnalyzer &sample, const parameters params):
+	MeanAnalyzer(DataSampleAnalyzer &sample, const Parameters parameters):
 		AnalyzerWrapper("Mean")
 	{
-	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(sample, params.numberOfBins);
+	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(sample, parameters.numberOfBins);
 	}
 };
 
 class VarianceAnalyzer : public AnalyzerWrapper
 {
 public:
-	VarianceAnalyzer(DataSampleAnalyzer &sample, const parameters params):
+	VarianceAnalyzer(DataSampleAnalyzer &sample, const Parameters parameters):
 		AnalyzerWrapper("Variance")
 	{
 	    DataSampleAnalyzer varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
 
 	    //todo: replace with dedicated function
-	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(varianceSample, params.numberOfBins);
+	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(varianceSample, parameters.numberOfBins);
 	}
 };
 
 class SkewnessAnalyzer : public AnalyzerWrapper
 {
 public:
-	SkewnessAnalyzer(DataSampleAnalyzer &sample, const parameters params):
+	SkewnessAnalyzer(DataSampleAnalyzer &sample, const Parameters parameters):
 		AnalyzerWrapper("Skewness")
 	{
 		//todo: replace with dedicated function
-	    estimateAndError = calcSkewness(sample, params.numberOfBins);
+	    estimateAndError = calcSkewness(sample, parameters.numberOfBins);
 	}
 };
 
 class KurtosisAnalyzer : public AnalyzerWrapper
 {
 public:
-	KurtosisAnalyzer(DataSampleAnalyzer &sample, const parameters params):
+	KurtosisAnalyzer(DataSampleAnalyzer &sample, const Parameters parameters):
 		AnalyzerWrapper("Kurtosis")
 	{
 	    //todo: replace with dedicated function
-	    estimateAndError = calcKurtosis(sample, params.numberOfBins);
+	    estimateAndError = calcKurtosis(sample, parameters.numberOfBins);
 	}
 };
 
@@ -92,45 +92,45 @@ public:
 class dataAnalyzer
 {
 public:
-	dataAnalyzer(DataSampleAnalyzer &sample, parameters paramsIn):
-		params(paramsIn)
+	dataAnalyzer(DataSampleAnalyzer &sample, Parameters parametersIn):
+		parameters(parametersIn)
 	{
-		if (params.calcAutocorrelation)
+		if (parameters.calcAutocorrelation)
 		{
 			//I dont know why I need a name for the object here and not below
 			//If I do not have that, I get a compiler error that AutocorrelationAnalyzer() is called!
 			AutocorrelationAnalyzer tmp(sample);
 		}
-	    if(params.analyseMean)
+	    if(parameters.analyseMean)
 	    {
-	        MeanAnalyzer(sample, paramsIn);
+	        MeanAnalyzer(sample, parameters);
 	    }
-	    if(params.analyseVariance)
+	    if(parameters.analyseVariance)
 	    {
-	        VarianceAnalyzer(sample, paramsIn);
+	        VarianceAnalyzer(sample, parameters);
 	    }
-	    if(params.analyseSkewness)
+	    if(parameters.analyseSkewness)
 	    {
-	        SkewnessAnalyzer(sample, paramsIn);
+	        SkewnessAnalyzer(sample, parameters);
 	    }
-	    if(params.analyseKurtosis)
+	    if(parameters.analyseKurtosis)
 	    {
-	        KurtosisAnalyzer(sample, paramsIn);
+	        KurtosisAnalyzer(sample, parameters);
 	    }
 	};
 
 private:
-	parameters params;
+	Parameters parameters;
 };
 
 class DatafileAnalyzer
 {
 public:
-	DatafileAnalyzer(std::string filename, parameters params)
+	DatafileAnalyzer(std::string filename, Parameters parameters)
 	{
 		//todo: move binning here
 		DataSampleAnalyzer dataSample(filename);
-		dataAnalyzer analyzer(dataSample, params);
+		dataAnalyzer analyzer(dataSample, parameters);
 	}
 };
 

@@ -1,6 +1,13 @@
 #include "Parameters.hpp"
 
-parameters::parameters(int argc, char ** argv)
+#include <boost/program_options.hpp>
+#include <boost/algorithm/string.hpp>
+namespace po = boost::program_options;
+
+//todo: remove this again
+using namespace std;
+
+Parameters::Parameters(int argc, char ** argv)
 {
 	defaultFile = "";
 
@@ -28,7 +35,7 @@ parameters::parameters(int argc, char ** argv)
 
 	if(vm.count("help")) { // see http://stackoverflow.com/questions/5395503/required-and-optional-arguments-using-boost-library-program-options as to why this is done before po::notifiy(vm)
 		std::cout << desc << '\n';
-		throw parameters::parse_aborted();
+		throw Parameters::parse_aborted();
 	}
 
 	po::notify(vm);
@@ -40,7 +47,7 @@ parameters::parameters(int argc, char ** argv)
 	}
 }
 
-void parameters::printParameters()
+void Parameters::printParameters()
 {
 	cout << "###############################" << endl;
 	cout << "Options:" << endl;
