@@ -1,12 +1,12 @@
 /*
- * dataAnalyzer.hpp
- *
- *  Created on: Apr 26, 2014
- *      Author: christopher
+ * datafileAnalyser.hpp
+ * Functionality to analyze a given datafile.
+ * No direct tests are implemented as all classes rely
+ * on functionality of other classes.
  */
 
-#ifndef DATAANALYZER_HPP_
-#define DATAANALYZER_HPP_
+#ifndef DATAFILEANALYZER_HPP_
+#define DATAFILEANALYZER_HPP_
 
 //todo: move to own directory
 #include "../executables/parameters.hpp"
@@ -86,10 +86,10 @@ public:
 		AnalyzerWrapper("Autocorrelation")
 	{
 		throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
-
 	}
 };
 
+//todo: rename to fileAnalyzer and create the dataSample object in here!
 class dataAnalyzer
 {
 public:
@@ -124,6 +124,15 @@ private:
 	parameters params;
 };
 
+class DatafileAnalyzer
+{
+public:
+	DatafileAnalyzer(std::string filename, parameters params)
+	{
+		//todo: move binning here
+		DataSampleAnalyzer dataSample(filename);
+		dataAnalyzer analyzer(dataSample, params);
+	}
+};
 
-
-#endif /* DATAANALYZER_HPP_ */
+#endif /* DATAFILEANALYZER_HPP_ */

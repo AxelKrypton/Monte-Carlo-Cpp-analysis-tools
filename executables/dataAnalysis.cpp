@@ -1,13 +1,11 @@
-#include "../dataAnalysisUtilities/dataAnalyzer.hpp"
+#include "../dataAnalysisUtilities/datafileAnalyzer.hpp"
 
 int main(int argc, char ** argv)
 {
 	try
 	{
 		parameters params(argc, argv);
-		//todo: move binning here?
-		DataSampleAnalyzer dataSample(params.file);
-	    dataAnalyzer analyzer(dataSample, params);
+	    DatafileAnalyzer analyzer(params.file, params);
 	}
 	//todo: move catch block into own function?
 	catch ( const std::exception &e)
