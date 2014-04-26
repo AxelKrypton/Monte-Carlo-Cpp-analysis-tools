@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "binnedDataSample.hpp"
+#include "../Parameters/Parameters.hpp"
 
 class EstimateAndError
 {
@@ -162,6 +163,12 @@ static EstimateAndError calcKurtosis(DataSample sample, int numberOfBins)
     double error = kurtosisSample.getJackknifeError();
 
     return EstimateAndError(skewness, error);
+}
+
+//todo: implement
+static EstimateAndError calcAutocorrelation(DataSample sample, Parameters parameters)
+{
+	throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
 }
 
 #endif /* DATAANALYSISUTILITIES_HPP_ */

@@ -77,10 +77,10 @@ public:
 class AutocorrelationAnalyzer : public AnalyzerWrapper
 {
 public:
-	AutocorrelationAnalyzer(DataSample &sample):
+	AutocorrelationAnalyzer(DataSample &sample, Parameters parameters):
 		AnalyzerWrapper("Autocorrelation")
 	{
-		throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
+		estimateAndError = calcAutocorrelation(sample, parameters);
 	}
 };
 
@@ -92,9 +92,7 @@ public:
 	{
 		if (parameters.calcAutocorrelation)
 		{
-			//I dont know why I need a name for the object here and not below
-			//If I do not have that, I get a compiler error that AutocorrelationAnalyzer() is called!
-			AutocorrelationAnalyzer tmp(sample);
+			AutocorrelationAnalyzer(sample, parameters);
 		}
 	    if(parameters.analyzeMean)
 	    {
