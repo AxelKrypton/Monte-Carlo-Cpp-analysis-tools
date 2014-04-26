@@ -94,7 +94,6 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(analyzeKurtosis_default, createParametersForDefaultCheck().analyzeKurtosis);
 	}
 
-
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(setArguments)
@@ -120,16 +119,6 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 
 		BOOST_CHECK(filename == parameters.file);
 	}
-
-//int binsize;
-//int numberOfBins;
-//int offset;
-//bool useBinning;
-//bool calcAutocorrelation;
-//bool analyzeMean;
-//bool analyzeVariance;
-//bool analyzeSkewness;
-//bool analyzeKurtosis;
 
 	static Parameters createParametersForArgumentSettingCheck_longOption(std::string argumentName, int newValue)
 	{
@@ -189,6 +178,103 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).offset);
 	}
 
+	static Parameters createParametersForArgumentSettingCheck_implicitOption(std::string argumentName)
+	{
+		std::string argument = argumentName;
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+		return Parameters(numberOfArguments, arguments);
+	}
+
+	BOOST_AUTO_TEST_CASE(binning1)
+	{
+		bool newValue = false;
+		std::string argumentName = "--useBinning";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).useBinning);
+	}
+
+	BOOST_AUTO_TEST_CASE(binning2)
+	{
+		bool newValue = false;
+		std::string argumentName = "--useBinning";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).useBinning);
+	}
+
+	BOOST_AUTO_TEST_CASE(calcAutocorrelation1)
+	{
+		bool newValue = true;
+		std::string argumentName = "--calcAutocorrelation";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).calcAutocorrelation);
+	}
+
+	BOOST_AUTO_TEST_CASE(calcAutocorrelation2)
+	{
+		bool newValue = true;
+		std::string argumentName = "--calcAutocorrelation";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).calcAutocorrelation);
+	}
+
+	BOOST_AUTO_TEST_CASE(calcAutocorrelation3)
+	{
+		bool newValue = true;
+		std::string argumentName = "-a";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).calcAutocorrelation);
+	}
+
+	BOOST_AUTO_TEST_CASE(analyzeMean1)
+	{
+		bool newValue = true;
+		std::string argumentName = "--analyzeMean";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).analyzeMean);
+	}
+
+	BOOST_AUTO_TEST_CASE(analyzeMean2)
+	{
+		bool newValue = false;
+		std::string argumentName = "--analyzeMean";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).analyzeMean);
+	}
+
+	BOOST_AUTO_TEST_CASE(analyzeVariance1)
+	{
+		bool newValue = true;
+		std::string argumentName = "--analyzeVariance";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).analyzeVariance);
+	}
+
+	BOOST_AUTO_TEST_CASE(analyzeVariance2)
+	{
+		bool newValue = false;
+		std::string argumentName = "--analyzeVariance";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).analyzeVariance);
+	}
+
+	BOOST_AUTO_TEST_CASE(analyzeSkewness1)
+	{
+		bool newValue = true;
+		std::string argumentName = "--analyzeSkewness";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).analyzeSkewness);
+	}
+
+	BOOST_AUTO_TEST_CASE(analyzeSkewness2)
+	{
+		bool newValue = false;
+		std::string argumentName = "--analyzeSkewness";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).analyzeSkewness);
+	}
+
+	BOOST_AUTO_TEST_CASE(analyzeKurtosis1)
+	{
+		bool newValue = true;
+		std::string argumentName = "--analyzeKurtosis";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).analyzeKurtosis);
+	}
+
+	BOOST_AUTO_TEST_CASE(analyzeKurtosis2)
+	{
+		bool newValue = false;
+		std::string argumentName = "--analyzeKurtosis";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).analyzeKurtosis);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
-
-
