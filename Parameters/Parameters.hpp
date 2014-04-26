@@ -14,6 +14,7 @@ public:
 	int numberOfBins;
 	int offset;
 	bool useBinning;
+	bool useNumberOfBinsForBinning;
 	bool calcAutocorrelation;
 	bool analyzeMean;
 	bool analyzeVariance;
@@ -22,6 +23,7 @@ public:
 
 private:
 	void printParameters();
+	void setBinningTypeParameter(bool valueIn);
 };
 
 #endif /* PARAMETERS_HPP_ */

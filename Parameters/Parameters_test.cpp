@@ -85,6 +85,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(useBinning_default, createParametersForDefaultCheck().useBinning);
 	}
 
+	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning)
+	{
+		bool defaultValue = true;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().useNumberOfBinsForBinning);
+	}
+
 	BOOST_AUTO_TEST_CASE(calcAutocorrelation)
 	{
 		bool calcAutocorrelation_default = false;
