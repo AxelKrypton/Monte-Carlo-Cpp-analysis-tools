@@ -7,7 +7,7 @@ namespace po = boost::program_options;
 //todo: remove this again
 using namespace std;
 
-Parameters::Parameters(int argc, char ** argv)
+Parameters::Parameters(int argc, const char ** argv)
 {
 	defaultFile = "";
 

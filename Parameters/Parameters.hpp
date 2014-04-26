@@ -6,15 +6,15 @@
 class Parameters
 {
 public:
-	Parameters(int argc, char ** argv);
+	Parameters(int argc, const char ** argv);
 
 	struct parse_aborted {};
+	std::string file;
 	int binsize;
 	int numberOfBins;
+	int offset;
 	bool useBinning;
 	bool calcAutocorrelation;
-	int offset;
-	std::string file;
 	bool analyseMean;
 	bool analyseVariance;
 	bool analyseSkewness;
