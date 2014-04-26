@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 	{
 		DataSample sample(file);
 		DataSample varSample = (sample - sample.getNthMoment(1) )^2;
-		DataSample binnedSample = varSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+		BinnedDataSampleFromNumberOfBins binnedSample (varSample, numberOfBins);
 		JackknifeEstimatorsFromBinnedDataSample jackSample(binnedSample);
 		BOOST_CHECK_CLOSE(jackSample.getJackknifeError(), expectedValue, testPrecision);
 	}
@@ -380,7 +380,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsExplicitAgainstCombinedMethod)
 		DataSample sample(fileThatDoesExist);
 		DataSample varSample = ( sample - sample.getNthMoment(1))^2;
 		JackknifeEstimatorsFromBinningWithNumberOfBins jackSample1(varSample, numberOfBins);
-		DataSampleBasic binnedSample = varSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+		BinnedDataSampleFromNumberOfBins binnedSample(varSample, numberOfBins);
 		JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample);
 
 		double varianceError1 = jackSample1.getJackknifeError();
@@ -397,7 +397,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsExplicitAgainstCombinedMethod)
 		DataSample sample(fileThatDoesExist);
 		DataSample varSample = ( sample - sample.getNthMoment(1))^2;
 		JackknifeEstimatorsFromBinningWithBinsize jackSample1(varSample, binsize);
-		DataSampleBasic binnedSample = varSample.createBinnedDataSampleWithBinsize(binsize);
+		BinnedDataSampleFromBinsize binnedSample (varSample, binsize);
 		JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample);
 
 		double varianceError1 = jackSample1.getJackknifeError();

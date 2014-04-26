@@ -1,5 +1,29 @@
 #include "jackknifeEstimators.hpp"
 
+//todo: the following fcts. are just copied here during refactoring!
+
+void checkDiscardedElements(int valueIn, std::string descriptionIn, int numberOfElements)
+{
+	int discardedElements = numberOfElements % valueIn;
+	if (discardedElements != 0)
+	{
+		std::cout << "Warning: " << descriptionIn << " is not a multiple of numberOfElements!" << std::endl;
+		std::cout << discardedElements<< " elements are discarded!" << std::endl;
+	}
+}
+
+int calcBinsize(int numberOfBins, int numberOfElements)
+{
+	checkDiscardedElements(numberOfBins, "numberOfBins", numberOfElements);
+	return numberOfElements / numberOfBins;
+}
+
+int calcNumberOfBins(int binsize, int numberOfElements)
+{
+	checkDiscardedElements(binsize, "binsize", numberOfElements);
+	return numberOfElements / binsize;
+}
+
 double JackknifeEstimators::getJackknifeVariance()
 {
 	DataSample tmp ( (*this - getNthMoment(1) )^( (double(2)) )  );
@@ -75,7 +99,7 @@ JackknifeEstimatorsFromBinningWithNumberOfBins::JackknifeEstimatorsFromBinningWi
 	JackknifeEstimators(sampleIn)
 {
 	checkIfJackknifeCanBePerformed(numberOfBins);
-	int binsize = calcBinsize(numberOfBins);
+	int binsize = calcBinsize(numberOfBins, sampleIn.getNumberOfElements());
 	setValues( createJackknifeEstimatorsWithBinning(numberOfBins, binsize) );
 }
 
@@ -83,7 +107,7 @@ JackknifeEstimatorsFromBinningWithBinsize::JackknifeEstimatorsFromBinningWithBin
 	JackknifeEstimators(sampleIn)
 {
 	checkIfJackknifeCanBePerformedWithBinsize(binsize);
-	int numberOfBins = calcBinsize(binsize);
+	int numberOfBins = calcBinsize(binsize, sampleIn.getNumberOfElements());
 	setValues( createJackknifeEstimatorsWithBinning(numberOfBins, binsize) );
 }
 

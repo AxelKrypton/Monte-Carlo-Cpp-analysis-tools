@@ -22,8 +22,6 @@ public:
 	double value;
 };
 
-//todo: remove all binning functionality, this is at the moment interlinked with the jackknife estimator class
-
 class DataSample: public DataSampleBasic
 {
 public:
@@ -53,22 +51,11 @@ public:
 
 	double getNthCentralMoment(int n);
 	double getNthMoment(int n);
-	DataSampleBasic createBinnedDataSampleWithNumberOfBins(int numberOfBins);
-	DataSampleBasic createBinnedDataSampleWithBinsize(int binsize);
 	int getUpperLimitForNthMoment();
 	int getLowerLimitForNthMoment();
 
 protected:
-	/**
-	 * Binning.
-	 * Following B.A. Berg,
-	 * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
-	 * p.52.
-	 */
-	DataSampleBasic performBinning(int numberOfBins, int binsize);
 	int getNumberOfMoments();
-	int calcBinsize(int numberOfBins);
-	int calcNumberOfBins(int binsize);
 	void initMoments();
 	double calcNthMoment(int n);
 	double calcNthMomentExplicit(int n);
@@ -76,10 +63,6 @@ protected:
 	double calcNthCentralMomentExplicit(int n);
 	double calcFirstMomentExplicit();
 	void checkIfNIsValid(int n);
-	void checkIfNumberOfBinsIsValid(int numberOfBins);
-	void checkIfBinsizeIsValid(int binsize);
-	void checkDiscardedElements(int valueIn, std::string descriptionIn);
-	void checkIfBinningParameterIsValid(int valueIn, std::string descriptionIn);
 
 	std::vector<Moment> moments;
 	std::vector<Moment> centralMoments;

@@ -8,7 +8,7 @@
 #ifndef JACKKNIFEESTIMATORS_HPP_
 #define JACKKNIFEESTIMATORS_HPP_
 
-#include "DataSample.hpp"
+#include "binnedDataSample.hpp"
 #include <iostream>
 
 //todo: add fcts. for mean and error
