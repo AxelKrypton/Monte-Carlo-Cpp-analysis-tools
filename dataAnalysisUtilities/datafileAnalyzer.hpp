@@ -121,8 +121,7 @@ class DatafileAnalyzer
 public:
 	DatafileAnalyzer(std::string filename, Parameters parameters)
 	{
-		//todo: move binning here
-		DataSample dataSample(filename);
+		DataSample dataSample = createDataSampleFromDatafile(filename, parameters);
 		DataSampleAnalyzer analyzer(dataSample, parameters);
 	}
 };

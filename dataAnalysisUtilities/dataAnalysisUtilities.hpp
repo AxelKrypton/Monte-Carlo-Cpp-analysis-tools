@@ -171,4 +171,17 @@ EstimateAndError calcAutocorrelation(DataSample sample, Parameters parameters)
 	throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
 }
 
+DataSample createDataSampleFromDatafile(std::string filename, Parameters parameters)
+{
+	DataSample dataSample(filename);
+	if ( parameters.useBinning)
+	{
+		return BinnedDataSampleFromNumberOfBins(dataSample, parameters.numberOfBins);
+	}
+	else
+	{
+		return dataSample;
+	}
+}
+
 #endif /* DATAANALYSISUTILITIES_HPP_ */

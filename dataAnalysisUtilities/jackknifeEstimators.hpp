@@ -44,6 +44,8 @@ protected:
 	DataSampleBasic createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize);
 };
 
+//todo: this is based on the jackknife prescription from Berg and needs to be changed!
+//todo: or perhaps only use these for mean and variance?
 class JackknifeEstimatorsFromBinnedDataSample: public JackknifeEstimators
 {
 public:

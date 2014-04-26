@@ -238,3 +238,29 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
+
+	BOOST_AUTO_TEST_CASE(noBinning)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		double elementsInFile = 1005.;
+		const char * arguments[] = {"foo", "foo", "--useBinning"};
+		Parameters parameters(3, arguments);
+		DataSample tmp = createDataSampleFromDatafile(fileThatDoesExist, parameters);
+		BOOST_CHECK_EQUAL(elementsInFile, tmp.getNumberOfElements());
+	}
+
+	BOOST_AUTO_TEST_CASE(binning)
+	{
+		std::string fileThatDoesExist = "datafile.example";
+		double elementsInFile = 1005.;
+		const char * arguments[] = {"foo", "foo"};
+		Parameters parameters(2, arguments);
+
+		int expectedNumberOfElements = parameters.numberOfBins;
+		DataSample tmp = createDataSampleFromDatafile(fileThatDoesExist, parameters);
+		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getNumberOfElements());
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
