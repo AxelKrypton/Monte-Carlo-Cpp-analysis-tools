@@ -35,7 +35,7 @@ protected:
 class MeanAnalyzer : public AnalyzerWrapper
 {
 public:
-	MeanAnalyzer(DataSampleAnalyzer &sample, const Parameters parameters):
+	MeanAnalyzer(DataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Mean")
 	{
 	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(sample, parameters.numberOfBins);
@@ -45,10 +45,10 @@ public:
 class VarianceAnalyzer : public AnalyzerWrapper
 {
 public:
-	VarianceAnalyzer(DataSampleAnalyzer &sample, const Parameters parameters):
+	VarianceAnalyzer(DataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Variance")
 	{
-	    DataSampleAnalyzer varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
+	    DataSample varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
 
 	    //todo: replace with dedicated function
 	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(varianceSample, parameters.numberOfBins);
@@ -58,7 +58,7 @@ public:
 class SkewnessAnalyzer : public AnalyzerWrapper
 {
 public:
-	SkewnessAnalyzer(DataSampleAnalyzer &sample, const Parameters parameters):
+	SkewnessAnalyzer(DataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Skewness")
 	{
 		//todo: replace with dedicated function
@@ -69,7 +69,7 @@ public:
 class KurtosisAnalyzer : public AnalyzerWrapper
 {
 public:
-	KurtosisAnalyzer(DataSampleAnalyzer &sample, const Parameters parameters):
+	KurtosisAnalyzer(DataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Kurtosis")
 	{
 	    //todo: replace with dedicated function
@@ -80,7 +80,7 @@ public:
 class AutocorrelationAnalyzer : public AnalyzerWrapper
 {
 public:
-	AutocorrelationAnalyzer(DataSampleAnalyzer &sample):
+	AutocorrelationAnalyzer(DataSample &sample):
 		AnalyzerWrapper("Autocorrelation")
 	{
 		throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
@@ -91,7 +91,7 @@ public:
 class dataAnalyzer
 {
 public:
-	dataAnalyzer(DataSampleAnalyzer &sample, Parameters parametersIn):
+	dataAnalyzer(DataSample &sample, Parameters parametersIn):
 		parameters(parametersIn)
 	{
 		if (parameters.calcAutocorrelation)
@@ -128,7 +128,7 @@ public:
 	DatafileAnalyzer(std::string filename, Parameters parameters)
 	{
 		//todo: move binning here
-		DataSampleAnalyzer dataSample(filename);
+		DataSample dataSample(filename);
 		dataAnalyzer analyzer(dataSample, parameters);
 	}
 };

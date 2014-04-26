@@ -3,7 +3,7 @@
 #define BOOST_TEST_MODULE dataSample
 #include <boost/test/unit_test.hpp>
 
-#include "dataSampleAnalyzer.hpp"
+#include "DataSample.hpp"
 
 #include "TestDataSample.hpp"
 
@@ -271,28 +271,28 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 
 	BOOST_AUTO_TEST_CASE(getNthMomentValidArgument1)
 	{
-		DataSampleAnalyzer dataSampleInstance;
+		DataSample dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(highestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentValidArgument2)
 	{
-		DataSampleAnalyzer dataSampleInstance;
+		DataSample dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument1)
 	{
-		DataSampleAnalyzer dataSampleInstance;
+		DataSample dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(highestValueAllowed + 1), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument2)
 	{
-		DataSampleAnalyzer dataSampleInstance;
+		DataSample dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed - 1), std::invalid_argument);
 	}
@@ -303,28 +303,28 @@ BOOST_AUTO_TEST_SUITE(getNthCentralMoment)
 
 	BOOST_AUTO_TEST_CASE(getNthCentralMomentValidArgument1)
 	{
-		DataSampleAnalyzer dataSampleInstance;
+		DataSample dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthCentralMoment(highestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthCentralMomentValidArgument2)
 	{
-		DataSampleAnalyzer dataSampleInstance;
+		DataSample dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthCentralMoment(lowestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthCentralMomentInvalidArgument1)
 	{
-		DataSampleAnalyzer dataSampleInstance;
+		DataSample dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthCentralMoment(highestValueAllowed + 1), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthCentralMomentInvalidArgument2)
 	{
-		DataSampleAnalyzer dataSampleInstance;
+		DataSample dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthCentralMoment(lowestValueAllowed - 1), std::invalid_argument);
 	}

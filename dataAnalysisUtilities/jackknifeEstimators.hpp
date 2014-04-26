@@ -8,25 +8,25 @@
 #ifndef JACKKNIFEESTIMATORS_HPP_
 #define JACKKNIFEESTIMATORS_HPP_
 
-#include "dataSampleAnalyzer.hpp"
+#include "DataSample.hpp"
 #include <iostream>
 
 //todo: add fcts. for mean and error
 //todo: overload constructor to add function
-class JackknifeEstimators: public DataSampleAnalyzer
+class JackknifeEstimators: public DataSample
 {
 public:
 
 	JackknifeEstimators(int numberOfElementsIn) :
-		DataSampleAnalyzer(numberOfElementsIn)
+		DataSample(numberOfElementsIn)
 	{
 		checkIfJackknifeCanBePerformed(numberOfElements);
 		DataSampleBasic tmp = calculatePseudoValues();
 		setValues(tmp);
 	};
 
-	JackknifeEstimators(DataSampleAnalyzer sampleIn) :
-		DataSampleAnalyzer(sampleIn)
+	JackknifeEstimators(DataSample sampleIn) :
+		DataSample(sampleIn)
 	{
 		checkIfJackknifeCanBePerformed(numberOfElements);
 		DataSampleBasic tmp = calculatePseudoValues();
@@ -47,19 +47,19 @@ protected:
 class JackknifeEstimatorsFromBinnedDataSample: public JackknifeEstimators
 {
 public:
-	JackknifeEstimatorsFromBinnedDataSample(DataSampleAnalyzer sampleIn);
+	JackknifeEstimatorsFromBinnedDataSample(DataSample sampleIn);
 };
 
 class JackknifeEstimatorsFromBinningWithNumberOfBins: public JackknifeEstimators
 {
 public:
-	JackknifeEstimatorsFromBinningWithNumberOfBins(DataSampleAnalyzer sampleIn, int numberOfBins);
+	JackknifeEstimatorsFromBinningWithNumberOfBins(DataSample sampleIn, int numberOfBins);
 };
 
 class JackknifeEstimatorsFromBinningWithBinsize: public JackknifeEstimators
 {
 public:
-	JackknifeEstimatorsFromBinningWithBinsize(DataSampleAnalyzer sampleIn, int numberOfBins);
+	JackknifeEstimatorsFromBinningWithBinsize(DataSample sampleIn, int numberOfBins);
 private:
 	void checkIfJackknifeCanBePerformedWithBinsize(int binsize);
 };

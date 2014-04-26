@@ -15,7 +15,7 @@ public:
 		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent), fillType(fillType)
 	{
 	  std::valarray<double> * testValues = initDataSampleBasedOnFillType(length);
-	  dataSampleInstance = new DataSampleAnalyzer(*testValues);
+	  dataSampleInstance = new DataSample(*testValues);
 	  delete testValues;
 	  actualValue = 0.;
 	}
@@ -24,7 +24,7 @@ public:
 		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
 	{
 		actualValue = 0.;
-		dataSampleInstance = new DataSampleAnalyzer(dataFilename, column, offset);
+		dataSampleInstance = new DataSample(dataFilename, column, offset);
 	}
 
 	~TestDataSample()
@@ -38,7 +38,7 @@ public:
 		return dataSampleInstance->getNumberOfElements();
 	}
 
-	DataSampleAnalyzer* getDataSample()
+	DataSample* getDataSample()
 	{
 		return dataSampleInstance;
 	}
@@ -81,7 +81,7 @@ protected:
 		  }
 	}
 
-	DataSampleAnalyzer * dataSampleInstance;
+	DataSample * dataSampleInstance;
 	double referenceValue;
 	double actualValue;
 	double testPrecision;

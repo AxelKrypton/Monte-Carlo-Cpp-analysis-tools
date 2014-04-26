@@ -6,7 +6,7 @@ DataSampleBasic BinnedDataSample::performBinning(DataSampleBasic sampleIn)
 	DataSampleBasic binnedDataSample(numberOfBins);
 	for(int iteration = 0; iteration < numberOfBins; iteration++)
 	{
-		binnedDataSample[iteration] = DataSampleAnalyzer(sampleIn.sampleSlice(iteration*binsize, binsize, 1)).getNthMoment(1);
+		binnedDataSample[iteration] = DataSample(sampleIn.sampleSlice(iteration*binsize, binsize, 1)).getNthMoment(1);
 	}
 	return binnedDataSample;
 }

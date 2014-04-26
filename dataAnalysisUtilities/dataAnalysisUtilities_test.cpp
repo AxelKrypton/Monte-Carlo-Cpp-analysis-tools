@@ -9,7 +9,7 @@
 
 BOOST_AUTO_TEST_SUITE(meanAndError)
 
-	static void testMeanAndError(DataSampleAnalyzer * sample, double expectedMean, double expectedError)
+	static void testMeanAndError(DataSample * sample, double expectedMean, double expectedError)
 	{
 		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(*sample);
 		BOOST_CHECK_CLOSE(meanAndError.estimate, expectedMean, doublePrecisionInPercent);
@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 	BOOST_AUTO_TEST_CASE(test1)
 	{
 		int numberOfElements = 795;
-		DataSampleAnalyzer sample(numberOfElements);
+		DataSample sample(numberOfElements);
 
 		double expectedMean = 0.;
 		double expectedError = 0.;
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 	{
 		int numberOfElements = 1542;
 		TestDataSample testSample(numberOfElements, ones);
-		DataSampleAnalyzer* sample = testSample.getDataSample();
+		DataSample* sample = testSample.getDataSample();
 
 		double expectedMean = 1.;
 		double expectedError = 0.;
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 		testMeanAndError(sample, expectedMean, expectedError);
 	}
 
-	double expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSampleAnalyzer sample, int numberOfElements)
+	double expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
 	{
 		double secondMoment = sample.getNthMoment(2);
 		double firstMoment = sample.getNthMoment(1);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 	{
 		int numberOfElements = 795;
 		TestDataSample testSample(numberOfElements, arrayPosition);
-		DataSampleAnalyzer* sample = testSample.getDataSample();
+		DataSample* sample = testSample.getDataSample();
 
 		double expectedError = sqrt( expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(*sample, numberOfElements) );
 		double expectedMean = 0.5  * (numberOfElements - 1);
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 
 	static void checkMeanErrorWithBinsize(std::string file, int binsize, double expectedValue, double testPrecision)
 	{
-		DataSampleAnalyzer sample(file);
+		DataSample sample(file);
 		EstimateAndError meanAndError = calcMeanAndErrorOfDataSampleWithBinningFromBinsize(sample, binsize);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 
 	static void checkMeanErrorWithNumberOfBins(std::string file, int numberOfBins, double expectedValue, double testPrecision)
 	{
-		DataSampleAnalyzer sample(file);
+		DataSample sample(file);
 		EstimateAndError meanAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(sample, numberOfBins);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(varianceAndError)
 
-	double expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSampleAnalyzer sample, int numberOfElements)
+	double expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
 	{
 		double secondMoment = sample.getNthMoment(2);
 		double firstMoment = sample.getNthMoment(1);
@@ -167,14 +167,14 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 	{
 		int numberOfElements = 2674;
 		TestDataSample testSample(numberOfElements, arrayPosition);
-		DataSampleAnalyzer* sample = testSample.getDataSample();
+		DataSample* sample = testSample.getDataSample();
 		double expectedValue = expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(*sample, numberOfElements);
 
 		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(*sample);
 		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedValue, doublePrecisionInPercent);
 	}
 
-	static void testVarianceAndError(DataSampleAnalyzer * sample, double expectedVariance, double expectedError, double testPrecision)
+	static void testVarianceAndError(DataSample * sample, double expectedVariance, double expectedError, double testPrecision)
 	{
 		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(*sample);
 		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedVariance, testPrecision);
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 	BOOST_AUTO_TEST_CASE(test1)
 	{
 		int numberOfElements = 2674;
-		DataSampleAnalyzer sample(numberOfElements);
+		DataSample sample(numberOfElements);
 
 		double expectedMean = 0.;
 		double expectedError = 0.;
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 	{
 		int numberOfElements = 1542;
 		TestDataSample testSample(numberOfElements, ones);
-		DataSampleAnalyzer* sample = testSample.getDataSample();
+		DataSample* sample = testSample.getDataSample();
 
 		double expectedMean = 0.;
 		double expectedError = 0.;
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 	{
 		int numberOfElements = 2345;
 		TestDataSample testSample(numberOfElements, arrayPosition);
-		DataSampleAnalyzer* sample = testSample.getDataSample();
+		DataSample* sample = testSample.getDataSample();
 
 		double expectedVariance = 458447.5;
 		double expectedError = 8465.84748859;
@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		//the difference in the variance estimate exceeds 1e-10 a bit, most likely due to rounding errors.
 		precisionOfDataInFileInPercent *= 5.;
 
-		DataSampleAnalyzer sample(fileThatDoesExist);
+		DataSample sample(fileThatDoesExist);
 
 		testVarianceAndError(&sample, expectedVariance, expectedError, precisionOfDataInFileInPercent);
 }

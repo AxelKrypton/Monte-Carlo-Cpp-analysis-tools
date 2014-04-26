@@ -19,7 +19,7 @@ public:
 	double error;
 };
 
-static double meanOfDataSample(DataSampleAnalyzer sampleIn)
+static double meanOfDataSample(DataSample sampleIn)
 {
 	return sampleIn.getNthMoment(1);
 }
@@ -37,12 +37,12 @@ static double meanOfDataSample(DataSampleAnalyzer sampleIn)
  * Note that for the mean the unbiased variance yields
  * the same error as jackknifing.
  */
-static double unbiasedVarianceOfDataSample(DataSampleAnalyzer sampleIn)
+static double unbiasedVarianceOfDataSample(DataSample sampleIn)
 {
 	return double(sampleIn.getNumberOfElements()) / double(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthCentralMoment(2);
 }
 
-static double unbiasedVarianceOfMean(DataSampleAnalyzer sampleIn)
+static double unbiasedVarianceOfMean(DataSample sampleIn)
 {
 	return 1. / double(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthCentralMoment(2);
 }
@@ -50,7 +50,7 @@ static double unbiasedVarianceOfMean(DataSampleAnalyzer sampleIn)
 //todo: refactor: code duplication up to the actual sample used!
 EstimateAndError calcMeanAndErrorOfDataSample(DataSampleBasic sampleIn)
 {
-	DataSampleAnalyzer tmp(sampleIn);
+	DataSample tmp(sampleIn);
 	double mean;
 	double error;
 
@@ -84,7 +84,7 @@ EstimateAndError calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(DataSam
 	return EstimateAndError(mean, error);
 }
 
-static double unbiasedErrorOfVariance(DataSampleAnalyzer sampleIn)
+static double unbiasedErrorOfVariance(DataSample sampleIn)
 {
 	/**
 	 * A Jackknife analysis of the (naive) sample variance
@@ -98,18 +98,18 @@ static double unbiasedErrorOfVariance(DataSampleAnalyzer sampleIn)
 	 * the "variance" of entry x_j ( (x_j - mean)^2 ) and treat
 	 * it the same way as an error on a mean.
 	 */
-	DataSampleAnalyzer varianceSample = (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
+	DataSample varianceSample = (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
 	return sqrt( unbiasedVarianceOfMean(varianceSample) );
 }
 
 EstimateAndError calcVarianceAndErrorOfDataSample(DataSampleBasic sampleIn)
 {
-	DataSampleAnalyzer sample(sampleIn);
+	DataSample sample(sampleIn);
 	double variance;
 	double error;
 
 	variance = unbiasedVarianceOfDataSample(sample);
-	DataSampleAnalyzer varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
+	DataSample varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
 	error = unbiasedErrorOfVariance(sample);
 
 	return EstimateAndError(variance, error);
@@ -119,16 +119,16 @@ EstimateAndError calcVarianceAndErrorOfDataSample(DataSampleBasic sampleIn)
 #include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
 
 //todo: work over this
-static EstimateAndError calcSkewness(DataSampleAnalyzer sample, int numberOfBins)
+static EstimateAndError calcSkewness(DataSample sample, int numberOfBins)
 {
     /**
      * Skewness gamma_1 is defined as:
      *   gamma_1 = <(x-mu)^3> / <(x-mu)^2>^(3/2)
      */
-    DataSampleAnalyzer thirdCentralMoment = (sample - sample.getNthMoment(1)) ^ 3;
-    DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
-    DataSampleAnalyzer binnedSample1 = thirdCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-    DataSampleAnalyzer binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+    DataSample thirdCentralMoment = (sample - sample.getNthMoment(1)) ^ 3;
+    DataSample secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
+    DataSample binnedSample1 = thirdCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+    DataSample binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
     JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
     JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
     //this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
@@ -141,7 +141,7 @@ static EstimateAndError calcSkewness(DataSampleAnalyzer sample, int numberOfBins
 
 //todo: work over this
 //todo: repair: this is acutally binder, rename? print also kurtosis?
-static EstimateAndError calcKurtosis(DataSampleAnalyzer sample, int numberOfBins)
+static EstimateAndError calcKurtosis(DataSample sample, int numberOfBins)
 {
     /**
 		 * The Fourth Std. Moment beta_2 is defined as:
@@ -150,10 +150,10 @@ static EstimateAndError calcKurtosis(DataSampleAnalyzer sample, int numberOfBins
 		 * The Kurtosis gamma_2 is defined as:
 		 *   gamma_2 = beta_2 - 3
 		 */
-    DataSampleAnalyzer fourthCentralMoment = (sample - sample.getNthMoment(1)) ^ 4;
-    DataSampleAnalyzer secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
-    DataSampleAnalyzer binnedSample1 = fourthCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-    DataSampleAnalyzer binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+    DataSample fourthCentralMoment = (sample - sample.getNthMoment(1)) ^ 4;
+    DataSample secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
+    DataSample binnedSample1 = fourthCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+    DataSample binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
     JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
     JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
     //this calculates x_i / y_i^2, where x_i and y_i are the jackknife estimators of the fourth and second moment

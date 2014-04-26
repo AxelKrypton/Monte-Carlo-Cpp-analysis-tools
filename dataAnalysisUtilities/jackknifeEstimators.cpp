@@ -2,7 +2,7 @@
 
 double JackknifeEstimators::getJackknifeVariance()
 {
-	DataSampleAnalyzer tmp ( (*this - getNthMoment(1) )^( (double(2)) )  );
+	DataSample tmp ( (*this - getNthMoment(1) )^( (double(2)) )  );
 	return tmp.getNthMoment(1) * getJackknifeNormalization();
 }
 
@@ -33,7 +33,7 @@ DataSampleBasic JackknifeEstimators::calculatePseudoValues()
 	{
 		double value = 0;
 
-		DataSampleAnalyzer tmp2( removeIthElement(iteration) );
+		DataSample tmp2( removeIthElement(iteration) );
 		double mean2 = tmp2.getNthMoment(1);
 
 		//this is the correct line, with mean equal to f(X_[i])
@@ -63,7 +63,7 @@ DataSampleBasic JackknifeEstimators::createJackknifeEstimatorsWithBinning(int nu
 	return binnedDataSample;
 }
 
-JackknifeEstimatorsFromBinnedDataSample::JackknifeEstimatorsFromBinnedDataSample(DataSampleAnalyzer sampleIn) :
+JackknifeEstimatorsFromBinnedDataSample::JackknifeEstimatorsFromBinnedDataSample(DataSample sampleIn) :
 JackknifeEstimators(sampleIn)
 {
 	int normalization = getJackknifeNormalization();
@@ -71,7 +71,7 @@ JackknifeEstimators(sampleIn)
 	setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
 }
 
-JackknifeEstimatorsFromBinningWithNumberOfBins::JackknifeEstimatorsFromBinningWithNumberOfBins(DataSampleAnalyzer sampleIn, int numberOfBins) :
+JackknifeEstimatorsFromBinningWithNumberOfBins::JackknifeEstimatorsFromBinningWithNumberOfBins(DataSample sampleIn, int numberOfBins) :
 	JackknifeEstimators(sampleIn)
 {
 	checkIfJackknifeCanBePerformed(numberOfBins);
@@ -79,7 +79,7 @@ JackknifeEstimatorsFromBinningWithNumberOfBins::JackknifeEstimatorsFromBinningWi
 	setValues( createJackknifeEstimatorsWithBinning(numberOfBins, binsize) );
 }
 
-JackknifeEstimatorsFromBinningWithBinsize::JackknifeEstimatorsFromBinningWithBinsize(DataSampleAnalyzer sampleIn, int binsize) :
+JackknifeEstimatorsFromBinningWithBinsize::JackknifeEstimatorsFromBinningWithBinsize(DataSample sampleIn, int binsize) :
 	JackknifeEstimators(sampleIn)
 {
 	checkIfJackknifeCanBePerformedWithBinsize(binsize);

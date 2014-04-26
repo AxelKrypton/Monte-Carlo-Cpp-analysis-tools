@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_SUITE(withNumberOfBins_binning)
 		int numberOfElements = 27;
 		int desiredNumberOfElementsOfBinnedDataSample = numberOfElements;
 		TestDataSample testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
-		DataSampleAnalyzer* originalSample = testSample.getDataSample();
+		DataSample* originalSample = testSample.getDataSample();
 		BinnedDataSampleFromNumberOfBins binnedSample(*originalSample, desiredNumberOfElementsOfBinnedDataSample);
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(1), binnedSample.getNthMoment(1));
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_SUITE(withNumberOfBins_binning)
 	static void testBinningWithNumberOfBins(int numberOfElements, int numberOfBins, double expectedFirstMoment)
 	{
 		TestDataSample testSample(numberOfElements, arrayPosition);
-		DataSampleAnalyzer* originalSample = testSample.getDataSample();
+		DataSample* originalSample = testSample.getDataSample();
 		BinnedDataSampleFromNumberOfBins binnedSample(*originalSample, numberOfBins);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
 	}
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_SUITE(withBinsize_binning)
 		int numberOfElements = 25;
 		int desiredBinsize = 1;
 		TestDataSample testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
-		DataSampleAnalyzer* originalSample = testSample.getDataSample();
+		DataSample* originalSample = testSample.getDataSample();
 		BinnedDataSampleFromBinsize binnedSample(*originalSample, desiredBinsize);
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
 		BOOST_CHECK_EQUAL(originalSample->getNthMoment(2), binnedSample.getNthMoment(2));
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_SUITE(withBinsize_binning)
 	void testBinningWithBinsize(int numberOfElements, int binsize, double expectedFirstMoment)
 	{
 		TestDataSample testSample(numberOfElements, arrayPosition);
-		DataSampleAnalyzer* originalSample = testSample.getDataSample();
+		DataSample* originalSample = testSample.getDataSample();
 		BinnedDataSampleFromBinsize binnedSample (*originalSample, binsize);
 		BOOST_CHECK_EQUAL(expectedFirstMoment, binnedSample.getNthMoment(1));
 	}

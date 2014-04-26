@@ -24,28 +24,28 @@ public:
 
 //todo: remove all binning functionality, this is at the moment interlinked with the jackknife estimator class
 
-class DataSampleAnalyzer: public DataSampleBasic
+class DataSample: public DataSampleBasic
 {
 public:
-	DataSampleAnalyzer(DataSampleBasic sampleIn):
+	DataSample(DataSampleBasic sampleIn):
 		DataSampleBasic(sampleIn)
 	{
 		initMoments();
 	}
 
-	DataSampleAnalyzer(int length = defaultSizeOfDataSample):
+	DataSample(int length = defaultSizeOfDataSample):
 		DataSampleBasic(length)
 	{
 		initMoments();
 	}
 
-	DataSampleAnalyzer(std::valarray<double> valuesIn):
+	DataSample(std::valarray<double> valuesIn):
 		DataSampleBasic(valuesIn)
 	{
 		initMoments();
 	}
 
-	DataSampleAnalyzer(std::string dataFilename, int column = 1, int offset = 0):
+	DataSample(std::string dataFilename, int column = 1, int offset = 0):
 		DataSampleBasic(dataFilename, column, offset)
 	{
 		initMoments();

@@ -1,9 +1,9 @@
 #ifndef BINNEDDATASAMPLE_HPP_
 #define BINNEDDATASAMPLE_HPP_
 
-#include "dataSampleAnalyzer.hpp"
+#include "DataSample.hpp"
 
-class BinnedDataSample : public DataSampleAnalyzer
+class BinnedDataSample : public DataSample
 {
 protected:
 
