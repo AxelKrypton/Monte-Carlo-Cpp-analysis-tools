@@ -10,9 +10,6 @@
 #include "../Parameters/Parameters.hpp"
 #include "dataAnalysisUtilities.hpp"
 
-//todo: perhaps make a common sample object that is passed as pointer or call by reference to save memory allocation stuff
-//todo: naming is bad, one should have: dataAnalyzer -> DataSampleAnalyzer, DataSampleAnalyzer -> DataSample, DataSample -> DataSampleBasic or so!
-
 class AnalyzerWrapper
 {
 protected:
@@ -87,11 +84,10 @@ public:
 	}
 };
 
-//todo: rename to fileAnalyzer and create the dataSample object in here!
-class dataAnalyzer
+class DataSampleAnalyzer
 {
 public:
-	dataAnalyzer(DataSample &sample, Parameters parametersIn):
+	DataSampleAnalyzer(DataSample &sample, Parameters parametersIn):
 		parameters(parametersIn)
 	{
 		if (parameters.calcAutocorrelation)
@@ -129,7 +125,7 @@ public:
 	{
 		//todo: move binning here
 		DataSample dataSample(filename);
-		dataAnalyzer analyzer(dataSample, parameters);
+		DataSampleAnalyzer analyzer(dataSample, parameters);
 	}
 };
 
