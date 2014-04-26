@@ -47,6 +47,7 @@ static double unbiasedVarianceOfMean(DataSampleAnalyzer sampleIn)
 	return 1. / double(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthCentralMoment(2);
 }
 
+//todo: refactor: code duplication up to the actual sample used!
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample sampleIn)
 {
 	DataSampleAnalyzer tmp(sampleIn);
