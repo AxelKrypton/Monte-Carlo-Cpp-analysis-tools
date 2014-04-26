@@ -9,7 +9,7 @@ using namespace std;
 
 Parameters::Parameters(int argc, const char ** argv)
 {
-	defaultFile = "";
+	std::string defaultFile = "";
 
 	po::options_description desc("Generic options");
 	po::variables_map vm;
@@ -21,10 +21,10 @@ Parameters::Parameters(int argc, const char ** argv)
 					("help,h", "Produce this help message")
 					("datafile,f", po::value<std::string>(&file)->default_value(defaultFile), "File containing data")
 					("offset,o", po::value<int>(&offset)->default_value(0), "Discard first <offset> values of data")
-					("analyseMean", po::value<bool>(&analyseMean)->default_value(true), "Analyse data for mean")
-					("analyseVariance", po::value<bool>(&analyseVariance)->default_value(true), "Analyse data for variance")
-					("analyseSkewness", po::value<bool>(&analyseSkewness)->default_value(true), "Analyse data for skewness")
-					("analyseKurtosis", po::value<bool>(&analyseKurtosis)->default_value(true), "Analyse data for kurtosis/binder-cumulant")
+					("analyseMean", po::value<bool>(&analyzeMean)->default_value(true), "Analyse data for mean")
+					("analyseVariance", po::value<bool>(&analyzeVariance)->default_value(true), "Analyse data for variance")
+					("analyseSkewness", po::value<bool>(&analyzeSkewness)->default_value(true), "Analyse data for skewness")
+					("analyseKurtosis", po::value<bool>(&analyzeKurtosis)->default_value(true), "Analyse data for kurtosis/binder-cumulant")
 					("useBinning", po::value<bool>(&useBinning)->default_value(true), "Use binning on data")
 					("numberOfBins,nb", po::value<int>(&numberOfBins)->default_value(10), "Number of bins")
 					("binsize,bs", po::value<int>(&binsize)->default_value(100), "Size of bin")

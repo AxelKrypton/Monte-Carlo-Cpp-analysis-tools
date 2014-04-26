@@ -101,19 +101,19 @@ public:
 			//If I do not have that, I get a compiler error that AutocorrelationAnalyzer() is called!
 			AutocorrelationAnalyzer tmp(sample);
 		}
-	    if(parameters.analyseMean)
+	    if(parameters.analyzeMean)
 	    {
 	        MeanAnalyzer(sample, parameters);
 	    }
-	    if(parameters.analyseVariance)
+	    if(parameters.analyzeVariance)
 	    {
 	        VarianceAnalyzer(sample, parameters);
 	    }
-	    if(parameters.analyseSkewness)
+	    if(parameters.analyzeSkewness)
 	    {
 	        SkewnessAnalyzer(sample, parameters);
 	    }
-	    if(parameters.analyseKurtosis)
+	    if(parameters.analyzeKurtosis)
 	    {
 	        KurtosisAnalyzer(sample, parameters);
 	    }

@@ -15,15 +15,13 @@ public:
 	int offset;
 	bool useBinning;
 	bool calcAutocorrelation;
-	bool analyseMean;
-	bool analyseVariance;
-	bool analyseSkewness;
-	bool analyseKurtosis;
+	bool analyzeMean;
+	bool analyzeVariance;
+	bool analyzeSkewness;
+	bool analyzeKurtosis;
 
 private:
 	void printParameters();
-
-	std::string defaultFile;
 };
 
 #endif /* PARAMETERS_HPP_ */
