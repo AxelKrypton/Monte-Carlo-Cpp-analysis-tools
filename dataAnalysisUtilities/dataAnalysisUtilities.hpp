@@ -120,7 +120,7 @@ EstimateAndError calcVarianceAndErrorOfDataSample(DataSampleBasic sampleIn)
 #include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
 
 //todo: work over this
-static EstimateAndError calcSkewness(DataSample sample, int numberOfBins)
+EstimateAndError calcSkewness(DataSample sample, int numberOfBins)
 {
     /**
      * Skewness gamma_1 is defined as:
@@ -128,8 +128,8 @@ static EstimateAndError calcSkewness(DataSample sample, int numberOfBins)
      */
     DataSample thirdCentralMoment = (sample - sample.getNthMoment(1)) ^ 3;
     DataSample secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
-    DataSample binnedSample1 = thirdCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-    DataSample binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+    BinnedDataSampleFromNumberOfBins binnedSample1(thirdCentralMoment, numberOfBins);
+    BinnedDataSampleFromNumberOfBins binnedSample2(secondCentralMoment, numberOfBins);
     JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
     JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
     //this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
@@ -142,7 +142,7 @@ static EstimateAndError calcSkewness(DataSample sample, int numberOfBins)
 
 //todo: work over this
 //todo: repair: this is acutally binder, rename? print also kurtosis?
-static EstimateAndError calcKurtosis(DataSample sample, int numberOfBins)
+EstimateAndError calcKurtosis(DataSample sample, int numberOfBins)
 {
     /**
 		 * The Fourth Std. Moment beta_2 is defined as:
@@ -153,8 +153,8 @@ static EstimateAndError calcKurtosis(DataSample sample, int numberOfBins)
 		 */
     DataSample fourthCentralMoment = (sample - sample.getNthMoment(1)) ^ 4;
     DataSample secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
-    DataSample binnedSample1 = fourthCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-    DataSample binnedSample2 = secondCentralMoment.createBinnedDataSampleWithNumberOfBins(numberOfBins);
+    BinnedDataSampleFromNumberOfBins binnedSample1 (fourthCentralMoment, numberOfBins);
+    BinnedDataSampleFromNumberOfBins binnedSample2 (secondCentralMoment, numberOfBins);
     JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
     JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
     //this calculates x_i / y_i^2, where x_i and y_i are the jackknife estimators of the fourth and second moment
@@ -166,7 +166,7 @@ static EstimateAndError calcKurtosis(DataSample sample, int numberOfBins)
 }
 
 //todo: implement
-static EstimateAndError calcAutocorrelation(DataSample sample, Parameters parameters)
+EstimateAndError calcAutocorrelation(DataSample sample, Parameters parameters)
 {
 	throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
 }
