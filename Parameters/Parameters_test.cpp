@@ -15,6 +15,27 @@ BOOST_AUTO_TEST_SUITE(build)
 		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, argumentWithoutFile), std::invalid_argument );
 	}
 
+	BOOST_AUTO_TEST_CASE(build1)
+	{
+		int numberOfArguments = 2;
+		const char * argumentWithFile[] = {"foo", "-f foo"};
+		BOOST_CHECK_NO_THROW(Parameters parameters(numberOfArguments, argumentWithFile) );
+	}
+
+	BOOST_AUTO_TEST_CASE(build2)
+	{
+		int numberOfArguments = 2;
+		const char * argumentWithFile[] = {"foo", "--file=foo"};
+		BOOST_CHECK_NO_THROW(Parameters parameters(numberOfArguments, argumentWithFile) );
+	}
+
+	BOOST_AUTO_TEST_CASE(build3)
+	{
+		int numberOfArguments = 2;
+		const char * argumentWithFile[] = {"foo", "foo"};
+		BOOST_CHECK_NO_THROW(Parameters parameters(numberOfArguments, argumentWithFile) );
+	}
+
 	BOOST_AUTO_TEST_CASE(help1)
 	{
 		int numberOfArguments = 2;

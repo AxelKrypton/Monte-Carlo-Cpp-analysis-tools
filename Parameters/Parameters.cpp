@@ -4,22 +4,17 @@
 #include <boost/algorithm/string.hpp>
 namespace po = boost::program_options;
 
-//todo: remove this again
-using namespace std;
-
 Parameters::Parameters(int argc, const char ** argv)
 {
 	std::string defaultFile = "";
 
-	po::options_description desc("   Options for data analysis.\nNote that boolean options can be changed from their default value implicitly, ie without giving explicitly true or false in the command line.\nFor example, \"--useBinning\" equals \"--useBinning=false\" (as the default value is true)");
+	po::options_description desc("   Options for data analysis.\nUsage: \"--<optionName>=<value>\" (or \"-<shortOptionName><value>\")\nNote that boolean options can be changed from their default value implicitly, ie without giving explicitly true or false in the command line.\nFor example, \"--useBinning\" equals \"--useBinning=false\" (as the default value is true)");
 	po::variables_map vm;
 
-	//todo: Maybe it would be nicer to put the observables into a vector!
-	//todo: add positional operator for data file!
+	//todo: Maybe it would be nicer to put the observables into a vector
 	/**
 	 * Apparently, when using short options with int one has to do "-n99"
-	 * because otherwise the empty space will be treated as a number which
-	 * causes an error.
+	 * because otherwise the empty space causes an error.
 	 */
 	desc.add_options()
 		("help,h", "Produce this help message")
@@ -35,7 +30,11 @@ Parameters::Parameters(int argc, const char ** argv)
 		("calcAutocorrelation,a", po::value<bool>(&calcAutocorrelation)->default_value(false)->implicit_value(true), "Estimate autocorrelation of data")
 		;
 
-	po::store(po::parse_command_line(argc, argv, desc), vm);
+	//option "file" can be given without option description
+	po::positional_options_description positionalOptions;
+	positionalOptions.add("file", 1);
+
+	po::store(po::command_line_parser(argc, argv).options(desc).positional(positionalOptions).run(), vm);
 
 	if(vm.count("help")) { // see http://stackoverflow.com/questions/5395503/required-and-optional-arguments-using-boost-library-program-options as to why this is done before po::notifiy(vm)
 		std::cout << desc << '\n';
@@ -53,21 +52,21 @@ Parameters::Parameters(int argc, const char ** argv)
 
 void Parameters::printParameters()
 {
-	cout << "###############################" << endl;
-	cout << "Options:" << endl;
-	cout << "###############################" << endl;
-	cout << "Datafile:\t" << file << endl;
-	cout << "Offset:\t" << offset << endl;
+	std::cout << "###############################" << std::endl;
+	std::cout << "Options:" << std::endl;
+	std::cout << "###############################" << std::endl;
+	std::cout << "Datafile:\t" << file << std::endl;
+	std::cout << "Offset:\t" << offset << std::endl;
 	//todo: add output of observables which are analyzed
-	cout << "###############################" << endl;
+	std::cout << "###############################" << std::endl;
 	if (useBinning)
 	{
-		cout << "binsize:\t" << binsize << endl;
-		cout << "number of bins:\t" << numberOfBins << endl;
+		std::cout << "binsize:\t" << binsize << std::endl;
+		std::cout << "number of bins:\t" << numberOfBins << std::endl;
 	}
 	else
-		cout << "Do not use binning!" << endl;
+		std::cout << "Do not use binning!" << std::endl;
 	if (calcAutocorrelation)
-		cout << "Calculate estimate on autocorrelation" << endl;
-	cout << "###############################" << endl;
+		std::cout << "Calculate estimate on autocorrelation" << std::endl;
+	std::cout << "###############################" << std::endl;
 }
