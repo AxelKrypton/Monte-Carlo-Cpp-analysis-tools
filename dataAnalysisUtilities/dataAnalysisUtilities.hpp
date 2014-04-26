@@ -118,7 +118,7 @@ EstimateAndError calcVarianceAndErrorOfDataSample(DataSample sampleIn)
 #include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
 
 //todo: work over this
-static EstimateAndError calcSkewness(DataSampleAnalyzer sample, int & numberOfBins)
+static EstimateAndError calcSkewness(DataSampleAnalyzer sample, int numberOfBins)
 {
     /**
      * Skewness gamma_1 is defined as:

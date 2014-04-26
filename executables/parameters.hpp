@@ -10,6 +10,7 @@ namespace po = boost::program_options;
 //todo: remove this again
 using namespace std;
 
+//todo: rename to Parameters
 class parameters
 {
 public:

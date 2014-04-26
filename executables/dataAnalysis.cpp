@@ -27,52 +27,52 @@ protected:
 class MeanAnalyzer : public AnalyzerWrapper
 {
 public:
-	MeanAnalyzer(DataSampleAnalyzer sample, int & numberOfBins):
+	MeanAnalyzer(DataSampleAnalyzer &sample, const parameters params):
 		AnalyzerWrapper("Mean")
 	{
-	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(sample, numberOfBins);
+	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(sample, params.numberOfBins);
 	}
 };
 
 class VarianceAnalyzer : public AnalyzerWrapper
 {
 public:
-	VarianceAnalyzer(DataSampleAnalyzer sample, int & numberOfBins):
+	VarianceAnalyzer(DataSampleAnalyzer &sample, const parameters params):
 		AnalyzerWrapper("Variance")
 	{
 	    DataSampleAnalyzer varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
 
 	    //todo: replace with dedicated function
-	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(varianceSample, numberOfBins);
+	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(varianceSample, params.numberOfBins);
 	}
 };
 
 class SkewnessAnalyzer : public AnalyzerWrapper
 {
 public:
-	SkewnessAnalyzer(DataSampleAnalyzer sample, int & numberOfBins):
+	SkewnessAnalyzer(DataSampleAnalyzer &sample, const parameters params):
 		AnalyzerWrapper("Skewness")
 	{
 		//todo: replace with dedicated function
-	    estimateAndError = calcSkewness(sample, numberOfBins);
+	    estimateAndError = calcSkewness(sample, params.numberOfBins);
 	}
 };
 
 class KurtosisAnalyzer : public AnalyzerWrapper
 {
 public:
-	KurtosisAnalyzer(DataSampleAnalyzer sample, int & numberOfBins):
+	KurtosisAnalyzer(DataSampleAnalyzer &sample, const parameters params):
 		AnalyzerWrapper("Kurtosis")
 	{
 	    //todo: replace with dedicated function
-	    estimateAndError = calcKurtosis(sample, numberOfBins);
+	    estimateAndError = calcKurtosis(sample, params.numberOfBins);
 	}
 };
 
 class AutocorrelationAnalyzer : public AnalyzerWrapper
 {
 public:
-	AutocorrelationAnalyzer(DataSampleAnalyzer sample):
+	AutocorrelationAnalyzer(DataSampleAnalyzer &sample):
 		AnalyzerWrapper("Autocorrelation")
 	{
 		throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
@@ -94,19 +94,19 @@ public:
 		}
 	    if(params.analyseMean)
 	    {
-	        MeanAnalyzer(sample, params.numberOfBins);
+	        MeanAnalyzer(sample, paramsIn);
 	    }
 	    if(params.analyseVariance)
 	    {
-	        VarianceAnalyzer(sample, params.numberOfBins);
+	        VarianceAnalyzer(sample, paramsIn);
 	    }
 	    if(params.analyseSkewness)
 	    {
-	        SkewnessAnalyzer(sample, params.numberOfBins);
+	        SkewnessAnalyzer(sample, paramsIn);
 	    }
 	    if(params.analyseKurtosis)
 	    {
-	        KurtosisAnalyzer(sample, params.numberOfBins);
+	        KurtosisAnalyzer(sample, paramsIn);
 	    }
 	};
 
@@ -119,6 +119,7 @@ int main(int argc, char ** argv)
 	try
 	{
 		parameters params(argc, argv);
+		//todo: move binning here?
 		DataSampleAnalyzer dataSample(params.file);
 	    dataAnalyzer analyzer(dataSample, params);
 	}
