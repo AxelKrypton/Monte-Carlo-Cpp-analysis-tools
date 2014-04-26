@@ -1,54 +1,59 @@
 
 #include "parameters.hpp"
+//todo: this include should not be necessary in the end
 #include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
+#include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 
+//todo: perhaps make a common sample object that is passed as pointer to save memory allocation stuff
+
+//todo: move this into own class
 void calcAutocorrelation(std::string file)
 {
 	throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
 }
 
-//todo: make this a fct. of DataSample or put it in a namespace!
-//todo: enlarge for binsize..
-std::pair<double,double> calcMeanAndErrorOfDataSampleWithBinning(DataSampleAnalyzer sampleIn, int numberOfBins)
+class AnalyzerWrapper
 {
-	DataSampleAnalyzer binnedSample = sampleIn.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-	double mean = binnedSample.getNthMoment(1);
-	/**
-	 * unbiased estimate of variance of the sample is
-	 *   n/(n-1) * biasedEstimator(varianceOfSample)
-	 * and the estimate of the variance of the mean of the sample is always:
-	 *   varianceEstimator(sample) / n
-	 * because of the central limit theorem.
-	 * Note that for the mean the unbiased variance yields
-	 * the same error as jackknifing.
-	 */
-	int n = binnedSample.getNumberOfElements();
-	double error = sqrt(1. / double(n - 1) * binnedSample.getNthCentralMoment(2));
-	return std::pair <double, double> (mean, error);
-}
+protected:
+	AnalyzerWrapper(std::string name):
+		estimateName(name)
+	{
+		std::cout << "# Analyse " << name << "..." << std::endl;
+	}
+	~AnalyzerWrapper()
+	{
+	    std::cout << "# " << estimateName << "\t\tError" << std::endl;
+	    std::cout << scientific << estimateAndError.estimate << "\t" << estimateAndError.error << std::endl;
+	}
 
-void calcMean(std::string & file, int & numberOfBins)
+	std::string estimateName;
+	EstimateAndError estimateAndError;
+};
+
+class MeanAnalyzer : public AnalyzerWrapper
 {
-    std::cout << "Analyse mean..." << std::endl;
-    DataSample sample(file);
+public:
+	MeanAnalyzer(std::string & file, int & numberOfBins):
+		AnalyzerWrapper("Mean")
+	{
+	    DataSample sample(file);
+	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(sample, numberOfBins);
+	}
+};
 
-    std::pair<double,double> meanAndError = calcMeanAndErrorOfDataSampleWithBinning(sample, numberOfBins);
-
-    std::cout << "Mean\t\tError" << std::endl;
-    std::cout << scientific << meanAndError.first << "\t" << meanAndError.second << std::endl;
-}
-
-void calcVariance(std::string & file, int & numberOfBins)
+class VarianceAnalyzer : public AnalyzerWrapper
 {
-    std::cout << "Analyse variance..." << std::endl;
-    DataSampleAnalyzer sample(file);
-    DataSampleAnalyzer varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
+public:
+	VarianceAnalyzer(std::string & file, int & numberOfBins):
+		AnalyzerWrapper("Variance")
+	{
+	    DataSampleAnalyzer sample(file);
+	    DataSampleAnalyzer varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
 
-    std::pair<double,double> meanAndError = calcMeanAndErrorOfDataSampleWithBinning(varianceSample, numberOfBins);
-
-    std::cout << "Variance\t\tError" << std::endl;
-    std::cout << scientific << meanAndError.first << "\t" << meanAndError.second << std::endl;
-}
+	    //todo: replace with dedicated function
+	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(varianceSample, numberOfBins);
+	}
+};
 
 void calcSkewness(std::string & file, int & numberOfBins)
 {
@@ -107,11 +112,11 @@ public:
 		}
 	    if(params.analyseMean)
 	    {
-	        calcMean(params.file, params.numberOfBins);
+	        MeanAnalyzer(params.file, params.numberOfBins);
 	    }
 	    if(params.analyseVariance)
 	    {
-	        calcVariance(params.file, params.numberOfBins);
+	        VarianceAnalyzer(params.file, params.numberOfBins);
 	    }
 	    if(params.analyseSkewness)
 	    {
