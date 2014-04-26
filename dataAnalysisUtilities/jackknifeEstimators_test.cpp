@@ -17,6 +17,12 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimators)
 		BOOST_CHECK_NO_THROW(JackknifeEstimators jackSample(sample));
 	}
 
+	BOOST_AUTO_TEST_CASE(build2)
+	{
+		int enoughElementsForJackknife = 573;
+		BOOST_CHECK_NO_THROW( JackknifeEstimators jackSample(enoughElementsForJackknife) );
+	}
+
 	BOOST_AUTO_TEST_CASE(buildInvalidArgument)
 	{
 		int tooFewElementsForJackknife = 1;
@@ -33,6 +39,8 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimators)
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
+
+//todo: go through and delete/modify tests
 
 BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 
@@ -114,96 +122,10 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 		BOOST_CHECK_CLOSE(jackknifeVariance, expectedValue, doublePrecisionInPercent);
 	}
 
-	void checkMeanErrorWithBinsize(std::string file, int binsize, double expectedValue, double testPrecision)
-	{
-		DataSampleAnalyzer sample(file);
-		DataSampleAnalyzer binnedSample = sample.createBinnedDataSampleWithBinsize(binsize);
-		JackknifeEstimatorsFromBinnedDataSample jackknifeSample(binnedSample);
-		BOOST_CHECK_CLOSE(jackknifeSample.getJackknifeError(), expectedValue, testPrecision);
-	}
-
-	void checkMeanErrorWithNumberOfBins(std::string file, int numberOfBins, double expectedValue, double testPrecision)
-	{
-		DataSampleAnalyzer sample(file);
-		DataSampleAnalyzer binnedSample = sample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
-		JackknifeEstimatorsFromBinnedDataSample jackknifeSample(binnedSample);
-		BOOST_CHECK_CLOSE(jackknifeSample.getJackknifeError(), expectedValue, testPrecision);
-	}
-
-	BOOST_AUTO_TEST_CASE(withBinsize_meanError1)
-	{
-		std::string fileThatDoesExist = "datafile.example";
-		int binsize = 1;
-		double precisionOfDataInFileInPercent = 1e-10;
-		double expectedValue = 3.44121381077520906E-004;
-
-		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedValue, precisionOfDataInFileInPercent);
-	}
-
-	BOOST_AUTO_TEST_CASE(withBinsize_meanError2)
-	{
-		std::string fileThatDoesExist = "datafile.example";
-		int binsize = 100;
-		double precisionOfDataInFileInPercent = 1e-10;
-		double expectedValue = 1.1564370727055974e-03;
-
-		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedValue, precisionOfDataInFileInPercent);
-	}
-
-	BOOST_AUTO_TEST_CASE(withBinsize_meanError3)
-	{
-		std::string fileThatDoesExist = "datafile2.example";
-		double precisionOfDataInFileInPercent = 1e-10;
-		int binsize = 100;
-		double expectedValue = 1.14688734781786292E-003;
-
-		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedValue, precisionOfDataInFileInPercent);
-	}
-
-	BOOST_AUTO_TEST_CASE(withNumberOfBins_meanError1)
-	{
-		std::string fileThatDoesExist = "datafile.example";
-		int numberOfBins = 1005;
-		double precisionOfDataInFileInPercent = 1e-10;
-		double expectedValue = 3.44121381077520906E-004;
-
-		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
-	}
-
-	BOOST_AUTO_TEST_CASE(withNumberOfBins_meanError2)
-	{
-		std::string fileThatDoesExist = "datafile.example";
-		double precisionOfDataInFileInPercent = 1e-10;
-		int numberOfBins = 10;
-		double expectedValue = 1.1564370727055974e-03;
-
-		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
-	}
-
-	BOOST_AUTO_TEST_CASE(withNumberOfBins_meanError3)
-	{
-		std::string fileThatDoesExist = "datafile2.example";
-		double precisionOfDataInFileInPercent = 1e-10;
-		int numberOfBins = 10;
-		double expectedValue = 1.14688734781786292E-003;
-
-		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
-	}
-
-	BOOST_AUTO_TEST_CASE(withNumberOfBins_meanError4)
-	{
-		std::string fileThatDoesExist = "datafile2.example";
-		double precisionOfDataInFileInPercent = 1e-10;
-		int numberOfBins = 100;
-		double expectedValue = 8.02188322114928275E-004;
-
-		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
-	}
-
 	void checkVarianceErrorWithNumberOfBins(std::string file, int numberOfBins, double expectedValue, double testPrecision)
 	{
 		DataSampleAnalyzer sample(file);
-		DataSampleAnalyzer varSample = sample.shiftAndPow(2, sample.getNthMoment(1));
+		DataSampleAnalyzer varSample = (sample - sample.getNthMoment(1) )^2;
 		DataSampleAnalyzer binnedSample = varSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
 		JackknifeEstimatorsFromBinnedDataSample jackSample(binnedSample);
 		BOOST_CHECK_CLOSE(jackSample.getJackknifeError(), expectedValue, testPrecision);
@@ -310,7 +232,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithNumberOfBins)
 	void checkVarianceErrorWithNumberOfBins(std::string file, int numberOfBins, double expectedValue, double testPrecision)
 	{
 		DataSampleAnalyzer sample(file);
-		DataSampleAnalyzer varSample = sample.shiftAndPow(2, sample.getNthMoment(1));
+		DataSampleAnalyzer varSample = (sample - sample.getNthMoment(1))^2;
 		JackknifeEstimatorsFromBinningWithNumberOfBins jackSample(varSample, numberOfBins);
 		BOOST_CHECK_CLOSE(jackSample.getJackknifeError(), expectedValue, testPrecision);
 	}
@@ -423,7 +345,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithBinsize)
 	void checkVarianceErrorWithBinsize(std::string file, int numberOfBins, double expectedValue, double testPrecision)
 	{
 		DataSampleAnalyzer sample(file);
-		DataSampleAnalyzer varSample = sample.shiftAndPow(2, sample.getNthMoment(1));
+		DataSampleAnalyzer varSample = ( sample - sample.getNthMoment(1))^2;
 		JackknifeEstimatorsFromBinningWithBinsize jackSample(varSample, numberOfBins);
 		BOOST_CHECK_CLOSE(jackSample.getJackknifeError(), expectedValue, testPrecision);
 	}
@@ -456,7 +378,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsExplicitAgainstCombinedMethod)
 		int numberOfBins = 50;
 
 		DataSampleAnalyzer sample(fileThatDoesExist);
-		DataSampleAnalyzer varSample = sample.shiftAndPow(2, sample.getNthMoment(1));
+		DataSampleAnalyzer varSample = ( sample - sample.getNthMoment(1))^2;
 		JackknifeEstimatorsFromBinningWithNumberOfBins jackSample1(varSample, numberOfBins);
 		DataSample binnedSample = varSample.createBinnedDataSampleWithNumberOfBins(numberOfBins);
 		JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample);
@@ -473,7 +395,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsExplicitAgainstCombinedMethod)
 		int binsize = 20;
 
 		DataSampleAnalyzer sample(fileThatDoesExist);
-		DataSampleAnalyzer varSample = sample.shiftAndPow(2, sample.getNthMoment(1));
+		DataSampleAnalyzer varSample = ( sample - sample.getNthMoment(1))^2;
 		JackknifeEstimatorsFromBinningWithBinsize jackSample1(varSample, binsize);
 		DataSample binnedSample = varSample.createBinnedDataSampleWithBinsize(binsize);
 		JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample);

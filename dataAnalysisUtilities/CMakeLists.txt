@@ -1,18 +1,24 @@
 add_library(dataAnalysisUtilities
 	dataSample.cpp
 	dataSampleAnalyzer.cpp
+	binnedDataSample.cpp
 	jackknifeEstimators.cpp
+	dataAnalysisUtilities.cpp
 )
 
 configure_file(datafile.example datafile.example COPYONLY)
 configure_file(datafile2.example datafile2.example COPYONLY)
 configure_file(datafile3.example datafile3.example COPYONLY)
 configure_file(datafileWithTwoColumns.example datafileWithTwoColumns.example)
-configure_file(emptyFile.example emptyFile.example)
-configure_file(fileWithBrokenLine.example fileWithBrokenLine.example)
-configure_file(fileWithComment.example fileWithComment.example)
-configure_file(fileWithEmptyLine.example fileWithEmptyLine.example)
+
+configure_file(emptyFile.example emptyFile.example COPYONLY)
+configure_file(fileWithBrokenLine.example fileWithBrokenLine.example COPYONLY)
+configure_file(fileWithComment.example fileWithComment.example COPYONLY)
+configure_file(fileWithEmptyLine.example fileWithEmptyLine.example COPYONLY)
 
 add_unit_test(dataSample dataSample_test dataAnalysisUtilities)
 add_unit_test(dataSampleAnalyzer dataSampleAnalyzer_test dataAnalysisUtilities)
+add_unit_test(binnedDataSample binnedDataSample_test dataAnalysisUtilities)
 add_unit_test(jackknifeEstimators jackknifeEstimators_test dataAnalysisUtilities)
+add_unit_test(dataAnalysisUtilities dataAnalysisUtilities_test dataAnalysisUtilities)
+

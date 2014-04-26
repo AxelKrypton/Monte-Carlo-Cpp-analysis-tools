@@ -8,55 +8,54 @@ BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(build1)
 	{
-		BOOST_REQUIRE_THROW(SimulationDataContainer simData, std::invalid_argument);
+		BOOST_REQUIRE_THROW(SimulationDataContainer simDataCont, std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(build2)
 	{
 		std::string fileThatDoesNotExist = "fileThatShouldNotBe";
-		BOOST_REQUIRE_THROW(SimulationDataContainer simData(fileThatDoesNotExist), std::invalid_argument);
+		BOOST_REQUIRE_THROW(SimulationDataContainer simDataCont(fileThatDoesNotExist), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(build3)
 	{
 		std::string fileThatDoesExist = "wrong_configfile_1";
-		BOOST_REQUIRE_THROW(SimulationDataContainer simData(fileThatDoesExist), std::runtime_error);
+		BOOST_REQUIRE_THROW(SimulationDataContainer simDataCont(fileThatDoesExist), std::runtime_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build4)
 	{
 		std::string fileThatDoesExist = "wrong_configfile_2";
-		BOOST_REQUIRE_THROW(SimulationDataContainer simData(fileThatDoesExist), std::runtime_error);
+		BOOST_REQUIRE_THROW(SimulationDataContainer simDataCont(fileThatDoesExist), std::runtime_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build5)
 	{
 		std::string fileThatDoesExist = "wrong_configfile_3";
-		BOOST_REQUIRE_THROW(SimulationDataContainer simData(fileThatDoesExist), std::logic_error);
+		BOOST_REQUIRE_THROW(SimulationDataContainer simDataCont(fileThatDoesExist), std::logic_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build6)
 	{
 		std::string fileThatDoesExist = "simulationDataContainer.configfile";
-		BOOST_CHECK_NO_THROW(SimulationDataContainer simData(fileThatDoesExist));
+		BOOST_CHECK_NO_THROW(SimulationDataContainer simDataCont(fileThatDoesExist));
 	}
 
 	BOOST_AUTO_TEST_CASE(build7)
 	{
 		std::string fileThatDoesExist = "simulationDataContainer.configfile";
 		int numberOfDataFilesGivenInInputFile = 3;
-		SimulationDataContainer simData(fileThatDoesExist);
-		BOOST_REQUIRE_EQUAL(simData.getNumberOfDatafiles(), numberOfDataFilesGivenInInputFile);
+		SimulationDataContainer simDataCont(fileThatDoesExist);
+		BOOST_REQUIRE_EQUAL(simDataCont.getNumberOfDatafiles(), numberOfDataFilesGivenInInputFile);
 	}
 
 	BOOST_AUTO_TEST_CASE(build8)
 	{
 		std::string fileThatDoesExist = "simulationDataContainer.configfile";
-		int numberOfDataFilesGivenInInputFile = 3;
 		int numberOfSimulationParametersGivenInInputFile = 2;
-		SimulationDataContainer simData(fileThatDoesExist);
-		for(int i=0; i<simData.getNumberOfDatafiles(); i++)
-			BOOST_REQUIRE_EQUAL(simData.getNumberOfSimulationParameters(i), numberOfSimulationParametersGivenInInputFile);
+		SimulationDataContainer simDataCont(fileThatDoesExist);
+		for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++)
+			BOOST_REQUIRE_EQUAL(simDataCont.getNumberOfSimulationParameters(i), numberOfSimulationParametersGivenInInputFile);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

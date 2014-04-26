@@ -15,34 +15,52 @@ const static int roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid 
 //TODO: move this to better place
 double defaultFunction(double in);
 
-//TODO: implement offset
 class DataSample
 {
 public:
 	DataSample(int length = defaultSizeOfDataSample);
 	DataSample(std::valarray<double> valuesIn);
 	//todo: think about creating two or three distinct constructors
-	DataSample(std::string dataFilename, int column = 1, int offset = 0);
+	DataSample(std::string dataFilename, int column = 1, int offset = 0, bool* isAnyEntryBad = NULL);
+	//todo: make the args and fcts. constant where possible
 	int getNumberOfElements();
 	DataSample applyFunction(double (*function)(double) = defaultFunction);
-	DataSample shiftAndPow(int n, double shift);
-	DataSample shift(double shift);
-	DataSample operator*(double factor);
-	DataSample pow(int n);
+	DataSample& operator+=(double factor);
+	DataSample& operator+=(DataSample sampleIn);
+	DataSample& operator-=(double factor);
+	DataSample& operator-=(DataSample sampleIn);
+	DataSample& operator*=(double factor);
+	DataSample& operator*=(DataSample sampleIn);
+	DataSample& operator/=(double factor);
+	DataSample& operator/=(DataSample sampleIn);
+	DataSample& operator^=(int n);
+	DataSample& operator^=(double n);
 	DataSample sampleSlice(int start, int size, int stride);
 	double sum();
 	double& operator[](size_t index);
+	DataSample removeIthElement(int i);
 
 protected:
 	void setValues(std::valarray<double> valuesIn);
 	void setValues(DataSample sampleIn);
 	void checkIfNumberOfElementsIsValid(int length);
 	void checkSliceParameters(int start, int size, int stride);
-	DataSample readDataFromFile(std::string filename, int column, int offset);
+	DataSample readDataFromFile(std::string filename, int column, int offset, bool* isAnyEntryBad = NULL);
 
 	std::valarray<double> values;
 	int numberOfElements;
 	const static int defaultSizeOfDataSample = 1;
 };
+
+DataSample operator+(DataSample sampleIn, double factor);
+DataSample operator+(DataSample lhs, DataSample rhs);
+DataSample operator-(DataSample sampleIn, double factor);
+DataSample operator-(DataSample lhs, DataSample rhs);
+DataSample operator*(DataSample sampleIn, double factor);
+DataSample operator*(DataSample lhs, DataSample rhs);
+DataSample operator/(DataSample sampleIn, double factor);
+DataSample operator/(DataSample lhs, DataSample rhs);
+DataSample operator^(DataSample sampleIn, int n);
+DataSample operator^(DataSample sampleIn, double n);
 
 #endif

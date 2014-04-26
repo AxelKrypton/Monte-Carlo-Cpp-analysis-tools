@@ -15,9 +15,9 @@ DataSample::DataSample(std::valarray<double> valuesIn)
 	setValues(valuesIn);
 }
 
-DataSample::DataSample(std::string dataFilename, int column, int offset)
+DataSample::DataSample(std::string dataFilename, int column, int offset, bool* isAnyEntryBad)
 {
-	setValues(readDataFromFile(dataFilename, column, offset));
+	setValues(readDataFromFile(dataFilename, column, offset, isAnyEntryBad));
 }
 
 void DataSample::setValues(std::valarray<double> valuesIn)
@@ -33,19 +33,18 @@ void DataSample::setValues(DataSample sampleIn)
 	values = sampleIn.values;
 }
 
-DataSample 	DataSample::pow(int n)
+static void checkDivisionFactor(double factorIn)
 {
-	return DataSample( std::pow(values, double(n)) );
+	if(factorIn == 0.)
+	{
+		throw std::invalid_argument("Cannot divide by zero!");
+	}
 }
 
-DataSample DataSample::shiftAndPow(int n, double shift)
+void checkNumberOfElements(int lhs, int rhs)
 {
-	return DataSample( std::pow((values - shift), double(n)) );
-}
-
-DataSample DataSample::shift(double shift)
-{
-	return DataSample( (values - shift) );
+	if (lhs != rhs)
+		throw std::invalid_argument("DataSamples have different number of elements!");
 }
 
 double DataSample::sum()
@@ -58,11 +57,132 @@ double& DataSample::operator[](size_t index)
 	return values[index];
 }
 
-DataSample DataSample::operator*(double factor)
+DataSample& DataSample::operator+=(double factor)
 {
-	return DataSample(values * factor);
+	values += factor;
+	return *this;
 }
 
+DataSample& DataSample::operator+=(DataSample sampleIn)
+{
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+	values += sampleIn.values;
+	return *this;
+}
+
+DataSample& DataSample::operator-=(double factor)
+{
+	values -= factor;
+	return *this;
+}
+
+DataSample& DataSample::operator-=(DataSample sampleIn)
+{
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+	values -= sampleIn.values;
+	return *this;
+}
+
+DataSample& DataSample::operator*=(double factor)
+{
+	values *= factor;
+	return *this;
+}
+
+DataSample& DataSample::operator*=(DataSample sampleIn)
+{
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+	values *= sampleIn.values;
+	return *this;
+}
+
+DataSample operator+(DataSample sampleIn, double factor)
+{
+	sampleIn += factor;
+	return sampleIn;
+}
+
+DataSample operator+(DataSample lhs, DataSample rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs += rhs;
+	return lhs;
+}
+
+DataSample operator-(DataSample sampleIn, double factor)
+{
+	sampleIn -= factor;
+	return sampleIn;
+}
+
+DataSample operator-(DataSample lhs, DataSample rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs -= rhs;
+	return lhs;
+}
+
+DataSample operator*(DataSample lhs, DataSample rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs *= rhs;
+	return lhs;
+}
+
+DataSample& DataSample::operator/=(double factor)
+{
+	checkDivisionFactor(factor);
+	values /= factor;
+	return *this;
+}
+
+DataSample& DataSample::operator/=(DataSample sampleIn)
+{
+	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+	values /= sampleIn.values;
+	return *this;
+}
+
+DataSample& DataSample::operator^=(int n)
+{
+	values = std::pow(values, double(n));
+	return *this;
+}
+
+DataSample& DataSample::operator^=(double n)
+{
+	values = std::pow(values, n);
+	return *this;
+}
+
+DataSample operator*(DataSample sampleIn, double factor)
+{
+	sampleIn *= factor;
+	return sampleIn;
+}
+
+DataSample operator/(DataSample lhs, DataSample rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs/=rhs;
+	return lhs;
+}
+
+DataSample operator/(DataSample sampleIn, double factor)
+{
+	checkDivisionFactor(factor);
+	return sampleIn /= factor;
+}
+
+DataSample operator^(DataSample sampleIn, int n)
+{
+	return sampleIn ^= n;
+}
+
+DataSample operator^(DataSample sampleIn, double n)
+{
+	return sampleIn ^= n;
+}
 
 int DataSample::getNumberOfElements()
 {
@@ -90,10 +210,10 @@ DataSample DataSample::applyFunction(double (*function)(double))
 	return dataSample;
 }
 
-DataSample DataSample::readDataFromFile(std::string filename, int column, int offset)
+DataSample DataSample::readDataFromFile(std::string filename, int column, int offset, bool* isAnyEntryBad)
 {
 	FileReader reader(filename, column, offset);
-	return reader.readDataFromFile();
+	return reader.readDataFromFile(isAnyEntryBad);
 }
 
 void DataSample::checkSliceParameters(int start, int size, int stride)
@@ -113,3 +233,27 @@ DataSample DataSample::sampleSlice(int start, int size, int stride)
 	checkSliceParameters(start, size, stride);
 	return DataSample(values[std::slice(start, size, stride)]);
 }
+
+static void checkRemoveParameter(int position, int numberOfElements)
+{
+	if (position < 0 || position >= numberOfElements)
+			throw std::invalid_argument("Can only remove element greater than or equal to zero and smaller than the number of entries!");
+}
+
+DataSample DataSample::removeIthElement(int i)
+{
+	checkRemoveParameter(i, numberOfElements);
+	DataSample tmp(numberOfElements - 1);
+	for (int iteration = 0; iteration < numberOfElements; iteration ++)
+	{
+		if (iteration == i)
+		{
+			continue;
+		}
+		int index = (iteration < i) ? iteration : iteration - 1;
+
+		tmp[index] = values[iteration];
+	}
+	return tmp;
+}
+

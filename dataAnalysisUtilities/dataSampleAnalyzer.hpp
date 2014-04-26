@@ -22,6 +22,8 @@ public:
 	double value;
 };
 
+//todo: remove all binning functionality, this is at the moment interlinked with the jackknife estimator class
+
 class DataSampleAnalyzer: public DataSample
 {
 public:
@@ -59,7 +61,7 @@ public:
 protected:
 	/**
 	 * Binning.
-	 * Following BA Berg,
+	 * Following B.A. Berg,
 	 * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
 	 * p.52.
 	 */
