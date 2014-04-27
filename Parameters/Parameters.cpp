@@ -7,8 +7,6 @@ namespace po = boost::program_options;
 Parameters::Parameters(int argc, const char ** argv)
 {
 	std::string defaultFile = "";
-	//todo: make this a real option
-	useNumberOfBinsForBinning = true;
 
 	po::options_description desc("   Options for data analysis.\nUsage: \"--<optionName>=<value>\" (or \"-<shortOptionName><value>\")\nNote that boolean options can be changed from their default value implicitly, ie without giving explicitly true or false in the command line.\nFor example, \"--useBinning\" equals \"--useBinning=false\" (as the default value is true)");
 	po::variables_map vm;
@@ -27,6 +25,7 @@ Parameters::Parameters(int argc, const char ** argv)
 		("analyzeSkewness", po::value<bool>(&analyzeSkewness)->default_value(true)->implicit_value(false), "Analyse data for skewness")
 		("analyzeKurtosis", po::value<bool>(&analyzeKurtosis)->default_value(true)->implicit_value(false), "Analyse data for kurtosis/binder-cumulant")
 		("useBinning", po::value<bool>(&useBinning)->default_value(true)->implicit_value(false), "Use binning on data")
+		("useNumberOfBinsForBinning", po::value<bool>(&useNumberOfBinsForBinning)->default_value(true)->implicit_value(false), "Perform binning based on \"numberOfBins\" parameter")
 		("binsize,b", po::value<int>(&binsize), "Size of bin (default: 100)")
 		("numberOfBins,n", po::value<int>(&numberOfBins), "Number of bins (default: 10)")
 		("calcAutocorrelation,a", po::value<bool>(&calcAutocorrelation)->default_value(false)->implicit_value(true), "Estimate autocorrelation of data")
@@ -43,14 +42,21 @@ Parameters::Parameters(int argc, const char ** argv)
 		throw Parameters::parse_aborted();
 	}
 
+	po::notify(vm);
+
 	/**
 	 * For the binning one has to know if it should be
 	 * performed with numberOfBins or with binsize parameter.
-	 * If a default value is assigned, the option counts as set.
-	 * This makes judgement difficult.
+	 * This can be judged with the "useNumberOfBinsForBinning"
+	 * parameter. However, it should be that this value
+	 * is changed automatically if a binsize is given in the
+	 * command line.
+	 * If a default value is assigned, the option is regarded as set.
+	 * This makes it difficult to see what was in the command line
+	 * as "count" is always true.
 	 * Hence, no default value is given in the definition of
 	 * the options but it is assigned as done below.
-	 * Propably this can be done better with the "notifier"
+	 * Probaply this can be done better with the "notifier"
 	 * functionality of boost.
 	 */
 
@@ -63,10 +69,6 @@ Parameters::Parameters(int argc, const char ** argv)
 	{
 		binsize = 100;
 	}
-
-	//todo: add tests
-	//todo: add check on bool parameter, otherwise default value of binsize is useless!
-	//check if numberOfBins or binsize shall be used for binning
 	if(vm.count("binsize"))
 	{
 		if(vm.count("numberOfBins"))
@@ -76,7 +78,6 @@ Parameters::Parameters(int argc, const char ** argv)
 		useNumberOfBinsForBinning = false;
 	}
 
-	po::notify(vm);
 	printParameters();
 
 	if (file == defaultFile)
@@ -88,20 +89,27 @@ Parameters::Parameters(int argc, const char ** argv)
 void Parameters::printParameters()
 {
 	std::cout << "###############################" << std::endl;
-	std::cout << "Options:" << std::endl;
+	std::cout << "# Options:" << std::endl;
 	std::cout << "###############################" << std::endl;
-	std::cout << "Datafile:\t" << file << std::endl;
-	std::cout << "Offset:\t" << offset << std::endl;
+	std::cout << "# Datafile:\t" << file << std::endl;
+	std::cout << "# Offset:\t" << offset << std::endl;
 	//todo: add output of observables which are analyzed
 	std::cout << "###############################" << std::endl;
 	if (useBinning)
 	{
-		std::cout << "binsize:\t" << binsize << std::endl;
-		std::cout << "number of bins:\t" << numberOfBins << std::endl;
+		std::cout << "# Perform binning with:" << std::endl;
+		if( useNumberOfBinsForBinning)
+		{
+			std::cout << "# Number of bins:\t" << numberOfBins << std::endl;
+		}
+		else
+		{
+			std::cout << "# Binsize:\t" << binsize << std::endl;
+		}
 	}
 	else
-		std::cout << "Do not use binning!" << std::endl;
+		std::cout << "# Do not perform binning!" << std::endl;
 	if (calcAutocorrelation)
-		std::cout << "Calculate estimate on autocorrelation" << std::endl;
+		std::cout << "# Calculate estimate on autocorrelation" << std::endl;
 	std::cout << "###############################" << std::endl;
 }
