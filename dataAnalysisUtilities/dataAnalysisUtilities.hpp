@@ -48,7 +48,6 @@ static double unbiasedVarianceOfMean(DataSample sampleIn)
 	return 1. / double(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthCentralMoment(2);
 }
 
-//todo: refactor: code duplication up to the actual sample used!
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn)
 {
 	double mean;
@@ -56,30 +55,6 @@ EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn)
 
 	mean = meanOfDataSample(sampleIn);
 	error = sqrt( unbiasedVarianceOfMean(sampleIn) );
-
-	return EstimateAndError(mean, error);
-}
-
-EstimateAndError calcMeanAndErrorOfDataSampleWithBinningFromBinsize(DataSampleBasic sampleIn, int binsize)
-{
-	BinnedDataSampleFromBinsize binnedSample (sampleIn, binsize);
-	double mean;
-	double error;
-
-	mean = meanOfDataSample(binnedSample);
-	error = sqrt( unbiasedVarianceOfMean(binnedSample) );
-
-	return EstimateAndError(mean, error);
-}
-
-EstimateAndError calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBins)
-{
-	BinnedDataSampleFromNumberOfBins binnedSample (sampleIn, numberOfBins);
-	double mean;
-	double error;
-
-	mean = meanOfDataSample(binnedSample);
-	error = sqrt( unbiasedVarianceOfMean(binnedSample) );
 
 	return EstimateAndError(mean, error);
 }

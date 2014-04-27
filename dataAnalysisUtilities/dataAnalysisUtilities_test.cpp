@@ -65,8 +65,14 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 
 	static void checkMeanErrorWithBinsize(std::string file, int binsize, double expectedValue, double testPrecision)
 	{
-		DataSample sample(file);
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSampleWithBinningFromBinsize(sample, binsize);
+		std::string argumentFile = "--file=" + file;
+		std::string argumentBinsize = "--binsize=" + boost::lexical_cast<std::string>(binsize);
+		const char * arguments[] = {"foo", argumentFile.c_str(), argumentBinsize.c_str()};
+		Parameters parameters(3, arguments);
+
+		DataSample sample = createDataSampleFromDatafile(file, parameters);
+
+		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
@@ -106,8 +112,14 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 
 	static void checkMeanErrorWithNumberOfBins(std::string file, int numberOfBins, double expectedValue, double testPrecision)
 	{
-		DataSample sample(file);
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(sample, numberOfBins);
+		std::string argumentFile = "--file=" + file;
+		std::string argumentBinsize = "--numberOfBins=" + boost::lexical_cast<std::string>(numberOfBins);
+		const char * arguments[] = {"foo", argumentFile.c_str(), argumentBinsize.c_str()};
+		Parameters parameters(3, arguments);
+
+		DataSample sample = createDataSampleFromDatafile(file, parameters);
+
+		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
