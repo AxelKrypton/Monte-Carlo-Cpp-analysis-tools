@@ -121,6 +121,24 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(analyzeKurtosis_default, createParametersForDefaultCheck().analyzeKurtosis);
 	}
 
+	BOOST_AUTO_TEST_CASE(analysisOutputFilePrefix)
+	{
+		std::string defaultValue = "";
+		const char * arguments[] = {"foo", "foo"};
+		Parameters parameters(2, arguments);
+
+		BOOST_CHECK(defaultValue == parameters.analysisOutputFilePrefix);
+	}
+
+	BOOST_AUTO_TEST_CASE(analysisOutputFilePostfix)
+	{
+		std::string defaultValue = "_stat";
+		const char * arguments[] = {"foo", "foo"};
+		Parameters parameters(2, arguments);
+
+		BOOST_CHECK(defaultValue == parameters.analysisOutputFilePostfix);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(setArguments)
@@ -336,6 +354,26 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		bool newValue = false;
 		std::string argumentName = "--analyzeKurtosis";
 		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).analyzeKurtosis);
+	}
+
+	BOOST_AUTO_TEST_CASE(analysisOutputFilePrefix)
+	{
+		std::string newValue = "test";
+		std::string argument = "--analysisOutputFilePrefix=" + newValue;
+		const char * arguments[] = {"foo", "foo", argument.c_str()};
+		Parameters parameters(3, arguments);
+
+		BOOST_CHECK(newValue == parameters.analysisOutputFilePrefix);
+	}
+
+	BOOST_AUTO_TEST_CASE(analysisOutputFilePostfix)
+	{
+		std::string newValue = "test";
+		std::string argument = "--analysisOutputFilePostfix=" + newValue;
+		const char * arguments[] = {"foo", "foo", argument.c_str()};
+		Parameters parameters(3, arguments);
+
+		BOOST_CHECK(newValue == parameters.analysisOutputFilePostfix);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

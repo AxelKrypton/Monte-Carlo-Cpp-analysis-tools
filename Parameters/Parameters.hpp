@@ -13,6 +13,8 @@ public:
 
 	struct parse_aborted {};
 	std::string file;
+	std::string analysisOutputFilePrefix;
+	std::string analysisOutputFilePostfix;
 	int binsize;
 	int numberOfBins;
 	int offset;
