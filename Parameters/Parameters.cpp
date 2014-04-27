@@ -27,7 +27,6 @@ Parameters::Parameters(int argc, const char ** argv)
 		;
 
 	//option "file" can be given without option description
-
 	positionalOptions.add("file", 1);
 	po::store(po::command_line_parser(argc, argv).options(desc).positional(positionalOptions).run(), vm);
 	po::notify(vm);

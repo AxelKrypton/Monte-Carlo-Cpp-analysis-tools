@@ -176,7 +176,14 @@ DataSample createDataSampleFromDatafile(std::string filename, Parameters paramet
 	DataSample dataSample(filename);
 	if ( parameters.useBinning)
 	{
-		return BinnedDataSampleFromNumberOfBins(dataSample, parameters.numberOfBins);
+		if ( parameters.useNumberOfBinsForBinning)
+		{
+			return BinnedDataSampleFromNumberOfBins(dataSample, parameters.numberOfBins);
+		}
+		else
+		{
+			return BinnedDataSampleFromBinsize(dataSample, parameters.binsize);
+		}
 	}
 	else
 	{
