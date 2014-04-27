@@ -49,14 +49,13 @@ static double unbiasedVarianceOfMean(DataSample sampleIn)
 }
 
 //todo: refactor: code duplication up to the actual sample used!
-EstimateAndError calcMeanAndErrorOfDataSample(DataSampleBasic sampleIn)
+EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn)
 {
-	DataSample tmp(sampleIn);
 	double mean;
 	double error;
 
-	mean = meanOfDataSample(tmp);
-	error = sqrt( unbiasedVarianceOfMean(tmp) );
+	mean = meanOfDataSample(sampleIn);
+	error = sqrt( unbiasedVarianceOfMean(sampleIn) );
 
 	return EstimateAndError(mean, error);
 }
@@ -120,16 +119,20 @@ EstimateAndError calcVarianceAndErrorOfDataSample(DataSampleBasic sampleIn)
 #include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
 
 //todo: work over this
-EstimateAndError calcSkewness(DataSample sample, int numberOfBins)
+EstimateAndError calcSkewness(DataSample sampleIn, Parameters parameters)
 {
     /**
      * Skewness gamma_1 is defined as:
      *   gamma_1 = <(x-mu)^3> / <(x-mu)^2>^(3/2)
      */
+
+	//todo: this is a workaround, the binned dataSample as argument has to be implemented.
+	DataSample sample(parameters.file);
+
     DataSample thirdCentralMoment = (sample - sample.getNthMoment(1)) ^ 3;
     DataSample secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
-    BinnedDataSampleFromNumberOfBins binnedSample1(thirdCentralMoment, numberOfBins);
-    BinnedDataSampleFromNumberOfBins binnedSample2(secondCentralMoment, numberOfBins);
+    BinnedDataSampleFromNumberOfBins binnedSample1(thirdCentralMoment, parameters.numberOfBins);
+    BinnedDataSampleFromNumberOfBins binnedSample2(secondCentralMoment, parameters.numberOfBins);
     JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
     JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
     //this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
@@ -142,7 +145,7 @@ EstimateAndError calcSkewness(DataSample sample, int numberOfBins)
 
 //todo: work over this
 //todo: repair: this is acutally binder, rename? print also kurtosis?
-EstimateAndError calcKurtosis(DataSample sample, int numberOfBins)
+EstimateAndError calcKurtosis(DataSample sampleIn, Parameters parameters)
 {
     /**
 		 * The Fourth Std. Moment beta_2 is defined as:
@@ -151,10 +154,14 @@ EstimateAndError calcKurtosis(DataSample sample, int numberOfBins)
 		 * The Kurtosis gamma_2 is defined as:
 		 *   gamma_2 = beta_2 - 3
 		 */
+
+	//todo: this is a workaround, the binned dataSample as argument has to be implemented.
+	DataSample sample(parameters.file);
+
     DataSample fourthCentralMoment = (sample - sample.getNthMoment(1)) ^ 4;
     DataSample secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
-    BinnedDataSampleFromNumberOfBins binnedSample1 (fourthCentralMoment, numberOfBins);
-    BinnedDataSampleFromNumberOfBins binnedSample2 (secondCentralMoment, numberOfBins);
+    BinnedDataSampleFromNumberOfBins binnedSample1 (fourthCentralMoment, parameters.numberOfBins);
+    BinnedDataSampleFromNumberOfBins binnedSample2 (secondCentralMoment, parameters.numberOfBins);
     JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
     JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
     //this calculates x_i / y_i^2, where x_i and y_i are the jackknife estimators of the fourth and second moment

@@ -35,7 +35,7 @@ public:
 	MeanAnalyzer(DataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Mean")
 	{
-	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(sample, parameters.numberOfBins);
+	    estimateAndError = calcMeanAndErrorOfDataSample(sample);
 	}
 };
 
@@ -48,7 +48,7 @@ public:
 	    DataSample varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
 
 	    //todo: replace with dedicated function
-	    estimateAndError = calcMeanAndErrorOfDataSampleWithBinningFromNumberOfBins(varianceSample, parameters.numberOfBins);
+	    estimateAndError = calcMeanAndErrorOfDataSample(varianceSample);
 	}
 };
 
@@ -59,7 +59,7 @@ public:
 		AnalyzerWrapper("Skewness")
 	{
 		//todo: replace with dedicated function
-	    estimateAndError = calcSkewness(sample, parameters.numberOfBins);
+	    estimateAndError = calcSkewness(sample, parameters);
 	}
 };
 
@@ -70,7 +70,7 @@ public:
 		AnalyzerWrapper("Kurtosis")
 	{
 	    //todo: replace with dedicated function
-	    estimateAndError = calcKurtosis(sample, parameters.numberOfBins);
+	    estimateAndError = calcKurtosis(sample, parameters);
 	}
 };
 
