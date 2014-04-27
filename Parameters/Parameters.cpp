@@ -1,15 +1,10 @@
 #include "Parameters.hpp"
 
-#include <boost/program_options.hpp>
-#include <boost/algorithm/string.hpp>
-namespace po = boost::program_options;
-
 Parameters::Parameters(int argc, const char ** argv)
 {
-	std::string defaultFile = "";
-
 	po::options_description desc("   Options for data analysis.\nUsage: \"--<optionName>=<value>\" (or \"-<shortOptionName><value>\")\nNote that boolean options can be changed from their default value implicitly, ie without giving explicitly true or false in the command line.\nFor example, \"--useBinning\" equals \"--useBinning=false\" (as the default value is true)");
 	po::variables_map vm;
+	po::positional_options_description positionalOptions;
 
 	//todo: Maybe it would be nicer to put the observables into a vector
 	/**
@@ -18,7 +13,7 @@ Parameters::Parameters(int argc, const char ** argv)
 	 */
 	desc.add_options()
 		("help,h", "Produce this help message")
-		("file,f", po::value<std::string>(&file)->default_value(defaultFile), "File containing data")
+		("file,f", po::value<std::string>(&file), "File containing data")
 		("offset,o", po::value<int>(&offset)->default_value(0), "Discard first <offset> values of data")
 		("analyzeMean", po::value<bool>(&analyzeMean)->default_value(true)->implicit_value(false), "Analyse data for mean")
 		("analyzeVariance", po::value<bool>(&analyzeVariance)->default_value(true)->implicit_value(false), "Analyse data for variance")
@@ -32,17 +27,26 @@ Parameters::Parameters(int argc, const char ** argv)
 		;
 
 	//option "file" can be given without option description
-	po::positional_options_description positionalOptions;
+
 	positionalOptions.add("file", 1);
-
 	po::store(po::command_line_parser(argc, argv).options(desc).positional(positionalOptions).run(), vm);
+	po::notify(vm);
 
+	checkParsedArguments(vm, desc);
+	printParameters();
+}
+
+void Parameters::checkParsedArguments(po::variables_map & vm, po::options_description & desc)
+{
 	if(vm.count("help")) { // see http://stackoverflow.com/questions/5395503/required-and-optional-arguments-using-boost-library-program-options as to why this is done before po::notifiy(vm)
 		std::cout << desc << '\n';
 		throw Parameters::parse_aborted();
 	}
 
-	po::notify(vm);
+	if (! vm.count("file") )
+	{
+		throw std::invalid_argument("No datafile given. Aborting!");
+	}
 
 	/**
 	 * For the binning one has to know if it should be
@@ -76,13 +80,6 @@ Parameters::Parameters(int argc, const char ** argv)
 			throw std::invalid_argument("Not clear what binning parameter to use, both \"numberOfBins\" and \"binsize\" have been set. Aborting!");
 		}
 		useNumberOfBinsForBinning = false;
-	}
-
-	printParameters();
-
-	if (file == defaultFile)
-	{
-		throw std::invalid_argument("No datafile given. Aborting!");
 	}
 }
 

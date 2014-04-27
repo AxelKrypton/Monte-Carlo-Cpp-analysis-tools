@@ -2,6 +2,9 @@
 #define PARAMETERS_HPP_
 
 #include "iostream"
+#include <boost/program_options.hpp>
+#include <boost/algorithm/string.hpp>
+namespace po = boost::program_options;
 
 class Parameters
 {
@@ -24,6 +27,7 @@ public:
 private:
 	void printParameters();
 	void setBinningTypeParameter(bool valueIn);
+	void checkParsedArguments(po::variables_map & vm, po::options_description & desc);
 };
 
 #endif /* PARAMETERS_HPP_ */
