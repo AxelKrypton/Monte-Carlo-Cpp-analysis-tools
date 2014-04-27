@@ -9,22 +9,24 @@
 
 #include "../Parameters/Parameters.hpp"
 #include "dataAnalysisUtilities.hpp"
+#include "../IO/io_utilities.hpp"
 
 class AnalyzerWrapper
 {
 protected:
-	AnalyzerWrapper(std::string name):
-		estimateName(name)
+	AnalyzerWrapper(std::string name, std::string outputFilename):
+		estimateName(name), outputFilename(outputFilename)
 	{
 		std::cout << "# Analyse " << name << "..." << std::endl;
 	}
 	~AnalyzerWrapper()
 	{
-	    std::cout << "# " << estimateName << "\t\tError" << std::endl;
-	    std::cout << std::scientific << estimateAndError.estimate << "\t" << estimateAndError.error << std::endl;
+		printEstimateAndError(estimateName, estimateAndError.estimate, estimateAndError.error);
+		writeEstimateAndErrorToFile(estimateName, estimateAndError.estimate, estimateAndError.error, outputFilename);
 	}
 
 	std::string estimateName;
+	std::string outputFilename;
 	EstimateAndError estimateAndError;
 };
 
@@ -32,7 +34,7 @@ class MeanAnalyzer : public AnalyzerWrapper
 {
 public:
 	MeanAnalyzer(DataSample &sample, const Parameters parameters):
-		AnalyzerWrapper("Mean")
+		AnalyzerWrapper("Mean", getFilenameForObservables(parameters))
 	{
 	    estimateAndError = calcMeanAndErrorOfDataSample(sample);
 	}
@@ -42,7 +44,7 @@ class VarianceAnalyzer : public AnalyzerWrapper
 {
 public:
 	VarianceAnalyzer(DataSample &sample, const Parameters parameters):
-		AnalyzerWrapper("Variance")
+		AnalyzerWrapper("Variance", getFilenameForObservables(parameters))
 	{
 	    estimateAndError = calcVarianceAndErrorOfDataSample(sample);
 	}
@@ -52,7 +54,7 @@ class SkewnessAnalyzer : public AnalyzerWrapper
 {
 public:
 	SkewnessAnalyzer(DataSample &sample, const Parameters parameters):
-		AnalyzerWrapper("Skewness")
+		AnalyzerWrapper("Skewness", getFilenameForObservables(parameters))
 	{
 	    estimateAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
 	}
@@ -62,7 +64,7 @@ class KurtosisAnalyzer : public AnalyzerWrapper
 {
 public:
 	KurtosisAnalyzer(DataSample &sample, const Parameters parameters):
-		AnalyzerWrapper("Kurtosis")
+		AnalyzerWrapper("Kurtosis", getFilenameForObservables(parameters))
 	{
 	    estimateAndError = calcKurtosisAndErrorOfDataSample(sample, parameters);
 	}
@@ -72,7 +74,7 @@ class AutocorrelationAnalyzer : public AnalyzerWrapper
 {
 public:
 	AutocorrelationAnalyzer(DataSample &sample, Parameters parameters):
-		AnalyzerWrapper("Autocorrelation")
+		AnalyzerWrapper("Autocorrelation", getFilenameForObservables(parameters))
 	{
 		estimateAndError = calcAutocorrelationAndErrorOfDataSample(sample, parameters);
 	}

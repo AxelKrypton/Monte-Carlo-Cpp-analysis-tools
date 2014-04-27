@@ -6,4 +6,7 @@
 
 std::string getFilenameForObservables(Parameters parameters);
 
+void printEstimateAndError(std::string estimateName, double estimateValue, double errorValue);
+void writeEstimateAndErrorToFile(std::string estimateName, double estimateValue, double errorValue, std::string filename);
+
 #endif /* IO_UTILITIES_HPP_ */

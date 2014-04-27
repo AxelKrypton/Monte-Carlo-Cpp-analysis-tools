@@ -6,7 +6,7 @@
 
 #include "io_utilities.hpp"
 
-BOOST_AUTO_TEST_CASE(FilenameForObservables)
+BOOST_AUTO_TEST_CASE(filenameForObservables)
 {
 	std::string dummyFilename = "foo";
 	const char * arguments[] = {"foo", dummyFilename.c_str()};
