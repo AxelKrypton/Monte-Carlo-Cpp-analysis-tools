@@ -17,4 +17,13 @@ BOOST_AUTO_TEST_CASE(filenameForObservables)
 	BOOST_CHECK(expectedName == getFilenameForObservables(parameters));
 }
 
+BOOST_AUTO_TEST_CASE(writeEstimateAndErrorToFile_invalidArgument)
+{
+	std::string fileThatCannotBeOpened = "";
+	const char * arguments[] = {"foo", fileThatCannotBeOpened.c_str()};
+	Parameters parameters(2, arguments);
+
+	BOOST_REQUIRE_THROW(writeEstimateAndErrorToFile(fileThatCannotBeOpened, 0., 0., fileThatCannotBeOpened), std::invalid_argument);
+}
+
 
