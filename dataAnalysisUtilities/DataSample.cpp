@@ -2,6 +2,11 @@
 #include <sstream>
 #include "DataSample.hpp"
 
+static double calcNthMomentExplicit(DataSample & sampleIn, int n);
+static double calcFirstMomentExplicit(DataSample & sampleIn);
+static double calcNthCentralMomentExplicit(DataSample & sampleIn, int n);
+static void checkIfNIsValid(int n, int upperLimit, int lowerLimit);
+
 void DataSample::initMoments()
 {
 	int numberOfMoments = getNumberOfMoments();
@@ -11,7 +16,7 @@ void DataSample::initMoments()
 
 double DataSample::getNthMoment(int n)
 {
-	checkIfNIsValid(n);
+	checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
 	if (!moments[n].calculated)
 	{
 		moments[n].set(calcNthMoment(n));
@@ -23,27 +28,17 @@ double DataSample::calcNthMoment(int n)
 {
 	if ( n == 1)
 	{
-		return calcFirstMomentExplicit();
+		return calcFirstMomentExplicit(*this);
 	}
 	else
 	{
-		return calcNthMomentExplicit(n);
+		return calcNthMomentExplicit(*this, n);
 	}
-}
-
-double DataSample::calcNthMomentExplicit(int n)
-{
-	return (*this^n).sum() / (double) numberOfElements;
-}
-
-double DataSample::calcFirstMomentExplicit()
-{
-	return sum() / numberOfElements;
 }
 
 double DataSample::getNthCentralMoment(int n)
 {
-	checkIfNIsValid(n);
+	checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
 	if (!centralMoments[n].calculated)
 	{
 		centralMoments[n].set(calcNthCentralMoment(n));
@@ -63,13 +58,8 @@ double DataSample::calcNthCentralMoment(int n)
 	}
 	else
 	{
-		return calcNthCentralMomentExplicit(n);
+		return calcNthCentralMomentExplicit(*this, n);
 	}
-}
-
-double DataSample::calcNthCentralMomentExplicit(int n)
-{
-	return ( (*this - getNthMoment(1) )^( (double(n)) )  ).sum()  / numberOfElements;
 }
 
 int DataSample::getNumberOfMoments()
@@ -87,9 +77,23 @@ int DataSample::getLowerLimitForNthMoment()
 	return lowerLimitForNthMoment;
 }
 
-void DataSample::checkIfNIsValid(int n)
+static void checkIfNIsValid(int n, int upperLimit, int lowerLimit)
 {
-	if(n < lowerLimitForNthMoment || n > upperLimitForNthMoment)
+	if(n < lowerLimit || n > upperLimit)
 		throw std::invalid_argument("The requested moment is not implemented yet!");
 }
 
+static double calcNthMomentExplicit(DataSample & sampleIn, int n)
+{
+	return (sampleIn^n).sum() / (double) sampleIn.getNumberOfElements();
+}
+
+static double calcFirstMomentExplicit(DataSample & sampleIn)
+{
+	return sampleIn.sum() / sampleIn.getNumberOfElements();
+}
+
+static double calcNthCentralMomentExplicit(DataSample & sampleIn, int n)
+{
+	return ( (sampleIn - sampleIn.getNthMoment(1) )^( (double(n)) )  ).sum()  / sampleIn.getNumberOfElements();
+}

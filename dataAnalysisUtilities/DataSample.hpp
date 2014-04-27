@@ -58,11 +58,7 @@ protected:
 	int getNumberOfMoments();
 	void initMoments();
 	double calcNthMoment(int n);
-	double calcNthMomentExplicit(int n);
 	double calcNthCentralMoment(int n);
-	double calcNthCentralMomentExplicit(int n);
-	double calcFirstMomentExplicit();
-	void checkIfNIsValid(int n);
 
 	std::vector<Moment> moments;
 	std::vector<Moment> centralMoments;
