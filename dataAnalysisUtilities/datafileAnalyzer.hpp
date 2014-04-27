@@ -28,7 +28,6 @@ protected:
 	EstimateAndError estimateAndError;
 };
 
-//todo: in all classes here: implement usage of binsize or no binning
 class MeanAnalyzer : public AnalyzerWrapper
 {
 public:
@@ -45,10 +44,7 @@ public:
 	VarianceAnalyzer(DataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Variance")
 	{
-	    DataSample varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
-
-	    //todo: replace with dedicated function
-	    estimateAndError = calcMeanAndErrorOfDataSample(varianceSample);
+	    estimateAndError = calcVarianceAndErrorOfDataSample(sample);
 	}
 };
 
@@ -58,8 +54,7 @@ public:
 	SkewnessAnalyzer(DataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Skewness")
 	{
-		//todo: replace with dedicated function
-	    estimateAndError = calcSkewness(sample, parameters);
+	    estimateAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
 	}
 };
 
@@ -69,8 +64,7 @@ public:
 	KurtosisAnalyzer(DataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Kurtosis")
 	{
-	    //todo: replace with dedicated function
-	    estimateAndError = calcKurtosis(sample, parameters);
+	    estimateAndError = calcKurtosisAndErrorOfDataSample(sample, parameters);
 	}
 };
 
@@ -80,7 +74,7 @@ public:
 	AutocorrelationAnalyzer(DataSample &sample, Parameters parameters):
 		AnalyzerWrapper("Autocorrelation")
 	{
-		estimateAndError = calcAutocorrelation(sample, parameters);
+		estimateAndError = calcAutocorrelationAndErrorOfDataSample(sample, parameters);
 	}
 };
 

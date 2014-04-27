@@ -20,7 +20,7 @@ public:
 	double error;
 };
 
-static double meanOfDataSample(DataSample sampleIn)
+static double meanOfDataSample(DataSample & sampleIn)
 {
 	return sampleIn.getNthMoment(1);
 }
@@ -38,28 +38,17 @@ static double meanOfDataSample(DataSample sampleIn)
  * Note that for the mean the unbiased variance yields
  * the same error as jackknifing.
  */
-static double unbiasedVarianceOfDataSample(DataSample sampleIn)
+static double unbiasedVarianceOfDataSample(DataSample & sampleIn)
 {
 	return double(sampleIn.getNumberOfElements()) / double(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthCentralMoment(2);
 }
 
-static double unbiasedVarianceOfMean(DataSample sampleIn)
+static double unbiasedVarianceOfMean(DataSample & sampleIn)
 {
 	return 1. / double(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthCentralMoment(2);
 }
 
-EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn)
-{
-	double mean;
-	double error;
-
-	mean = meanOfDataSample(sampleIn);
-	error = sqrt( unbiasedVarianceOfMean(sampleIn) );
-
-	return EstimateAndError(mean, error);
-}
-
-static double unbiasedErrorOfVariance(DataSample sampleIn)
+static double unbiasedErrorOfVariance(DataSample & sampleIn)
 {
 	/**
 	 * A Jackknife analysis of the (naive) sample variance
@@ -77,15 +66,24 @@ static double unbiasedErrorOfVariance(DataSample sampleIn)
 	return sqrt( unbiasedVarianceOfMean(varianceSample) );
 }
 
-EstimateAndError calcVarianceAndErrorOfDataSample(DataSampleBasic sampleIn)
+EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn)
 {
-	DataSample sample(sampleIn);
+	double mean;
+	double error;
+
+	mean = meanOfDataSample(sampleIn);
+	error = sqrt( unbiasedVarianceOfMean(sampleIn) );
+
+	return EstimateAndError(mean, error);
+}
+
+EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn)
+{
 	double variance;
 	double error;
 
-	variance = unbiasedVarianceOfDataSample(sample);
-	DataSample varianceSample = (sample - sample.getNthMoment(1)) ^ 2;
-	error = unbiasedErrorOfVariance(sample);
+	variance = unbiasedVarianceOfDataSample(sampleIn);
+	error = unbiasedErrorOfVariance(sampleIn);
 
 	return EstimateAndError(variance, error);
 }
@@ -94,7 +92,7 @@ EstimateAndError calcVarianceAndErrorOfDataSample(DataSampleBasic sampleIn)
 #include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
 
 //todo: work over this
-EstimateAndError calcSkewness(DataSample sampleIn, Parameters parameters)
+EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample sampleIn, Parameters parameters)
 {
     /**
      * Skewness gamma_1 is defined as:
@@ -120,7 +118,7 @@ EstimateAndError calcSkewness(DataSample sampleIn, Parameters parameters)
 
 //todo: work over this
 //todo: repair: this is acutally binder, rename? print also kurtosis?
-EstimateAndError calcKurtosis(DataSample sampleIn, Parameters parameters)
+EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample sampleIn, Parameters parameters)
 {
     /**
 		 * The Fourth Std. Moment beta_2 is defined as:
@@ -148,7 +146,7 @@ EstimateAndError calcKurtosis(DataSample sampleIn, Parameters parameters)
 }
 
 //todo: implement
-EstimateAndError calcAutocorrelation(DataSample sample, Parameters parameters)
+EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample sample, Parameters parameters)
 {
 	throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
 }
