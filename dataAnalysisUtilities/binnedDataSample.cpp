@@ -1,8 +1,14 @@
 #include "binnedDataSample.hpp"
+#include "../IO/io_utilities.hpp"
+
+static void printBinningInformation(int numberOfBins, int binsize)
+{
+	std::cout << "# Perform binning with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
+}
 
 DataSampleBasic BinnedDataSample::performBinning(DataSampleBasic sampleIn)
 {
-	std::cout << "perform binning with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
+	printBinningInformation(numberOfBins, binsize);
 	DataSampleBasic binnedDataSample(numberOfBins);
 	for(int iteration = 0; iteration < numberOfBins; iteration++)
 	{

@@ -13,6 +13,7 @@ void printEstimateAndError(std::string estimateName, double estimateValue, doubl
 	std::cout << std::scientific << estimateValue << "\t" << errorValue << std::endl;
 }
 
+//todo: add test for exception
 void writeEstimateAndErrorToFile(std::string estimateName, double estimateValue, double errorValue, std::string filename)
 {
 	std::ofstream outputstream;
@@ -26,3 +27,4 @@ void writeEstimateAndErrorToFile(std::string estimateName, double estimateValue,
 		throw std::invalid_argument("Could open file for estimate and error output. Aborting!");
 	}
 }
+
