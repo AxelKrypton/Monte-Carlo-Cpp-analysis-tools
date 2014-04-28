@@ -1,3 +1,5 @@
+- is it ok to obtain the mean and variance from the binned sample and not from the whole one? (binning neglects elements depending on the binsize)
+
 - implement autocorrelation
 
 - work over jackknife class
