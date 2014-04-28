@@ -11,6 +11,7 @@ int main(int argc, const char ** argv)
 	catch ( const std::exception &e)
 	{
 		std::cout << e.what() << std::endl;
+		exit(1);
 	}
 	catch(Parameters::parse_aborted)
 	{
@@ -19,6 +20,7 @@ int main(int argc, const char ** argv)
 	catch (...)
 	{
 		std::cout << "Caught non-standard exception!";
+		exit(1);
 	}
 
     return 0;
