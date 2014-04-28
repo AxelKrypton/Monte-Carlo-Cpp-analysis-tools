@@ -1,0 +1,2 @@
+- add documentary files (e.g. about jackknife)
+- add reference executables
