@@ -2,7 +2,6 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE dataSample
 #include <boost/test/unit_test.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include "io_utilities.hpp"
 
