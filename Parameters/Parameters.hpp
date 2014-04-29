@@ -25,6 +25,7 @@ public:
 	bool analyzeVariance;
 	bool analyzeSkewness;
 	bool analyzeKurtosis;
+	bool binningMustFitDataSampleSize;
 
 private:
 	void printParameters();

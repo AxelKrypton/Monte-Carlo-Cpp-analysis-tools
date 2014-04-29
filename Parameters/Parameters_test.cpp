@@ -139,6 +139,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_CHECK(defaultValue == parameters.analysisOutputFilePostfix);
 	}
 
+	BOOST_AUTO_TEST_CASE(binningMustFitDataSampleSize)
+	{
+		bool defaultValue = false;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().binningMustFitDataSampleSize);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(setArguments)
@@ -374,6 +380,20 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		Parameters parameters(3, arguments);
 
 		BOOST_CHECK(newValue == parameters.analysisOutputFilePostfix);
+	}
+
+	BOOST_AUTO_TEST_CASE(binningMustFitDataSampleSize1)
+	{
+		bool newValue = true;
+		std::string argumentName = "--binningMustFitDataSampleSize";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).binningMustFitDataSampleSize);
+	}
+
+	BOOST_AUTO_TEST_CASE(binningMustFitDataSampleSize2)
+	{
+		bool newValue = true;
+		std::string argumentName = "--binningMustFitDataSampleSize";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).binningMustFitDataSampleSize);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
