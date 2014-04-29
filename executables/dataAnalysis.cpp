@@ -1,4 +1,5 @@
 #include "../dataAnalysisUtilities/datafileAnalyzer.hpp"
+#include "exceptions.hpp"
 
 int main(int argc, const char ** argv)
 {
@@ -8,6 +9,11 @@ int main(int argc, const char ** argv)
 	    DatafileAnalyzer analyzer(parameters.file, parameters);
 	}
 	//todo: move catch block into own function?
+	catch ( wrongBinningParameter &e)
+	{
+		std::cout << e.what() << std::endl;
+		exit(2);
+	}
 	catch ( const std::exception &e)
 	{
 		std::cout << e.what() << std::endl;

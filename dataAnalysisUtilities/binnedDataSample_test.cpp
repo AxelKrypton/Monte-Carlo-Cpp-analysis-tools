@@ -6,6 +6,7 @@
 #include "binnedDataSample.hpp"
 
 #include "TestDataSample.hpp"
+#include "../executables/exceptions.hpp"
 
 BOOST_AUTO_TEST_SUITE(withNumberOfBins_build)
 
@@ -34,13 +35,32 @@ BOOST_AUTO_TEST_SUITE(withNumberOfBins_build)
 	{
 		int numberOfElements = 123;
 		int numberThatIsTooBig = numberOfElements + 1;
-		testBinningWithNumberOfBins_wrongArgument(numberOfElements, numberThatIsTooBig);	}
+		testBinningWithNumberOfBins_wrongArgument(numberOfElements, numberThatIsTooBig);
+	}
 
 	BOOST_AUTO_TEST_CASE(invalidArgument3)
 	{
 		int numberOfElements = 33;
 		int negativeNumber = - numberOfElements;
-		testBinningWithNumberOfBins_wrongArgument(numberOfElements, negativeNumber);	}
+		testBinningWithNumberOfBins_wrongArgument(numberOfElements, negativeNumber);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument4)
+	{
+		int numberOfElements = 33;
+		int notFittingBinningParameter = 2;
+		DataSampleBasic sample(numberOfElements);
+		BOOST_REQUIRE_THROW(BinnedDataSampleFromNumberOfBins binnedSample(sample, notFittingBinningParameter, true), wrongBinningParameter);
+	}
+
+	BOOST_AUTO_TEST_CASE(invalidArgument5)
+	{
+		int numberOfElements = 33;
+		int notFittingBinningParameter = 2;
+		DataSampleBasic sample(numberOfElements);
+		BOOST_REQUIRE_THROW(BinnedDataSampleFromBinsize binnedSample(sample, notFittingBinningParameter, true), wrongBinningParameter);
+	}
+
 
 	static void testBinningWithNumberOfBins_elements(int numberOfElements, int desiredNumberOfElementsOfBinnedDataSample)
 	{

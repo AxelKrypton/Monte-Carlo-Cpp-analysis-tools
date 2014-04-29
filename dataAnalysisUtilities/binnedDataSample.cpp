@@ -1,5 +1,7 @@
 #include "binnedDataSample.hpp"
+
 #include "../IO/io_utilities.hpp"
+#include "../executables/exceptions.hpp"
 
 static void printBinningInformation(int numberOfBins, int binsize)
 {
@@ -24,19 +26,23 @@ void BinnedDataSample::checkDiscardedElements(int valueIn, std::string descripti
 	{
 		std::cout << "Warning: " << descriptionIn << " is not a multiple of numberOfElements!" << std::endl;
 		std::cout << discardedElements<< " elements are discarded!" << std::endl;
+		if ( binningMustFitSize )
+		{
+			throw wrongBinningParameter();
+		}
 	}
 }
 
-BinnedDataSampleFromNumberOfBins::BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn)
+BinnedDataSampleFromNumberOfBins::BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn, bool requireBinningToMatchSize)
 {
+	binningMustFitSize = requireBinningToMatchSize;
 	numberOfBins = numberOfBinsIn;
 	checkIfNumberOfBinsIsValid(sampleIn.getNumberOfElements());
 	calcBinsize(sampleIn.getNumberOfElements());
 	setValues(performBinning(sampleIn));
 }
 
-//todo: rename again!
-static void checkIfBinningParameterIsValid_toberenamed(int valueIn, std::string descriptionIn, int numberOfElements)
+static void checkIfBinningParameterIsValid(int valueIn, std::string descriptionIn, int numberOfElements)
 {
 	if(valueIn <= 0)
 		throw std::invalid_argument("Cannot perform binning with " +  descriptionIn + " zero or less!");
@@ -46,7 +52,7 @@ static void checkIfBinningParameterIsValid_toberenamed(int valueIn, std::string 
 
 void BinnedDataSampleFromNumberOfBins::checkIfNumberOfBinsIsValid(int elementsOfSample)
 {
-	checkIfBinningParameterIsValid_toberenamed(numberOfBins, "numberOfBins", elementsOfSample);
+	checkIfBinningParameterIsValid(numberOfBins, "numberOfBins", elementsOfSample);
 }
 
 void BinnedDataSampleFromNumberOfBins::calcBinsize(int elementsOfSample)
@@ -57,7 +63,7 @@ void BinnedDataSampleFromNumberOfBins::calcBinsize(int elementsOfSample)
 
 void BinnedDataSampleFromBinsize::checkIfBinsizeIsValid(int elementsOfSample)
 {
-	checkIfBinningParameterIsValid_toberenamed(binsize, "binsize", elementsOfSample);
+	checkIfBinningParameterIsValid(binsize, "binsize", elementsOfSample);
 }
 
 void BinnedDataSampleFromBinsize::calcNumberOfBins(int elementsOfSample)
@@ -66,8 +72,9 @@ void BinnedDataSampleFromBinsize::calcNumberOfBins(int elementsOfSample)
 	numberOfBins = elementsOfSample / binsize;
 }
 
-BinnedDataSampleFromBinsize::BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsizeIn)
+BinnedDataSampleFromBinsize::BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsizeIn, bool requireBinningToMatchSize)
 {
+	binningMustFitSize = requireBinningToMatchSize;
 	binsize = binsizeIn;
 	checkIfBinsizeIsValid(sampleIn.getNumberOfElements());
 	calcNumberOfBins(sampleIn.getNumberOfElements());

@@ -18,12 +18,13 @@ protected:
 
 	int numberOfBins;
 	int binsize;
+	bool binningMustFitSize;
 };
 
 class BinnedDataSampleFromNumberOfBins : public BinnedDataSample
 {
 public:
-	BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn);
+	BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn, bool requireBinningToMatchSize = false);
 
 protected:
 	void checkIfNumberOfBinsIsValid(int elementsOfSample);
@@ -33,7 +34,7 @@ protected:
 class BinnedDataSampleFromBinsize : public BinnedDataSample
 {
 public:
-	BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsize);
+	BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsize, bool requireBinningToMatchSize = false);
 
 protected:
 	void checkIfBinsizeIsValid(int elementsOfSample);
