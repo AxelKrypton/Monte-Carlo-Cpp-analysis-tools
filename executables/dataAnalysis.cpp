@@ -1,5 +1,6 @@
 #include "../dataAnalysisUtilities/datafileAnalyzer.hpp"
 #include "exceptions.hpp"
+#include "exitCodes.hpp"
 
 int main(int argc, const char ** argv)
 {
@@ -12,12 +13,12 @@ int main(int argc, const char ** argv)
 	catch ( wrongBinningParameter &e)
 	{
 		std::cout << e.what() << std::endl;
-		exit(2);
+		exit(EXIT_BINNING_ERROR);
 	}
 	catch ( const std::exception &e)
 	{
 		std::cout << e.what() << std::endl;
-		exit(1);
+		exit(EXIT_ERROR);
 	}
 	catch(Parameters::parse_aborted)
 	{
@@ -26,8 +27,8 @@ int main(int argc, const char ** argv)
 	catch (...)
 	{
 		std::cout << "Caught non-standard exception!";
-		exit(1);
+		exit(EXIT_ERROR);
 	}
 
-    return 0;
+    return EXIT_NORMAL;
 }
