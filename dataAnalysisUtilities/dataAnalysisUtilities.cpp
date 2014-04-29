@@ -138,11 +138,11 @@ DataSample createDataSampleFromDatafile(std::string filename, Parameters paramet
 	{
 		if ( parameters.useNumberOfBinsForBinning)
 		{
-			return BinnedDataSampleFromNumberOfBins(dataSample, parameters.numberOfBins);
+			return BinnedDataSampleFromNumberOfBins(dataSample, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
 		}
 		else
 		{
-			return BinnedDataSampleFromBinsize(dataSample, parameters.binsize);
+			return BinnedDataSampleFromBinsize(dataSample, parameters.binsize, parameters.binningMustFitDataSampleSize);
 		}
 	}
 	else
