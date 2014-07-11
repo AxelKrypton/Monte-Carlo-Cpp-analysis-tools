@@ -84,16 +84,34 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 
     DataSample thirdCentralMoment = (sample - sample.getNthMoment(1)) ^ 3;
     DataSample secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
-    BinnedDataSampleFromNumberOfBins binnedSample1(thirdCentralMoment, parameters.numberOfBins);
-    BinnedDataSampleFromNumberOfBins binnedSample2(secondCentralMoment, parameters.numberOfBins);
-    JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
-    JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
-    //this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
-    JackknifeEstimators skewnessSample(jackSample1 / (jackSample2 ^ (3. / 2)));
-    double skewness = skewnessSample.getNthMoment(1);
-    double error = skewnessSample.getJackknifeError();
+    if ( parameters.useNumberOfBinsForBinning)
+      {
+	BinnedDataSampleFromNumberOfBins binnedSample1(thirdCentralMoment, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
+	BinnedDataSampleFromNumberOfBins binnedSample2(secondCentralMoment, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
 
-    return EstimateAndError(skewness, error);
+	JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
+	JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
+	//this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
+	JackknifeEstimators skewnessSample(jackSample1 / (jackSample2 ^ (3. / 2)));
+	double skewness = skewnessSample.getNthMoment(1);
+	double error = skewnessSample.getJackknifeError();
+    
+	return EstimateAndError(skewness, error);
+      }
+    else
+      {
+	BinnedDataSampleFromBinsize binnedSample1(thirdCentralMoment, parameters.binsize, parameters.binningMustFitDataSampleSize);
+	BinnedDataSampleFromBinsize binnedSample2(secondCentralMoment, parameters.binsize, parameters.binningMustFitDataSampleSize);
+
+	JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
+	JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
+	//this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
+	JackknifeEstimators skewnessSample(jackSample1 / (jackSample2 ^ (3. / 2)));
+	double skewness = skewnessSample.getNthMoment(1);
+	double error = skewnessSample.getJackknifeError();
+	
+	return EstimateAndError(skewness, error);
+      }
 }
 
 //todo: work over this
@@ -113,16 +131,33 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Paramet
 
     DataSample fourthCentralMoment = (sample - sample.getNthMoment(1)) ^ 4;
     DataSample secondCentralMoment = (sample - sample.getNthMoment(1)) ^ 2;
-    BinnedDataSampleFromNumberOfBins binnedSample1 (fourthCentralMoment, parameters.numberOfBins);
-    BinnedDataSampleFromNumberOfBins binnedSample2 (secondCentralMoment, parameters.numberOfBins);
-    JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
-    JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
-    //this calculates x_i / y_i^2, where x_i and y_i are the jackknife estimators of the fourth and second moment
-    JackknifeEstimators kurtosisSample(jackSample1 / (jackSample2 ^ 2));
-    double skewness = kurtosisSample.getNthMoment(1);
-    double error = kurtosisSample.getJackknifeError();
+    if ( parameters.useNumberOfBinsForBinning)
+      {
+	BinnedDataSampleFromNumberOfBins binnedSample1 (fourthCentralMoment, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
+	BinnedDataSampleFromNumberOfBins binnedSample2 (secondCentralMoment, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
+	JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
+	JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
+	//this calculates x_i / y_i^2, where x_i and y_i are the jackknife estimators of the fourth and second moment
+	JackknifeEstimators kurtosisSample(jackSample1 / (jackSample2 ^ 2));
+	double skewness = kurtosisSample.getNthMoment(1);
+	double error = kurtosisSample.getJackknifeError();
 
-    return EstimateAndError(skewness, error);
+	return EstimateAndError(skewness, error);
+      }
+    else
+      {
+	BinnedDataSampleFromBinsize binnedSample1(fourthCentralMoment, parameters.binsize, parameters.binningMustFitDataSampleSize);
+	BinnedDataSampleFromBinsize binnedSample2(secondCentralMoment, parameters.binsize, parameters.binningMustFitDataSampleSize);
+	JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
+	JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
+	//this calculates x_i / y_i^2, where x_i and y_i are the jackknife estimators of the fourth and second moment
+	JackknifeEstimators kurtosisSample(jackSample1 / (jackSample2 ^ 2));
+	double skewness = kurtosisSample.getNthMoment(1);
+	double error = kurtosisSample.getJackknifeError();
+
+	return EstimateAndError(skewness, error);
+      }
+
 }
 
 //todo: implement
