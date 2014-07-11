@@ -38,6 +38,8 @@ add_library(StAT ${StAT_FILES})
 
 ## Add to StAT each sub-directory linking it to the StAT library (see Macros.cmake in cmake folder)
 add_modules(StAT
+	Parameters
+	IO
 	dataAnalysisUtilities
 	Reweighting
 )
@@ -49,3 +51,6 @@ target_link_libraries(StAT ${StAT_USED_LIBS})
 ## The actual executables (frontends)
 add_executable(dataAnalysis executables/dataAnalysis.cpp)
 target_link_libraries(dataAnalysis StAT)
+
+#include scripts-directory
+add_subdirectory("${CMAKE_SOURCE_DIR}/Scripts")

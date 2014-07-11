@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_SUITE(AccessOperator)
 		filledMap["beta"] = 4.0;
 		SimulationData simData(filledMap, fileThatDoesExist);
 		int numberOfDataSampleGivenInInputFile = simData.getNumberOfDataSample();
-		BOOST_REQUIRE_NO_THROW(DataSample dataSample = simData[numberOfDataSampleGivenInInputFile-1]);
+		BOOST_REQUIRE_NO_THROW(DataSampleBasic dataSample = simData[numberOfDataSampleGivenInInputFile-1]);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

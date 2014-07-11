@@ -6,7 +6,7 @@
 
 static void checkIfDatafileExists(std::string);
 static void throwInvalidColumnOfFile(std::string, const int);
-static void checkIfDatafileWasGood(std::vector<DataSample>, std::string);
+static void checkIfDatafileWasGood(std::vector<DataSampleBasic>, std::string);
 
 /*****************************************************************************************/
 
@@ -25,7 +25,7 @@ SimulationData::SimulationData(std::map<std::string, double> simulationParameter
 		for(int i=0; ; i++){
 			bool charInLine;
 			try{
-				simulationRawData.push_back(DataSample(filenameIn, i+1, offset, &charInLine));
+				simulationRawData.push_back(DataSampleBasic(filenameIn, i+1, offset, &charInLine));
 				/*
 				 * Note: if in a column are present only invalid data, the above push_back throw an exception
 				 *       and the rest of the try is skipped. Furthermore one cannot rely on the value of charInLine
@@ -70,7 +70,7 @@ double SimulationData::getParameterValue(std::string parameterName)
 }
 
 
-DataSample& SimulationData::operator[](int index)
+DataSampleBasic& SimulationData::operator[](int index)
 {
 	return simulationRawData.at(index);
 }
@@ -97,7 +97,7 @@ static void throwInvalidColumnOfFile(std::string filenameIn, const int columnNum
  * that all lines must have had the same amount of columns, namely each created DataSample should
  * have the same amount of elements.
  */
-static void checkIfDatafileWasGood(std::vector<DataSample> rawData, std::string fileIn){
+static void checkIfDatafileWasGood(std::vector<DataSampleBasic> rawData, std::string fileIn){
 	if(rawData.size() == 0)
 		throw std::invalid_argument("Datafile \"" + fileIn + "\" contains only lines to be ignored or not numeric data!!");
 	for(size_t i=1; i< rawData.size(); i++){

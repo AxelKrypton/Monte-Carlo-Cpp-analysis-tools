@@ -8,44 +8,60 @@
 #ifndef JACKKNIFEESTIMATORS_HPP_
 #define JACKKNIFEESTIMATORS_HPP_
 
-#include "dataSampleAnalyzer.hpp"
+#include "binnedDataSample.hpp"
 #include <iostream>
 
-class JackknifeEstimators: public DataSampleAnalyzer
+//todo: add fcts. for mean and error
+//todo: overload constructor to add function
+class JackknifeEstimators: public DataSample
 {
 public:
 
-	JackknifeEstimators(DataSampleAnalyzer sampleIn) :
-		DataSampleAnalyzer(sampleIn)
+	JackknifeEstimators(int numberOfElementsIn) :
+		DataSample(numberOfElementsIn)
 	{
 		checkIfJackknifeCanBePerformed(numberOfElements);
+		DataSampleBasic tmp = calculatePseudoValues();
+		setValues(tmp);
+	};
+
+	JackknifeEstimators(DataSample sampleIn) :
+		DataSample(sampleIn)
+	{
+		checkIfJackknifeCanBePerformed(numberOfElements);
+		DataSampleBasic tmp = calculatePseudoValues();
+		setValues(tmp);
 	};
 
 	double getJackknifeVariance();
 	double getJackknifeError();
 
 protected:
+	DataSampleBasic calculatePseudoValues();
 	int getJackknifeNormalization();
 	void checkIfJackknifeCanBePerformed(int n);
-	DataSample createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize);
+	//todo: is this simply blocked binning and not jackknifing?
+	DataSampleBasic createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize);
 };
 
+//todo: this is based on the jackknife prescription from Berg and needs to be changed!
+//todo: or perhaps only use these for mean and variance?
 class JackknifeEstimatorsFromBinnedDataSample: public JackknifeEstimators
 {
 public:
-	JackknifeEstimatorsFromBinnedDataSample(DataSampleAnalyzer sampleIn);
+	JackknifeEstimatorsFromBinnedDataSample(DataSample sampleIn);
 };
 
 class JackknifeEstimatorsFromBinningWithNumberOfBins: public JackknifeEstimators
 {
 public:
-	JackknifeEstimatorsFromBinningWithNumberOfBins(DataSampleAnalyzer sampleIn, int numberOfBins);
+	JackknifeEstimatorsFromBinningWithNumberOfBins(DataSample sampleIn, int numberOfBins);
 };
 
 class JackknifeEstimatorsFromBinningWithBinsize: public JackknifeEstimators
 {
 public:
-	JackknifeEstimatorsFromBinningWithBinsize(DataSampleAnalyzer sampleIn, int numberOfBins);
+	JackknifeEstimatorsFromBinningWithBinsize(DataSample sampleIn, int numberOfBins);
 private:
 	void checkIfJackknifeCanBePerformedWithBinsize(int binsize);
 };

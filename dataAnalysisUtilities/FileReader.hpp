@@ -48,7 +48,7 @@ public:
 		infile.close();
 	}
 
-	DataSample readDataFromFile(bool* isAnyEntryBad = NULL)
+	DataSampleBasic readDataFromFile(bool* isAnyEntryBad = NULL)
 	{
 		goTroughFile();
 
@@ -57,7 +57,7 @@ public:
 
 		if(isAnyEntryBad != NULL)
 			*isAnyEntryBad = anyBadEntry;
-		return DataSample( std::valarray<double>(data.data(), data.size()) );
+		return DataSampleBasic( std::valarray<double>(data.data(), data.size()) );
 	}
 
 private:

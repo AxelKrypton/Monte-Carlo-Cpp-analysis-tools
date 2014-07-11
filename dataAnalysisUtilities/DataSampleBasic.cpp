@@ -2,32 +2,32 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "dataSample.hpp"
+#include "DataSampleBasic.hpp"
 #include "FileReader.hpp"
 
-DataSample::DataSample(int length)
+DataSampleBasic::DataSampleBasic(int length)
 {
 	setValues(std::valarray<double>(length));
 }
 
-DataSample::DataSample(std::valarray<double> valuesIn)
+DataSampleBasic::DataSampleBasic(std::valarray<double> valuesIn)
 {
 	setValues(valuesIn);
 }
 
-DataSample::DataSample(std::string dataFilename, int column, int offset, bool* isAnyEntryBad)
+DataSampleBasic::DataSampleBasic(std::string dataFilename, int column, int offset, bool* isAnyEntryBad)
 {
 	setValues(readDataFromFile(dataFilename, column, offset, isAnyEntryBad));
 }
 
-void DataSample::setValues(std::valarray<double> valuesIn)
+void DataSampleBasic::setValues(std::valarray<double> valuesIn)
 {
 	checkIfNumberOfElementsIsValid(valuesIn.size());
 	values = valuesIn;
 	numberOfElements = valuesIn.size();
 }
 
-void DataSample::setValues(DataSample sampleIn)
+void DataSampleBasic::setValues(DataSampleBasic sampleIn)
 {
 	numberOfElements = sampleIn.getNumberOfElements();
 	values = sampleIn.values;
@@ -47,138 +47,149 @@ void checkNumberOfElements(int lhs, int rhs)
 		throw std::invalid_argument("DataSamples have different number of elements!");
 }
 
-double DataSample::sum()
+double DataSampleBasic::sum()
 {
 	return values.sum();
 }
 
-double& DataSample::operator[](size_t index)
+double& DataSampleBasic::operator[](size_t index)
 {
 	return values[index];
 }
 
-DataSample& DataSample::operator+=(double factor)
+DataSampleBasic& DataSampleBasic::operator+=(double factor)
 {
 	values += factor;
 	return *this;
 }
 
-DataSample& DataSample::operator+=(DataSample sampleIn)
+DataSampleBasic& DataSampleBasic::operator+=(DataSampleBasic sampleIn)
 {
 	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
 	values += sampleIn.values;
 	return *this;
 }
 
-DataSample& DataSample::operator-=(double factor)
+DataSampleBasic& DataSampleBasic::operator-=(double factor)
 {
 	values -= factor;
 	return *this;
 }
 
-DataSample& DataSample::operator-=(DataSample sampleIn)
+DataSampleBasic& DataSampleBasic::operator-=(DataSampleBasic sampleIn)
 {
 	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
 	values -= sampleIn.values;
 	return *this;
 }
 
-DataSample& DataSample::operator*=(double factor)
+DataSampleBasic& DataSampleBasic::operator*=(double factor)
 {
 	values *= factor;
 	return *this;
 }
 
-DataSample& DataSample::operator*=(DataSample sampleIn)
+DataSampleBasic& DataSampleBasic::operator*=(DataSampleBasic sampleIn)
 {
 	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
 	values *= sampleIn.values;
 	return *this;
 }
 
-DataSample operator+(DataSample sampleIn, double factor)
+DataSampleBasic operator+(DataSampleBasic sampleIn, double factor)
 {
 	sampleIn += factor;
 	return sampleIn;
 }
 
-DataSample operator+(DataSample lhs, DataSample rhs)
+DataSampleBasic operator+(DataSampleBasic lhs, DataSampleBasic rhs)
 {
 	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
 	lhs += rhs;
 	return lhs;
 }
 
-DataSample operator-(DataSample sampleIn, double factor)
+DataSampleBasic operator-(DataSampleBasic sampleIn, double factor)
 {
 	sampleIn -= factor;
 	return sampleIn;
 }
 
-DataSample operator-(DataSample lhs, DataSample rhs)
+DataSampleBasic operator-(DataSampleBasic lhs, DataSampleBasic rhs)
 {
 	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
 	lhs -= rhs;
 	return lhs;
 }
 
-DataSample operator*(DataSample lhs, DataSample rhs)
+DataSampleBasic operator*(DataSampleBasic lhs, DataSampleBasic rhs)
 {
 	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
 	lhs *= rhs;
 	return lhs;
 }
 
-DataSample& DataSample::operator/=(double factor)
+DataSampleBasic& DataSampleBasic::operator/=(double factor)
 {
 	checkDivisionFactor(factor);
 	values /= factor;
 	return *this;
 }
 
-DataSample& DataSample::operator/=(DataSample sampleIn)
+DataSampleBasic& DataSampleBasic::operator/=(DataSampleBasic sampleIn)
 {
 	checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
 	values /= sampleIn.values;
 	return *this;
 }
 
-DataSample& DataSample::operator^=(int n)
+DataSampleBasic& DataSampleBasic::operator^=(int n)
 {
 	values = std::pow(values, double(n));
 	return *this;
 }
 
-DataSample operator*(DataSample sampleIn, double factor)
+DataSampleBasic& DataSampleBasic::operator^=(double n)
+{
+	values = std::pow(values, n);
+	return *this;
+}
+
+DataSampleBasic operator*(DataSampleBasic sampleIn, double factor)
 {
 	sampleIn *= factor;
 	return sampleIn;
 }
 
-DataSample operator/(DataSample lhs, DataSample rhs)
+DataSampleBasic operator/(DataSampleBasic lhs, DataSampleBasic rhs)
 {
 	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
 	lhs/=rhs;
 	return lhs;
 }
 
-DataSample operator/(DataSample sampleIn, double factor)
+DataSampleBasic operator/(DataSampleBasic sampleIn, double factor)
 {
 	checkDivisionFactor(factor);
 	return sampleIn /= factor;
 }
 
-DataSample operator^(DataSample sampleIn, int n)
+DataSampleBasic operator^(DataSampleBasic sampleIn, int n)
 {
 	return sampleIn ^= n;
 }
 
-int DataSample::getNumberOfElements()
+DataSampleBasic operator^(DataSampleBasic sampleIn, double n)
+{
+	return sampleIn ^= n;
+}
+
+int DataSampleBasic::getNumberOfElements()
 {
 	return numberOfElements;
 }
 
-void DataSample::checkIfNumberOfElementsIsValid(int length)
+void DataSampleBasic::checkIfNumberOfElementsIsValid(int length)
 {
 	if(length <= 0)
 		throw std::invalid_argument("Cannot create dataSample with zero or less elements!");
@@ -192,20 +203,20 @@ double defaultFunction(double in)
 	return in;
 }
 
-DataSample DataSample::applyFunction(double (*function)(double))
+DataSampleBasic DataSampleBasic::applyFunction(double (*function)(double))
 {
 	std::valarray<double> functionAppliedToArray = values.apply(function);
-	DataSample dataSample(functionAppliedToArray);
+	DataSampleBasic dataSample(functionAppliedToArray);
 	return dataSample;
 }
 
-DataSample DataSample::readDataFromFile(std::string filename, int column, int offset, bool* isAnyEntryBad)
+DataSampleBasic DataSampleBasic::readDataFromFile(std::string filename, int column, int offset, bool* isAnyEntryBad)
 {
 	FileReader reader(filename, column, offset);
 	return reader.readDataFromFile(isAnyEntryBad);
 }
 
-void DataSample::checkSliceParameters(int start, int size, int stride)
+void DataSampleBasic::checkSliceParameters(int start, int size, int stride)
 {
 	if( start < 0 || start >= numberOfElements)
 		throw std::invalid_argument("sampleSlice parameter \"start\" must be between 0 and (number of datapoints -1)!");
@@ -217,9 +228,32 @@ void DataSample::checkSliceParameters(int start, int size, int stride)
 		throw std::invalid_argument("product of sampleSlice parameters \"slice\" and \"stride\" must be between 1 and number of datapoints!");
 }
 
-DataSample DataSample::sampleSlice(int start, int size, int stride)
+DataSampleBasic DataSampleBasic::sampleSlice(int start, int size, int stride)
 {
 	checkSliceParameters(start, size, stride);
-	return DataSample(values[std::slice(start, size, stride)]);
+	return DataSampleBasic(values[std::slice(start, size, stride)]);
+}
+
+static void checkRemoveParameter(int position, int numberOfElements)
+{
+	if (position < 0 || position >= numberOfElements)
+			throw std::invalid_argument("Can only remove element greater than or equal to zero and smaller than the number of entries!");
+}
+
+DataSampleBasic DataSampleBasic::removeIthElement(int i)
+{
+	checkRemoveParameter(i, numberOfElements);
+	DataSampleBasic tmp(numberOfElements - 1);
+	for (int iteration = 0; iteration < numberOfElements; iteration ++)
+	{
+		if (iteration == i)
+		{
+			continue;
+		}
+		int index = (iteration < i) ? iteration : iteration - 1;
+
+		tmp[index] = values[iteration];
+	}
+	return tmp;
 }
 

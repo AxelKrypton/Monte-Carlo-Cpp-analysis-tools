@@ -1,49 +1,32 @@
 #include "jackknifeEstimators.hpp"
 
-JackknifeEstimatorsFromBinnedDataSample::JackknifeEstimatorsFromBinnedDataSample(DataSampleAnalyzer sampleIn) :
-JackknifeEstimators(sampleIn)
+//todo: the following fcts. are just copied here during refactoring!
+
+void checkDiscardedElements(int valueIn, std::string descriptionIn, int numberOfElements)
 {
-	int normalization = getJackknifeNormalization();
-	double sumOfDataSampleElements = sampleIn.sum();
-	setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
-}
-
-DataSample JackknifeEstimators::createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize)
-{
-	std::cout << "create binned jackknife estimators with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
-
-	DataSample cutSample = sampleSlice(0, binsize*numberOfBins, 1);
-	double sumOfAllElementsInBinnedSample = cutSample.sum();
-	int numberOfElementsInBinndedSample = cutSample.getNumberOfElements();
-
-	DataSample binnedDataSample(numberOfBins);
-	for (int iteration = 0; iteration < numberOfBins; iteration++)
+	int discardedElements = numberOfElements % valueIn;
+	if (discardedElements != 0)
 	{
-		double sumOfAllElementsInBin = ( sampleSlice(iteration * binsize,	binsize, 1) ).sum();
-		binnedDataSample[iteration] = (sumOfAllElementsInBinnedSample - sumOfAllElementsInBin) / (numberOfElementsInBinndedSample - binsize);
+		std::cout << "Warning: " << descriptionIn << " is not a multiple of numberOfElements!" << std::endl;
+		std::cout << discardedElements<< " elements are discarded!" << std::endl;
 	}
-	return binnedDataSample;
 }
 
-JackknifeEstimatorsFromBinningWithNumberOfBins::JackknifeEstimatorsFromBinningWithNumberOfBins(DataSampleAnalyzer sampleIn, int numberOfBins) :
-	JackknifeEstimators(sampleIn)
+int calcBinsize(int numberOfBins, int numberOfElements)
 {
-	checkIfJackknifeCanBePerformed(numberOfBins);
-	int binsize = calcBinsize(numberOfBins);
-	setValues( createJackknifeEstimatorsWithBinning(numberOfBins, binsize) );
+	checkDiscardedElements(numberOfBins, "numberOfBins", numberOfElements);
+	return numberOfElements / numberOfBins;
 }
 
-JackknifeEstimatorsFromBinningWithBinsize::JackknifeEstimatorsFromBinningWithBinsize(DataSampleAnalyzer sampleIn, int binsize) :
-	JackknifeEstimators(sampleIn)
+int calcNumberOfBins(int binsize, int numberOfElements)
 {
-	checkIfJackknifeCanBePerformedWithBinsize(binsize);
-	int numberOfBins = calcBinsize(binsize);
-	setValues( createJackknifeEstimatorsWithBinning(numberOfBins, binsize) );
+	checkDiscardedElements(binsize, "binsize", numberOfElements);
+	return numberOfElements / binsize;
 }
 
 double JackknifeEstimators::getJackknifeVariance()
 {
-	DataSampleAnalyzer tmp ( (*this - getNthMoment(1) )^( (double(2)) )  );
+	DataSample tmp ( (*this - getNthMoment(1) )^( (double(2)) )  );
 	return tmp.getNthMoment(1) * getJackknifeNormalization();
 }
 
@@ -64,8 +47,73 @@ void JackknifeEstimators::checkIfJackknifeCanBePerformed(int n)
 		throw std::invalid_argument("Cannot create jackknifeEstimators with these parameters!");
 }
 
+DataSampleBasic JackknifeEstimators::calculatePseudoValues()
+{
+	//this is for f(X) = Mean(X)
+	DataSampleBasic tmp(numberOfElements);
+	double mean = calcNthMoment(1);
+
+	for (int iteration = 0; iteration < numberOfElements; iteration++)
+	{
+		double value = 0;
+
+		DataSample tmp2( removeIthElement(iteration) );
+		double mean2 = tmp2.getNthMoment(1);
+
+		//this is the correct line, with mean equal to f(X_[i])
+//		value = numberOfElements * mean - (numberOfElements - 1) * mean2;
+		//but numerically, this is bad, and analytically it reads
+		value = values[iteration];
+
+		tmp[iteration] = value;
+	}
+	return tmp;
+}
+
+DataSampleBasic JackknifeEstimators::createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize)
+{
+	std::cout << "create binned jackknife estimators with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
+
+	DataSampleBasic cutSample = sampleSlice(0, binsize*numberOfBins, 1);
+	double sumOfAllElementsInBinnedSample = cutSample.sum();
+	int numberOfElementsInBinndedSample = cutSample.getNumberOfElements();
+
+	DataSampleBasic binnedDataSample(numberOfBins);
+	for (int iteration = 0; iteration < numberOfBins; iteration++)
+	{
+		double sumOfAllElementsInBin = ( sampleSlice(iteration * binsize,	binsize, 1) ).sum();
+		binnedDataSample[iteration] = (sumOfAllElementsInBinnedSample - sumOfAllElementsInBin) / (numberOfElementsInBinndedSample - binsize);
+	}
+	return binnedDataSample;
+}
+
+JackknifeEstimatorsFromBinnedDataSample::JackknifeEstimatorsFromBinnedDataSample(DataSample sampleIn) :
+JackknifeEstimators(sampleIn)
+{
+	int normalization = getJackknifeNormalization();
+	double sumOfDataSampleElements = sampleIn.sum();
+	setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
+}
+
+JackknifeEstimatorsFromBinningWithNumberOfBins::JackknifeEstimatorsFromBinningWithNumberOfBins(DataSample sampleIn, int numberOfBins) :
+	JackknifeEstimators(sampleIn)
+{
+	checkIfJackknifeCanBePerformed(numberOfBins);
+	int binsize = calcBinsize(numberOfBins, sampleIn.getNumberOfElements());
+	setValues( createJackknifeEstimatorsWithBinning(numberOfBins, binsize) );
+}
+
+JackknifeEstimatorsFromBinningWithBinsize::JackknifeEstimatorsFromBinningWithBinsize(DataSample sampleIn, int binsize) :
+	JackknifeEstimators(sampleIn)
+{
+	checkIfJackknifeCanBePerformedWithBinsize(binsize);
+	int numberOfBins = calcBinsize(binsize, sampleIn.getNumberOfElements());
+	setValues( createJackknifeEstimatorsWithBinning(numberOfBins, binsize) );
+}
+
 void JackknifeEstimatorsFromBinningWithBinsize::checkIfJackknifeCanBePerformedWithBinsize(int binsize)
 {
 	if(binsize < 1 || binsize >= numberOfElements)
 		throw std::invalid_argument("Cannot create jackknifeEstimators with this binsize!");
 }
+
