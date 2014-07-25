@@ -17,6 +17,8 @@ public:
 	std::string analysisOutputFilePostfix;
 	int binsize;
 	int numberOfBins;
+	int numberOfBinsForAutocorrelation;
+	int timeMaxAutocorrelationFunction;
 	int offset;
 	bool useBinning;
 	bool useNumberOfBinsForBinning;

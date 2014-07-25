@@ -27,6 +27,8 @@ Parameters::Parameters(int argc, const char ** argv)
 		("binsize,b", po::value<int>(&binsize), "Size of bin (default: 100)")
 		("numberOfBins,n", po::value<int>(&numberOfBins), "Number of bins (default: 10)")
 		("calcAutocorrelation,a", po::value<bool>(&calcAutocorrelation)->default_value(false)->implicit_value(true), "Estimate autocorrelation of data")
+		("numberOfBinsForAutocorrelation", po::value<int>(&numberOfBinsForAutocorrelation), "Number of bins for the estimate of the autocorrelation time (default: 10)")
+		("timeMaxAutocorrelationFunction", po::value<int>(&timeMaxAutocorrelationFunction), "Maximum data distance for the estimate of the autocorrelation function (needed parameter).")
 		;
 
 	//option "file" can be given without option description
@@ -45,9 +47,14 @@ void Parameters::checkParsedArguments(po::variables_map & vm, po::options_descri
 		throw Parameters::parse_aborted();
 	}
 
-	if (! vm.count("file") )
+	if (! vm.count("file"))
 	{
 		throw std::invalid_argument("No datafile given. Aborting!");
+	}
+
+	if (calcAutocorrelation && (! vm.count("timeMaxAutocorrelationFunction")))
+	{
+		throw std::invalid_argument("If calcAutocorrelation==true then the option --timeMaxAutocorrelationFunction=... must be given. Aborting!");
 	}
 
 	/**
@@ -75,6 +82,10 @@ void Parameters::checkParsedArguments(po::variables_map & vm, po::options_descri
 	{
 		binsize = 100;
 	}
+	if(!vm.count("numberOfBinsForAutocorrelation"))
+	{
+		numberOfBinsForAutocorrelation = 10;
+	}
 	if(vm.count("binsize"))
 	{
 		if(vm.count("numberOfBins"))
@@ -83,6 +94,7 @@ void Parameters::checkParsedArguments(po::variables_map & vm, po::options_descri
 		}
 		useNumberOfBinsForBinning = false;
 	}
+
 }
 
 void Parameters::printParameters()
@@ -113,6 +125,12 @@ void Parameters::printParameters()
 	else
 		std::cout << "# Do not perform binning!" << std::endl;
 	if (calcAutocorrelation)
-		std::cout << "# Calculate estimate on autocorrelation" << std::endl;
+	{
+		std::cout << "###############################" << std::endl;
+		std::cout << "# Calculate estimate of autocorrelation time:" << std::endl;
+		std::cout << "#  - for \"t\" up to " << timeMaxAutocorrelationFunction << "," << std::endl;
+		std::cout << "#  - using " << numberOfBinsForAutocorrelation << " bins to bin the data before" << std::endl;
+		std::cout << "#    applying Jackknife." << std::endl;
+	}
 	std::cout << "###############################" << std::endl;
 }

@@ -50,6 +50,20 @@ BOOST_AUTO_TEST_SUITE(build)
 		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, argumentsWithHelp), Parameters::parse_aborted );
 	}
 
+	BOOST_AUTO_TEST_CASE(autocorrelation1)
+	{
+		int numberOfArguments = 3;
+		const char * argumentsWithAutocorrelation[] = {"foo", "foo", "-a"};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, argumentsWithAutocorrelation), std::invalid_argument );
+	}
+
+	BOOST_AUTO_TEST_CASE(autocorrelation2)
+	{
+		int numberOfArguments = 3;
+		const char * argumentsWithAutocorrelation[] = {"foo", "foo", "--calcAutocorrelation"};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, argumentsWithAutocorrelation), std::invalid_argument );
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(defaults)
@@ -71,6 +85,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
 	{
 		int numberOfBins_default = 10;
 		BOOST_REQUIRE_EQUAL(numberOfBins_default, createParametersForDefaultCheck().numberOfBins);
+	}
+
+	BOOST_AUTO_TEST_CASE(numberOfBinsForAutocorrelation)
+	{
+		int numberOfBinsForAutocorrelation_default = 10;
+		BOOST_REQUIRE_EQUAL(numberOfBinsForAutocorrelation_default, createParametersForDefaultCheck().numberOfBinsForAutocorrelation);
 	}
 
 	BOOST_AUTO_TEST_CASE(offset)
@@ -215,6 +235,20 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).numberOfBins);
 	}
 
+	BOOST_AUTO_TEST_CASE(numberOfBinsForAutocorrelation)
+	{
+		int newValue = 999;
+		std::string argumentName = "--numberOfBinsForAutocorrelation";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).numberOfBinsForAutocorrelation);
+	}
+
+	BOOST_AUTO_TEST_CASE(timeMaxAutocorrelationFunction)
+	{
+		int newValue = 999;
+		std::string argumentName = "--timeMaxAutocorrelationFunction";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).timeMaxAutocorrelationFunction);
+	}
+
 	BOOST_AUTO_TEST_CASE(offset1)
 	{
 		int newValue = 999;
@@ -288,22 +322,37 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 	BOOST_AUTO_TEST_CASE(calcAutocorrelation1)
 	{
 		bool newValue = true;
-		std::string argumentName = "--calcAutocorrelation";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).calcAutocorrelation);
+
+		std::string argument1 = "--calcAutocorrelation=" + boost::lexical_cast<std::string>(newValue);
+		std::string argument2 = "--timeMaxAutocorrelationFunction=10";
+		int numberOfArguments = 4;
+		const char * arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+		Parameters parameters(numberOfArguments, arguments);
+		BOOST_CHECK_EQUAL(newValue, parameters.calcAutocorrelation);
 	}
 
 	BOOST_AUTO_TEST_CASE(calcAutocorrelation2)
 	{
 		bool newValue = true;
-		std::string argumentName = "--calcAutocorrelation";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).calcAutocorrelation);
+
+		std::string argument1 = "--calcAutocorrelation";
+		std::string argument2 = "--timeMaxAutocorrelationFunction=10";
+		int numberOfArguments = 4;
+		const char * arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+		Parameters parameters(numberOfArguments, arguments);
+		BOOST_CHECK_EQUAL(newValue, parameters.calcAutocorrelation);
 	}
 
 	BOOST_AUTO_TEST_CASE(calcAutocorrelation3)
 	{
 		bool newValue = true;
-		std::string argumentName = "-a";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).calcAutocorrelation);
+
+		std::string argument1 = "-a" + boost::lexical_cast<std::string>(newValue);
+		std::string argument2 = "--timeMaxAutocorrelationFunction=10";
+		int numberOfArguments = 4;
+		const char * arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+		Parameters parameters(numberOfArguments, arguments);
+		BOOST_CHECK_EQUAL(newValue, parameters.calcAutocorrelation);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeMean1)
