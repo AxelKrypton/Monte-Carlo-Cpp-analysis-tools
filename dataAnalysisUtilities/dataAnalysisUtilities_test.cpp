@@ -293,12 +293,11 @@ BOOST_AUTO_TEST_SUITE(autocorrelationTime)
 
 	BOOST_AUTO_TEST_CASE(TestVsBerg)
 	{
-		std::string fileWithGaussianNumbers = "gaussianNumbers_Berg.dat";
-		DataSample gaussianCorrelatedBergData(fileWithGaussianNumbers);
-		const char * arguments[] = {"foo", "foo"};
-		Parameters parameters(2, arguments);
+		const char * arguments[] = {"foo", "--file=gaussianNumbers_Berg.dat", "-a", "--timeMaxAutocorrelationFunction=128", "--numberOfBinsForAutocorrelation=32"};
+		Parameters parameters(4, arguments);
+		DataSample gaussianCorrelatedBergData(parameters.file, 2);
 
-		BOOST_REQUIRE_NO_THROW(calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters));
+		BOOST_REQUIRE_THROW(calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters), std::invalid_argument);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -161,10 +161,11 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Paramet
 }
 
 /*
- * Here, following again the Berg book (pages 201-202), a method to estimate the
- * integrated_autocorrelation_time with an error is implemented. It is based on the Jackknife
- * method. The idea is to build a set of jackknife estimators for the autocorrelation_function
- * C(t) of eq. (4.3) at some FIXED time. Once this set X of estimators is ready one can
+ * Here, following the Berg book (pages 201-202), a method to estimate the integrated_autocorrelation_time
+ * with an error is implemented. It is based on the Jackknife method. The idea is to build a set of
+ * jackknife estimators for the autocorrelation_function C(t) of eq. (4.3) at some FIXED time.
+ *
+ * Once this set X of estimators is ready one can
  *   - either use the jackknife function above with a trivial f in order to get a value with
  *     error for C(t)
  *      --->  jackknife(X, [] (double val) -> double {return val;})
@@ -175,22 +176,25 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Paramet
  *  In both cases, one can produce plots similar to those of Figure 4.1-4.2.
  *
  *  In the following, we will implement only the second case. Plotting the resulting data with
- *  errors, from the plateau, one can make the final estimate of the integrated_autocorrelation_time.
+ *  errors, from the FIRST plateau, one can make the final estimate of the integrated_autocorrelation_time
+ *  (read around equation (4.13) to understand why to look at the first plateau is important).
  *
  *  NOTE: Probably the jackknife call could in principle done with a more complicated function
  *        so that the sets X and Y can be built directly inside the jackknife. This is not however
  *        wise because to apply the jackknife one must have NOT correlated data and here this is
- *        achieved with a binning on the estimators before calling the jackknife.
+ *        achieved with a binning on the estimators BEFORE calling the jackknife.
  *
  *  NOTE: In principle, if one is interested only to a rough idea of the integrated_autocorrelation_time
- *        he can use the function integrated_autocorrelation_time_estimators and look for a plateau
- *        plotting the output data. Of course this is not so rigorous because no error is estimated.
+ *        he can implement the equation (4.14) and look for a plateau plotting the output data.
+ *        Of course this is not so rigorous because no error is estimated.
  *
- *  NOTE: The parameter number_of_bins in the following function is that used to make binning on the
- *        estimators before the jackknife. On page 201 of Berg's book there is written that it
- *        has to be much smaller of the total amount of data. This is up to the user, but if it is not given,
- *        (or set to 0) then it is set to x.size()/100.
+ *  NOTE: The number of bins in the following function is that used to make binning on the estimators before
+ *        the jackknife and it is contained in parameters (numberOfBinsForAutocorrelation).
+ *        On page 201 of Berg's book there is written that it has to be much smaller of the total amount of data.
+ *        This is up to the user, but if it is not given, then it is set to 10 (in principle fine for a data sample
+ *        with more than 1000 data).
  */
+static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(const DataSample & sample, int time);
 
 std::vector<EstimateAndError> calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters)
 {
@@ -228,3 +232,18 @@ DataSample createDataSampleFromDatafile(std::string filename, Parameters paramet
 		return dataSample;
 	}
 }
+
+
+
+/*****************************************************************************************/
+static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(DataSample & sample, int time)
+{
+	DataSampleBasic x_first  = sample.sampleSlice(0, sample.getNumberOfElements() - time, 1);
+	DataSampleBasic x_second = sample.sampleSlice(time, sample.getNumberOfElements() - time, 1);
+	double data_mean = sample.getNthMoment(1);
+	return ((x_first - data_mean) * (x_second - data_mean));
+}
+
+
+
+

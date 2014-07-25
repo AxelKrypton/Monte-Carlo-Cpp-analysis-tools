@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "binnedDataSample.hpp"
+#include "DataSample.hpp"
 #include "../Parameters/Parameters.hpp"
 
 class EstimateAndError
