@@ -160,11 +160,54 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Paramet
 
 }
 
+/*
+ * Here, following again the Berg book (pages 201-202), a method to estimate the
+ * integrated_autocorrelation_time with an error is implemented. It is based on the Jackknife
+ * method. The idea is to build a set of jackknife estimators for the autocorrelation_function
+ * C(t) of eq. (4.3) at some FIXED time. Once this set X of estimators is ready one can
+ *   - either use the jackknife function above with a trivial f in order to get a value with
+ *     error for C(t)
+ *      --->  jackknife(X, [] (double val) -> double {return val;})
+ *   - or build other sets of estimators like X at different times and use them to build a set Y
+ *     of estimators for the integrated_autocorrelation_time at time t (see eq. (4.14)). Again
+ *     use the jackknife function above with a trivial f in order to get a value with error for tau_int(t)
+ *      --->  jackknife(Y, [] (double val) -> double {return val;})
+ *  In both cases, one can produce plots similar to those of Figure 4.1-4.2.
+ *
+ *  In the following, we will implement only the second case. Plotting the resulting data with
+ *  errors, from the plateau, one can make the final estimate of the integrated_autocorrelation_time.
+ *
+ *  NOTE: Probably the jackknife call could in principle done with a more complicated function
+ *        so that the sets X and Y can be built directly inside the jackknife. This is not however
+ *        wise because to apply the jackknife one must have NOT correlated data and here this is
+ *        achieved with a binning on the estimators before calling the jackknife.
+ *
+ *  NOTE: In principle, if one is interested only to a rough idea of the integrated_autocorrelation_time
+ *        he can use the function integrated_autocorrelation_time_estimators and look for a plateau
+ *        plotting the output data. Of course this is not so rigorous because no error is estimated.
+ *
+ *  NOTE: The parameter number_of_bins in the following function is that used to make binning on the
+ *        estimators before the jackknife. On page 201 of Berg's book there is written that it
+ *        has to be much smaller of the total amount of data. This is up to the user, but if it is not given,
+ *        (or set to 0) then it is set to x.size()/100.
+ */
+
+std::vector<EstimateAndError> calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters)
+{
+	throw std::invalid_argument("Array of Autocorrelation is not implemented yet. Aborting!");
+}
+
 //todo: implement
 EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters)
 {
 	throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
 }
+
+
+
+
+
+
 
 DataSample createDataSampleFromDatafile(std::string filename, Parameters parameters)
 {

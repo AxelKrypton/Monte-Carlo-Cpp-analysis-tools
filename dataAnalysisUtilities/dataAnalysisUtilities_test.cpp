@@ -287,3 +287,21 @@ BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(autocorrelationTime)
+
+	BOOST_AUTO_TEST_CASE(TestVsBerg)
+	{
+		std::string fileWithGaussianNumbers = "gaussianNumbers_Berg.dat";
+		DataSample gaussianCorrelatedBergData(fileWithGaussianNumbers);
+		const char * arguments[] = {"foo", "foo"};
+		Parameters parameters(2, arguments);
+
+		BOOST_REQUIRE_NO_THROW(calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters));
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+
