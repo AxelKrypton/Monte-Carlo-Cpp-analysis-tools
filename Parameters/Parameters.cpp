@@ -26,7 +26,7 @@ Parameters::Parameters(int argc, const char ** argv)
 		("binningMustFitDataSampleSize", po::value<bool>(&binningMustFitDataSampleSize)->default_value(false)->implicit_value(true), "Require that no element of the data sample is discarded during binning")
 		("binsize,b", po::value<int>(&binsize), "Size of bin (default: 100)")
 		("numberOfBins,n", po::value<int>(&numberOfBins), "Number of bins (default: 10)")
-		("calcAutocorrelation,a", po::value<bool>(&calcAutocorrelation)->default_value(false)->implicit_value(true), "Estimate autocorrelation of data")
+		("calcAutocorrelation,a", po::value<bool>(&calcAutocorrelation)->default_value(false)->implicit_value(true), "Estimate autocorrelation of data. In this case no other observable is evaluated!")
 		("numberOfBinsForAutocorrelation", po::value<int>(&numberOfBinsForAutocorrelation), "Number of bins for the estimate of the autocorrelation time (default: 10)")
 		("timeMaxAutocorrelationFunction", po::value<int>(&timeMaxAutocorrelationFunction), "Maximum data distance for the estimate of the autocorrelation function (needed parameter).")
 		;

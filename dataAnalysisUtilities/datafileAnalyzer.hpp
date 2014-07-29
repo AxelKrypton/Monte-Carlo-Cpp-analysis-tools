@@ -11,23 +11,31 @@
 #include "dataAnalysisUtilities.hpp"
 #include "../IO/io_utilities.hpp"
 
-class AnalyzerWrapper
+class AnalyzerWrapperBasic
 {
 protected:
-	AnalyzerWrapper(std::string name, std::string outputFilename):
+	AnalyzerWrapperBasic(std::string name, std::string outputFilename):
 		estimateName(name), outputFilename(outputFilename)
 	{
 		std::cout << "# Analyse " << name << "..." << std::endl;
 	}
+	~AnalyzerWrapperBasic(){}
+
+	std::string estimateName;
+	std::string outputFilename;
+	EstimateAndError estimateAndError;
+};
+
+class AnalyzerWrapper : public AnalyzerWrapperBasic
+{
+protected:
+	AnalyzerWrapper(std::string name, std::string outputFilename):
+		AnalyzerWrapperBasic(name, outputFilename) {}
 	~AnalyzerWrapper()
 	{
 		printEstimateAndError(estimateName, estimateAndError.estimate, estimateAndError.error);
 		writeEstimateAndErrorToFile(estimateName, estimateAndError.estimate, estimateAndError.error, outputFilename);
 	}
-
-	std::string estimateName;
-	std::string outputFilename;
-	EstimateAndError estimateAndError;
 };
 
 class MeanAnalyzer : public AnalyzerWrapper
@@ -70,11 +78,11 @@ public:
 	}
 };
 
-class AutocorrelationAnalyzer : public AnalyzerWrapper
+class AutocorrelationAnalyzer : public AnalyzerWrapperBasic
 {
 public:
 	AutocorrelationAnalyzer(DataSample &sample, Parameters parameters):
-		AnalyzerWrapper("Autocorrelation", getFilenameForObservables(parameters))
+		AnalyzerWrapperBasic("Autocorrelation", getFilenameForObservables(parameters))
 	{
 		estimateAndError = calcAutocorrelationAndErrorOfDataSample(sample, parameters);
 	}
@@ -92,8 +100,6 @@ public:
 		if (parameters.calcAutocorrelation)
 		{
 			AutocorrelationAnalyzer(sample, parameters);
-			//todo: this does not return a meaningful estimateAndError object!
-			//todo: Hence, it should not be written to file!
 		}
 		else
 		{
