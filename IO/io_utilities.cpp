@@ -14,6 +14,7 @@ void printEstimateAndError(std::string estimateName, double estimateValue, doubl
 }
 
 //todo: add test for exception
+//todo: merge these two fcts.
 void writeEstimateAndErrorToFile(std::string estimateName, double estimateValue, double errorValue, std::string filename)
 {
 	std::ofstream outputstream;
@@ -22,6 +23,23 @@ void writeEstimateAndErrorToFile(std::string estimateName, double estimateValue,
 		std::cout << "# Writing estimate and error of \"" << estimateName << "\" to file \"" << filename << "\"" << std::endl;
 		outputstream << "# " << estimateName << "\t\tError"  << '\n';
 		outputstream << std::scientific << estimateValue << "\t" << errorValue << '\n';
+		outputstream.close();
+	} else {
+		throw std::invalid_argument("Could open file for estimate and error output. Aborting!");
+	}
+}
+
+void writeEstimateAndErrorArraysToFile(std::string estimateName, std::vector<double> estimate, std::vector<double> error, std::string filename)
+{
+	std::cout << "# Writing estimate and error array of \"" << estimateName << "\" to file \"" << filename << "\"" << std::endl;
+	std::ofstream outputstream;
+	outputstream.open(filename.c_str(), std::ios::app);
+	if(outputstream.is_open()) {
+		//todo: check if both are of equal size
+		for (int i = 0; i < int(estimate.size() ); i++)
+		{
+			outputstream << std::scientific << estimate[i] << "\t" << error[i] << '\n';
+		}
 		outputstream.close();
 	} else {
 		throw std::invalid_argument("Could open file for estimate and error output. Aborting!");
