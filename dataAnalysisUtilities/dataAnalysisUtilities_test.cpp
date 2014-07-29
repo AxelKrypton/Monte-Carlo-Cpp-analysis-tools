@@ -294,10 +294,32 @@ BOOST_AUTO_TEST_SUITE(autocorrelationTime)
 	BOOST_AUTO_TEST_CASE(TestVsBerg)
 	{
 		const char * arguments[] = {"foo", "--file=gaussianNumbers_Berg.dat", "-a", "--timeMaxAutocorrelationFunction=128", "--numberOfBinsForAutocorrelation=32"};
-		Parameters parameters(4, arguments);
+		Parameters parameters(5, arguments);
 		DataSample gaussianCorrelatedBergData(parameters.file, 2);
+		DataSample referenceTauValues("intTauBergRefResult32bins.dat", 2);
+		DataSample referenceTauErrors("intTauBergRefResult32bins.dat", 3);
 
-		BOOST_REQUIRE_THROW(calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters), std::invalid_argument);
+		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters);
+
+		for(uint i=0; i<result.size(); i++){
+			BOOST_CHECK_CLOSE(result[i].estimate, referenceTauValues[i], doublePrecisionInPercent);
+			BOOST_CHECK_CLOSE(result[i].error, referenceTauErrors[i], doublePrecisionInPercent);
+		}
+
+		/*
+		std::valarray<double> deltaVal(result.size());
+		std::valarray<double> deltaErr(result.size());
+
+		std::cout.precision(15);
+		for(uint i=0; i<result.size(); i++){
+			deltaVal[i] = fabs(result[i].estimate - referenceTauValues[i]);
+			deltaErr[i] = fabs(result[i].error - referenceTauErrors[i]);
+		}
+
+		std::cout << "Max diff value = " << deltaVal.max() << std::endl;
+		std::cout << "Max diff error = " << deltaErr.max() << std::endl;
+		*/
+
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

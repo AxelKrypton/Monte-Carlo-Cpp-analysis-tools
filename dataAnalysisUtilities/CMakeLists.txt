@@ -16,6 +16,7 @@ configure_file(fileWithBrokenLine.example fileWithBrokenLine.example COPYONLY)
 configure_file(fileWithComment.example fileWithComment.example COPYONLY)
 configure_file(fileWithEmptyLine.example fileWithEmptyLine.example COPYONLY)
 configure_file(../sampleDatafiles/gaussianNumbers_Berg.dat gaussianNumbers_Berg.dat COPYONLY)
+configure_file(../sampleDatafiles/intTauBergRefResult32bins.dat intTauBergRefResult32bins.dat COPYONLY)
 
 add_unit_test(dataSampleBasic DataSampleBasic_test dataAnalysisUtilities)
 add_unit_test(dataSample DataSample_test dataAnalysisUtilities)

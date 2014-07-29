@@ -194,11 +194,41 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Paramet
  *        This is up to the user, but if it is not given, then it is set to 10 (in principle fine for a data sample
  *        with more than 1000 data).
  */
-static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(const DataSample & sample, int time);
+static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(DataSample & sample, int time);
 
 std::vector<EstimateAndError> calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters)
 {
-	throw std::invalid_argument("Array of Autocorrelation is not implemented yet. Aborting!");
+	std::vector<BinnedDataSampleFromNumberOfBins> autocorrelationFunctionValuesBinnedSets;
+	for(int time=0; time<parameters.timeMaxAutocorrelationFunction; time++){
+		autocorrelationFunctionValuesBinnedSets.push_back(BinnedDataSampleFromNumberOfBins(
+				                                          autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(sample, time),
+				                                          parameters.numberOfBinsForAutocorrelation, false, false));
+	}
+
+/*	std::cout.precision(15);
+	std::cout << "----------------------------" << std::endl;
+
+	for(int n=0; n<parameters.numberOfBinsForAutocorrelation; n++)
+		std::cout << "ACORJ(IT=0, " << n << ") = " << autocorrelationFunctionValuesBinnedSets[0][n] << std::endl;
+
+	std::cout << "----------------------------" << std::endl; */
+
+	std::vector<DataSample> integratedTimeBinnedSets;
+	//The first array of integratedTimeBinnedSets must be an array of ones
+	integratedTimeBinnedSets.push_back(DataSample(std::valarray<double>(1.0, autocorrelationFunctionValuesBinnedSets[0].getNumberOfElements())));
+
+	for(int time=1; time<parameters.timeMaxAutocorrelationFunction; time++){
+		integratedTimeBinnedSets.push_back((integratedTimeBinnedSets[time-1]
+		                                    + 2.0 * autocorrelationFunctionValuesBinnedSets[time] / autocorrelationFunctionValuesBinnedSets[0]));
+	}
+
+	std::vector<EstimateAndError> result;
+	for(int time=0; time<parameters.timeMaxAutocorrelationFunction; time++){
+		JackknifeEstimatorsFromBinnedDataSample jackSample(integratedTimeBinnedSets[time]);
+		result.push_back(EstimateAndError(integratedTimeBinnedSets[time].getNthMoment(1), jackSample.getJackknifeError()));
+	}
+
+	return result;
 }
 
 //todo: implement
@@ -241,7 +271,15 @@ static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(
 	DataSampleBasic x_first  = sample.sampleSlice(0, sample.getNumberOfElements() - time, 1);
 	DataSampleBasic x_second = sample.sampleSlice(time, sample.getNumberOfElements() - time, 1);
 	double data_mean = sample.getNthMoment(1);
-	return ((x_first - data_mean) * (x_second - data_mean));
+	/*
+	 * Since we do not know in general if the "true" mean value of our sample is zero, we will
+	 * always substitute it by its estimator (the mean of the sample itself), but then we introduce
+	 * a bias that we correct here. Read paragraph between (4.19) and (4.20) on Berg's book for
+	 * additional informations.
+	 */
+	DataSampleBasic result = ((x_first - data_mean) * (x_second - data_mean));
+	result *= (double)sample.getNumberOfElements() / (sample.getNumberOfElements() - 1);
+	return result;
 }
 
 
