@@ -199,7 +199,8 @@ static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(
 std::vector<EstimateAndError> calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters)
 {
 	std::vector<BinnedDataSampleFromNumberOfBins> autocorrelationFunctionValuesBinnedSets;
-	for(int time=0; time<parameters.timeMaxAutocorrelationFunction; time++){
+	for(int time=0; time<parameters.timeMaxAutocorrelationFunction; time++)
+	{
 		autocorrelationFunctionValuesBinnedSets.push_back(BinnedDataSampleFromNumberOfBins(
 				                                          autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(sample, time),
 				                                          parameters.numberOfBinsForAutocorrelation, false, false));
@@ -231,36 +232,52 @@ std::vector<EstimateAndError> calcArrayOfAutocorrelationAndErrorEsitmatesOfDataS
 	return result;
 }
 
-//todo: implement
-EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters)
+//todo: move this to IO
+static std::string getFilenameForAutocorrelation(Parameters parameters)
 {
-	throw std::invalid_argument("Autocorrelation is not implemented yet. Aborting!");
+	return parameters.file + "_auto";
 }
 
+EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters)
+{
+	std::vector<EstimateAndError> result = calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(sample, parameters);
 
+	std::vector<double> estimates;
+	std::vector<double> errors;
+	for (int i = 0; i< int(result.size()); i++ )
+	{
+		estimates.push_back(result[i].estimate);
+		errors.push_back(result[i].error);
+	}
 
+	std::string filename = getFilenameForAutocorrelation(parameters);
 
-
-
+	writeEstimateAndErrorArraysToFile("auto", estimates, errors, filename);
+}
 
 DataSample createDataSampleFromDatafile(std::string filename, Parameters parameters)
 {
 	DataSample dataSample(filename);
 	if ( parameters.useBinning)
 	{
-		if ( parameters.useNumberOfBinsForBinning)
+		if (parameters.calcAutocorrelation)
 		{
-			return BinnedDataSampleFromNumberOfBins(dataSample, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
+			std::cout << "Do not perform binning as the autocorrelation should be estimated!" << std::endl;
 		}
 		else
 		{
-			return BinnedDataSampleFromBinsize(dataSample, parameters.binsize, parameters.binningMustFitDataSampleSize);
+			std::cout << "Perform binning on data sample..." << std::endl;
+			if ( parameters.useNumberOfBinsForBinning)
+			{
+				return BinnedDataSampleFromNumberOfBins(dataSample, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
+			}
+			else
+			{
+				return BinnedDataSampleFromBinsize(dataSample, parameters.binsize, parameters.binningMustFitDataSampleSize);
+			}
 		}
 	}
-	else
-	{
-		return dataSample;
-	}
+	return dataSample;
 }
 
 

@@ -5,6 +5,7 @@
 #include "binnedDataSample.hpp"
 #include "DataSample.hpp"
 #include "../Parameters/Parameters.hpp"
+#include "../IO/io_utilities.hpp"
 
 class EstimateAndError
 {

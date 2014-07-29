@@ -86,26 +86,34 @@ public:
 	DataSampleAnalyzer(DataSample &sample, Parameters parametersIn):
 		parameters(parametersIn)
 	{
+		/**
+		 * If the autocorrelation should be estimated, do not analyze any other observable!
+		 */
 		if (parameters.calcAutocorrelation)
 		{
 			AutocorrelationAnalyzer(sample, parameters);
+			//todo: this does not return a meaningful estimateAndError object!
+			//todo: Hence, it should not be written to file!
 		}
-	    if(parameters.analyzeMean)
-	    {
-	        MeanAnalyzer(sample, parameters);
-	    }
-	    if(parameters.analyzeVariance)
-	    {
-	        VarianceAnalyzer(sample, parameters);
-	    }
-	    if(parameters.analyzeSkewness)
-	    {
-	        SkewnessAnalyzer(sample, parameters);
-	    }
-	    if(parameters.analyzeKurtosis)
-	    {
-	        KurtosisAnalyzer(sample, parameters);
-	    }
+		else
+		{
+			if(parameters.analyzeMean)
+			{
+				MeanAnalyzer(sample, parameters);
+			}
+			if(parameters.analyzeVariance)
+			{
+				VarianceAnalyzer(sample, parameters);
+			}
+			if(parameters.analyzeSkewness)
+			{
+				SkewnessAnalyzer(sample, parameters);
+			}
+			if(parameters.analyzeKurtosis)
+			{
+				KurtosisAnalyzer(sample, parameters);
+			}
+		}
 	};
 
 private:
