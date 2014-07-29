@@ -53,12 +53,16 @@ protected:
 };
 
 DataSampleBasic operator+(DataSampleBasic sampleIn, double factor);
+DataSampleBasic operator+(double factor, DataSampleBasic sampleIn);
 DataSampleBasic operator+(DataSampleBasic lhs, DataSampleBasic rhs);
 DataSampleBasic operator-(DataSampleBasic sampleIn, double factor);
+DataSampleBasic operator-(double factor, DataSampleBasic sampleIn);
 DataSampleBasic operator-(DataSampleBasic lhs, DataSampleBasic rhs);
 DataSampleBasic operator*(DataSampleBasic sampleIn, double factor);
+DataSampleBasic operator*(double factor, DataSampleBasic sampleIn);
 DataSampleBasic operator*(DataSampleBasic lhs, DataSampleBasic rhs);
 DataSampleBasic operator/(DataSampleBasic sampleIn, double factor);
+DataSampleBasic operator/(double factor, DataSampleBasic sampleIn);
 DataSampleBasic operator/(DataSampleBasic lhs, DataSampleBasic rhs);
 DataSampleBasic operator^(DataSampleBasic sampleIn, int n);
 DataSampleBasic operator^(DataSampleBasic sampleIn, double n);

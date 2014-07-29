@@ -96,39 +96,6 @@ DataSampleBasic& DataSampleBasic::operator*=(DataSampleBasic sampleIn)
 	return *this;
 }
 
-DataSampleBasic operator+(DataSampleBasic sampleIn, double factor)
-{
-	sampleIn += factor;
-	return sampleIn;
-}
-
-DataSampleBasic operator+(DataSampleBasic lhs, DataSampleBasic rhs)
-{
-	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
-	lhs += rhs;
-	return lhs;
-}
-
-DataSampleBasic operator-(DataSampleBasic sampleIn, double factor)
-{
-	sampleIn -= factor;
-	return sampleIn;
-}
-
-DataSampleBasic operator-(DataSampleBasic lhs, DataSampleBasic rhs)
-{
-	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
-	lhs -= rhs;
-	return lhs;
-}
-
-DataSampleBasic operator*(DataSampleBasic lhs, DataSampleBasic rhs)
-{
-	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
-	lhs *= rhs;
-	return lhs;
-}
-
 DataSampleBasic& DataSampleBasic::operator/=(double factor)
 {
 	checkDivisionFactor(factor);
@@ -155,16 +122,61 @@ DataSampleBasic& DataSampleBasic::operator^=(double n)
 	return *this;
 }
 
+DataSampleBasic operator+(DataSampleBasic sampleIn, double factor)
+{
+	sampleIn += factor;
+	return sampleIn;
+}
+
+DataSampleBasic operator+(double factor, DataSampleBasic sampleIn)
+{
+	sampleIn += factor;
+	return sampleIn;
+}
+
+DataSampleBasic operator+(DataSampleBasic lhs, DataSampleBasic rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs += rhs;
+	return lhs;
+}
+
+DataSampleBasic operator-(DataSampleBasic sampleIn, double factor)
+{
+	sampleIn -= factor;
+	return sampleIn;
+}
+
+DataSampleBasic operator-(double factor, DataSampleBasic sampleIn)
+{
+	sampleIn -= factor;
+	sampleIn *= -1.;
+	return sampleIn;
+}
+
+DataSampleBasic operator-(DataSampleBasic lhs, DataSampleBasic rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs -= rhs;
+	return lhs;
+}
+
 DataSampleBasic operator*(DataSampleBasic sampleIn, double factor)
 {
 	sampleIn *= factor;
 	return sampleIn;
 }
 
-DataSampleBasic operator/(DataSampleBasic lhs, DataSampleBasic rhs)
+DataSampleBasic operator*(double factor, DataSampleBasic sampleIn)
+{
+	sampleIn *= factor;
+	return sampleIn;
+}
+
+DataSampleBasic operator*(DataSampleBasic lhs, DataSampleBasic rhs)
 {
 	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
-	lhs/=rhs;
+	lhs *= rhs;
 	return lhs;
 }
 
@@ -172,6 +184,21 @@ DataSampleBasic operator/(DataSampleBasic sampleIn, double factor)
 {
 	checkDivisionFactor(factor);
 	return sampleIn /= factor;
+}
+
+DataSampleBasic operator/(double factor, DataSampleBasic sampleIn)
+{
+	for(int i=0; i<sampleIn.getNumberOfElements(); i++)
+		checkDivisionFactor(sampleIn[i]);
+	sampleIn ^= -1.;
+	return sampleIn *= factor;
+}
+
+DataSampleBasic operator/(DataSampleBasic lhs, DataSampleBasic rhs)
+{
+	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+	lhs/=rhs;
+	return lhs;
 }
 
 DataSampleBasic operator^(DataSampleBasic sampleIn, int n)
@@ -194,8 +221,8 @@ void DataSampleBasic::checkIfNumberOfElementsIsValid(int length)
 	if(length <= 0)
 		throw std::invalid_argument("Cannot create dataSample with zero or less elements!");
 	//todo: think about better warning!
-	if(length > roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid)
-		std::cout << "Warning: the datasize is such that double precision may not be valid anymore (depending on the data)!" << std::endl;
+	//if(length > roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid)
+		//std::cout << "Warning: the datasize is such that double precision may not be valid anymore (depending on the data)!" << std::endl;
 }
 
 double defaultFunction(double in)
