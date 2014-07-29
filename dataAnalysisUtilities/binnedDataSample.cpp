@@ -10,7 +10,8 @@ static void printBinningInformation(int numberOfBins, int binsize)
 
 DataSampleBasic BinnedDataSample::performBinning(DataSampleBasic sampleIn)
 {
-	printBinningInformation(numberOfBins, binsize);
+	if(warningOutput)
+		printBinningInformation(numberOfBins, binsize);
 	DataSampleBasic binnedDataSample(numberOfBins);
 	for(int iteration = 0; iteration < numberOfBins; iteration++)
 	{
@@ -24,8 +25,10 @@ void BinnedDataSample::checkDiscardedElements(int valueIn, std::string descripti
 	int discardedElements = elementsOfSample % valueIn;
 	if (discardedElements != 0)
 	{
-		std::cout << "Warning: " << descriptionIn << " is not a multiple of numberOfElements!" << std::endl;
-		std::cout << discardedElements<< " elements are discarded!" << std::endl;
+		if(warningOutput){
+			std::cout << "Warning: " << descriptionIn << " is not a multiple of numberOfElements!" << std::endl;
+			std::cout << discardedElements<< " elements are discarded!" << std::endl;
+		}
 		if ( binningMustFitSize )
 		{
 			throw wrongBinningParameter();
@@ -33,9 +36,10 @@ void BinnedDataSample::checkDiscardedElements(int valueIn, std::string descripti
 	}
 }
 
-BinnedDataSampleFromNumberOfBins::BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn, bool requireBinningToMatchSize)
+BinnedDataSampleFromNumberOfBins::BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn, bool requireBinningToMatchSize, bool warningOutputIn)
 {
 	binningMustFitSize = requireBinningToMatchSize;
+	warningOutput = warningOutputIn;
 	numberOfBins = numberOfBinsIn;
 	checkIfNumberOfBinsIsValid(sampleIn.getNumberOfElements());
 	calcBinsize(sampleIn.getNumberOfElements());
@@ -72,9 +76,10 @@ void BinnedDataSampleFromBinsize::calcNumberOfBins(int elementsOfSample)
 	numberOfBins = elementsOfSample / binsize;
 }
 
-BinnedDataSampleFromBinsize::BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsizeIn, bool requireBinningToMatchSize)
+BinnedDataSampleFromBinsize::BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsizeIn, bool requireBinningToMatchSize, bool warningOutputIn)
 {
 	binningMustFitSize = requireBinningToMatchSize;
+	warningOutput = warningOutputIn;
 	binsize = binsizeIn;
 	checkIfBinsizeIsValid(sampleIn.getNumberOfElements());
 	calcNumberOfBins(sampleIn.getNumberOfElements());
