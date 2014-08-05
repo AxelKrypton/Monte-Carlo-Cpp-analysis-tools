@@ -26,7 +26,8 @@ EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn);
 EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters);
-std::vector<EstimateAndError> calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters);
+std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters);
+std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters);
 DataSample createDataSampleFromDatafile(std::string filename, Parameters parameters);
 
 #endif /* DATAANALYSISUTILITIES_HPP_ */

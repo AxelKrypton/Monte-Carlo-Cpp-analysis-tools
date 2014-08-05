@@ -175,9 +175,9 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Paramet
  *      --->  jackknife(Y, [] (double val) -> double {return val;})
  *  In both cases, one can produce plots similar to those of Figure 4.1-4.2.
  *
- *  In the following, we will implement only the second case. Plotting the resulting data with
- *  errors, from the FIRST plateau, one can make the final estimate of the integrated_autocorrelation_time
- *  (read around equation (4.13) to understand why to look at the first plateau is important).
+ *  Plotting the resulting data with errors, from the FIRST plateau, one can make the final estimate
+ *  of the integrated_autocorrelation_time (read around equation (4.13) to understand why to look at
+ *  the first plateau is important).
  *
  *  NOTE: Probably the jackknife call could in principle done with a more complicated function
  *        so that the sets X and Y can be built directly inside the jackknife. This is not however
@@ -195,23 +195,28 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Paramet
  *        with more than 1000 data).
  */
 static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(DataSample & sample, int time);
+static std::vector<BinnedDataSampleFromNumberOfBins> calcAutocorrelationFunctionValuesBinnedSets(DataSample & sample, Parameters parameters);
 
-std::vector<EstimateAndError> calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters)
+std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters)
 {
-	std::vector<BinnedDataSampleFromNumberOfBins> autocorrelationFunctionValuesBinnedSets;
+
+	std::vector<BinnedDataSampleFromNumberOfBins>
+	autocorrelationFunctionValuesBinnedSets = calcAutocorrelationFunctionValuesBinnedSets(sample, parameters);
+
+	std::vector<EstimateAndError> result;
 	for(int time=0; time<parameters.timeMaxAutocorrelationFunction; time++){
-		autocorrelationFunctionValuesBinnedSets.push_back(BinnedDataSampleFromNumberOfBins(
-				                                          autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(sample, time),
-				                                          parameters.numberOfBinsForAutocorrelation, false, false));
+		JackknifeEstimatorsFromBinnedDataSample jackSample(autocorrelationFunctionValuesBinnedSets[time]);
+		result.push_back(EstimateAndError(autocorrelationFunctionValuesBinnedSets[time].getNthMoment(1), jackSample.getJackknifeError()));
 	}
 
-/*	std::cout.precision(15);
-	std::cout << "----------------------------" << std::endl;
+	return result;
+}
 
-	for(int n=0; n<parameters.numberOfBinsForAutocorrelation; n++)
-		std::cout << "ACORJ(IT=0, " << n << ") = " << autocorrelationFunctionValuesBinnedSets[0][n] << std::endl;
+std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters)
+{
 
-	std::cout << "----------------------------" << std::endl; */
+	std::vector<BinnedDataSampleFromNumberOfBins>
+	autocorrelationFunctionValuesBinnedSets = calcAutocorrelationFunctionValuesBinnedSets(sample, parameters);
 
 	std::vector<DataSample> integratedTimeBinnedSets;
 	//The first array of integratedTimeBinnedSets must be an array of ones
@@ -278,10 +283,20 @@ static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(
 	 * additional informations.
 	 */
 	DataSampleBasic result = ((x_first - data_mean) * (x_second - data_mean));
-	result *= (double)sample.getNumberOfElements() / (sample.getNumberOfElements() - 1);
+	result = result * sample.getNumberOfElements() / (sample.getNumberOfElements() - 1);
 	return result;
 }
 
+static std::vector<BinnedDataSampleFromNumberOfBins> calcAutocorrelationFunctionValuesBinnedSets(DataSample & sample, Parameters parameters)
+{
+	std::vector<BinnedDataSampleFromNumberOfBins> autocorrelationFunctionValuesBinnedSets;
+	for(int time=0; time<parameters.timeMaxAutocorrelationFunction; time++){
+		autocorrelationFunctionValuesBinnedSets.push_back(BinnedDataSampleFromNumberOfBins(
+				                                          autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(sample, time),
+				                                          parameters.numberOfBinsForAutocorrelation, false, false));
+	}
+	return autocorrelationFunctionValuesBinnedSets;
+}
 
 
 

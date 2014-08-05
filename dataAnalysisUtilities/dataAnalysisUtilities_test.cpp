@@ -289,9 +289,41 @@ BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(autocorrelationTime)
+BOOST_AUTO_TEST_SUITE(autocorrelation)
 
-	BOOST_AUTO_TEST_CASE(TestVsBerg)
+	BOOST_AUTO_TEST_CASE(corrFuncTestVsBerg)
+	{
+		const char * arguments[] = {"foo", "--file=gaussianNumbers_Berg.dat", "-a", "--timeMaxAutocorrelationFunction=128", "--numberOfBinsForAutocorrelation=32"};
+		Parameters parameters(5, arguments);
+		DataSample gaussianCorrelatedBergData(parameters.file, 2);
+		DataSample referenceCorrFuncValues("autFuncBergRefResult32bins.dat", 2);
+		DataSample referenceCorrFuncErrors("autFuncBergRefResult32bins.dat", 3);
+
+		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationFunctionsAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters);
+
+		/*
+		 * Since in the Berg Code the jackknife estimators are always calculated without
+		 * any analytic simplification, the reference result are too different from ours.
+		 * Then we just implemented this analytic simplification in his code.
+		 * [the modification consists in introducing after line "CALL DATJACK(NBINS,WORK,ACORJ)"
+		 *  of the file autcorj.f the for loop
+		 *     DO IBINS=1,NBINS
+		 *       ACORJ(IBINS)=WORK(IBINS)
+		 *     END DO
+		 *  and in the file at21.f divide the ACE output variable of STEBJ0 by (NBINS-1) when
+		 *  it is print to screen]
+		 *
+		 * Nevertheless there are some rounding errors because the calculation is carried out differently
+		 * from how we do. This is the reason why here we do not use "doublePrecisionInPercent"
+		 * but only 3.e-10 in the boost check of the error.
+		 */
+		for(uint i=0; i<result.size(); i++){
+			BOOST_CHECK_CLOSE(result[i].estimate, referenceCorrFuncValues[i], 3.e-10);
+			BOOST_CHECK_CLOSE(result[i].error, referenceCorrFuncErrors[i], 3.e-10);
+		}
+	}
+
+	BOOST_AUTO_TEST_CASE(tauTestVsBerg)
 	{
 		const char * arguments[] = {"foo", "--file=gaussianNumbers_Berg.dat", "-a", "--timeMaxAutocorrelationFunction=128", "--numberOfBinsForAutocorrelation=32"};
 		Parameters parameters(5, arguments);
@@ -299,27 +331,16 @@ BOOST_AUTO_TEST_SUITE(autocorrelationTime)
 		DataSample referenceTauValues("intTauBergRefResult32bins.dat", 2);
 		DataSample referenceTauErrors("intTauBergRefResult32bins.dat", 3);
 
-		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters);
-
-		for(uint i=0; i<result.size(); i++){
-			BOOST_CHECK_CLOSE(result[i].estimate, referenceTauValues[i], doublePrecisionInPercent);
-			BOOST_CHECK_CLOSE(result[i].error, referenceTauErrors[i], doublePrecisionInPercent);
-		}
+		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters);
 
 		/*
-		std::valarray<double> deltaVal(result.size());
-		std::valarray<double> deltaErr(result.size());
-
-		std::cout.precision(15);
+		 * See the comment above for the reason why we use 1.e-10 instead
+		 * of "doublePrecisionInPercent" in the boost check.
+		 */
 		for(uint i=0; i<result.size(); i++){
-			deltaVal[i] = fabs(result[i].estimate - referenceTauValues[i]);
-			deltaErr[i] = fabs(result[i].error - referenceTauErrors[i]);
+			BOOST_CHECK_CLOSE(result[i].estimate, referenceTauValues[i], 1.e-10);
+			BOOST_CHECK_CLOSE(result[i].error, referenceTauErrors[i], 1.e-10);
 		}
-
-		std::cout << "Max diff value = " << deltaVal.max() << std::endl;
-		std::cout << "Max diff error = " << deltaErr.max() << std::endl;
-		*/
-
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
