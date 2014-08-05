@@ -6,6 +6,8 @@ add_library(dataAnalysisUtilities
 	dataAnalysisUtilities.cpp
 )
 
+target_link_libraries(dataAnalysisUtilities IO)
+
 configure_file(datafile.example datafile.example COPYONLY)
 configure_file(datafile2.example datafile2.example COPYONLY)
 configure_file(datafile3.example datafile3.example COPYONLY)
