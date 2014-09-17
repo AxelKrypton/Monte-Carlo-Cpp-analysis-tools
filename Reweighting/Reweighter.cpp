@@ -83,7 +83,7 @@ void Reweighter::setNewRangesOfParameters(std::vector<std::pair<double, double> 
 }
 
 
-void Reweighter::setNewNumberOfPoints(std::vector<unsigned int> newNumberOfPointsOfParametersIn){
+void Reweighter::setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn){
 	newNumberOfPointsOfParameters = newNumberOfPointsOfParametersIn;
 	calculateNewPoints();
 }
@@ -263,7 +263,8 @@ static bool isLogZPresentInParameters(std::vector<std::string> rewPar){
 }
 
 static void writeNewPoints(std::vector<std::vector<double> >&  valuesOfNewParameters,
-		std::vector<std::vector<double> > newPointValuesForSingleParameter, std::vector<double> aux, int numberOfRow, int atInTheRow)
+                           std::vector<std::vector<double> > newPointValuesForSingleParameter,
+                           std::vector<double> aux, int numberOfRow, int atInTheRow)
 {
 	if(aux.size() == newPointValuesForSingleParameter.size()){
 		valuesOfNewParameters.push_back(aux);

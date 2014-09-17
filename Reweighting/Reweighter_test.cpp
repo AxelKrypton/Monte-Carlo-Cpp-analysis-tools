@@ -184,6 +184,9 @@ BOOST_AUTO_TEST_SUITE(setters)
 		BOOST_REQUIRE_THROW(reweighter->setNewRangesOfParameters(newRanges), std::invalid_argument);
 		delete reweighter;
 		reweighter = new Reweighter(fileThatDoesExist, newRanges, newNumPoints);
+        newRanges.pop_back();
+        BOOST_REQUIRE_THROW(reweighter->setNewRangesOfParameters(newRanges), std::invalid_argument);
+        newRanges.push_back(std::make_pair(-1.2e12, -1.6e12));
 		newRanges[1] = std::make_pair(0.7, 1.3);
 		BOOST_REQUIRE_NO_THROW(reweighter->setNewRangesOfParameters(newRanges));
 		std::vector<std::vector<double> > refPoints;
@@ -223,11 +226,14 @@ BOOST_AUTO_TEST_SUITE(setters)
 		newRanges.push_back(std::make_pair(0.8, 1.2));
 		newRanges.push_back(std::make_pair(-1.2e12, -1.6e12));
 		Reweighter* reweighter = new Reweighter(fileThatDoesExist);
-		BOOST_REQUIRE_THROW(reweighter->setNewNumberOfPoints(newNumPoints), std::invalid_argument);
+        BOOST_REQUIRE_THROW(reweighter->setNewNumberOfPointsOfParameters(newNumPoints), std::invalid_argument);
 		delete reweighter;
 		reweighter = new Reweighter(fileThatDoesExist, newRanges, newNumPoints);
+        newNumPoints.pop_back();
+        BOOST_REQUIRE_THROW(reweighter->setNewNumberOfPointsOfParameters(newNumPoints), std::invalid_argument);
+        newNumPoints.push_back(4);
 		newNumPoints[1] = 5;
-		BOOST_REQUIRE_NO_THROW(reweighter->setNewNumberOfPoints(newNumPoints));
+        BOOST_REQUIRE_NO_THROW(reweighter->setNewNumberOfPointsOfParameters(newNumPoints));
 		BOOST_REQUIRE_EQUAL(reweighter->getNumberOfNewPoints(), 80);
 	}
 

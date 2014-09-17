@@ -18,7 +18,7 @@ public:
 	double getPrecisionToCalculateLogZ();
 	//Setters
 	void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn);
-	void setNewNumberOfPoints(std::vector<unsigned int> newNumberOfPointsOfParametersIn);
+    void setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn);
 	void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
 			                 std::vector<unsigned int> newNumberOfPointsOfParametersIn);
 	void setPrecisionToCalculateLogZ(double precisionToCalculateLogZ);
