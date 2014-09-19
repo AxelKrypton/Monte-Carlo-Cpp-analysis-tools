@@ -11,12 +11,18 @@ static double logarithmic_sum(double, double);
 
 /*****************************************************************************************/
 
-Reweighter::Reweighter() {
-	throw std::invalid_argument("Reweighter needs input file for construction!");
+/*
+ * The following exception in the default constructor is never thrown because in the
+ * initialization list (that is not explicitly given) there is an implicit call to
+ * the default constructor of the SimulationDataContainer class that throws an std::invalid_argument
+ * exception.
+ */
+ReweighterAbstract::ReweighterAbstract() {
+    throw std::invalid_argument("Reweighter needs input file for construction!");
 }
 
 
-void Reweighter::generalInitialization()
+void ReweighterAbstract::generalInitialization()
 {
 	extractNamesOfParametersFromSimulationData(simulationDataContainer[0], reweightingParameterNames);
 	checkCorrectnessOfReweightingConfigurationFile(simulationDataContainer, reweightingParameterNames);
@@ -29,7 +35,7 @@ void Reweighter::generalInitialization()
 }
 
 
-Reweighter::Reweighter(std::string configurationFileIn, double precisionToCalculateLogZ)
+ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn, double precisionToCalculateLogZ)
  : configurationFile(configurationFileIn), simulationDataContainer(configurationFileIn),
    precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
 {
@@ -37,7 +43,7 @@ Reweighter::Reweighter(std::string configurationFileIn, double precisionToCalcul
 }
 
 
-Reweighter::Reweighter(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
 		   std::vector<unsigned int>  newNumberOfPointsOfParametersIn, double precisionToCalculateLogZ)
  : configurationFile(configurationFileIn),  simulationDataContainer(configurationFileIn), newRangesOfParameters(newRangesOfParametersIn),
    newNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn), precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
@@ -47,49 +53,49 @@ Reweighter::Reweighter(std::string configurationFileIn, std::vector<std::pair<do
 }
 
 
-std::vector<std::vector<double> > Reweighter::getValuesOfSimulationParameters(){
+std::vector<std::vector<double> > ReweighterAbstract::getValuesOfSimulationParameters(){
 	return valuesOfSimulationParameters;
 }
 
 
-std::vector<std::vector<double> > Reweighter::getValuesOfNewParameters(){
+std::vector<std::vector<double> > ReweighterAbstract::getValuesOfNewParameters(){
 	return valuesOfNewParameters;
 }
 
 
-int Reweighter::getNumberOfNewPoints(){
+int ReweighterAbstract::getNumberOfNewPoints(){
 	return valuesOfNewParameters.size();
 }
 
 
-std::vector<double> Reweighter::getLogZAtSimulatedPoints(){
+std::vector<double> ReweighterAbstract::getLogZAtSimulatedPoints(){
 	return logZAtSimulatedPoints;
 }
 
 
-std::vector<double> Reweighter::getLogZAtNewPoints(){
+std::vector<double> ReweighterAbstract::getLogZAtNewPoints(){
 	return logZAtNewPoints;
 }
 
 
-double Reweighter::getPrecisionToCalculateLogZ(){
+double ReweighterAbstract::getPrecisionToCalculateLogZ(){
 	return precisionOfIterativeProcedureToCalculateLogZ;
 }
 
 
-void Reweighter::setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
+void ReweighterAbstract::setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
 	newRangesOfParameters = newRangesOfParametersIn;
 	calculateNewPoints();
 }
 
 
-void Reweighter::setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn){
+void ReweighterAbstract::setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn){
 	newNumberOfPointsOfParameters = newNumberOfPointsOfParametersIn;
 	calculateNewPoints();
 }
 
 
-void Reweighter::setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+void ReweighterAbstract::setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
 		                               std::vector<unsigned int> newNumberOfPointsOfParametersIn)
 {
 	newRangesOfParameters = newRangesOfParametersIn;
@@ -97,14 +103,14 @@ void Reweighter::setNewParameters(std::vector<std::pair<double, double> >  newRa
 	calculateNewPoints();
 }
 
-void Reweighter::setPrecisionToCalculateLogZ(double precisionToCalculateLogZ){
+void ReweighterAbstract::setPrecisionToCalculateLogZ(double precisionToCalculateLogZ){
 	if(precisionToCalculateLogZ <= 0.0)
 		throw std::range_error("Precision smaller than or equal to zero is nonsense!");
 	precisionOfIterativeProcedureToCalculateLogZ = precisionToCalculateLogZ;
 }
 
 
-void Reweighter::calculateNewPoints(){
+void ReweighterAbstract::calculateNewPoints(){
 	//todo: improve! Here the easiest implementation -> new point values determined as (upper_bound-lower_bound)/num_points
 	if(newRangesOfParameters.size() != newNumberOfPointsOfParameters.size() ||
        newRangesOfParameters.size() != reweightingParameterNames.size())
@@ -141,7 +147,7 @@ void Reweighter::calculateNewPoints(){
  *       instance, logZAtSimulatedPoints must have the right amount of memory reserved
  *       before calling this function.
  */
-std::vector<double> Reweighter::calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated){
+std::vector<double> ReweighterAbstract::calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated){
 
 	std::vector<double> outputValuesOfLogZ(valuesOfParametersAtWhichLogZIsCalculated.size());
 	double logarithmOfDenominator;
@@ -189,7 +195,7 @@ std::vector<double> Reweighter::calculateLogZAtNewPoints(std::vector<std::vector
  *       instance, logZAtSimulatedPoints must have the right amount of memory reserved
  *       before calling this function.
  */
-void Reweighter::calculateLogZAtSimulatedPoints(){
+void ReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
 
 
 
@@ -197,7 +203,7 @@ void Reweighter::calculateLogZAtSimulatedPoints(){
 	double residuum;
 	std::vector<double> newLogZ(valuesOfSimulationParameters.size());
 	do{
-		newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters);
+        newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters);
 		residuum = 0.0;
 		//todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
 		for(size_t indexSimulations = 0; indexSimulations < valuesOfSimulationParameters.size(); indexSimulations++){
@@ -210,7 +216,9 @@ void Reweighter::calculateLogZAtSimulatedPoints(){
 
 }
 
-
+void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
+    logZAtNewPoints = calculateLogZAtNewPoints(valuesOfNewParameters);
+}
 
 
 

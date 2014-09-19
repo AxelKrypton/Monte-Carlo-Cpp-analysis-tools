@@ -3,12 +3,56 @@
 
 #include "SimulationDataContainer.hpp"
 
-class Reweighter {
+/*
+ * The idea underlying the implementation of the Reweighter class is that the user construct a
+ * Reweighter object, sets the values of new parameters (ranges and number of points) either in
+ * the constructor or using the setter setNewParameters, and then uses methods such as
+ * getLogZAtNewPoints to get the result of the calculation. This means that the user has not
+ * to invoque a method to start the calculation itself.
+ *
+ * Given what written above, one has to consider that to calculate the logZ at the new points
+ * the value of logZ at the simulated points is needed and, of course, one must have the values
+ * of the new points. There are basically two scenarios:
+ *  - In the constructor the new points are not set and they are set afterwards with the setter.
+ *    This means that the constructor will calculate logZ only at the simulated points, while logZ
+ *    at the new points will be calculated in the setter.
+ *  - In the constructor everything is set. Thus both the logZ at the simulated points and logZ
+ *    at the new points will be calculated by the constructor.
+ *
+ * NOTE: Actually there are three kind of setters: one to set only the ranges, one to set only
+ *       the number of new points, and one to set both. The first two are thought to be used
+ *       only to re-set the values: one cannot instatiate an object without giving the new parameters
+ *       and then call first on single setter and then the other. For this case, the complete
+ *       setter shoud be used. However, all these three setters will calculate again the values
+ *       of logZ at the new points.
+ *
+ * Now, it should be clear that, to make this class more user-friendly, some functionalities in
+ * principle different have been grouped in single methods (like the setting operation and the
+ * calculation). The problem is that in the tests the single functonality shoud be tested. Hence
+ * one would like to test the setter itself, without carrying out any calculation in it. The calculation
+ * should to be tested in a separate test case. This is the reason why we proceed implementing a
+ * ReweighterAbstract class that has the setters as pure virtual functions. In the derived classes
+ * Reweighter and ReweighterTest these setters will be properly defined, i.e. in the Reweighter the
+ * calculation of logZ at new points will be done and in ReweighterTest not. About the calculation
+ * in the constructor, one would like to do something similar, but we know it is not possible to have
+ * a virtual constructor. Thus we will not put this calculation in the ReweighterAbstract class
+ * constructor, but only in the real Reweighter class.
+ *
+ * NOTE: Since abstract classes cannot be used to instantiate objects, it could be misleading to
+ *       have a public constructor. Actually, it seems to make no difference to have a public or
+ *       a private constructor in an abstract class, we will make them protected (read this reference
+ *       http://stackoverflow.com/questions/1363147/is-a-public-constructor-in-an-abstract-class-a-codesmell
+ *       for more detials).
+ *
+ * REMARK: For each pure virtual method, the base class can still have an implementation of such a method
+ *         that can be explicitly called in the children with the scope resolution operator. In this way,
+ *         derived classes can call this sort of default implementation. Pure virtual (=0) means that
+ *         derived classes must provide an implementation, not that the base class can not provide an implementation!
+ */
+
+class ReweighterAbstract {
 public:
-	Reweighter();
-	Reweighter(std::string configurationFileIn, double precisionToCalculateLogZ = 1.e-7);
-	Reweighter(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
-			     std::vector<unsigned int>  newNumberOfPointsOfParametersIn, double precisionToCalculateLogZ = 1.e-7);
+    virtual ~ReweighterAbstract() {}
 	//Getters
 	std::vector<std::vector<double> > getValuesOfSimulationParameters();
 	std::vector<std::vector<double> > getValuesOfNewParameters();
@@ -17,28 +61,35 @@ public:
 	std::vector<double> getLogZAtNewPoints();
 	double getPrecisionToCalculateLogZ();
 	//Setters
-	void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn);
-    void setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn);
-	void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
-			                 std::vector<unsigned int> newNumberOfPointsOfParametersIn);
-	void setPrecisionToCalculateLogZ(double precisionToCalculateLogZ);
-	//Other functionalities
+    void setPrecisionToCalculateLogZ(double precisionToCalculateLogZ);
+    virtual void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn) = 0;
+    virtual void setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn) = 0;
+    virtual void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+                                  std::vector<unsigned int> newNumberOfPointsOfParametersIn) = 0;
+    //Other functionalities
+    //Write logZ to configFile?!
 
 protected:
-	/*
-	 * Note: These protected functions should be private, but we leave them public for testing purposes
-	 */
-	std::vector<double> calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated);
-	void calculateLogZAtSimulatedPoints();
+    ReweighterAbstract();
+    ReweighterAbstract(std::string configurationFileIn, double precisionToCalculateLogZ = 1.e-7);
+    ReweighterAbstract(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+                 std::vector<unsigned int>  newNumberOfPointsOfParametersIn, double precisionToCalculateLogZ = 1.e-7);
+
+    void calculateAndSetLogZAtNewPoints();
+    void calculateAndSetLogZAtSimulatedPoints();
 
 private:
-	/*
+    /*
 	 * Note: The following function is basically the second constructor above. We put it here because it is also the first part
 	 *       of the third constructor. In C one constructor cannot call another constructor (in c++11 one would use delegating constructors).
 	 */
 	void generalInitialization();
-	void calculateNewPoints();
 
+    //Method in which "valuesOfNewParameters" is filled and some checks are done
+    void calculateNewPoints();
+    std::vector<double> calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated);
+
+    //Members
 	std::string configurationFile;
 	std::vector<std::string> reweightingParameterNames;
 	SimulationDataContainer simulationDataContainer;
@@ -84,6 +135,41 @@ private:
 	std::vector<unsigned int>  newNumberOfPointsOfParameters;
 	double precisionOfIterativeProcedureToCalculateLogZ;
 };
+
+
+class Reweighter : public ReweighterAbstract{
+public:
+    Reweighter() : ReweighterAbstract() {std::cout << "In Reweighter ctor!\n";}
+    Reweighter(std::string configurationFileIn, double precisionToCalculateLogZ = 1.e-7)
+     : ReweighterAbstract(configurationFileIn, precisionToCalculateLogZ) {
+        calculateAndSetLogZAtSimulatedPoints();
+    }
+    Reweighter(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+               std::vector<unsigned int>  newNumberOfPointsOfParametersIn, double precisionToCalculateLogZ = 1.e-7)
+     : ReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
+                          newNumberOfPointsOfParametersIn, precisionToCalculateLogZ) {
+        calculateAndSetLogZAtSimulatedPoints();
+        calculateAndSetLogZAtNewPoints();
+    }
+
+    //Setters
+    void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
+        ReweighterAbstract::setNewRangesOfParameters(newRangesOfParametersIn);
+        calculateAndSetLogZAtNewPoints();
+    }
+
+    void setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn){
+        ReweighterAbstract::setNewNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn);
+        calculateAndSetLogZAtNewPoints();
+    }
+
+    void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+                          std::vector<unsigned int> newNumberOfPointsOfParametersIn){
+        ReweighterAbstract::setNewParameters(newRangesOfParametersIn, newNumberOfPointsOfParametersIn);
+        calculateAndSetLogZAtNewPoints();
+    }
+};
+
 
 
 #endif /* REWEIGHTER_H_ */
