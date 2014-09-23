@@ -1,12 +1,14 @@
 #include <algorithm>
+#include <stdio.h>
 #include "Reweighter.hpp"
 #include "SimulationData.hpp"
 
-static void extractNamesOfParametersFromSimulationData(SimulationData, std::vector<std::string>&);
+static void extractNamesOfParametersFromSimulationDataIgnoringLogZ(SimulationData, std::vector<std::string>&);
 static void checkCorrectnessOfReweightingConfigurationFile(SimulationDataContainer, std::vector<std::string>);
-static void extractValuesOfSimulationParameters(SimulationDataContainer, std::vector<std::vector<double> >&);
-static bool isLogZPresentInParameters(std::vector<std::string>);
+static void extractValuesOfSimulationParametersIgnoringLogZ(SimulationDataContainer, std::vector<std::vector<double> >&);
+static void extractAndSetProvidedValuesOfLogZAtSimulatedPoints(SimulationDataContainer, std::vector<double> &);
 static void writeNewPoints(std::vector<std::vector<double> >&, std::vector<std::vector<double> >, std::vector<double>, int=0, int=0);
+static void findIflogZHasToBeCalculated(std::vector<double>, std::vector<int>&);
 static double logarithmic_sum(double, double);
 
 /*****************************************************************************************/
@@ -24,14 +26,13 @@ ReweighterAbstract::ReweighterAbstract() {
 
 void ReweighterAbstract::generalInitialization()
 {
-	extractNamesOfParametersFromSimulationData(simulationDataContainer[0], reweightingParameterNames);
+    extractNamesOfParametersFromSimulationDataIgnoringLogZ(simulationDataContainer[0], reweightingParameterNames);
 	checkCorrectnessOfReweightingConfigurationFile(simulationDataContainer, reweightingParameterNames);
-	extractValuesOfSimulationParameters(simulationDataContainer, valuesOfSimulationParameters);
-	if(isLogZPresentInParameters(reweightingParameterNames))
-		throw std::logic_error("So far logZ cannot be passed as parameter in the configuration file!");
+    extractValuesOfSimulationParametersIgnoringLogZ(simulationDataContainer, valuesOfSimulationParameters);
 	if(precisionOfIterativeProcedureToCalculateLogZ <= 0.0)
 		throw std::range_error("Precision smaller than or equal to zero is nonsense!");
-	logZAtSimulatedPoints.reserve(valuesOfSimulationParameters.size());
+    logZAtSimulatedPoints.resize(valuesOfSimulationParameters.size(), 0.0);
+    extractAndSetProvidedValuesOfLogZAtSimulatedPoints(simulationDataContainer, logZAtSimulatedPoints);
 }
 
 
@@ -196,24 +197,59 @@ std::vector<double> ReweighterAbstract::calculateLogZAtNewPoints(std::vector<std
  *       before calling this function.
  */
 void ReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
+    /*
+     * Here we MUST initialize the values of the logZ to zero. Namely one should do something like
+     *    logZAtSimulatedPoints.assign(valuesOfSimulationParameters.size(), 0.0);
+     * but this is unnecessary since in the constructor we used the method resize() on the vector.
+     *
+     * NOTE: Since maybe in the configurationFile some values of logZ have been provided, here
+     *       we have to skip those points for which logZ has not to bee calculated. Nevertheless
+     *       this means quite some overhead, so we split the code into two blocks (if no value
+     *       of logZ is provided and if some is given).
+     *
+     * TODO: Benchmark in real life if these two blocks can be merged, i.e. how long does the
+     *       indices set up in the else here below.
+     */
+    if(logZAtSimulatedPoints == std::vector<double>(logZAtSimulatedPoints.size(), 0)){
 
+        double residuum;
+        std::vector<double> newLogZ(valuesOfSimulationParameters.size());
+        do{
+            newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters);
+            residuum = 0.0;
+            //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
+            for(size_t indexSimulations = 0; indexSimulations < valuesOfSimulationParameters.size(); indexSimulations++){
+                residuum += expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indexSimulations])
+                           *expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indexSimulations]);
+                //here one should put eq.(8.34)
+            }
+            logZAtSimulatedPoints = newLogZ;
+        }while(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ);
 
+    }else{
 
-	logZAtSimulatedPoints.assign(valuesOfSimulationParameters.size(), 0.0);
-	double residuum;
-	std::vector<double> newLogZ(valuesOfSimulationParameters.size());
-	do{
-        newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters);
-		residuum = 0.0;
-		//todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
-		for(size_t indexSimulations = 0; indexSimulations < valuesOfSimulationParameters.size(); indexSimulations++){
-			residuum += expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indexSimulations])
-					   *expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indexSimulations]);
-			//here one should put eq.(8.34)
-		}
-		logZAtSimulatedPoints = newLogZ;
-	}while(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ);
+        //Set up to skip some calculation on logZ
+        std::vector<int> indicesOfParametersAtWhichLogZHasToBeCalculated;
+        findIflogZHasToBeCalculated(logZAtSimulatedPoints, indicesOfParametersAtWhichLogZHasToBeCalculated);
+        std::vector<std::vector<double> > valuesOfParametersAtWhichLogZHasToBeCalculated;
+        for(size_t i=0; i<indicesOfParametersAtWhichLogZHasToBeCalculated.size(); i++)
+            valuesOfParametersAtWhichLogZHasToBeCalculated.push_back(valuesOfSimulationParameters[indicesOfParametersAtWhichLogZHasToBeCalculated[i]]);
+        //Real calculation
+        double residuum;
+        std::vector<double> newLogZ;
+        do{
+            newLogZ = calculateLogZAtNewPoints(valuesOfParametersAtWhichLogZHasToBeCalculated);
+            residuum = 0.0;
+            //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
+            for(size_t indexSimulations = 0; indexSimulations < valuesOfParametersAtWhichLogZHasToBeCalculated.size(); indexSimulations++){
+                residuum += expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]])
+                           *expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]]);
+                //here one should put eq.(8.34)
+                logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]] = newLogZ[indexSimulations];
+            }
+        }while(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ);
 
+    }
 }
 
 void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
@@ -232,19 +268,21 @@ void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
 
 /*****************************************************************************************/
 
-void extractNamesOfParametersFromSimulationData(SimulationData simData, std::vector<std::string>& parNames){
+void extractNamesOfParametersFromSimulationDataIgnoringLogZ(SimulationData simData, std::vector<std::string>& parNames){
 	std::map<std::string, double> auxMap;
 	auxMap = simData.getSimulationParameters();
 	parNames.clear();
-	for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++)
-		parNames.push_back(it->first);
+    for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
+        if(it->first != "logZ")
+            parNames.push_back(it->first);
+    }
 }
 
 static void checkCorrectnessOfReweightingConfigurationFile(SimulationDataContainer simDataCont, std::vector<std::string> parNames){
 	std::vector<std::string> auxParNames;
 	for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
 		if(i!=0){
-			extractNamesOfParametersFromSimulationData(simDataCont[i], auxParNames);
+            extractNamesOfParametersFromSimulationDataIgnoringLogZ(simDataCont[i], auxParNames);
 			if(auxParNames != parNames)
 				throw std::invalid_argument("Configuration file for Reweighting not valid. Use the same parameter names in each line!");
 		}
@@ -253,22 +291,55 @@ static void checkCorrectnessOfReweightingConfigurationFile(SimulationDataContain
 	}
 }
 
-void extractValuesOfSimulationParameters(SimulationDataContainer simDataCont, std::vector<std::vector<double> >& valuesOfSimPar){
+void extractValuesOfSimulationParametersIgnoringLogZ(SimulationDataContainer simDataCont, std::vector<std::vector<double> >& valuesOfSimPar){
 	std::map<std::string, double> auxMap;
 	std::vector<double> auxVector;
 	valuesOfSimPar.clear();
 	for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
 		auxMap = simDataCont[i].getSimulationParameters();
-		for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++)
-			auxVector.push_back(it->second);
+        for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
+            if(it->first != "logZ")
+                auxVector.push_back(it->second);
+        }
 		valuesOfSimPar.push_back(auxVector);
 		auxVector.clear();
 	}
 }
 
-static bool isLogZPresentInParameters(std::vector<std::string> rewPar){
-	return std::find(rewPar.begin(), rewPar.end(), "logZ") != rewPar.end();
+static void extractAndSetProvidedValuesOfLogZAtSimulatedPoints(SimulationDataContainer simDataCont, std::vector<double>& logZ){
+    std::map<std::string, double> auxMap;
+    for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
+        auxMap = simDataCont[i].getSimulationParameters();
+        for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
+            if(it->first == "logZ")
+                logZ[i] = it->second;
+        }
+    }
 }
+
+
+/*
+ * In the following function, we decide to calculate logZ at those simulated points for which in
+ * the constructor logZ has been not set to a non-zero value. This is ok, since the method 
+ * calculateAndSetLogZAtSimulatedPoints should be called only in the constructor after
+ * having set the available logZ values. In principle, it should be equivalent to select here
+ * the points looking inside the parameters in simulationDataContainer and selecting those
+ * for which logZ is not present. Actually, there is a subtle difference. Suppose that for some
+ * reason calculateAndSetLogZAtSimulatedPoints is called after the constructor somewhere. Then
+ * the values of logZ would have been already calculated and, since valuesOfSimulationParameters
+ * are (must be) still the same, it makes sense not to calculate logZ again (as it would be if we
+ * just look into simulationDataContainer parameters).
+ */
+static void findIflogZHasToBeCalculated(std::vector<double> logZAtSimulatedPoints,
+                                        std::vector<int> & indicesOfParametersAtWhichLogZHasToBeCalculated)
+{
+    indicesOfParametersAtWhichLogZHasToBeCalculated.clear();
+    for(size_t i=0; i<logZAtSimulatedPoints.size(); i++){
+        if (logZAtSimulatedPoints[i] == 0.0)
+            indicesOfParametersAtWhichLogZHasToBeCalculated.push_back(i);
+    }
+}
+
 
 static void writeNewPoints(std::vector<std::vector<double> >&  valuesOfNewParameters,
                            std::vector<std::vector<double> > newPointValuesForSingleParameter,
@@ -285,6 +356,7 @@ static void writeNewPoints(std::vector<std::vector<double> >&  valuesOfNewParame
 		aux.pop_back();
 	}
 }
+
 
 /*
  * Here a tool to sum quantities using logarithms is developed.

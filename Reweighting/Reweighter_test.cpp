@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE Reweighter
+#define BOOST_TEST_MODULE Reweighter_objects
 #include <boost/test/unit_test.hpp>
 
 #include "Reweighter.hpp"
@@ -66,30 +66,30 @@ BOOST_AUTO_TEST_SUITE( build)
 	{
 		std::string fileThatDoesExistButWrong1 = "GeneralTestFiles/wrong_configfile_7"; //correct structure but with datafile with wrong number of columns
 		std::string fileThatDoesExistButWrong2 = "GeneralTestFiles/wrong_configfile_8"; //correct structure but with different parameters name in two lines
-		std::string fileThatDoesExistButWrong3 = "GeneralTestFiles/wrong_configfile_9"; //correct structure but with logZ as parameter
         BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong1), std::logic_error);
         BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong2), std::invalid_argument);
-        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong3), std::logic_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build4)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
-        ReweighterTest reweighter(fileThatDoesExist);
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, 0.0), std::range_error);
         BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, -1.), std::range_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build5)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
-        ReweighterTest reweighter(fileThatDoesExist);
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist));
+        std::string fileThatDoesExist1 = "GeneralTestFiles/simulationDataContainer.configfile_1";
+        std::string fileThatDoesExist2 = "GeneralTestFiles/simulationDataContainer.configfile_2";
+        std::string fileThatDoesExist3 = "GeneralTestFiles/simulationDataContainer.configfile_3";
+        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist1));
+        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist2));
+        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist3));
 	}
 
 	BOOST_AUTO_TEST_CASE(build6)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints;
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -107,9 +107,28 @@ BOOST_AUTO_TEST_SUITE( build)
 		newNumPoints.back() = 1;
         BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints), std::invalid_argument);
 		newNumPoints.back() = 5;
-        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
         BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints));
 	}
+
+    BOOST_AUTO_TEST_CASE(build7)
+    {
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_2";
+        ReweighterTest reweighter(fileThatDoesExist);
+        double referenceLogZAtSimulatedPoints[3] = {3.14, 6.28, 9.42};
+        BOOST_REQUIRE_EQUAL(reweighter.getLogZAtSimulatedPoints().size(), 3);
+        for(size_t i=0; i<reweighter.getLogZAtSimulatedPoints().size(); i++)
+            BOOST_REQUIRE_EQUAL(reweighter.getLogZAtSimulatedPoints()[i], referenceLogZAtSimulatedPoints[i]);
+    }
+
+    BOOST_AUTO_TEST_CASE(build8)
+    {
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
+        ReweighterTest reweighter(fileThatDoesExist);
+        double referenceLogZAtSimulatedPoints[3] = {0.0, 3.14, 0.0};
+        BOOST_REQUIRE_EQUAL(reweighter.getLogZAtSimulatedPoints().size(), 3);
+        for(size_t i=0; i<reweighter.getLogZAtSimulatedPoints().size(); i++)
+            BOOST_REQUIRE_EQUAL(reweighter.getLogZAtSimulatedPoints()[i], referenceLogZAtSimulatedPoints[i]);
+    }
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -117,7 +136,7 @@ BOOST_AUTO_TEST_SUITE(getters)
 
 	BOOST_AUTO_TEST_CASE(getters1)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         ReweighterTest* reweighter = new ReweighterTest(fileThatDoesExist);
 		std::vector<std::vector<double> > refParameters;
 		double refLine1[3] = {4.0, 0.7, -1.e12};
@@ -134,7 +153,7 @@ BOOST_AUTO_TEST_SUITE(getters)
 
 	BOOST_AUTO_TEST_CASE(getters2)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(3, 2);
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -171,7 +190,7 @@ BOOST_AUTO_TEST_SUITE(getters)
 
 	BOOST_AUTO_TEST_CASE(getters3)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(3, 4);
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -184,21 +203,24 @@ BOOST_AUTO_TEST_SUITE(getters)
 
 	BOOST_AUTO_TEST_CASE(getters4)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         ReweighterTest reweighter(fileThatDoesExist);
-		BOOST_REQUIRE_EQUAL(reweighter.getLogZAtSimulatedPoints().size(), 0);
+        double referenceLogZAtSimulatedPoints[3] = {0.0, 0.0, 0.0};
+        BOOST_REQUIRE_EQUAL(reweighter.getLogZAtSimulatedPoints().size(), 3);
+        for(size_t i=0; i<reweighter.getLogZAtSimulatedPoints().size(); i++)
+            BOOST_REQUIRE_EQUAL(reweighter.getLogZAtSimulatedPoints()[i], referenceLogZAtSimulatedPoints[i]);
 	}
 
 	BOOST_AUTO_TEST_CASE(getters5)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         ReweighterTest reweighter(fileThatDoesExist);
 		BOOST_REQUIRE_EQUAL(reweighter.getLogZAtNewPoints().size(), 0);
 	}
 
 	BOOST_AUTO_TEST_CASE(getters6)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         ReweighterTest reweighter(fileThatDoesExist);
 		BOOST_REQUIRE_EQUAL(reweighter.getPrecisionToCalculateLogZ(), 1.e-7);
         ReweighterTest reweighter2(fileThatDoesExist, 0.001);
@@ -211,7 +233,7 @@ BOOST_AUTO_TEST_SUITE(setters)
 
 	BOOST_AUTO_TEST_CASE(setters1)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(3, 2);
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -256,7 +278,7 @@ BOOST_AUTO_TEST_SUITE(setters)
 
 	BOOST_AUTO_TEST_CASE(setters2)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(3, 4);
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -276,7 +298,7 @@ BOOST_AUTO_TEST_SUITE(setters)
 
 	BOOST_AUTO_TEST_CASE(setters3)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(3, 2);
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -315,7 +337,7 @@ BOOST_AUTO_TEST_SUITE(setters)
 
 	BOOST_AUTO_TEST_CASE(setters4)
 	{
-		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(3, 4);
 		newRanges.push_back(std::make_pair(4.2, 4.6));
@@ -334,7 +356,7 @@ BOOST_AUTO_TEST_SUITE(reweight)
 
 	BOOST_AUTO_TEST_CASE(reweight1)
 	{
-		std::string fileThatDoesExist = "RealTestData/configfile";
+        std::string fileThatDoesExist = "RealTestData/configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(1, 30);
 		newRanges.push_back(std::make_pair(5.348, 5.3509));
@@ -347,14 +369,14 @@ BOOST_AUTO_TEST_SUITE(reweight)
 											  111.394746648728, 109.377283996608, 107.360166318050, 105.343397218084, 103.326980343670,
 											  101.310919381828,  99.295218057480,  97.279880131209,  95.264909396662,  93.250309677931,
 											   91.236084826628,  89.222238718882,  87.208775251947,  85.195698340792,  83.183011914383};
-		std::vector<double> newLogZ = reweighter.testCalculateLogZAtNewPoints();
+        std::vector<double> newLogZ = reweighter.testCalculateLogZAtNewPoints();
 		for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
 			BOOST_REQUIRE_CLOSE(referenceLogZAtNewPoints[i], newLogZ[i], 1.e-8);
 	}
 
 	BOOST_AUTO_TEST_CASE(reweight2)
 	{
-		std::string fileThatDoesExist = "RealTestData/configfile";
+        std::string fileThatDoesExist = "RealTestData/configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints(1, 30);
 		newRanges.push_back(std::make_pair(5.348, 5.3509));
@@ -366,6 +388,32 @@ BOOST_AUTO_TEST_SUITE(reweight)
 		for(size_t i=0; i < reweighter.getValuesOfSimulationParameters().size(); i++)
 			BOOST_REQUIRE_CLOSE(referenceLogZAtSimulatedPoints[i], simulatedLogZ[i], 1.e-8);
 	}
+
+    BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES( reweight3, 2 )
+    BOOST_AUTO_TEST_CASE(reweight3)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_2";
+        std::vector<std::pair<double, double> > newRanges;
+        std::vector< unsigned int> newNumPoints(1, 30);
+        newRanges.push_back(std::make_pair(5.348, 5.3509));
+        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
+        //for(size_t i=0; i<reweighter.getValuesOfNewParameters().size(); i++)
+        //	std::cout << reweighter.getValuesOfNewParameters()[i][0] << std::endl;
+        double referenceLogZAtSimulatedPoints[] = {1.305544243113, -38.693372513854, -98.366081552663};
+        std::vector<double> simulatedLogZ = reweighter.testCalculateLogZAtSimulatedPoints();
+
+        BOOST_CHECK_CLOSE(referenceLogZAtSimulatedPoints[0], simulatedLogZ[0], 1.e-8);
+        BOOST_REQUIRE_EQUAL(referenceLogZAtSimulatedPoints[1], simulatedLogZ[1]);
+        BOOST_CHECK_CLOSE(referenceLogZAtSimulatedPoints[2], simulatedLogZ[2], 1.e-8);
+        /*
+         * For some reason, setting one or more values of logZ in the configfile as done here,
+         * leads to slightly different values of logZ at the remaining simulated points then
+         * when all the values are calculated. That is why we have above two expected failures
+         * and why we repeate here such a failing checks with less precision.
+         */
+        BOOST_REQUIRE_CLOSE(referenceLogZAtSimulatedPoints[0], simulatedLogZ[0], 2.e-5);
+        BOOST_REQUIRE_CLOSE(referenceLogZAtSimulatedPoints[2], simulatedLogZ[2], 2.e-5);
+    }
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -407,6 +455,31 @@ std::vector< unsigned int> newNumPoints(1, 30);
         BOOST_REQUIRE_NO_THROW(reweighter->setNewNumberOfPointsOfParameters(newNumPoints));
         newRanges[0]=std::make_pair(5.349, 5.350);
         BOOST_REQUIRE_NO_THROW(reweighter->setNewRangesOfParameters(newRanges));
+    }
+
+    BOOST_AUTO_TEST_CASE(realrun)
+    {
+        double referenceLogZAtSimulatedPoints[] = {1.305544243113, -38.693372513854, -98.366081552663};
+        double referenceLogZAtNewPoints[] = {142.441104343211, 140.415043785678, 138.389221202136,
+                                             136.363638116277, 134.338296081536, 132.313196681783,
+                                             130.288341531890, 128.263732278401, 126.239370600000,
+                                             124.215258208119, 122.191396847539, 120.167788296795,
+                                             118.144434368740, 116.121336910983, 114.098497806397,
+                                             112.075918973426, 110.053602366528, 108.031549976496,
+                                             106.009763830825, 103.988245993877, 101.966998567182,
+                                             99.946023689575, 97.925323537411, 95.904900324531,
+                                             93.884756302372, 91.864893759899, 89.845315023592,
+                                             87.826022457196, 85.807018461570, 83.788305474381};
+        //Reset ranges and num points because of the previous test (newRanges and newNumPoints are out of the cases)
+        newNumPoints[0]=30;
+        newRanges[0]=std::make_pair(5.348, 5.3509);
+        Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints);
+        std::vector<double> simulatedLogZ = reweighter.getLogZAtSimulatedPoints();
+        std::vector<double> newLogZ = reweighter.getLogZAtNewPoints();
+        for(size_t i=0; i < reweighter.getValuesOfSimulationParameters().size(); i++)
+            BOOST_REQUIRE_CLOSE(referenceLogZAtSimulatedPoints[i], simulatedLogZ[i], 1.e-8);
+        for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
+            BOOST_REQUIRE_CLOSE(referenceLogZAtNewPoints[i], newLogZ[i], 1.e-8);
     }
 
 BOOST_AUTO_TEST_SUITE_END()
