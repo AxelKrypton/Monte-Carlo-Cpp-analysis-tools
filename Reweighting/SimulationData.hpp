@@ -15,6 +15,7 @@ public:
 	int getNumberOfDataSample();
 	double getParameterValue(std::string parameterName);
 	std::map<std::string, double> getSimulationParameters();
+    std::string getDatafileName();
 	DataSampleBasic& operator[](int index);
 
 private:
