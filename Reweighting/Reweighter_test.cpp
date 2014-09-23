@@ -2,6 +2,7 @@
 #define BOOST_TEST_MODULE Reweighter_objects
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
+#include <fstream>
 
 #include "Reweighter.hpp"
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePreciosionInPercent
@@ -388,6 +389,29 @@ BOOST_AUTO_TEST_SUITE(functionalities)
             boost::filesystem::remove(outputFileName);
         delete reweighter;
     }
+
+    BOOST_AUTO_TEST_CASE(writeNewPointsToFile)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_1";
+        std::vector<std::pair<double, double> > newRanges;
+        std::vector< unsigned int> newNumPoints(1, 30);
+        newRanges.push_back(std::make_pair(5.348, 5.3509));
+        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
+        std::string outputFileName = "testWritingNewPoints";
+        std::ofstream outputFile;
+        outputFile.open(outputFileName.c_str());
+        outputFile << "Hello!";
+        outputFile.close();
+        BOOST_REQUIRE_MESSAGE(boost::filesystem::exists( outputFileName ) == true, "Something bad happened creating a file!");
+        BOOST_REQUIRE_THROW(reweighter.writeNewPointsToFileWithLogZ(outputFileName), std::invalid_argument);
+        boost::filesystem::remove(outputFileName);
+        std::vector<double> newLogZ = reweighter.testCalculateLogZAtNewPoints();
+        reweighter.writeNewPointsToFileWithLogZ(outputFileName);
+        BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
+        if(boost::filesystem::exists(outputFileName))
+            boost::filesystem::remove(outputFileName);
+    }
+
 
 BOOST_AUTO_TEST_SUITE_END()
 

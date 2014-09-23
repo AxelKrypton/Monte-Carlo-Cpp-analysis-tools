@@ -67,7 +67,8 @@ public:
     virtual void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                                   std::vector<unsigned int> newNumberOfPointsOfParametersIn) = 0;
     //Other functionalities
-    void writeNewConfigurationFileWithLogZ(std:: string newConfigFileName = "");
+    void writeNewConfigurationFileWithLogZ(std::string newConfigFileName = "");
+    void writeNewPointsToFileWithLogZ(std::string outputFileName = "logZAtNewPoints");
 
 protected:
     ReweighterAbstract();

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <fstream>
+#include <boost/filesystem.hpp>
 #include "Reweighter.hpp"
 #include "SimulationData.hpp"
 
@@ -116,7 +117,7 @@ void ReweighterAbstract::writeNewConfigurationFileWithLogZ(std::string newConfig
     std::ofstream outputFile;
     outputFile.open(newConfigFileName.c_str(), std::ofstream::app);
     if(!outputFile)
-        throw std::runtime_error("Something went wrong opening the file " + newConfigFileName + "!");
+        throw std::runtime_error("Something went wrong opening the file \"" + newConfigFileName + "\"!");
     outputFile.precision(16);
     outputFile << "\n\n#===================================================================================\n\n";
     for(int i=0; i<simulationDataContainer.getNumberOfDatafiles(); i++){
@@ -130,6 +131,24 @@ void ReweighterAbstract::writeNewConfigurationFileWithLogZ(std::string newConfig
     outputFile.close();
 }
 
+void ReweighterAbstract::writeNewPointsToFileWithLogZ(std::string outputFileName){
+    if(boost::filesystem::exists(outputFileName))
+        throw std::invalid_argument("The file \"outputFileName\" already exists! It will not be overwritten, aborting...");
+    std::ofstream outputFile;
+    outputFile.open(outputFileName.c_str());
+    if(!outputFile)
+        throw std::runtime_error("Something went wrong opening the file \"" + outputFileName + "\"!");
+    outputFile.precision(16);
+    for(size_t i=0; i<reweightingParameterNames.size(); i++)
+        outputFile << "# " << reweightingParameterNames[i] << "\t";
+    outputFile << "logZ\n";
+    for(size_t i=0; i<valuesOfNewParameters.size(); i++){
+        for(size_t j=0; j<valuesOfNewParameters[i].size(); j++)
+            outputFile << valuesOfNewParameters[i][j] << "\t";
+        outputFile << logZAtNewPoints[i] << std::endl;
+    }
+    outputFile.close();
+}
 
 /*****************************************************************************************/
 /************************** PROTECTED OR PRIVATE METHODS *********************************/
