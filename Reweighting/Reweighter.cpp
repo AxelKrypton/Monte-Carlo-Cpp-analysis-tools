@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <stdio.h>
+#include <fstream>
 #include "Reweighter.hpp"
 #include "SimulationData.hpp"
 
@@ -110,6 +110,30 @@ void ReweighterAbstract::setPrecisionToCalculateLogZ(double precisionToCalculate
 	precisionOfIterativeProcedureToCalculateLogZ = precisionToCalculateLogZ;
 }
 
+void ReweighterAbstract::writeNewConfigurationFileWithLogZ(std::string newConfigFileName){
+    if(newConfigFileName == "")
+        newConfigFileName = configurationFile + "_new";
+    std::ofstream outputFile;
+    outputFile.open(newConfigFileName.c_str(), std::ofstream::app);
+    if(!outputFile)
+        throw std::runtime_error("Something went wrong opening the file " + newConfigFileName + "!");
+    outputFile.precision(16);
+    outputFile << "\n\n#===================================================================================\n\n";
+    for(int i=0; i<simulationDataContainer.getNumberOfDatafiles(); i++){
+        outputFile << simulationDataContainer[i].getDatafileName() << "\t";
+        for(size_t j=0; j<reweightingParameterNames.size(); j++){
+            outputFile << reweightingParameterNames[j] << " " << valuesOfSimulationParameters[i][j] << "\t";
+        }
+        outputFile << "logZ " << logZAtSimulatedPoints[i] << std::endl;
+    }
+    outputFile << "\n#===================================================================================\n\n";
+    outputFile.close();
+}
+
+
+/*****************************************************************************************/
+/************************** PROTECTED OR PRIVATE METHODS *********************************/
+/*****************************************************************************************/
 
 void ReweighterAbstract::calculateNewPoints(){
 	//todo: improve! Here the easiest implementation -> new point values determined as (upper_bound-lower_bound)/num_points
@@ -130,7 +154,6 @@ void ReweighterAbstract::calculateNewPoints(){
 	logZAtNewPoints.reserve(valuesOfNewParameters.size());
 }
 
-/*=======================================================================================*/
 
 /*
  * This function is to calculate the value of the partition function at a new point
@@ -266,6 +289,8 @@ void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
 
 
 
+/*****************************************************************************************/
+/******************************* STATIC FUNCTIONS ****************************************/
 /*****************************************************************************************/
 
 void extractNamesOfParametersFromSimulationDataIgnoringLogZ(SimulationData simData, std::vector<std::string>& parNames){
