@@ -48,6 +48,24 @@
  *         that can be explicitly called in the children with the scope resolution operator. In this way,
  *         derived classes can call this sort of default implementation. Pure virtual (=0) means that
  *         derived classes must provide an implementation, not that the base class can not provide an implementation!
+ *
+ *
+ * It is also worth to spend some words about the reweighting procedure of the observables. To get the value
+ * of the observables at the new points, basically the Eq.(8.39) of Barkema's book has to be implemented.
+ * Thus one has to know the values of each observable at each step of the Monte Carlo, or more precisely for
+ * each given configuration. So it is not sufficient to know the value of the logZ at the simulated points
+ * and the value of each observable at each simulated points (i.e. only the mean over the Monte Carlo history)
+ * in order to calculate the values of the observables at the new points. This slightly complicates the
+ * implementation, since it makes then less sense to have a completely new object to get the new values of the
+ * observables. It is indeed rather natural to make the Reweighter class responsible also for calculating
+ * the values of the new observables, though in this way the "Single responsability" principle is partially
+ * violated (even if actually one could think as responsability the observables reweighting).
+ * The reason why it is quite easy to include here the observable reweight procedure is that one can
+ * easily give the observables data to the class, without changing almost anything. It is enough to give
+ * them as columns after the conjugated quantities in each simulation data file. Since the number of conjugated
+ * quantities is known, being it equal to the number of reweighting parameters, one can easily deduce the
+ * number of observables that have to be reweighted.
+ *
  */
 
 class ReweighterAbstract {
@@ -135,6 +153,7 @@ private:
 	std::vector<std::pair<double, double> >  newRangesOfParameters;
 	std::vector<unsigned int>  newNumberOfPointsOfParameters;
 	double precisionOfIterativeProcedureToCalculateLogZ;
+    int numberOfObservablesToBeReweighted;
 };
 
 

@@ -69,8 +69,10 @@ BOOST_AUTO_TEST_SUITE( build)
 	{
 		std::string fileThatDoesExistButWrong1 = "GeneralTestFiles/wrong_configfile_7"; //correct structure but with datafile with wrong number of columns
 		std::string fileThatDoesExistButWrong2 = "GeneralTestFiles/wrong_configfile_8"; //correct structure but with different parameters name in two lines
+        std::string fileThatDoesExistButWrong3 = "GeneralTestFiles/wrong_configfile_9"; //correct structure but with different number of observables in one file
         BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong1), std::logic_error);
         BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong2), std::invalid_argument);
+        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong3), std::logic_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build4)

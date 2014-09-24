@@ -5,7 +5,7 @@
 #include "SimulationData.hpp"
 
 static void extractNamesOfParametersFromSimulationDataIgnoringLogZ(SimulationData, std::vector<std::string>&);
-static void checkCorrectnessOfReweightingConfigurationFile(SimulationDataContainer, std::vector<std::string>);
+static void checkCorrectnessOfReweightingConfigurationFile(SimulationDataContainer, std::vector<std::string>, int);
 static void extractValuesOfSimulationParametersIgnoringLogZ(SimulationDataContainer, std::vector<std::vector<double> >&);
 static void extractAndSetProvidedValuesOfLogZAtSimulatedPoints(SimulationDataContainer, std::vector<double> &);
 static void writeNewPoints(std::vector<std::vector<double> >&, std::vector<std::vector<double> >, std::vector<double>, int=0, int=0);
@@ -28,7 +28,9 @@ ReweighterAbstract::ReweighterAbstract() {
 void ReweighterAbstract::generalInitialization()
 {
     extractNamesOfParametersFromSimulationDataIgnoringLogZ(simulationDataContainer[0], reweightingParameterNames);
-	checkCorrectnessOfReweightingConfigurationFile(simulationDataContainer, reweightingParameterNames);
+    numberOfObservablesToBeReweighted = simulationDataContainer[0].getNumberOfDataSample() - reweightingParameterNames.size();
+    std::cout << "Nobs = " << simulationDataContainer[0].getNumberOfDataSample() << " - " << reweightingParameterNames.size() << " = " << numberOfObservablesToBeReweighted << std::endl;
+    checkCorrectnessOfReweightingConfigurationFile(simulationDataContainer, reweightingParameterNames, numberOfObservablesToBeReweighted);
     extractValuesOfSimulationParametersIgnoringLogZ(simulationDataContainer, valuesOfSimulationParameters);
 	if(precisionOfIterativeProcedureToCalculateLogZ <= 0.0)
 		throw std::range_error("Precision smaller than or equal to zero is nonsense!");
@@ -324,7 +326,7 @@ void extractNamesOfParametersFromSimulationDataIgnoringLogZ(SimulationData simDa
     }
 }
 
-static void checkCorrectnessOfReweightingConfigurationFile(SimulationDataContainer simDataCont, std::vector<std::string> parNames){
+static void checkCorrectnessOfReweightingConfigurationFile(SimulationDataContainer simDataCont, std::vector<std::string> parNames, int numObs){
 	std::vector<std::string> auxParNames;
 	for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
 		if(i!=0){
@@ -332,8 +334,11 @@ static void checkCorrectnessOfReweightingConfigurationFile(SimulationDataContain
 			if(auxParNames != parNames)
 				throw std::invalid_argument("Configuration file for Reweighting not valid. Use the same parameter names in each line!");
 		}
-		if((int)parNames.size() != simDataCont[i].getNumberOfDataSample())
-			throw std::logic_error("Configuration file for Reweighting not valid. At least one datafile has not the right number of columns!");
+        //In the following two checks is also excluded the unlucky case in which numObs < 0.
+        if((int)parNames.size() > simDataCont[i].getNumberOfDataSample())
+            throw std::logic_error("Configuration file for Reweighting not valid. At least one datafile has not enough columns!");
+        if(numObs != simDataCont[i].getNumberOfDataSample() - (int)parNames.size())
+            throw std::logic_error("Configuration file for Reweighting not valid. Number of observables in datafiles not coherent!");
 	}
 }
 
