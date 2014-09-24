@@ -76,6 +76,8 @@ std::vector<double> ReweighterAbstract::getLogZAtSimulatedPoints(){
 
 
 std::vector<double> ReweighterAbstract::getLogZAtNewPoints(){
+    if(newRangesOfParameters.size() == 0 || newNumberOfPointsOfParameters.size() == 0)
+        throw std::logic_error("Values of logZ at new points cannot be retrieved without setting before the new points!");
 	return logZAtNewPoints;
 }
 

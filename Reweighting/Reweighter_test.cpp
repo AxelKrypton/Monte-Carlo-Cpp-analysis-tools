@@ -217,8 +217,16 @@ BOOST_AUTO_TEST_SUITE(getters)
 	BOOST_AUTO_TEST_CASE(getters5)
 	{
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
-        ReweighterTest reweighter(fileThatDoesExist);
-		BOOST_REQUIRE_EQUAL(reweighter.getLogZAtNewPoints().size(), 0);
+        ReweighterTest* reweighter = new ReweighterTest(fileThatDoesExist);
+        BOOST_REQUIRE_THROW(reweighter->getLogZAtNewPoints().size(), std::logic_error);
+        delete reweighter;
+        std::vector<std::pair<double, double> > newRanges;
+        std::vector< unsigned int> newNumPoints(3, 4);
+        newRanges.push_back(std::make_pair(4.2, 4.6));
+        newRanges.push_back(std::make_pair(0.8, 1.2));
+        newRanges.push_back(std::make_pair(-1.2e12, -1.6e12));
+        reweighter = new ReweighterTest(fileThatDoesExist, newRanges, newNumPoints);
+        BOOST_REQUIRE_EQUAL(reweighter->getLogZAtNewPoints().size(), 0);
 	}
 
 	BOOST_AUTO_TEST_CASE(getters6)
