@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_SUITE(kurtosisAndError)
 	
 		RawAndBinnedDataSample sample(gaussianData, parameters);
 
-		EstimateAndError kurtosisAndError = calcKurtosisAndErrorOfDataSample(sample.getRawData(), parameters);
+		EstimateAndError kurtosisAndError = calcKurtosisAndErrorOfDataSample(sample, parameters);
 		BOOST_CHECK_CLOSE(kurtosisAndError.estimate, expectedKurtosis, expectedPrecisionInPercent);
 		BOOST_CHECK_SMALL(kurtosisAndError.error, expectedError);
 	}

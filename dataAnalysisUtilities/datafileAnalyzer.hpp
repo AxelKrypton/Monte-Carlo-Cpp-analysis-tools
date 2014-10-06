@@ -69,7 +69,7 @@ public:
 class KurtosisAnalyzer : public AnalyzerWrapper
 {
 public:
-	KurtosisAnalyzer(DataSample &sample, const Parameters parameters):
+	KurtosisAnalyzer(RawAndBinnedDataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Kurtosis", getFilenameForObservables(parameters))
 	{
 	    estimateAndError = calcKurtosisAndErrorOfDataSample(sample, parameters);
@@ -115,7 +115,7 @@ public:
 			}
 			if(parameters.analyzeKurtosis)
 			{
-				KurtosisAnalyzer(sample.getBinnedData(), parameters);
+				KurtosisAnalyzer(sample, parameters);
 			}
 		}
 	};
