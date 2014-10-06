@@ -59,7 +59,7 @@ public:
 class SkewnessAnalyzer : public AnalyzerWrapper
 {
 public:
-	SkewnessAnalyzer(DataSample &sample, const Parameters parameters):
+	SkewnessAnalyzer(RawAndBinnedDataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Skewness", getFilenameForObservables(parameters))
 	{
 	    estimateAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
@@ -111,7 +111,7 @@ public:
 			}
 			if(parameters.analyzeSkewness)
 			{
-				SkewnessAnalyzer(sample.getBinnedData(), parameters);
+				SkewnessAnalyzer(sample, parameters);
 			}
 			if(parameters.analyzeKurtosis)
 			{
