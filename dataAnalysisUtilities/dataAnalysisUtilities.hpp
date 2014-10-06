@@ -27,10 +27,10 @@ class RawAndBinnedDataSample
 public:
 	RawAndBinnedDataSample(std::string filename, Parameters parameters);
 	DataSample & getRawData() {return rawData;}
-	DataSample & getBinnedData() {return binnedData;}
+	BinnedDataSample & getBinnedData() {return binnedData;}
 private:
 	DataSample rawData;
-	DataSample binnedData;
+	BinnedDataSample binnedData;
 };
 
 EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);

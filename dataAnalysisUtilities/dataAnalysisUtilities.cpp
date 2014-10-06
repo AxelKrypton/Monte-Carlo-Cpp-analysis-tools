@@ -296,7 +296,7 @@ RawAndBinnedDataSample::RawAndBinnedDataSample(std::string filename, Parameters 
 		if (parameters.calcAutocorrelation)
 		{
 			std::cout << "Do not perform binning as the autocorrelation should be estimated!" << std::endl;
-			binnedData = rawData;
+			binnedData = BinnedDataSampleFromBinsize(rawData, 1, parameters.binningMustFitDataSampleSize);
 		}
 		else
 		{
@@ -313,7 +313,11 @@ RawAndBinnedDataSample::RawAndBinnedDataSample(std::string filename, Parameters 
 	}
 	else
 	{
-		binnedData = rawData;
+		binnedData = BinnedDataSampleFromBinsize(rawData, 1, parameters.binningMustFitDataSampleSize);
+	}
+	if( parameters.adjustDataSampleSizeToBinning && !binnedData.doesBinningFitBinsize() )
+	{
+		std::cout << "# Adjusting data sample size..." << std::endl;
 	}
 }
 
