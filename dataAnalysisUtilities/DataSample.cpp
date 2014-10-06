@@ -97,3 +97,14 @@ static double calcNthCentralMomentExplicit(DataSample & sampleIn, int n)
 {
 	return ( (sampleIn - sampleIn.getNthMoment(1) )^( (double(n)) )  ).sum()  / sampleIn.getNumberOfElements();
 }
+
+DataSample removeNElementsFromDataSample(DataSample sampleIn, int n)
+{
+	int numberOfElements = sampleIn.getNumberOfElements();
+	DataSampleBasic tmp = sampleIn;
+	for (int iteration = numberOfElements - 1; iteration >= numberOfElements - n; iteration --)
+	{
+		tmp = tmp.removeIthElement(iteration);
+	}
+	return DataSample(tmp);
+}
