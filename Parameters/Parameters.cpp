@@ -122,6 +122,10 @@ void Parameters::printParameters()
 		{
 			std::cout << "# Require binsize/numberOfBins\n#   to be multiple of number of\n#   data points" << std::endl;
 		}
+		if( adjustDataSampleSizeToBinning )
+		{
+			std::cout << "# Resize raw data sample in case data points are discarded during binning" << std::endl;
+		}
 	}
 	else
 		std::cout << "# Do not perform binning!" << std::endl;
