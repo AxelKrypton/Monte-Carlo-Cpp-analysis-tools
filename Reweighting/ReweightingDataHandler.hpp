@@ -2,7 +2,6 @@
 #define REWEIGHTINGDATAHANDLER_H_
 
 #include "SimulationDataContainer.hpp"
-#include "Reweighter.hpp"
 
 /*
  * The following object is supposed to deal with all the I/O operations and to prepare a
@@ -28,12 +27,18 @@
  *       exception will be thrown!
  */
 
+class ReweighterAbstract;
+class Reweighter;
+
 class ReweightingDataHandler {
+    friend class ReweighterAbstract;
 public:
     ReweightingDataHandler();
     ReweightingDataHandler(std::string configurationFileIn);
-    //todo: Think whether return here a const& instead of a copy
-    SimulationDataContainer getDataForReweighter();
+    //Getters
+    std::vector<std::string> getNamesOfParametersIgnoringMetaParameters();
+    std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters();
+    void extractAndSetProvidedValuesOfLogZAtSimulatedPoints(std::vector<double>& logZ);
     //Output to file
     void writeNewConfigurationFileWithMetaparameters(Reweighter reweighter, std::string newConfigFileName = "");
     void writeNewPointsToFileWithLogZ(Reweighter reweighter, std::string outputFileName = "logZAtNewPoints");
@@ -44,12 +49,15 @@ protected:
 private:
     std::string configurationFile;
     SimulationDataContainer simulationDataContainer;
+    int numberOfObservablesToBeReweighted;
+
     /*
-     * The following methods are private and not static in the .cpp file since they have to access
-     * private members of Reweighter class (possible due to friendship).
+     * These are metaparameters that must NOT be interpreted as reweighting parameters,
+     * though they can be given in the configurationFile and then be stored in the
+     * SimulationData parameters. Note that they are static in order to be accessible
+     * from outside without an object.
      */
-    void checkCorrectnessOfConfigurationFileForReweighting();
-    void calculateAndSetNumberOfBinsToBeUsed();
+    static const std::vector<std::string> metaParameters;
 };
 
 

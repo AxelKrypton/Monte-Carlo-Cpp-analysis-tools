@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "ReweightingDataHandler.hpp"
+#include "Reweighter.hpp"
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePrecisionInPercent
 
 class ReweightingDataHandlerTest : public ReweightingDataHandler{
@@ -46,12 +47,14 @@ BOOST_AUTO_TEST_SUITE(build)
         std::string fileThatDoesExistButWrong4 = "GeneralTestFiles/wrong_configfile_10"; //correct structure but with two identical set of reweigthing parameters
         std::string fileThatDoesExistButWrong5 = "GeneralTestFiles/wrong_configfile_11"; //correct structure but without binsize at least on one line
         std::string fileThatDoesExistButWrong6 = "GeneralTestFiles/wrong_configfile_12"; //correct structure but with negative binsize
+        std::string fileThatDoesExistButWrong7 = "GeneralTestFiles/wrong_configfile_13"; //correct structure but with different number of observables in two files
         BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong1), std::logic_error);
         BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong2), std::invalid_argument);
         BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong3), std::logic_error);
         BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong4), std::logic_error);
         BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong5), std::runtime_error);
         BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong6), std::invalid_argument);
+        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong7), std::logic_error);
     }
 
     BOOST_AUTO_TEST_CASE(build4)
@@ -79,15 +82,44 @@ BOOST_AUTO_TEST_SUITE(getters)
 
     BOOST_AUTO_TEST_CASE(getters1)
     {
-        std::string fileThatDoesExist = "RealTestData/configfile_3";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
         ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist);
-        const int referenceNumberOfBins = 16;
-        SimulationDataContainer simDataCont = reweightingDataHandler.getDataForReweighter();
-        for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
-            for(int j=0; j<simDataCont[i].getNumberOfDataSample(); j++){
-                BOOST_REQUIRE_EQUAL(simDataCont[i][j].getNumberOfElements(), referenceNumberOfBins);
-            }
+        std::vector<std::string> referenceParams;
+        referenceParams.push_back("beta");
+        referenceParams.push_back("chem_pot_im");
+        std::vector<std::string> gottenParams = reweightingDataHandler.getNamesOfParametersIgnoringMetaParameters();
+        for(size_t i=0; i<referenceParams.size(); i++)
+            BOOST_REQUIRE_EQUAL(referenceParams[i], gottenParams[i]);
+    }
+
+    BOOST_AUTO_TEST_CASE(getters2)
+    {
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
+        ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist);
+        std::vector<std::vector<double> > referenceValues(3, std::vector<double>(2));
+        referenceValues[0][0] = 4.0;
+        referenceValues[1][0] = 4.5;
+        referenceValues[2][0] = 4.5;
+        referenceValues[0][1] = 0.7;
+        referenceValues[1][1] = 1.0;
+        referenceValues[2][1] = 1.3;
+        std::vector<std::vector<double> > gottenValues = reweightingDataHandler.getValuesOfSimulationParametersIgnoringMetaParameters();
+        for(size_t i=0; i<referenceValues.size(); i++){
+            for(size_t j=0; j<referenceValues[i].size(); j++)
+                BOOST_REQUIRE_EQUAL(referenceValues[i][j], gottenValues[i][j]);
         }
+    }
+
+    BOOST_AUTO_TEST_CASE(getters3)
+    {
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
+        ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist);
+        std::vector<double> referenceLogZ(3, 0.0);
+        referenceLogZ[1] = 3.14;
+        std::vector<double> setLogZ(3, 0.0);
+        reweightingDataHandler.extractAndSetProvidedValuesOfLogZAtSimulatedPoints(setLogZ);
+        for(size_t i=0; i<referenceLogZ.size(); i++)
+            BOOST_REQUIRE_EQUAL(referenceLogZ[i], setLogZ[i]);
     }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -95,11 +127,13 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(functionalities)
 
+//TODO: Write a ReweighterMockup object to be used inside these tests!
+
     BOOST_AUTO_TEST_CASE(writeNewConfigFile1)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
         ReweightingDataHandler reweightingDataHandler(fileThatDoesExist);
-        reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(Reweighter(reweightingDataHandler.getDataForReweighter()));
+        reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(Reweighter(fileThatDoesExist));
         std::string outputFileName = "configFileWithLogZ";
         BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
         if(boost::filesystem::exists(outputFileName))
@@ -113,13 +147,13 @@ BOOST_AUTO_TEST_SUITE(functionalities)
         std::vector<std::pair<double, double> > newRanges;
         std::vector< unsigned int> newNumPoints(1, 30);
         newRanges.push_back(std::make_pair(5.348, 5.3509));
-        Reweighter* reweighter = new Reweighter(reweightingDataHandler.getDataForReweighter(), newRanges, newNumPoints);
+        Reweighter* reweighter = new Reweighter(fileThatDoesExist, newRanges, newNumPoints);
         std::vector<double> simulatedLogZ = reweighter->getLogZAtSimulatedPoints();
         std::string outputFileName = "testWritingConfigFile";
         reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(*reweighter, outputFileName);
         BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
         delete reweighter;
-        reweighter = new Reweighter(ReweightingDataHandler(outputFileName).getDataForReweighter());
+        reweighter = new Reweighter(outputFileName);
         for(size_t i=0; i<simulatedLogZ.size(); i++)
             BOOST_REQUIRE_CLOSE(reweighter->getLogZAtSimulatedPoints()[i], simulatedLogZ[i], doublePrecisionInPercent);
         if(boost::filesystem::exists(outputFileName))
@@ -134,7 +168,7 @@ BOOST_AUTO_TEST_SUITE(functionalities)
         std::vector<std::pair<double, double> > newRanges;
         std::vector< unsigned int> newNumPoints(1, 30);
         newRanges.push_back(std::make_pair(5.348, 5.3509));
-        Reweighter reweighter(reweightingDataHandler.getDataForReweighter(), newRanges, newNumPoints);
+        Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints);
         std::string outputFileName = "testWritingNewPoints";
         std::ofstream outputFile;
         outputFile.open(outputFileName.c_str());

@@ -11,10 +11,10 @@ class ReweighterTest : public ReweighterAbstract{
 public:
     ReweighterTest() : ReweighterAbstract() {}
     ReweighterTest(std::string configurationFileIn, double precisionToCalculateLogZ = 1.e-7)
-     : ReweighterAbstract(ReweightingDataHandler(configurationFileIn).getDataForReweighter(), precisionToCalculateLogZ) {}
+     : ReweighterAbstract(configurationFileIn, precisionToCalculateLogZ) {}
     ReweighterTest(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                    std::vector<unsigned int>  newNumberOfPointsOfParametersIn, double precisionToCalculateLogZ = 1.e-7)
-     : ReweighterAbstract(ReweightingDataHandler(configurationFileIn).getDataForReweighter(), newRangesOfParametersIn,
+     : ReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
                           newNumberOfPointsOfParametersIn, precisionToCalculateLogZ) {}
 
     //Setters
@@ -86,48 +86,14 @@ BOOST_AUTO_TEST_SUITE(build)
         BOOST_REQUIRE_THROW(ReweighterTest reweighter, std::invalid_argument);
 	}
 
-//	BOOST_AUTO_TEST_CASE(build2)
-//	{
-//		std::string fileThatDoesNotExist = "fileThatShouldNotBe";
-//		std::string fileThatDoesExistButWrong1 = "GeneralTestFiles/wrong_configfile_3"; //wrong structure
-//		std::string fileThatDoesExistButWrong2 = "GeneralTestFiles/wrong_configfile_4"; //correct structure but with two identical set of parameters
-//		std::string fileThatDoesExistButWrong3 = "GeneralTestFiles/wrong_configfile_5"; //correct structure but with two identical filenames
-//		std::string fileThatDoesExistButWrong4 = "GeneralTestFiles/wrong_configfile_6"; //correct structure but with not existing file inside
-//        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesNotExist), std::exception);
-//        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong1), std::exception);
-//        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong2), std::exception);
-//        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong3), std::exception);
-//        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong4), std::exception);
-//	}
-
-//	BOOST_AUTO_TEST_CASE(build3)
-//	{
-//		std::string fileThatDoesExistButWrong1 = "GeneralTestFiles/wrong_configfile_7"; //correct structure but with datafile with wrong number of columns
-//        std::string fileThatDoesExistButWrong2 = "GeneralTestFiles/wrong_configfile_8"; //correct structure but with different parameters name in two lines
-//        std::string fileThatDoesExistButWrong3 = "GeneralTestFiles/wrong_configfile_9"; //correct structure but with different number of observables in one file
-//        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong1), std::logic_error);
-//        //BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong2), std::invalid_argument);
-//        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExistButWrong3), std::logic_error);
-//	}
-
-    BOOST_AUTO_TEST_CASE(build4)
+    BOOST_AUTO_TEST_CASE(build2)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, 0.0), std::range_error);
         BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, -1.), std::range_error);
     }
 
-//	BOOST_AUTO_TEST_CASE(build5)
-//	{
-//        std::string fileThatDoesExist1 = "GeneralTestFiles/simulationDataContainer.configfile_1";
-//        std::string fileThatDoesExist2 = "GeneralTestFiles/simulationDataContainer.configfile_2";
-//        std::string fileThatDoesExist3 = "GeneralTestFiles/simulationDataContainer.configfile_3";
-//        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist1));
-//        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist2));
-//        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist3));
-//	}
-
-	BOOST_AUTO_TEST_CASE(build6)
+    BOOST_AUTO_TEST_CASE(build3)
 	{
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
@@ -150,7 +116,7 @@ BOOST_AUTO_TEST_SUITE(build)
         BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints));
 	}
 
-    BOOST_AUTO_TEST_CASE(build7)
+    BOOST_AUTO_TEST_CASE(build4)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_2";
         ReweighterTest reweighter(fileThatDoesExist);
@@ -160,7 +126,7 @@ BOOST_AUTO_TEST_SUITE(build)
             BOOST_REQUIRE_EQUAL(reweighter.getLogZAtSimulatedPoints()[i], referenceLogZAtSimulatedPoints[i]);
     }
 
-    BOOST_AUTO_TEST_CASE(build8)
+    BOOST_AUTO_TEST_CASE(build5)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
         ReweighterTest reweighter(fileThatDoesExist);
@@ -575,21 +541,21 @@ std::vector< unsigned int> newNumPoints(1, 30);
     BOOST_AUTO_TEST_CASE(constructors)
     {
         BOOST_REQUIRE_THROW(Reweighter reweighter, std::invalid_argument);
-        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(ReweightingDataHandler(fileThatDoesExist).getDataForReweighter()));
-        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(ReweightingDataHandler(fileThatDoesExist).getDataForReweighter(), 1.e-5));
-        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(ReweightingDataHandler(fileThatDoesExist).getDataForReweighter(), newRanges, newNumPoints));
-        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(ReweightingDataHandler(fileThatDoesExist).getDataForReweighter(), newRanges, newNumPoints, 1.e-5));
+        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist));
+        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, 1.e-5));
+        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints));
+        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints, 1.e-5));
     }
 
     BOOST_AUTO_TEST_CASE(setters)
     {
-        Reweighter *reweighter= new Reweighter(ReweightingDataHandler(fileThatDoesExist).getDataForReweighter());
+        Reweighter *reweighter= new Reweighter(fileThatDoesExist);
         BOOST_REQUIRE_THROW(reweighter->setNewNumberOfPointsOfParameters(newNumPoints), std::invalid_argument);
         delete reweighter;
-        reweighter= new Reweighter(ReweightingDataHandler(fileThatDoesExist).getDataForReweighter());
+        reweighter= new Reweighter(fileThatDoesExist);
         BOOST_REQUIRE_THROW(reweighter->setNewRangesOfParameters(newRanges), std::invalid_argument);
         delete reweighter;
-        reweighter= new Reweighter(ReweightingDataHandler(fileThatDoesExist).getDataForReweighter());
+        reweighter= new Reweighter(fileThatDoesExist);
         BOOST_REQUIRE_NO_THROW(reweighter->setNewParameters(newRanges, newNumPoints));
         newNumPoints[0]=20;
         BOOST_REQUIRE_NO_THROW(reweighter->setNewNumberOfPointsOfParameters(newNumPoints));
@@ -611,7 +577,7 @@ std::vector< unsigned int> newNumPoints(1, 30);
         //Reset ranges and num points because of the previous test (newRanges and newNumPoints are out of the cases)
         newNumPoints[0]=30;
         newRanges[0]=std::make_pair(5.348, 5.3509);
-        Reweighter reweighter(ReweightingDataHandler(fileThatDoesExist).getDataForReweighter(), newRanges, newNumPoints);
+        Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints);
         std::vector<double> simulatedLogZ = reweighter.getLogZAtSimulatedPoints();
         std::vector<double> newLogZ = reweighter.getLogZAtNewPoints();
         for(size_t i=0; i < reweighter.getValuesOfSimulationParameters().size(); i++)
