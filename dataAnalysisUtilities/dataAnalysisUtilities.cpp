@@ -57,7 +57,7 @@ EstimateAndError calcMeanAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn)
 	return EstimateAndError(mean, error);
 }
 
-EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn)
+EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)
 {
 	double mean;
 	double error;

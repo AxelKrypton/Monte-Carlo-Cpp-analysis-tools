@@ -33,7 +33,7 @@ private:
 	DataSample binnedData;
 };
 
-EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn);
+EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
 EstimateAndError calcMeanAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn);
 EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn);
 EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);

@@ -41,7 +41,7 @@ protected:
 class MeanAnalyzer : public AnalyzerWrapper
 {
 public:
-	MeanAnalyzer(DataSample &sample, const Parameters parameters):
+	MeanAnalyzer(RawAndBinnedDataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Mean", getFilenameForObservables(parameters))
 	{
 	    estimateAndError = calcMeanAndErrorOfDataSample(sample);
@@ -105,7 +105,7 @@ public:
 		{
 			if(parameters.analyzeMean)
 			{
-				MeanAnalyzer(sample.getBinnedData(), parameters);
+				MeanAnalyzer(sample, parameters);
 			}
 			if(parameters.analyzeVariance)
 			{

@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 
 	static void testMeanAndError(DataSample * sample, double expectedMean, double expectedError)
 	{
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(*sample);
+		EstimateAndError meanAndError = calcMeanAndErrorOfUncorrelatedDataSample(*sample);
 		BOOST_CHECK_CLOSE(meanAndError.estimate, expectedMean, doublePrecisionInPercent);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedError, doublePrecisionInPercent);
 	}
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 
 		RawAndBinnedDataSample sample(file, parameters);
 
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample.getBinnedData());
+		EstimateAndError meanAndError = calcMeanAndErrorOfUncorrelatedDataSample(sample.getBinnedData());
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 
 		RawAndBinnedDataSample sample(file, parameters);
 
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample.getBinnedData());
+		EstimateAndError meanAndError = calcMeanAndErrorOfUncorrelatedDataSample(sample.getBinnedData());
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
