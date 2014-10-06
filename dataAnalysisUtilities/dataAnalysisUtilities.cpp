@@ -68,7 +68,7 @@ EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)
 	return EstimateAndError(mean, error);
 }
 
-EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn)
+EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)
 {
 	double variance;
 	double error;

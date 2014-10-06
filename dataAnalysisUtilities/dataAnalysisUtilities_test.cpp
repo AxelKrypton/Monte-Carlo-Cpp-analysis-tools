@@ -182,13 +182,13 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		DataSample* sample = testSample.getDataSample();
 		double expectedValue = expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(*sample, numberOfElements);
 
-		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(*sample);
+		EstimateAndError varianceAndError = calcVarianceAndErrorOfUncorrelatedDataSample(*sample);
 		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedValue, doublePrecisionInPercent);
 	}
 
 	static void testVarianceAndError(DataSample * sample, double expectedVariance, double expectedError, double testPrecision)
 	{
-		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(*sample);
+		EstimateAndError varianceAndError = calcVarianceAndErrorOfUncorrelatedDataSample(*sample);
 		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedVariance, testPrecision);
 		BOOST_CHECK_CLOSE(varianceAndError.error, expectedError, testPrecision);
 	}

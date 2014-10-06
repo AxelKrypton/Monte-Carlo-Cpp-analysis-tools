@@ -54,7 +54,7 @@ public:
 	VarianceAnalyzer(DataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Variance", getFilenameForObservables(parameters))
 	{
-	    estimateAndError = calcVarianceAndErrorOfDataSample(sample);
+	    estimateAndError = calcVarianceAndErrorOfUncorrelatedDataSample(sample);
 	}
 };
 
