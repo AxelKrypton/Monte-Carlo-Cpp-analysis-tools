@@ -255,30 +255,7 @@ EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Pa
 	writeEstimateAndErrorArraysToFile("auto", estimates, errors, filename);
 }
 
-DataSample createDataSampleFromDatafile(std::string filename, Parameters parameters)
-{
-	DataSample dataSample(filename);
-	if ( parameters.useBinning)
-	{
-		if (parameters.calcAutocorrelation)
-		{
-			std::cout << "Do not perform binning as the autocorrelation should be estimated!" << std::endl;
-		}
-		else
-		{
-			std::cout << "Perform binning on data sample..." << std::endl;
-			if ( parameters.useNumberOfBinsForBinning)
-			{
-				return BinnedDataSampleFromNumberOfBins(dataSample, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
-			}
-			else
-			{
-				return BinnedDataSampleFromBinsize(dataSample, parameters.binsize, parameters.binningMustFitDataSampleSize);
-			}
-		}
-	}
-	return dataSample;
-}
+
 
 
 
@@ -298,6 +275,38 @@ static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(
 	result *= (double)sample.getNumberOfElements() / (sample.getNumberOfElements() - 1);
 	return result;
 }
+
+
+RawAndBinnedDataSample::RawAndBinnedDataSample(std::string filename, Parameters parameters)
+{
+	rawData = DataSample(filename);
+	if ( parameters.useBinning)
+	{
+		if (parameters.calcAutocorrelation)
+		{
+			std::cout << "Do not perform binning as the autocorrelation should be estimated!" << std::endl;
+			binnedData = rawData;
+		}
+		else
+		{
+			std::cout << "Perform binning on data sample..." << std::endl;
+			if ( parameters.useNumberOfBinsForBinning)
+			{
+				binnedData = BinnedDataSampleFromNumberOfBins(rawData, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
+			}
+			else
+			{
+				binnedData = BinnedDataSampleFromBinsize(rawData, parameters.binsize, parameters.binningMustFitDataSampleSize);
+			}
+		}
+	}
+	else
+	{
+		binnedData = rawData;
+	}
+}
+
+
 
 
 

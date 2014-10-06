@@ -25,31 +25,7 @@ public:
 class RawAndBinnedDataSample
 {
 public:
-	RawAndBinnedDataSample(std::string filename, Parameters parameters)
-	{
-		rawData = DataSample(filename);
-		if ( parameters.useBinning)
-		{
-			if (parameters.calcAutocorrelation)
-			{
-				std::cout << "Do not perform binning as the autocorrelation should be estimated!" << std::endl;
-				binnedData = rawData;
-			}
-			else
-			{
-				std::cout << "Perform binning on data sample..." << std::endl;
-				if ( parameters.useNumberOfBinsForBinning)
-				{
-					binnedData = BinnedDataSampleFromNumberOfBins(rawData, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
-				}
-				else
-				{
-					binnedData = BinnedDataSampleFromBinsize(rawData, parameters.binsize, parameters.binningMustFitDataSampleSize);
-				}
-			}
-		}
-		binnedData = rawData;
-	}
+	RawAndBinnedDataSample(std::string filename, Parameters parameters);
 	DataSample & getRawData() {return rawData;}
 	DataSample & getBinnedData() {return binnedData;}
 private:
@@ -63,6 +39,5 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters);
 std::vector<EstimateAndError> calcArrayOfAutocorrelationAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters);
-DataSample createDataSampleFromDatafile(std::string filename, Parameters parameters);
 
 #endif /* DATAANALYSISUTILITIES_HPP_ */

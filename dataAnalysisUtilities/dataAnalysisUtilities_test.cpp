@@ -70,9 +70,9 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 		const char * arguments[] = {"foo", argumentFile.c_str(), argumentBinsize.c_str()};
 		Parameters parameters(3, arguments);
 
-		DataSample sample = createDataSampleFromDatafile(file, parameters);
+		RawAndBinnedDataSample sample(file, parameters);
 
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample);
+		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample.getBinnedData());
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
@@ -117,9 +117,9 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 		const char * arguments[] = {"foo", argumentFile.c_str(), argumentBinsize.c_str()};
 		Parameters parameters(3, arguments);
 
-		DataSample sample = createDataSampleFromDatafile(file, parameters);
+		RawAndBinnedDataSample sample(file, parameters);
 
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample);
+		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample.getBinnedData());
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
@@ -259,8 +259,9 @@ BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 		double elementsInFile = 1005.;
 		const char * arguments[] = {"foo", "foo", "--useBinning"};
 		Parameters parameters(3, arguments);
-		DataSample tmp = createDataSampleFromDatafile(fileThatDoesExist, parameters);
-		BOOST_CHECK_EQUAL(elementsInFile, tmp.getNumberOfElements());
+		RawAndBinnedDataSample tmp(fileThatDoesExist, parameters);
+		
+		BOOST_CHECK_EQUAL(elementsInFile, tmp.getRawData().getNumberOfElements());
 	}
 
 	BOOST_AUTO_TEST_CASE(binningWithNumberOfBins)
@@ -270,8 +271,8 @@ BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 		Parameters parameters(2, arguments);
 
 		int expectedNumberOfElements = parameters.numberOfBins;
-		DataSample tmp = createDataSampleFromDatafile(fileThatDoesExist, parameters);
-		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getNumberOfElements());
+		RawAndBinnedDataSample tmp(fileThatDoesExist, parameters);
+		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getBinnedData().getNumberOfElements());
 	}
 
 	BOOST_AUTO_TEST_CASE(binningWithBinsize)
@@ -282,8 +283,8 @@ BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 		Parameters parameters(3, arguments);
 
 		int expectedNumberOfElements = (int) elementsInFile / 10;
-		DataSample tmp = createDataSampleFromDatafile(fileThatDoesExist, parameters);
-		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getNumberOfElements());
+		RawAndBinnedDataSample tmp(fileThatDoesExist, parameters);
+		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getBinnedData().getNumberOfElements());
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
