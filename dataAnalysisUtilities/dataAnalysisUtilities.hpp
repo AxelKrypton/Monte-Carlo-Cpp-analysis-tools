@@ -34,6 +34,7 @@ private:
 };
 
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn);
+EstimateAndError calcMeanAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn);
 EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn);
 EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);

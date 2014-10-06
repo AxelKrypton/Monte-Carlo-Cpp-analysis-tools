@@ -46,6 +46,17 @@ static double unbiasedErrorOfVariance(DataSample & sampleIn)
 	return sqrt( unbiasedVarianceOfMean(varianceSample) );
 }
 
+EstimateAndError calcMeanAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn)
+{
+	double mean;
+	double error;
+
+	mean = meanOfDataSample(sampleIn.getRawData());
+	error = sqrt( unbiasedVarianceOfMean(sampleIn.getBinnedData()) );
+
+	return EstimateAndError(mean, error);
+}
+
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn)
 {
 	double mean;
