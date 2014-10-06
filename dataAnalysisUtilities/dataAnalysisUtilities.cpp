@@ -208,7 +208,7 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Paramet
 static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(DataSample & sample, int time);
 static std::vector<BinnedDataSampleFromNumberOfBins> calcAutocorrelationFunctionValuesBinnedSets(DataSample & sample, Parameters parameters);
 
-std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters)
+std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEstimatesOfDataSample(DataSample & sample, Parameters parameters)
 {
 
 	std::vector<BinnedDataSampleFromNumberOfBins>

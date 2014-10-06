@@ -41,7 +41,7 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Paramet
 EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters);
 
 std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters);
-std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters);
+std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(DataSample & sample, Parameters parameters);
 
 
 #endif /* DATAANALYSISUTILITIES_HPP_ */
