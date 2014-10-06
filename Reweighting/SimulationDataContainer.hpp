@@ -7,7 +7,7 @@ class SimulationDataContainer
 {
 public:
 	SimulationDataContainer();
-	SimulationDataContainer(std::string configurationFile);
+    explicit SimulationDataContainer(std::string configurationFile);
 	int getNumberOfDatafiles();
 	int getNumberOfSimulationParameters(int fileNumber);
 	SimulationData& operator[](int index);

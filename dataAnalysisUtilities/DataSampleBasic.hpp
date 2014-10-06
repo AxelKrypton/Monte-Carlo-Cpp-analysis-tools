@@ -37,6 +37,8 @@ public:
 	DataSampleBasic& operator^=(double n);
 	DataSampleBasic sampleSlice(int start, int size, int stride);
 	double sum();
+    double min();
+    double max();
 	double& operator[](size_t index);
 	DataSampleBasic removeIthElement(int i);
 	DataSampleBasic removeLastNElements(int n);

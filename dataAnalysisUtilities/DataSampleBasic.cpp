@@ -52,6 +52,16 @@ double DataSampleBasic::sum()
 	return values.sum();
 }
 
+double DataSampleBasic::max()
+{
+    return values.max();
+}
+
+double DataSampleBasic::min()
+{
+    return values.min();
+}
+
 double& DataSampleBasic::operator[](size_t index)
 {
 	return values[index];
