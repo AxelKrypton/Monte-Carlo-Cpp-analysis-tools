@@ -253,6 +253,29 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(skewnessAndError)
+
+	BOOST_AUTO_TEST_CASE(withNumberOfBins)
+	{
+		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
+		
+		double expectedSkewness = 1.;
+		double expectedError = 1e-2;
+
+		double expectedPrecisionInPercent = 1;
+
+		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
+		Parameters parameters(3, arguments);
+	
+		RawAndBinnedDataSample sample(gaussianData, parameters);
+
+		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample.getRawData(), parameters);
+		BOOST_CHECK_CLOSE(skewnessAndError.estimate, expectedSkewness, expectedPrecisionInPercent);
+		BOOST_CHECK_SMALL(skewnessAndError.error, expectedError);
+	}
+	
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 
 	BOOST_AUTO_TEST_CASE(noBinning)
