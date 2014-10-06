@@ -62,7 +62,7 @@ public:
 	SkewnessAnalyzer(RawAndBinnedDataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Skewness", getFilenameForObservables(parameters))
 	{
-	    estimateAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
+		estimateAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
 	}
 };
 

@@ -93,7 +93,6 @@ EstimateAndError calcVarianceAndErrorOfDataSample(RawAndBinnedDataSample & sampl
 //todo: this include should not be necessary in the end
 #include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
 
-//todo: work over this
 EstimateAndError calcSkewnessAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn, Parameters parameters)
 {
 	/**
@@ -102,14 +101,14 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(RawAndBinnedDataSample & sampl
 		*/
 	double skewness = 0.;
 	double error = 0.;
-
-	skewness = sampleIn.getRawData().getNthMoment(3) / pow (sampleIn.getRawData().getNthMoment(2),(3./2.) );
+	
+	skewness = sampleIn.getRawData().getNthCentralMoment(3) / pow (sampleIn.getRawData().getNthCentralMoment(2),(3./2.) );
 	
 	DataSample thirdCentralMoment = (sampleIn.getRawData() - sampleIn.getRawData().getNthMoment(1)) ^ 3;
 	DataSample secondCentralMoment = (sampleIn.getRawData() - sampleIn.getRawData().getNthMoment(1)) ^ 2;
 	
-	DataSample * binnedSample1 = NULL;
-	DataSample * binnedSample2 = NULL;
+	BinnedDataSample * binnedSample1 = NULL;
+	BinnedDataSample * binnedSample2 = NULL;
 	
 	if ( parameters.useNumberOfBinsForBinning)
 	{
@@ -126,12 +125,12 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(RawAndBinnedDataSample & sampl
 	JackknifeEstimatorsFromBinnedDataSample jackSample2(*binnedSample2);
 	//this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
 	JackknifeEstimators skewnessSample(jackSample1 / (jackSample2 ^ (3. / 2)));
+	
 	error = skewnessSample.getJackknifeError();
 	
 	return EstimateAndError(skewness, error);
 }
 
-//todo: work over this
 //todo: repair: this is acutally binder, rename? print also kurtosis?
 EstimateAndError calcKurtosisAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn, Parameters parameters)
 {
@@ -142,10 +141,8 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(RawAndBinnedDataSample & sampl
 	 * The Kurtosis gamma_2 is defined as:
 	 *   gamma_2 = beta_2 - 3
 	 */
-	double kurtosis = 0.;
+	double kurtosis = sampleIn.getRawData().getNthCentralMoment(4) / pow (sampleIn.getRawData().getNthCentralMoment(2),2. );
 	double error = 0.;
-
-	kurtosis = sampleIn.getRawData().getNthMoment(4) / pow (sampleIn.getRawData().getNthMoment(2),2. );
 	
 	DataSample fourthCentralMoment = (sampleIn.getRawData() - sampleIn.getRawData().getNthMoment(1)) ^ 4;
 	DataSample secondCentralMoment = (sampleIn.getRawData() - sampleIn.getRawData().getNthMoment(1)) ^ 2;
