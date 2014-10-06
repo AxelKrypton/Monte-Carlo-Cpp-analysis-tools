@@ -28,6 +28,7 @@ public:
 	bool analyzeSkewness;
 	bool analyzeKurtosis;
 	bool binningMustFitDataSampleSize;
+	bool adjustDataSampleSizeToBinning;
 
 private:
 	void printParameters();
