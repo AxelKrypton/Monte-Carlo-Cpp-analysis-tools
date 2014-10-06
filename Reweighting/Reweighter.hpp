@@ -2,6 +2,7 @@
 #define REWEIGHTER_H_
 
 #include "SimulationDataContainer.hpp"
+#include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 
 /*
  * The idea underlying the implementation of the Reweighter class is that the user construct a
@@ -66,9 +67,12 @@
  * quantities is known, being it equal to the number of reweighting parameters, one can easily deduce the
  * number of observables that have to be reweighted.
  *
+ * TODO: Think if it makes sense (and if it is possible...) to make the test class friend of the
+ *       ReweighterAbstract class to have access to private member for testing purposes.
  */
 
 class ReweighterAbstract {
+    friend class ReweightingDataHandler;
 public:
     virtual ~ReweighterAbstract() {}
 	//Getters
@@ -85,17 +89,24 @@ public:
     virtual void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                                   std::vector<unsigned int> newNumberOfPointsOfParametersIn) = 0;
     //Other functionalities
-    void writeNewConfigurationFileWithLogZ(std::string newConfigFileName = "");
-    void writeNewPointsToFileWithLogZ(std::string outputFileName = "logZAtNewPoints");
+    std::vector<std::vector<EstimateAndError> > calculateAndGetReweightedObservables();
 
 protected:
     ReweighterAbstract();
-    ReweighterAbstract(std::string configurationFileIn, double precisionToCalculateLogZ = 1.e-7);
-    ReweighterAbstract(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
-                 std::vector<unsigned int>  newNumberOfPointsOfParametersIn, double precisionToCalculateLogZ = 1.e-7);
+    ReweighterAbstract(SimulationDataContainer simulationDataContainerIn, double precisionToCalculateLogZ = 1.e-7);
+    ReweighterAbstract(SimulationDataContainer simulationDataContainerIn,
+                       std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+                       std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
+                       double precisionToCalculateLogZ = 1.e-7);
 
+    //Some of the following method could be static functions in the .cpp file but are here for testing purposes
     void calculateAndSetLogZAtNewPoints();
     void calculateAndSetLogZAtSimulatedPoints();
+    void prepareObservablesBeforeReweighting(std::vector<double> &);
+    void restoreObservablesAfterReweighting(std::vector<double>, std::vector<std::vector<std::valarray<double> > > *jackknifePartialPred);
+    std::vector<std::vector<double> > calculateReweightedObservableValues(SimulationDataContainer simDataCont, const int entryToBeLeftOut = -1);
+    //This getter again only for testing reason
+    SimulationDataContainer getSimulationDataContainer();
 
 private:
     /*
@@ -103,15 +114,16 @@ private:
 	 *       of the third constructor. In C one constructor cannot call another constructor (in c++11 one would use delegating constructors).
 	 */
 	void generalInitialization();
+    static void extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(SimulationData, std::vector<std::string>&);
+    static void extractValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer simDataCont, std::vector<std::vector<double> >& valuesOfSimPar);
 
     //Method in which "valuesOfNewParameters" is filled and some checks are done
     void calculateNewPoints();
     std::vector<double> calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated);
 
     //Members
-	std::string configurationFile;
+    SimulationDataContainer simulationDataContainer;
 	std::vector<std::string> reweightingParameterNames;
-	SimulationDataContainer simulationDataContainer;
 
 	/*
 	 * Here in the following objects the order depending on which parameters are
@@ -143,6 +155,7 @@ private:
 	std::vector<std::vector<double> >  valuesOfNewParameters;
 	std::vector<double> logZAtSimulatedPoints;
 	std::vector<double> logZAtNewPoints;
+    std::vector<std::vector<EstimateAndError> > observablesAtNewPoints;
 
 	//Todo: think whether keep these two objects as members or not
 	//Note: the following two elements could be unified in c++11 with std::tuple
@@ -154,19 +167,29 @@ private:
 	std::vector<unsigned int>  newNumberOfPointsOfParameters;
 	double precisionOfIterativeProcedureToCalculateLogZ;
     int numberOfObservablesToBeReweighted;
+
+    /*
+     * These are metaparameters that must be not interpreted as reweighting parameters,
+     * though they can be given in the configurationFile and then be stored in the
+     * SimulationData parameters. Note that they are static in order to be accessible
+     * from outside without an object (e.g. in ReweighterDataHandler).
+     */
+    static const std::vector<std::string> metaParameters;
 };
 
 
 class Reweighter : public ReweighterAbstract{
 public:
-    Reweighter() : ReweighterAbstract() {std::cout << "In Reweighter ctor!\n";}
-    Reweighter(std::string configurationFileIn, double precisionToCalculateLogZ = 1.e-7)
-     : ReweighterAbstract(configurationFileIn, precisionToCalculateLogZ) {
+    Reweighter() : ReweighterAbstract() {}
+    explicit Reweighter(SimulationDataContainer simulationDataContainerIn, double precisionToCalculateLogZ = 1.e-7)
+     : ReweighterAbstract(simulationDataContainerIn, precisionToCalculateLogZ) {
         calculateAndSetLogZAtSimulatedPoints();
     }
-    Reweighter(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
-               std::vector<unsigned int>  newNumberOfPointsOfParametersIn, double precisionToCalculateLogZ = 1.e-7)
-     : ReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
+    Reweighter(SimulationDataContainer simulationDataContainerIn,
+                        std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+                        std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
+                        double precisionToCalculateLogZ = 1.e-7)
+     : ReweighterAbstract(simulationDataContainerIn, newRangesOfParametersIn,
                           newNumberOfPointsOfParametersIn, precisionToCalculateLogZ) {
         calculateAndSetLogZAtSimulatedPoints();
         calculateAndSetLogZAtNewPoints();
