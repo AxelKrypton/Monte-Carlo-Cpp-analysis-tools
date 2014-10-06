@@ -698,6 +698,21 @@ BOOST_AUTO_TEST_SUITE(deleteElements)
 		DataSampleBasic sample2 = sample.removeLastNElements(numberOfElementsToRemove);
 		BOOST_REQUIRE_EQUAL(sample2.getNumberOfElements(), numberOfElements);
 	}
+	
+	BOOST_AUTO_TEST_CASE(removeFive)
+	{
+		int numberOfElements = 37;
+		int numberOfElementsToRemove = 5;
+		
+		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
+		for (int i = numberOfElements-1; i >= numberOfElements - numberOfElementsToRemove; i--)
+		{
+			sample[i] *= 1000;
+		}
+		
+		DataSampleBasic sample2 = sample.removeLastNElements(numberOfElementsToRemove);
+		BOOST_REQUIRE_EQUAL(sample2.sum(), sample.sum() - 1000 * numberOfElementsToRemove);
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
