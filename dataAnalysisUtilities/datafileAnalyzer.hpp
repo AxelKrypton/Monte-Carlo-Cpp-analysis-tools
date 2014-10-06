@@ -51,10 +51,10 @@ public:
 class VarianceAnalyzer : public AnalyzerWrapper
 {
 public:
-	VarianceAnalyzer(DataSample &sample, const Parameters parameters):
+	VarianceAnalyzer(RawAndBinnedDataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Variance", getFilenameForObservables(parameters))
 	{
-	    estimateAndError = calcVarianceAndErrorOfUncorrelatedDataSample(sample);
+	    estimateAndError = calcVarianceAndErrorOfDataSample(sample);
 	}
 };
 
@@ -109,7 +109,7 @@ public:
 			}
 			if(parameters.analyzeVariance)
 			{
-				VarianceAnalyzer(sample.getBinnedData(), parameters);
+				VarianceAnalyzer(sample, parameters);
 			}
 			if(parameters.analyzeSkewness)
 			{

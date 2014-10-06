@@ -79,6 +79,17 @@ EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampl
 	return EstimateAndError(variance, error);
 }
 
+EstimateAndError calcVarianceAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn)
+{
+	double variance;
+	double error;
+
+	variance = unbiasedVarianceOfDataSample(sampleIn.getBinnedData());
+	error = unbiasedErrorOfVariance(sampleIn.getBinnedData());
+
+	return EstimateAndError(variance, error);
+}
+
 //todo: this include should not be necessary in the end
 #include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
 

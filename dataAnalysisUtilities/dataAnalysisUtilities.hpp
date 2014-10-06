@@ -36,6 +36,7 @@ private:
 EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
 EstimateAndError calcMeanAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn);
 EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
+EstimateAndError calcVarianceAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn);
 EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters);
