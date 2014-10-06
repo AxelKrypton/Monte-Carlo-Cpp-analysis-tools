@@ -287,11 +287,6 @@ DataSampleBasic DataSampleBasic::removeIthElement(int i)
 DataSampleBasic DataSampleBasic::removeLastNElements(int n)
 {
 	checkRemoveParameter(n, numberOfElements);
-	DataSampleBasic tmp(numberOfElements - n);
-	for (int iteration = 0; iteration < numberOfElements - n; iteration ++)
-	{
-		tmp[iteration] = values[iteration];
-	}
-	return tmp;
+	return DataSampleBasic(values[std::slice(0, numberOfElements - n, 1)]);
 }
 
