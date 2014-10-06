@@ -22,7 +22,7 @@ DataSampleBasic BinnedDataSample::performBinning(DataSampleBasic sampleIn)
 
 void BinnedDataSample::checkDiscardedElements(int valueIn, std::string descriptionIn, int elementsOfSample)
 {
-	int discardedElements = elementsOfSample % valueIn;
+	discardedElements = elementsOfSample % valueIn;
 	if (discardedElements != 0)
 	{
 		if(warningOutput){
