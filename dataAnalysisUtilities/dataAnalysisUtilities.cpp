@@ -223,7 +223,7 @@ std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEstimat
 	return result;
 }
 
-std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters)
+std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(DataSample & sample, Parameters parameters)
 {
 
 	std::vector<BinnedDataSampleFromNumberOfBins>
@@ -255,7 +255,7 @@ static std::string getFilenameForAutocorrelation(Parameters parameters)
 
 EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters)
 {
-	std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEsitmatesOfDataSample(sample, parameters);
+	std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(sample, parameters);
 
 	std::vector<double> estimates;
 	std::vector<double> errors;

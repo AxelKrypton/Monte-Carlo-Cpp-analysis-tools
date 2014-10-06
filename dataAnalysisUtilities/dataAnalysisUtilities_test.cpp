@@ -300,7 +300,7 @@ BOOST_AUTO_TEST_SUITE(autocorrelation)
 		DataSample referenceCorrFuncValues("autFuncBergRefResult32bins.dat", 2);
 		DataSample referenceCorrFuncErrors("autFuncBergRefResult32bins.dat", 3);
 
-		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationFunctionsAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters);
+		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationFunctionsAndErrorEstimatesOfDataSample(gaussianCorrelatedBergData, parameters);
 
 		/*
 		 * Since in the Berg Code the jackknife estimators are always calculated without
@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_SUITE(autocorrelation)
 		DataSample referenceTauValues("intTauBergRefResult32bins.dat", 2);
 		DataSample referenceTauErrors("intTauBergRefResult32bins.dat", 3);
 
-		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters);
+		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(gaussianCorrelatedBergData, parameters);
 
 		/*
 		 * See the comment above for the reason why we use 1.e-10 instead
