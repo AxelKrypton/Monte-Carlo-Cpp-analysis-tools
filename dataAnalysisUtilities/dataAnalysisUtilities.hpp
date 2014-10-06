@@ -51,7 +51,7 @@ public:
 		binnedData = rawData;
 	}
 	DataSample & getRawData() {return rawData;}
-	DataSample & getbinnedData() {return binnedData;}
+	DataSample & getBinnedData() {return binnedData;}
 private:
 	DataSample rawData;
 	DataSample binnedData;

@@ -91,7 +91,7 @@ public:
 class DataSampleAnalyzer
 {
 public:
-	DataSampleAnalyzer(DataSample &sample, Parameters parametersIn):
+	DataSampleAnalyzer(RawAndBinnedDataSample &sample, Parameters parametersIn):
 		parameters(parametersIn)
 	{
 		/**
@@ -99,25 +99,25 @@ public:
 		 */
 		if (parameters.calcAutocorrelation)
 		{
-			AutocorrelationAnalyzer(sample, parameters);
+			AutocorrelationAnalyzer(sample.getBinnedData(), parameters);
 		}
 		else
 		{
 			if(parameters.analyzeMean)
 			{
-				MeanAnalyzer(sample, parameters);
+				MeanAnalyzer(sample.getBinnedData(), parameters);
 			}
 			if(parameters.analyzeVariance)
 			{
-				VarianceAnalyzer(sample, parameters);
+				VarianceAnalyzer(sample.getBinnedData(), parameters);
 			}
 			if(parameters.analyzeSkewness)
 			{
-				SkewnessAnalyzer(sample, parameters);
+				SkewnessAnalyzer(sample.getBinnedData(), parameters);
 			}
 			if(parameters.analyzeKurtosis)
 			{
-				KurtosisAnalyzer(sample, parameters);
+				KurtosisAnalyzer(sample.getBinnedData(), parameters);
 			}
 		}
 	};
@@ -131,8 +131,8 @@ class DatafileAnalyzer
 public:
 	DatafileAnalyzer(std::string filename, Parameters parameters)
 	{
-		DataSample dataSample = createDataSampleFromDatafile(filename, parameters);
-		DataSampleAnalyzer analyzer(dataSample, parameters);
+		RawAndBinnedDataSample data(filename, parameters);
+		DataSampleAnalyzer analyzer(data, parameters);
 	}
 };
 
