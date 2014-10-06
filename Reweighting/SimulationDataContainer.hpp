@@ -15,8 +15,6 @@ public:
 private:
 	std::vector<SimulationData> simulationDataSet;
 
-	void extractInformationFromFile(std::string fileIn,
-	    std::vector<std::string>& DataFilename, std::vector<std::map<std::string, double> >& dataParameters);
 };
 
 #endif /* SIMULATIONCONTAINERDATA_HPP_ */

@@ -11,7 +11,9 @@ static bool isLastEntryPresentMoreThanOnce(std::vector<std::string>);
 static bool isLastMapPresentMoreThanOnce(std::vector<std::map<std::string, double> >);
 static bool mapCompare(const std::map<std::string, double>&, const std::map<std::string, double>&);
 static bool isAnyMapEmpty(std::vector<std::map<std::string, double> >);
-
+static void extractInformationFromFile(std::string fileIn,
+                                       std::vector<std::string>& dataFilenames,
+                                       std::vector<std::map<std::string, double> >& dataParameters);
 /*****************************************************************************************/
 
 SimulationDataContainer::SimulationDataContainer()
@@ -46,7 +48,7 @@ int SimulationDataContainer::getNumberOfSimulationParameters(int fileNumber)
 	return simulationDataSet[fileNumber].getNumberOfSimulationParameters();
 }
 
-void SimulationDataContainer::extractInformationFromFile(std::string fileIn,
+void extractInformationFromFile(std::string fileIn,
     std::vector<std::string>& dataFilenames, std::vector<std::map<std::string, double> >& dataParameters)
 {
 	std::ifstream infile(fileIn.c_str());

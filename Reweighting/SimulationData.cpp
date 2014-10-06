@@ -61,12 +61,18 @@ std::map<std::string, double> SimulationData::getSimulationParameters(){
 	return simulationParameters;
 }
 
+
 double SimulationData::getParameterValue(std::string parameterName)
 {
 	//This would be one line with c++11 with .at()
 	if(simulationParameters.find(parameterName) == simulationParameters.end())
 		throw std::out_of_range("The given parameter \"" + parameterName + "\" has not been found!");
 	return simulationParameters[parameterName];
+}
+
+
+std::string SimulationData::getDatafileName(){
+    return datafileName;
 }
 
 
