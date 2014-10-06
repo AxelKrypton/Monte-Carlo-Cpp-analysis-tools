@@ -300,7 +300,11 @@ RawAndBinnedDataSample::RawAndBinnedDataSample(std::string filename, Parameters 
 	if( parameters.adjustDataSampleSizeToBinning && !binnedData.doesBinningFitBinsize() )
 	{
 		std::cout << "# Adjusting data sample size..." << std::endl;
-		rawData = removeNElementsFromDataSample(rawData, binnedData.getNumberOfDiscardedElements() );
+		rawData = rawData.removeLastNElements(binnedData.getNumberOfDiscardedElements() );
+	}
+	else if (!binnedData.doesBinningFitBinsize() )
+	{
+		std::cout << "# WARNING: Elements are discarded for binned quantities only!" << std::endl;
 	}
 }
 
