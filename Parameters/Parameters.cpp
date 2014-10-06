@@ -24,6 +24,7 @@ Parameters::Parameters(int argc, const char ** argv)
 		("useBinning", po::value<bool>(&useBinning)->default_value(true)->implicit_value(false), "Use binning on data")
 		("useNumberOfBinsForBinning", po::value<bool>(&useNumberOfBinsForBinning)->default_value(true)->implicit_value(false), "Perform binning based on \"numberOfBins\" parameter")
 		("binningMustFitDataSampleSize", po::value<bool>(&binningMustFitDataSampleSize)->default_value(false)->implicit_value(true), "Require that no element of the data sample is discarded during binning")
+		("adjustDataSampleSizeToBinning", po::value<bool>(&adjustDataSampleSizeToBinning)->default_value(true)->implicit_value(true), "Adjust number of elements of the data sample if elements are discarded during binning")
 		("binsize,b", po::value<int>(&binsize), "Size of bin (default: 100)")
 		("numberOfBins,n", po::value<int>(&numberOfBins), "Number of bins (default: 10)")
 		("calcAutocorrelation,a", po::value<bool>(&calcAutocorrelation)->default_value(false)->implicit_value(true), "Estimate autocorrelation of data. In this case no other observable is evaluated!")
@@ -120,6 +121,10 @@ void Parameters::printParameters()
 		if( binningMustFitDataSampleSize )
 		{
 			std::cout << "# Require binsize/numberOfBins\n#   to be multiple of number of\n#   data points" << std::endl;
+		}
+		if( adjustDataSampleSizeToBinning )
+		{
+			std::cout << "# Resize raw data sample in case data points are discarded during binning" << std::endl;
 		}
 	}
 	else

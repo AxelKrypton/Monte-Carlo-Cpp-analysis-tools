@@ -22,13 +22,27 @@ public:
 	double error;
 };
 
-EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn);
-EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn);
+class RawAndBinnedDataSample
+{
+public:
+	RawAndBinnedDataSample(std::string filename, Parameters parameters);
+	DataSample & getRawData() {return rawData;}
+	BinnedDataSample & getBinnedData() {return binnedData;}
+private:
+	DataSample rawData;
+	BinnedDataSample binnedData;
+};
+
+EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
+EstimateAndError calcMeanAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn);
+EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
+EstimateAndError calcVarianceAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn);
 EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters);
-std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters);
-std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters);
-DataSample createDataSampleFromDatafile(std::string filename, Parameters parameters);
+
+std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEstimatesOfDataSample(DataSample & sample, Parameters parameters);
+std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(DataSample & sample, Parameters parameters);
+
 
 #endif /* DATAANALYSISUTILITIES_HPP_ */

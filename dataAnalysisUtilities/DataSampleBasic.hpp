@@ -41,6 +41,7 @@ public:
     double max();
 	double& operator[](size_t index);
 	DataSampleBasic removeIthElement(int i);
+	DataSampleBasic removeLastNElements(int n);
 
 protected:
 	void setValues(std::valarray<double> valuesIn);

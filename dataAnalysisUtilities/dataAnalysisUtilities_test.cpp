@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 
 	static void testMeanAndError(DataSample * sample, double expectedMean, double expectedError)
 	{
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(*sample);
+		EstimateAndError meanAndError = calcMeanAndErrorOfUncorrelatedDataSample(*sample);
 		BOOST_CHECK_CLOSE(meanAndError.estimate, expectedMean, doublePrecisionInPercent);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedError, doublePrecisionInPercent);
 	}
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 		const char * arguments[] = {"foo", argumentFile.c_str(), argumentBinsize.c_str()};
 		Parameters parameters(3, arguments);
 
-		DataSample sample = createDataSampleFromDatafile(file, parameters);
+		RawAndBinnedDataSample sample(file, parameters);
 
 		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 		const char * arguments[] = {"foo", argumentFile.c_str(), argumentBinsize.c_str()};
 		Parameters parameters(3, arguments);
 
-		DataSample sample = createDataSampleFromDatafile(file, parameters);
+		RawAndBinnedDataSample sample(file, parameters);
 
 		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
@@ -182,13 +182,13 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		DataSample* sample = testSample.getDataSample();
 		double expectedValue = expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(*sample, numberOfElements);
 
-		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(*sample);
+		EstimateAndError varianceAndError = calcVarianceAndErrorOfUncorrelatedDataSample(*sample);
 		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedValue, doublePrecisionInPercent);
 	}
 
 	static void testVarianceAndError(DataSample * sample, double expectedVariance, double expectedError, double testPrecision)
 	{
-		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(*sample);
+		EstimateAndError varianceAndError = calcVarianceAndErrorOfUncorrelatedDataSample(*sample);
 		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedVariance, testPrecision);
 		BOOST_CHECK_CLOSE(varianceAndError.error, expectedError, testPrecision);
 	}
@@ -232,25 +232,72 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		testVarianceAndError(sample, expectedVariance, expectedError, testPrecision);
 	}
 
-	BOOST_AUTO_TEST_CASE(withNumberOfBins_varianceError1)
+	BOOST_AUTO_TEST_CASE(withBinning)
 	{
-		std::string fileThatDoesExist = "datafile.example";
-		double elementsInFile = 1005.;
-		//the value of the reference program must be multiplied by N/(N-1) to get the unbiased value!
-		double expectedVariance = 1.18893203014724946E-004 * elementsInFile / (elementsInFile - 1.) ;
-		double expectedError = 4.98147373492720661E-006;
+		std::string gaussianData = "gaussianNumbers_0_1_0_3.dat";
+		
+		double expectedVariance = 1.;
+		double expectedError = 1e-3;
 
-		double precisionOfDataInFileInPercent = 1e-10;
-		//the difference in the variance estimate exceeds 1e-10 a bit, most likely due to rounding errors.
-		precisionOfDataInFileInPercent *= 5.;
+		double expectedPrecisionInPercent = 1;
 
-		DataSample sample(fileThatDoesExist);
+		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
+		Parameters parameters(3, arguments);
+	
+		RawAndBinnedDataSample sample(gaussianData, parameters);
 
-		testVarianceAndError(&sample, expectedVariance, expectedError, precisionOfDataInFileInPercent);
+		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(sample);
+		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedVariance, expectedPrecisionInPercent);
+		BOOST_CHECK_SMALL(varianceAndError.error, expectedError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(skewnessAndError)
+
+	BOOST_AUTO_TEST_CASE(withBinning)
+	{
+		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
+		
+		double expectedSkewness = 1.;
+		double expectedError = 1e-2;
+
+		double expectedPrecisionInPercent = 1;
+
+		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
+		Parameters parameters(3, arguments);
+	
+		RawAndBinnedDataSample sample(gaussianData, parameters);
+
+		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample.getRawData(), parameters);
+		BOOST_CHECK_CLOSE(skewnessAndError.estimate, expectedSkewness, expectedPrecisionInPercent);
+		BOOST_CHECK_SMALL(skewnessAndError.error, expectedError);
+	}
+	
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(kurtosisAndError)
+
+	BOOST_AUTO_TEST_CASE(withBinning)
+	{
+		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
+		
+		double expectedKurtosis = 3.;
+		double expectedError = 1e-2;
+
+		double expectedPrecisionInPercent = 1;
+
+		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
+		Parameters parameters(3, arguments);
+	
+		RawAndBinnedDataSample sample(gaussianData, parameters);
+
+		EstimateAndError kurtosisAndError = calcKurtosisAndErrorOfDataSample(sample.getRawData(), parameters);
+		BOOST_CHECK_CLOSE(kurtosisAndError.estimate, expectedKurtosis, expectedPrecisionInPercent);
+		BOOST_CHECK_SMALL(kurtosisAndError.error, expectedError);
+	}
+	
+BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 
 	BOOST_AUTO_TEST_CASE(noBinning)
@@ -259,8 +306,9 @@ BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 		double elementsInFile = 1005.;
 		const char * arguments[] = {"foo", "foo", "--useBinning"};
 		Parameters parameters(3, arguments);
-		DataSample tmp = createDataSampleFromDatafile(fileThatDoesExist, parameters);
-		BOOST_CHECK_EQUAL(elementsInFile, tmp.getNumberOfElements());
+		RawAndBinnedDataSample tmp(fileThatDoesExist, parameters);
+		
+		BOOST_CHECK_EQUAL(elementsInFile, tmp.getRawData().getNumberOfElements());
 	}
 
 	BOOST_AUTO_TEST_CASE(binningWithNumberOfBins)
@@ -270,8 +318,8 @@ BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 		Parameters parameters(2, arguments);
 
 		int expectedNumberOfElements = parameters.numberOfBins;
-		DataSample tmp = createDataSampleFromDatafile(fileThatDoesExist, parameters);
-		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getNumberOfElements());
+		RawAndBinnedDataSample tmp(fileThatDoesExist, parameters);
+		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getBinnedData().getNumberOfElements());
 	}
 
 	BOOST_AUTO_TEST_CASE(binningWithBinsize)
@@ -282,8 +330,8 @@ BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 		Parameters parameters(3, arguments);
 
 		int expectedNumberOfElements = (int) elementsInFile / 10;
-		DataSample tmp = createDataSampleFromDatafile(fileThatDoesExist, parameters);
-		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getNumberOfElements());
+		RawAndBinnedDataSample tmp(fileThatDoesExist, parameters);
+		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getBinnedData().getNumberOfElements());
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -299,7 +347,7 @@ BOOST_AUTO_TEST_SUITE(autocorrelation)
 		DataSample referenceCorrFuncValues("autFuncBergRefResult32bins.dat", 2);
 		DataSample referenceCorrFuncErrors("autFuncBergRefResult32bins.dat", 3);
 
-		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationFunctionsAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters);
+		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationFunctionsAndErrorEstimatesOfDataSample(gaussianCorrelatedBergData, parameters);
 
 		/*
 		 * Since in the Berg Code the jackknife estimators are always calculated without
@@ -331,7 +379,7 @@ BOOST_AUTO_TEST_SUITE(autocorrelation)
 		DataSample referenceTauValues("intTauBergRefResult32bins.dat", 2);
 		DataSample referenceTauErrors("intTauBergRefResult32bins.dat", 3);
 
-		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEsitmatesOfDataSample(gaussianCorrelatedBergData, parameters);
+		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(gaussianCorrelatedBergData, parameters);
 
 		/*
 		 * See the comment above for the reason why we use 1.e-10 instead

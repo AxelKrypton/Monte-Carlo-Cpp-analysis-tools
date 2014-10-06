@@ -1,7 +1,5 @@
 /*
  * datafileAnalyser.hpp
- * No direct tests are implemented as all classes rely
- * on functionality of other classes.
  */
 
 #ifndef DATAFILEANALYZER_HPP_
@@ -41,7 +39,7 @@ protected:
 class MeanAnalyzer : public AnalyzerWrapper
 {
 public:
-	MeanAnalyzer(DataSample &sample, const Parameters parameters):
+	MeanAnalyzer(RawAndBinnedDataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Mean", getFilenameForObservables(parameters))
 	{
 	    estimateAndError = calcMeanAndErrorOfDataSample(sample);
@@ -51,7 +49,7 @@ public:
 class VarianceAnalyzer : public AnalyzerWrapper
 {
 public:
-	VarianceAnalyzer(DataSample &sample, const Parameters parameters):
+	VarianceAnalyzer(RawAndBinnedDataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Variance", getFilenameForObservables(parameters))
 	{
 	    estimateAndError = calcVarianceAndErrorOfDataSample(sample);
@@ -91,7 +89,7 @@ public:
 class DataSampleAnalyzer
 {
 public:
-	DataSampleAnalyzer(DataSample &sample, Parameters parametersIn):
+	DataSampleAnalyzer(RawAndBinnedDataSample &sample, Parameters parametersIn):
 		parameters(parametersIn)
 	{
 		/**
@@ -99,7 +97,7 @@ public:
 		 */
 		if (parameters.calcAutocorrelation)
 		{
-			AutocorrelationAnalyzer(sample, parameters);
+			AutocorrelationAnalyzer(sample.getBinnedData(), parameters);
 		}
 		else
 		{
@@ -113,11 +111,11 @@ public:
 			}
 			if(parameters.analyzeSkewness)
 			{
-				SkewnessAnalyzer(sample, parameters);
+				SkewnessAnalyzer(sample.getBinnedData(), parameters);
 			}
 			if(parameters.analyzeKurtosis)
 			{
-				KurtosisAnalyzer(sample, parameters);
+				KurtosisAnalyzer(sample.getBinnedData(), parameters);
 			}
 		}
 	};
@@ -131,8 +129,8 @@ class DatafileAnalyzer
 public:
 	DatafileAnalyzer(std::string filename, Parameters parameters)
 	{
-		DataSample dataSample = createDataSampleFromDatafile(filename, parameters);
-		DataSampleAnalyzer analyzer(dataSample, parameters);
+		RawAndBinnedDataSample data(filename, parameters);
+		DataSampleAnalyzer analyzer(data, parameters);
 	}
 };
 

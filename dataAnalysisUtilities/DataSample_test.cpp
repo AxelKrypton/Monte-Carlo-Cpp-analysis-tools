@@ -333,3 +333,16 @@ BOOST_AUTO_TEST_SUITE_END()
 
 //todo: add tests for 3. and 4. central moments!
 
+BOOST_AUTO_TEST_SUITE(removeElements)
+
+	BOOST_AUTO_TEST_CASE(removeElements1)
+	{
+		int numberOfElements = 100;
+		int numberOfElementsToRemove = 10;
+		DataSample tmp(numberOfElements);
+		DataSample tmp2 = removeNElementsFromDataSample(tmp, numberOfElementsToRemove);
+		
+		BOOST_REQUIRE_EQUAL(tmp2.getNumberOfElements(), numberOfElements - numberOfElementsToRemove);
+	}
+	
+BOOST_AUTO_TEST_SUITE_END()

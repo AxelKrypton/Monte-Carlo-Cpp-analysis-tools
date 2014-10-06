@@ -46,7 +46,18 @@ static double unbiasedErrorOfVariance(DataSample & sampleIn)
 	return sqrt( unbiasedVarianceOfMean(varianceSample) );
 }
 
-EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn)
+EstimateAndError calcMeanAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn)
+{
+	double mean;
+	double error;
+
+	mean = meanOfDataSample(sampleIn.getRawData());
+	error = sqrt( unbiasedVarianceOfMean(sampleIn.getBinnedData()) );
+
+	return EstimateAndError(mean, error);
+}
+
+EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)
 {
 	double mean;
 	double error;
@@ -57,13 +68,24 @@ EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn)
 	return EstimateAndError(mean, error);
 }
 
-EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn)
+EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)
 {
 	double variance;
 	double error;
 
 	variance = unbiasedVarianceOfDataSample(sampleIn);
 	error = unbiasedErrorOfVariance(sampleIn);
+
+	return EstimateAndError(variance, error);
+}
+
+EstimateAndError calcVarianceAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn)
+{
+	double variance;
+	double error;
+
+	variance = unbiasedVarianceOfDataSample(sampleIn.getRawData());
+	error = unbiasedErrorOfVariance(sampleIn.getBinnedData());
 
 	return EstimateAndError(variance, error);
 }
@@ -197,7 +219,7 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Paramet
 static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(DataSample & sample, int time);
 static std::vector<BinnedDataSampleFromNumberOfBins> calcAutocorrelationFunctionValuesBinnedSets(DataSample & sample, Parameters parameters);
 
-std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters)
+std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEstimatesOfDataSample(DataSample & sample, Parameters parameters)
 {
 
 	std::vector<BinnedDataSampleFromNumberOfBins>
@@ -212,7 +234,7 @@ std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEsitmat
 	return result;
 }
 
-std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEsitmatesOfDataSample(DataSample & sample, Parameters parameters)
+std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(DataSample & sample, Parameters parameters)
 {
 
 	std::vector<BinnedDataSampleFromNumberOfBins>
@@ -244,7 +266,7 @@ static std::string getFilenameForAutocorrelation(Parameters parameters)
 
 EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters)
 {
-	std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEsitmatesOfDataSample(sample, parameters);
+	std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(sample, parameters);
 
 	std::vector<double> estimates;
 	std::vector<double> errors;
@@ -259,32 +281,43 @@ EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Pa
 	writeEstimateAndErrorArraysToFile("auto", estimates, errors, filename);
 }
 
-DataSample createDataSampleFromDatafile(std::string filename, Parameters parameters)
+RawAndBinnedDataSample::RawAndBinnedDataSample(std::string filename, Parameters parameters)
 {
-	DataSample dataSample(filename);
+	rawData = DataSample(filename);
 	if ( parameters.useBinning)
 	{
 		if (parameters.calcAutocorrelation)
 		{
 			std::cout << "Do not perform binning as the autocorrelation should be estimated!" << std::endl;
+			binnedData = BinnedDataSampleFromBinsize(rawData, 1, parameters.binningMustFitDataSampleSize);
 		}
 		else
 		{
 			std::cout << "Perform binning on data sample..." << std::endl;
 			if ( parameters.useNumberOfBinsForBinning)
 			{
-				return BinnedDataSampleFromNumberOfBins(dataSample, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
+				binnedData = BinnedDataSampleFromNumberOfBins(rawData, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
 			}
 			else
 			{
-				return BinnedDataSampleFromBinsize(dataSample, parameters.binsize, parameters.binningMustFitDataSampleSize);
+				binnedData = BinnedDataSampleFromBinsize(rawData, parameters.binsize, parameters.binningMustFitDataSampleSize);
 			}
 		}
 	}
-	return dataSample;
+	else
+	{
+		binnedData = BinnedDataSampleFromBinsize(rawData, 1, parameters.binningMustFitDataSampleSize);
+	}
+	if( parameters.adjustDataSampleSizeToBinning && !binnedData.doesBinningFitBinsize() )
+	{
+		std::cout << "# Adjusting data sample size..." << std::endl;
+		rawData = rawData.removeLastNElements(binnedData.getNumberOfDiscardedElements() );
+	}
+	else if (!binnedData.doesBinningFitBinsize() )
+	{
+		std::cout << "# WARNING: Elements are discarded for binned quantities only!" << std::endl;
+	}
 }
-
-
 
 /*****************************************************************************************/
 static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(DataSample & sample, int time)
@@ -313,6 +346,7 @@ static std::vector<BinnedDataSampleFromNumberOfBins> calcAutocorrelationFunction
 	}
 	return autocorrelationFunctionValuesBinnedSets;
 }
+
 
 
 

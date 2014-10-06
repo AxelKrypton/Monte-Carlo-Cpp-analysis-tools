@@ -22,17 +22,22 @@ DataSampleBasic BinnedDataSample::performBinning(DataSampleBasic sampleIn)
 
 void BinnedDataSample::checkDiscardedElements(int valueIn, std::string descriptionIn, int elementsOfSample)
 {
-	int discardedElements = elementsOfSample % valueIn;
+	discardedElements = elementsOfSample % valueIn;
 	if (discardedElements != 0)
 	{
 		if(warningOutput){
 			std::cout << "Warning: " << descriptionIn << " is not a multiple of numberOfElements!" << std::endl;
 			std::cout << discardedElements<< " elements are discarded!" << std::endl;
 		}
+		binningFitsBinsize = false;
 		if ( binningMustFitSize )
 		{
 			throw wrongBinningParameter();
 		}
+	}
+	else
+	{
+		binningFitsBinsize = true;
 	}
 }
 

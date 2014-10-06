@@ -66,4 +66,6 @@ protected:
 	const static int lowerLimitForNthMoment = 0;
 };
 
+DataSample removeNElementsFromDataSample(DataSample sampleIn, int n);
+
 #endif /* DATASAMPLEANALYZER_HPP_ */

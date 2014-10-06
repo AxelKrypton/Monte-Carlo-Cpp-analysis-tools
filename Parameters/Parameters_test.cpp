@@ -164,6 +164,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		bool defaultValue = false;
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().binningMustFitDataSampleSize);
 	}
+	
+	BOOST_AUTO_TEST_CASE(adjustDataSampleSizeToBinning)
+	{
+		bool defaultValue = true;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().adjustDataSampleSizeToBinning);
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -309,7 +315,6 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 
 	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning_invalidArgument)
 	{
-		bool newValue = false;
 		int newValueBinsize = 99;
 
 		std::string argument1 = "--binsize=" + boost::lexical_cast<std::string>(newValueBinsize);
@@ -445,4 +450,10 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).binningMustFitDataSampleSize);
 	}
 
+	BOOST_AUTO_TEST_CASE(adjustDataSampleSizeToBinning)
+	{
+		bool newValue = false;
+		std::string argumentName = "--adjustDataSampleSizeToBinning";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).binningMustFitDataSampleSize);
+	}
 BOOST_AUTO_TEST_SUITE_END()
