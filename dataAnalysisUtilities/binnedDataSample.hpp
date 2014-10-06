@@ -5,6 +5,8 @@
 
 class BinnedDataSample : public DataSample
 {
+public:
+	bool doesBinningFitBinsize(){ return binningFitsBinsize; }
 protected:
 
 	/**
@@ -19,6 +21,7 @@ protected:
 	int numberOfBins;
 	int binsize;
 	bool binningMustFitSize;
+	bool binningFitsBinsize;
 	bool warningOutput;
 };
 
