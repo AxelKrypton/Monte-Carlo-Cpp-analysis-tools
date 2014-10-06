@@ -672,6 +672,35 @@ BOOST_AUTO_TEST_SUITE(deleteElement)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(deleteElements)
+
+	BOOST_AUTO_TEST_CASE(invalidArgument1)
+	{
+		int numberOfElements = 35;
+		int numberOfElementsToRemove = numberOfElements;
+		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
+		BOOST_REQUIRE_THROW(sample.removeLastNElements(numberOfElementsToRemove), std::invalid_argument);
+	}
+	
+	BOOST_AUTO_TEST_CASE(invalidArgument2)
+	{
+		int numberOfElements = 35;
+		int numberOfElementsToRemove = -numberOfElements;
+		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
+		BOOST_REQUIRE_THROW(sample.removeLastNElements(numberOfElementsToRemove), std::invalid_argument);
+	}
+	
+	BOOST_AUTO_TEST_CASE(removeNothing)
+	{
+		int numberOfElements = 37;
+		int numberOfElementsToRemove = 0;
+		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
+		DataSampleBasic sample2 = sample.removeLastNElements(numberOfElementsToRemove);
+		BOOST_REQUIRE_EQUAL(sample2.getNumberOfElements(), numberOfElements);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(applyFunction)
 
 	double square(double in)
