@@ -84,7 +84,7 @@ EstimateAndError calcVarianceAndErrorOfDataSample(RawAndBinnedDataSample & sampl
 	double variance;
 	double error;
 
-	variance = unbiasedVarianceOfDataSample(sampleIn.getBinnedData());
+	variance = unbiasedVarianceOfDataSample(sampleIn.getRawData());
 	error = unbiasedErrorOfVariance(sampleIn.getBinnedData());
 
 	return EstimateAndError(variance, error);

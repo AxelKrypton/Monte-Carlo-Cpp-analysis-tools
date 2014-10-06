@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 
 		RawAndBinnedDataSample sample(file, parameters);
 
-		EstimateAndError meanAndError = calcMeanAndErrorOfUncorrelatedDataSample(sample.getBinnedData());
+		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 
 		RawAndBinnedDataSample sample(file, parameters);
 
-		EstimateAndError meanAndError = calcMeanAndErrorOfUncorrelatedDataSample(sample.getBinnedData());
+		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
@@ -234,19 +234,21 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 
 	BOOST_AUTO_TEST_CASE(withNumberOfBins_varianceError1)
 	{
-		std::string fileThatDoesExist = "datafile.example";
-		double elementsInFile = 1005.;
-		//the value of the reference program must be multiplied by N/(N-1) to get the unbiased value!
-		double expectedVariance = 1.18893203014724946E-004 * elementsInFile / (elementsInFile - 1.) ;
-		double expectedError = 4.98147373492720661E-006;
+		std::string gaussianData = "gaussianNumbers_0_1_0_3.dat";
+		
+		double expectedVariance = 1.;
+		double expectedError = 1e-3;
 
-		double precisionOfDataInFileInPercent = 1e-10;
-		//the difference in the variance estimate exceeds 1e-10 a bit, most likely due to rounding errors.
-		precisionOfDataInFileInPercent *= 5.;
+		double expectedPrecisionInPercent = 1;
 
-		DataSample sample(fileThatDoesExist);
+		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
+		Parameters parameters(3, arguments);
+	
+		RawAndBinnedDataSample sample(gaussianData, parameters);
 
-		testVarianceAndError(&sample, expectedVariance, expectedError, precisionOfDataInFileInPercent);
+		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(sample);
+		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedVariance, expectedPrecisionInPercent);
+		BOOST_CHECK_SMALL(varianceAndError.error, expectedError);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

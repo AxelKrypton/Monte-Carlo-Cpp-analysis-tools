@@ -1,7 +1,5 @@
 /*
  * datafileAnalyser.hpp
- * No direct tests are implemented as all classes rely
- * on functionality of other classes.
  */
 
 #ifndef DATAFILEANALYZER_HPP_
