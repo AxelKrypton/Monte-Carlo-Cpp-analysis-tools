@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		testVarianceAndError(sample, expectedVariance, expectedError, testPrecision);
 	}
 
-	BOOST_AUTO_TEST_CASE(withNumberOfBins_varianceError1)
+	BOOST_AUTO_TEST_CASE(withBinning)
 	{
 		std::string gaussianData = "gaussianNumbers_0_1_0_3.dat";
 		
@@ -255,7 +255,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(skewnessAndError)
 
-	BOOST_AUTO_TEST_CASE(withNumberOfBins)
+	BOOST_AUTO_TEST_CASE(withBinning)
 	{
 		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
 		
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(kurtosisAndError)
 
-	BOOST_AUTO_TEST_CASE(withNumberOfBins)
+	BOOST_AUTO_TEST_CASE(withBinning)
 	{
 		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
 		
