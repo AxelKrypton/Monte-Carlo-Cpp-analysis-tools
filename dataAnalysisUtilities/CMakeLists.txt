@@ -13,6 +13,8 @@ configure_file(datafile2.example datafile2.example COPYONLY)
 configure_file(datafile3.example datafile3.example COPYONLY)
 configure_file(datafileWithTwoColumns.example datafileWithTwoColumns.example)
 
+configure_file(gaussianNumbers_0_1_0_3.dat gaussianNumbers_0_1_0_3.dat COPYONLY)
+
 configure_file(emptyFile.example emptyFile.example COPYONLY)
 configure_file(fileWithBrokenLine.example fileWithBrokenLine.example COPYONLY)
 configure_file(fileWithComment.example fileWithComment.example COPYONLY)
