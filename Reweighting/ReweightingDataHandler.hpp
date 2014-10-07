@@ -48,7 +48,8 @@ protected:
 
 private:
     std::string configurationFile;
-    SimulationDataContainer simulationDataContainer;
+    SimulationDataContainer simulationRawDataContainer;
+    SimulationDataContainer simulationBinnedDataContainer;
     int numberOfObservablesToBeReweighted;
 
     /*

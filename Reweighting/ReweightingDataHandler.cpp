@@ -11,6 +11,7 @@ static void extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(Sim
 static void extractValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer, std::vector<std::vector<double> >& , const std::vector<std::string>&);
 static void checkCorrectnessOfConfigurationFileForReweighting(SimulationDataContainer, const std::vector<std::string>, int);
 static int getNumberOfBinsToBeUsed(SimulationDataContainer, const std::vector<std::string>);
+static void printBinsizesActuallyUsed(SimulationDataContainer, const int);
 
 /*****************************************************************************************/
 
@@ -20,26 +21,43 @@ static int getNumberOfBinsToBeUsed(SimulationDataContainer, const std::vector<st
 std::string tmp[2] = {"logZ", "binsize"};
 const std::vector<std::string> ReweightingDataHandler::metaParameters(tmp, tmp+2);
 
+
 ReweightingDataHandler::ReweightingDataHandler() {
     throw std::invalid_argument("ReweightingDataHandler needs input file for construction!");
 }
 
 ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn)
-    : configurationFile(configurationFileIn), simulationDataContainer(configurationFileIn)
+    : configurationFile(configurationFileIn), simulationRawDataContainer(configurationFileIn), simulationBinnedDataContainer(simulationRawDataContainer)
 {
-    numberOfObservablesToBeReweighted = simulationDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
-    checkCorrectnessOfConfigurationFileForReweighting(simulationDataContainer, ReweightingDataHandler::metaParameters, numberOfObservablesToBeReweighted);
-    numberOfBinsToBeUsed = getNumberOfBinsToBeUsed(simulationDataContainer, ReweightingDataHandler::metaParameters);
+    numberOfObservablesToBeReweighted = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
+    checkCorrectnessOfConfigurationFileForReweighting(simulationRawDataContainer, ReweightingDataHandler::metaParameters, numberOfObservablesToBeReweighted);
+    numberOfBinsToBeUsed = getNumberOfBinsToBeUsed(simulationRawDataContainer, ReweightingDataHandler::metaParameters);
+    //Print information about binsizes actually used
+    printBinsizesActuallyUsed(simulationRawDataContainer, numberOfBinsToBeUsed);
     //Perform binning on the data
-    for(int i=0; i<simulationDataContainer.getNumberOfDatafiles(); i++){
-        for(int j=0; j<simulationDataContainer[i].getNumberOfDataSample(); j++){
-            simulationDataContainer[i][j] = BinnedDataSampleFromNumberOfBins(simulationDataContainer[i][j], numberOfBinsToBeUsed, false, false);
+    std::pair<SimulationDataContainer, std::vector<int> >
+            binnedDataAndLeftOutEntries = simulationRawDataContainer.getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(numberOfBinsToBeUsed);
+
+    simulationBinnedDataContainer = binnedDataAndLeftOutEntries.first;
+    std::cout.precision(16);
+    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
+        for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
+            std::cout << "sim[" << i << "][" << j << "] = " << simulationRawDataContainer[i][j].getNumberOfElements() << "\t\t";
+            std::cout << "bin[" << i << "][" << j << "] = " << simulationBinnedDataContainer[i][j].getNumberOfElements() << "\n";
+//        for(int k=0; k<simulationDataContainer[i][j].getNumberOfElements(); k++)
+//            std::cout << simulationDataContainer[i][j][k] << "\n";
         }
     }
-    std::cout.precision(16);
-    for(int i=0; i<simulationDataContainer.getNumberOfDatafiles(); i++){
-        for(int j=0; j<simulationDataContainer[i].getNumberOfDataSample(); j++){
-            std::cout << "sim[" << i << "][" << j << "] = " << simulationDataContainer[i][j].getNumberOfElements() << "    mean = " << simulationDataContainer[i][j].sum()/simulationDataContainer[i][j].getNumberOfElements() <<"\n";
+    //Refining on the raw data
+    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
+        for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
+            simulationRawDataContainer[i][j] = simulationRawDataContainer[i][j].removeLastNElements(binnedDataAndLeftOutEntries.second[i]);
+        }
+    }
+    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
+        for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
+            std::cout << "sim[" << i << "][" << j << "] = " << simulationRawDataContainer[i][j].getNumberOfElements()  << "\t\t";
+            std::cout << "bin[" << i << "][" << j << "] = " << simulationBinnedDataContainer[i][j].getNumberOfElements() << "\n";
 //        for(int k=0; k<simulationDataContainer[i][j].getNumberOfElements(); k++)
 //            std::cout << simulationDataContainer[i][j][k] << "\n";
         }
@@ -49,14 +67,14 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn)
 
 std::vector<std::string> ReweightingDataHandler::getNamesOfParametersIgnoringMetaParameters(){
     std::vector<std::string> result;
-    extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(simulationDataContainer[0], result,
+    extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(simulationRawDataContainer[0], result,
                                                                      ReweightingDataHandler::metaParameters);
     return result;
 }
 
 std::vector<std::vector<double> > ReweightingDataHandler::getValuesOfSimulationParametersIgnoringMetaParameters(){
     std::vector<std::vector<double> > result;
-    extractValuesOfSimulationParametersIgnoringMetaParameters(simulationDataContainer, result,
+    extractValuesOfSimulationParametersIgnoringMetaParameters(simulationRawDataContainer, result,
                                                               ReweightingDataHandler::metaParameters);
     return result;
 }
@@ -70,8 +88,8 @@ void ReweightingDataHandler::extractAndSetProvidedValuesOfLogZAtSimulatedPoints(
             throw std::invalid_argument("logZ asked to be set but already with some non-zero value inside!");
     }
     std::map<std::string, double> auxMap;
-    for(int i=0; i<simulationDataContainer.getNumberOfDatafiles(); i++){
-        auxMap = simulationDataContainer[i].getSimulationParameters();
+    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
+        auxMap = simulationRawDataContainer[i].getSimulationParameters();
         for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
             if(it->first == "logZ")
                 logZ[i] = it->second;
@@ -89,8 +107,8 @@ void ReweightingDataHandler::writeNewConfigurationFileWithMetaparameters(Reweigh
         throw std::runtime_error("Something went wrong opening the file \"" + newConfigFileName + "\"!");
     outputFile.precision(16);
     outputFile << "\n\n#===================================================================================\n\n";
-    for(int i=0; i<reweighter.reweightingDataHandler.simulationDataContainer.getNumberOfDatafiles(); i++){
-        outputFile << reweighter.reweightingDataHandler.simulationDataContainer[i].getDatafileName() << "\t";
+    for(int i=0; i<reweighter.reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); i++){
+        outputFile << reweighter.reweightingDataHandler.simulationRawDataContainer[i].getDatafileName() << "\t";
         for(size_t j=0; j<reweighter.reweightingParameterNames.size(); j++){
             outputFile << reweighter.reweightingParameterNames[j] << " " << reweighter.valuesOfSimulationParameters[i][j] << "\t";
         }
@@ -99,7 +117,7 @@ void ReweightingDataHandler::writeNewConfigurationFileWithMetaparameters(Reweigh
             if(ReweightingDataHandler::metaParameters[j] == "logZ")
                 outputFile << reweighter.logZAtSimulatedPoints[i];
             else if(ReweightingDataHandler::metaParameters[j] == "binsize")
-                outputFile << reweighter.reweightingDataHandler.simulationDataContainer[i][0].getNumberOfElements()/numberOfBinsToBeUsed;
+                outputFile << reweighter.reweightingDataHandler.simulationRawDataContainer[i][0].getNumberOfElements()/numberOfBinsToBeUsed;
             else
                 throw std::runtime_error("Encountered unknown metaparameter writing new configuration file!");
             outputFile << "\t";
@@ -247,6 +265,38 @@ static void extractValuesOfSimulationParametersIgnoringMetaParameters(Simulation
         auxVector.clear();
     }
 }
+
+/*
+ * ATTENTION: The access operator [] of map, even if used only to retrieve the value, modifies the
+ *            map inserting a new default initialized element, when the asked element is not found.
+ *            Here we use this fact to print zero binsizes for files for which binsize has not been
+ *            given, but then at the end of the function, the object SimulationDataContainer will
+ *            be modified and this modification has not to be propagated throughout the code. Hence
+ *            here we pass ON PURPOSE simDataCont by value and it has NOT to be changed to a const
+ *            reference or worse to a reference.
+ */
+static void printBinsizesActuallyUsed(SimulationDataContainer simDataCont, const int numberOfBinsToBeUsed){
+    size_t maxLengthDataFilename = simDataCont[0].getDatafileName().length();
+    for(int i=1; i<simDataCont.getNumberOfDatafiles(); i++){
+        if(simDataCont[i].getDatafileName().length() > maxLengthDataFilename)
+            maxLengthDataFilename = simDataCont[1].getDatafileName().length();
+    }
+    std::cout << "\n";
+    for(size_t i=0; i<maxLengthDataFilename+50; i++)
+        std::cout << "=";
+    std::cout << "\n";
+
+    for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
+        std::cout << simDataCont[i].getDatafileName();
+        std::cout << "   Given binsize = " << simDataCont[i].getSimulationParameters()["binsize"];
+        std::cout << "    Used binsize = " << simDataCont[i][0].getNumberOfElements()/numberOfBinsToBeUsed << "\n";
+    }
+
+    for(size_t i=0; i<maxLengthDataFilename+50; i++)
+        std::cout << "=";
+    std::cout << "\n\n";
+}
+
 
 
 static bool isLastEntryPresentMoreThanOnce(std::vector<std::vector<double> > parValues){
