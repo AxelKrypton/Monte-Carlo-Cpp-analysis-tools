@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 	
 		RawAndBinnedDataSample sample(gaussianData, parameters);
 
-		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample.getRawData(), parameters);
+		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
 		BOOST_CHECK_CLOSE(skewnessAndError.estimate, expectedSkewness, expectedPrecisionInPercent);
 		BOOST_CHECK_SMALL(skewnessAndError.error, expectedError);
 	}
@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_SUITE(kurtosisAndError)
 	
 		RawAndBinnedDataSample sample(gaussianData, parameters);
 
-		EstimateAndError kurtosisAndError = calcKurtosisAndErrorOfDataSample(sample.getRawData(), parameters);
+		EstimateAndError kurtosisAndError = calcKurtosisAndErrorOfDataSample(sample, parameters);
 		BOOST_CHECK_CLOSE(kurtosisAndError.estimate, expectedKurtosis, expectedPrecisionInPercent);
 		BOOST_CHECK_SMALL(kurtosisAndError.error, expectedError);
 	}

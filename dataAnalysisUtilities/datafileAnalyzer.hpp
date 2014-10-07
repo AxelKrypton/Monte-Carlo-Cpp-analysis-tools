@@ -59,17 +59,17 @@ public:
 class SkewnessAnalyzer : public AnalyzerWrapper
 {
 public:
-	SkewnessAnalyzer(DataSample &sample, const Parameters parameters):
+	SkewnessAnalyzer(RawAndBinnedDataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Skewness", getFilenameForObservables(parameters))
 	{
-	    estimateAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
+		estimateAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
 	}
 };
 
 class KurtosisAnalyzer : public AnalyzerWrapper
 {
 public:
-	KurtosisAnalyzer(DataSample &sample, const Parameters parameters):
+	KurtosisAnalyzer(RawAndBinnedDataSample &sample, const Parameters parameters):
 		AnalyzerWrapper("Kurtosis", getFilenameForObservables(parameters))
 	{
 	    estimateAndError = calcKurtosisAndErrorOfDataSample(sample, parameters);
@@ -111,11 +111,11 @@ public:
 			}
 			if(parameters.analyzeSkewness)
 			{
-				SkewnessAnalyzer(sample.getBinnedData(), parameters);
+				SkewnessAnalyzer(sample, parameters);
 			}
 			if(parameters.analyzeKurtosis)
 			{
-				KurtosisAnalyzer(sample.getBinnedData(), parameters);
+				KurtosisAnalyzer(sample, parameters);
 			}
 		}
 	};
