@@ -117,23 +117,22 @@ std::vector<std::vector<EstimateAndError> > ReweighterAbstract::calculateAndGetR
     std::cout << " Starting reweighting of observables...\n\n";
     std::vector<double> minimumOfEachObservable(reweightingDataHandler.numberOfObservablesToBeReweighted, std::numeric_limits<double>::max());
     prepareObservablesBeforeReweighting(minimumOfEachObservable);
-    assignMeanValuesToEstimateAndError(calculateReweightedObservableValues(reweightingDataHandler.simulationDataContainer), observablesAtNewPoints);
+    assignMeanValuesToEstimateAndError(calculateReweightedObservableValues(), observablesAtNewPoints);
     size_t numberOfNewPoints = valuesOfNewParameters.size();
-    size_t numberOfBinsUsedToBinData = reweightingDataHandler.simulationDataContainer[0][0].getNumberOfElements();
+    size_t numberOfBinsUsedToBinData = reweightingDataHandler.numberOfBinsToBeUsed;
     std::vector<std::vector<std::valarray<double> > > jackknife(numberOfNewPoints,
                                                                 std::vector<std::valarray<double> >(reweightingDataHandler.numberOfObservablesToBeReweighted,
                                                                                                     std::valarray<double>(numberOfBinsUsedToBinData)));
+    for(size_t i=0; i<numberOfNewPoints; i++){
+        for(size_t j=0; j<(size_t)reweightingDataHandler.numberOfObservablesToBeReweighted; j++){
+            for(size_t k=0; k<numberOfBinsUsedToBinData; k++){
 
+            }
+        }
+    }
 
     /*
      * implement Jakknife error: the restore has to be done before the calculation of the error itself!!!
-     *
-     * NOTE: As realized on 02.10.2014 the binning has to be done ONLY for the error calculation and not for the
-     *       observable value itself!!! This means we have to adapt all this class in order to have somehow two
-     *       simulationDataContainer: one as private member with the raw data, and one probably temporary
-     *       here in this function built on the basis of the ReweightingDataHandler information. Doing in this
-     *       way the binning is done here. Think about how to discard data according to binsize, but this should
-     *       be done using the new method resize of DataSampleBasic class (still to be implemented).
      */
     restoreObservablesAfterReweighting(minimumOfEachObservable, NULL);
 
@@ -198,30 +197,44 @@ void ReweighterAbstract::calculateNewPoints(){
  *       instance, logZAtSimulatedPoints must have the right amount of memory reserved
  *       before calling this function.
  */
-std::vector<double> ReweighterAbstract::calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated){
+std::vector<double> ReweighterAbstract::calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated,
+                                                                 bool useBinnedData, const int entryToBeLeftOut,
+                                                                 std::vector<double>* logZAtSimulationPointToBeUsed){
+
+    SimulationDataContainer& simDataCont = (useBinnedData) ? reweightingDataHandler.simulationBinnedDataContainer
+                                                           : reweightingDataHandler.simulationRawDataContainer;
+    if(entryToBeLeftOut >= simDataCont[0][0].getNumberOfElements())
+        throw std::logic_error("A not existing data entry has been asked to be excluded calculating logZ!");
+    if(logZAtSimulationPointToBeUsed == NULL)
+        logZAtSimulationPointToBeUsed = &logZAtSimulatedPoints;
 
 	std::vector<double> outputValuesOfLogZ(valuesOfParametersAtWhichLogZIsCalculated.size());
 	double logarithmOfDenominator;
 	size_t numberOfReweightingParameters = reweightingParameterNames.size();
 	size_t numberOfSimulationsDone = valuesOfSimulationParameters.size();
 	for(size_t indexNewPoint = 0; indexNewPoint < valuesOfParametersAtWhichLogZIsCalculated.size(); indexNewPoint++){
-		for(size_t indexSimulation1 = 0; indexSimulation1 < numberOfSimulationsDone; indexSimulation1++){
-            size_t numberConfigurations1 = reweightingDataHandler.simulationDataContainer[indexSimulation1][0].getNumberOfElements();
+        bool firstValue = true;
+        for(size_t indexSimulation1 = 0; indexSimulation1 < numberOfSimulationsDone; indexSimulation1++){
+            size_t numberConfigurations1 = simDataCont[indexSimulation1][0].getNumberOfElements();
 			for(size_t indexConfiguration = 0; indexConfiguration < numberConfigurations1; indexConfiguration++){
+                if((int)indexConfiguration == entryToBeLeftOut)
+                    continue;
 				for(size_t indexSimulation2 = 0; indexSimulation2 < numberOfSimulationsDone; indexSimulation2++){
-                    size_t numberConfigurations2 = reweightingDataHandler.simulationDataContainer[indexSimulation2][0].getNumberOfElements();
+                    size_t numberConfigurations2 = simDataCont[indexSimulation2][0].getNumberOfElements();
+                    if(entryToBeLeftOut >= 0) numberConfigurations2--; //The number of conf has to be decreased if we leave one out!
 					double exponent = 0.0;
 					for(size_t indexConjugatedQuantity = 0; indexConjugatedQuantity < numberOfReweightingParameters; indexConjugatedQuantity++){
 						exponent += (valuesOfParametersAtWhichLogZIsCalculated[indexNewPoint][indexConjugatedQuantity]
 						                     - valuesOfSimulationParameters[indexSimulation2][indexConjugatedQuantity])
-                                    *reweightingDataHandler.simulationDataContainer[indexSimulation1][indexConjugatedQuantity][indexConfiguration];
+                                    *simDataCont[indexSimulation1][indexConjugatedQuantity][indexConfiguration];
 					}
-					double newTerm = log((double)numberConfigurations2) - logZAtSimulatedPoints[indexSimulation2] + exponent;
+                    double newTerm = log((double)numberConfigurations2) - (*logZAtSimulationPointToBeUsed)[indexSimulation2] + exponent;
 					logarithmOfDenominator = (indexSimulation2 == 0) ? newTerm : logarithmic_sum(logarithmOfDenominator, newTerm);
 				}
-				outputValuesOfLogZ[indexNewPoint] = (indexSimulation1 == 0 && indexConfiguration == 0) ?
+                outputValuesOfLogZ[indexNewPoint] = (indexSimulation1 == 0 && (indexConfiguration == 0 || firstValue)) ?
 												 -logarithmOfDenominator :
 				                                  logarithmic_sum(outputValuesOfLogZ[indexNewPoint], -logarithmOfDenominator);
+                firstValue = false;
 			}
 		}
 	}
@@ -307,6 +320,40 @@ void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
     logZAtNewPoints = calculateLogZAtNewPoints(valuesOfNewParameters);
 }
 
+std::vector<double> ReweighterAbstract::calculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
+                                                                                                     std::vector<double> logZAtSimulationPointToBeUsed){
+    return calculateLogZAtNewPoints(valuesOfNewParameters, true, entryToBeLeftOut, &logZAtSimulationPointToBeUsed);
+}
+
+/*
+ * Here we implement a dedicated function to calculate logZ at simulated points leaving out one of the binned data.
+ * We are aware that we duplicate somehouw the function calculateAndSetLogZAtSimulatedPoints, but we postpone
+ * this to a future refactoring.
+ *
+ * TODO: Refactor this function making it part of \"calculateAndSetLogZAtSimulatedPoints\" that will have
+ *       to be modified (separate setting and calculation, bool useBinnedData as parameter, ecc.)
+ */
+std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut){
+
+    if(entryToBeLeftOut < 0 || entryToBeLeftOut >= reweightingDataHandler.numberOfBinsToBeUsed)
+        throw std::out_of_range("Invalid entry to be left out in \"calculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry\" function.");
+    double residuum;
+    std::vector<double> newLogZ(valuesOfSimulationParameters.size());
+    std::vector<double> resultLogZ(valuesOfSimulationParameters.size(), 0.0);
+    do{
+        newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters, true, entryToBeLeftOut, &resultLogZ);
+        residuum = 0.0;
+        //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
+        for(size_t indexSimulations = 0; indexSimulations < valuesOfSimulationParameters.size(); indexSimulations++){
+            residuum += expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations])
+                       *expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations]);
+            //here one should put eq.(8.34)
+        }
+        resultLogZ = newLogZ;
+    }while(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ);
+
+    return resultLogZ;
+}
 
 /*
  * This function just calculates the value of the observables at the new points using a given
@@ -317,7 +364,7 @@ void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
  * NOTE: From ALL the data files given in the SimulationDataContainer, the entry number "entryToBeLeftOut"
  *       is discarded in the calculation of the observables. This is to apply the Jackknife method later.
  *
- * NOTE: In this function, we consider understood that, in the SimulationDataContainer given as parameter,
+ * NOTE: In this function, we consider understood that, in the SimulationDataContainer used in the calculation,
  *       the observables are "ready to be reweighted". This means that within such an object the logarithms
  *       of the original values must have been stored. Hence, in case of observables that can be negative,
  *       a global shift has to be done before taking the logarithms and an analog invert shift has to
@@ -329,15 +376,27 @@ void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
  *         it is done on the purpose to keep the calculation of logZ and the observables separated.
  * TODO: Refactor calculation of logarithmOfDenominator in an own function.
  */
-std::vector<std::vector<double> > ReweighterAbstract::calculateReweightedObservableValues(SimulationDataContainer simDataCont, const int entryToBeLeftOut){
+std::vector<std::vector<double> > ReweighterAbstract::calculateReweightedObservableValues(bool useBinnedData,
+                                                                                          const int entryToBeLeftOut,
+                                                                                          std::vector<double> *logZAtSimulationPointToBeUsed,
+                                                                                          std::vector<double> *logZAtNewPointsToBeUsed){
+
+    SimulationDataContainer& simDataCont = (useBinnedData) ? reweightingDataHandler.simulationBinnedDataContainer
+                                                           : reweightingDataHandler.simulationRawDataContainer;
     if(entryToBeLeftOut >= simDataCont[0][0].getNumberOfElements())
         throw std::logic_error("A not existing data entry has been asked to be excluded reweighting observables!");
+    if(logZAtSimulationPointToBeUsed == NULL)
+        logZAtSimulationPointToBeUsed = &logZAtSimulatedPoints;
+    if(logZAtNewPointsToBeUsed == NULL)
+        logZAtNewPointsToBeUsed = &logZAtNewPoints;
+
     size_t numberOfReweightingParameters = reweightingParameterNames.size();
     size_t numberOfSimulationsDone = valuesOfSimulationParameters.size();
     size_t numberOfNewPoints = valuesOfNewParameters.size();
     std::vector<std::vector<double> > outputValuesOfObservables(numberOfNewPoints, std::vector<double>(reweightingDataHandler.numberOfObservablesToBeReweighted));
     double logarithmOfDenominator;
     for(size_t indexNewPoint = 0; indexNewPoint < numberOfNewPoints; indexNewPoint++){
+        bool firstValue = true;
         for(size_t indexSimulation1 = 0; indexSimulation1 < numberOfSimulationsDone; indexSimulation1++){
             size_t numberConfigurations1 = simDataCont[indexSimulation1][0].getNumberOfElements();
             for(size_t indexConfiguration = 0; indexConfiguration < numberConfigurations1; indexConfiguration++){
@@ -345,58 +404,67 @@ std::vector<std::vector<double> > ReweighterAbstract::calculateReweightedObserva
                     continue;
                 for(size_t indexSimulation2 = 0; indexSimulation2 < numberOfSimulationsDone; indexSimulation2++){
                     size_t numberConfigurations2 = simDataCont[indexSimulation2][0].getNumberOfElements();
+                    if(entryToBeLeftOut >= 0) numberConfigurations2--; //The number of conf has to be decreased if we leave one out!
                     double exponent = 0.0;
                     for(size_t indexConjugatedQuantity = 0; indexConjugatedQuantity < numberOfReweightingParameters; indexConjugatedQuantity++){
                         exponent += (valuesOfNewParameters[indexNewPoint][indexConjugatedQuantity]
                                     -valuesOfSimulationParameters[indexSimulation2][indexConjugatedQuantity])
                                     *simDataCont[indexSimulation1][indexConjugatedQuantity][indexConfiguration];
                     }
-                    double newTerm = log((double)numberConfigurations2) - logZAtSimulatedPoints[indexSimulation2] + exponent;
+                    double newTerm = log((double)numberConfigurations2) - (*logZAtSimulationPointToBeUsed)[indexSimulation2] + exponent;
                     logarithmOfDenominator = (indexSimulation2 == 0) ? newTerm : logarithmic_sum(logarithmOfDenominator, newTerm);
                 }
                 for(int indexObservable=0; indexObservable<reweightingDataHandler.numberOfObservablesToBeReweighted; indexObservable++){
                     double newTerm = simDataCont[indexSimulation1][indexObservable+numberOfReweightingParameters][indexConfiguration] - logarithmOfDenominator;
                     outputValuesOfObservables[indexNewPoint][indexObservable] =
-                            (indexSimulation1 == 0 && indexConfiguration == 0) ? newTerm :
+                            (indexSimulation1 == 0 && (indexConfiguration == 0 || firstValue)) ? newTerm :
                             logarithmic_sum(outputValuesOfObservables[indexNewPoint][indexObservable], newTerm);
-
+                    firstValue = false;
                 }
             }
         }
         for(int indexObservable=0; indexObservable<reweightingDataHandler.numberOfObservablesToBeReweighted; indexObservable++)
-            outputValuesOfObservables[indexNewPoint][indexObservable] -= logZAtNewPoints[indexNewPoint];
+            outputValuesOfObservables[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
     }
 
     return outputValuesOfObservables;
 }
 
-
+/*
+ * The preparation of the observables, as well as their restoration, has to be done also on
+ * the binned data, since they are used to estimate the error (with the Jackknife method).
+ * One could calculate the minimum also of the binned data, but since the goal is to have
+ * positive quantities before taking the logarithm, it is enough to use the minimum of the
+ * raw data that will be in general smaller or equal to the minimum of the binned data.
+ */
 void ReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<double>& minimumOfEachObservable){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
     //Estimate of minimum of each observable through all files
-    for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationDataContainer.getNumberOfDatafiles(); indexSimulation++){
-        for(int indexObservable=numberOfReweightingParameters; indexObservable<reweightingDataHandler.simulationDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++){
-            if(reweightingDataHandler.simulationDataContainer[indexSimulation][indexObservable].min() < minimumOfEachObservable[indexObservable-numberOfReweightingParameters])
-                minimumOfEachObservable[indexObservable-numberOfReweightingParameters] = reweightingDataHandler.simulationDataContainer[indexSimulation][indexObservable].min();
+    for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
+        for(int indexObservable=numberOfReweightingParameters; indexObservable<reweightingDataHandler.simulationRawDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++){
+            if(reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].min() < minimumOfEachObservable[indexObservable-numberOfReweightingParameters])
+                minimumOfEachObservable[indexObservable-numberOfReweightingParameters] = reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].min();
         }
     }
     //Shift, if necessary, and logarithm
-    for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationDataContainer.getNumberOfDatafiles(); indexSimulation++){
-        for(int indexObservable=numberOfReweightingParameters; indexObservable<reweightingDataHandler.simulationDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++){
+    for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
+        for(int indexObservable=numberOfReweightingParameters; indexObservable<reweightingDataHandler.simulationRawDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++){
             if(minimumOfEachObservable[indexObservable-numberOfReweightingParameters] < 0){
                 if(indexSimulation == 0)
                     std::cout << "  Observable number " << indexObservable-numberOfReweightingParameters << " shifted due to negative values!\n";
-                reweightingDataHandler.simulationDataContainer[indexSimulation][indexObservable] -= 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
+                reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable] -= 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
+                reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable] -= 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
             }
-            for(int indexData=0; indexData<reweightingDataHandler.simulationDataContainer[indexSimulation][indexObservable].getNumberOfElements(); indexData++){
-                if(reweightingDataHandler.simulationDataContainer[indexSimulation][indexObservable][indexData] == 0.0){
+            for(int indexData=0; indexData<reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].getNumberOfElements(); indexData++){
+                if(reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable][indexData] == 0.0){
                     std::ostringstream exceptionString("Zero-value for observable ");
                     exceptionString << indexObservable << " found in datafile " << indexSimulation;
                     exceptionString << "at trajectory number " << indexData << ". Impossible to take the logarithm!";
                     throw std::runtime_error(exceptionString.str());
                 }
             }
-            reweightingDataHandler.simulationDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationDataContainer[indexSimulation][indexObservable].applyFunction(log);
+            reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].applyFunction(log);
+            reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable].applyFunction(log);
         }
     }
 }
@@ -404,10 +472,11 @@ void ReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<double>
 void ReweighterAbstract::restoreObservablesAfterReweighting(std::vector<double> minimumOfEachObservable,
                               std::vector<std::vector<std::valarray<double> > > *jackknifePartialPred){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
-    //Exponential and shift, if necessary, BOTH on raw data AND on values at new points + Jackknife partial predicitions
-    for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationDataContainer.getNumberOfDatafiles(); indexSimulation++){
-        for(int indexObservable=numberOfReweightingParameters; indexObservable<reweightingDataHandler.simulationDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++){
-            reweightingDataHandler.simulationDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationDataContainer[indexSimulation][indexObservable].applyFunction(exp);
+    //Exponential and shift, if necessary, BOTH on raw/binned data AND on values at new points + Jackknife partial predicitions
+    for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
+        for(int indexObservable=numberOfReweightingParameters; indexObservable<reweightingDataHandler.simulationRawDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++){
+            reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].applyFunction(exp);
+            reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable].applyFunction(exp);
             for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
                 observablesAtNewPoints[indexNewPoint][indexObservable].estimate = exp(observablesAtNewPoints[indexNewPoint][indexObservable].estimate);
                 if(jackknifePartialPred != NULL){
@@ -419,15 +488,17 @@ void ReweighterAbstract::restoreObservablesAfterReweighting(std::vector<double> 
             if(minimumOfEachObservable[indexObservable-numberOfReweightingParameters] < 0){
                 if(indexSimulation == 0)
                     std::cout << "  Observable number " << indexObservable-numberOfReweightingParameters << " restored!\n";
-                reweightingDataHandler.simulationDataContainer[indexSimulation][indexObservable] += 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
+                reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable] += 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
+                reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable] += 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
             }
         }
     }
 }
 
 
-SimulationDataContainer ReweighterAbstract::getSimulationDataContainer(){
-    return reweightingDataHandler.simulationDataContainer;
+SimulationDataContainer ReweighterAbstract::getSimulationDataContainer(bool raw){
+    return (raw == true) ? reweightingDataHandler.simulationRawDataContainer
+                         : reweightingDataHandler.simulationBinnedDataContainer;
 }
 
 

@@ -102,12 +102,18 @@ protected:
 
     //Some of the following method could be static functions in the .cpp file but are here for testing purposes
     void calculateAndSetLogZAtNewPoints();
+    std::vector<double> calculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
+                                                                                     std::vector<double> logZAtSimulationPointToBeUsed);
     void calculateAndSetLogZAtSimulatedPoints();
+    std::vector<double> calculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut);
     void prepareObservablesBeforeReweighting(std::vector<double> &);
     void restoreObservablesAfterReweighting(std::vector<double>, std::vector<std::vector<std::valarray<double> > > *jackknifePartialPred);
-    std::vector<std::vector<double> > calculateReweightedObservableValues(SimulationDataContainer simDataCont, const int entryToBeLeftOut = -1);
+    std::vector<std::vector<double> > calculateReweightedObservableValues(bool useBinnedData = false,
+                                                                          const int entryToBeLeftOut = -1,
+                                                                          std::vector<double> *logZAtSimulationPointToBeUsed = NULL,
+                                                                          std::vector<double> *logZAtNewPointsToBeUsed = NULL);
     //This getter again only for testing reason
-    SimulationDataContainer getSimulationDataContainer();
+    SimulationDataContainer getSimulationDataContainer(bool raw = true);
 
 private:
     /*
@@ -118,7 +124,9 @@ private:
 
     //Method in which "valuesOfNewParameters" is filled and some checks are done
     void calculateNewPoints();
-    std::vector<double> calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated);
+    std::vector<double> calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated,
+                                                 bool useBinnedData = false, const int entryToBeLeftOut = -1,
+                                                 std::vector<double> *logZAtSimulationPointToBeUsed = NULL);
 
     //Members
     ReweightingDataHandler reweightingDataHandler;
