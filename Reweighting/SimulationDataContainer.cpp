@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "SimulationDataContainer.hpp"
+#include "../dataAnalysisUtilities/binnedDataSample.hpp"
 
 
 static void checkIfDatafileExists(std::string);
@@ -48,7 +49,31 @@ int SimulationDataContainer::getNumberOfSimulationParameters(int fileNumber)
 	return simulationDataSet[fileNumber].getNumberOfSimulationParameters();
 }
 
-void extractInformationFromFile(std::string fileIn,
+std::pair<SimulationDataContainer, std::vector<int> >
+SimulationDataContainer::getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(int numberOfBinsToBeUsed){
+    SimulationDataContainer binnedSimulationDataSet(*this); //default copy ctor should be enough
+    std::vector<int> entriesLeftOut;
+    //Here we make no check on the datafile, since they already were done in SimulationData ctor
+    for(int i=0; i<binnedSimulationDataSet.getNumberOfDatafiles(); i++){
+        for(int j=0; j<binnedSimulationDataSet[i].getNumberOfDataSample(); j++){
+            binnedSimulationDataSet[i][j] = BinnedDataSampleFromNumberOfBins(simulationDataSet[i][j],
+                                                                             numberOfBinsToBeUsed, false, false);
+        }
+        int tmpSizeOfDataSample = simulationDataSet[i][0].getNumberOfElements();
+        entriesLeftOut.push_back(tmpSizeOfDataSample - tmpSizeOfDataSample/numberOfBinsToBeUsed*numberOfBinsToBeUsed);
+    }
+    return std::make_pair(binnedSimulationDataSet, entriesLeftOut);
+}
+
+
+
+
+
+/*****************************************************************************************/
+/******************************* STATIC FUNCTIONS ****************************************/
+/*****************************************************************************************/
+
+static void extractInformationFromFile(std::string fileIn,
     std::vector<std::string>& dataFilenames, std::vector<std::map<std::string, double> >& dataParameters)
 {
 	std::ifstream infile(fileIn.c_str());
@@ -92,10 +117,8 @@ void extractInformationFromFile(std::string fileIn,
 	infile.close();
 }
 
-/*****************************************************************************************/
-
 //todo: use stat of sys/stat.h to check existence and access to the file
-void checkIfDatafileExists(std::string filename){
+static void checkIfDatafileExists(std::string filename){
 	std::ifstream file;
 	file.open(filename.c_str());
 	if ( !file.is_open() )

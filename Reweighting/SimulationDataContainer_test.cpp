@@ -103,3 +103,30 @@ BOOST_AUTO_TEST_SUITE(AccessOperator)
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(BinningContainer)
+
+    BOOST_AUTO_TEST_CASE(BinningContainer1)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_1";
+        const int numberOfBins = 100;
+        std::vector<int> referenceEntriesToBeLeftOut(3);
+        referenceEntriesToBeLeftOut[0] = 4;
+        referenceEntriesToBeLeftOut[1] = 53;
+        referenceEntriesToBeLeftOut[2] = 84;
+        SimulationDataContainer simDataCont(fileThatDoesExist);
+        std::pair<SimulationDataContainer, std::vector<int> >
+                binnedObject = simDataCont.getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(numberOfBins);
+        for(int i=0; i<3; i++){
+            BOOST_CHECK_EQUAL(binnedObject.second[i], referenceEntriesToBeLeftOut[i]);
+            BOOST_CHECK_EQUAL(binnedObject.first[i][0].getNumberOfElements(), numberOfBins);
+        }
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+
+
+

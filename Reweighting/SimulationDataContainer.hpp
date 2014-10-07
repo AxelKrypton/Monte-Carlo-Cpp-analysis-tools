@@ -10,6 +10,7 @@ public:
     explicit SimulationDataContainer(std::string configurationFile);
 	int getNumberOfDatafiles();
 	int getNumberOfSimulationParameters(int fileNumber);
+    std::pair<SimulationDataContainer, std::vector<int> > getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(int numberOfBinsToBeUsed);
 	SimulationData& operator[](int index);
 
 private:
