@@ -135,6 +135,11 @@ EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn, Paramet
 //todo: this include should not be necessary in the end
 #include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
 
+DataSample calcSkewness(DataSample & in1, DataSample & in2)
+{
+	return in1 / (in2 ^ (3. / 2));
+}
+
 EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
 	/**
@@ -155,8 +160,7 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 	JackknifeEstimators jackSample1(binnedSample1);
 	JackknifeEstimators jackSample2(binnedSample2);
 	
-	//this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
-	DataSample skewnessSample = jackSample1 / (jackSample2 ^ (3. / 2));
+	DataSample skewnessSample = calcSkewness(jackSample1, jackSample2);
 	
 	error = calculateJacknifeError(skewnessSample);
 	
