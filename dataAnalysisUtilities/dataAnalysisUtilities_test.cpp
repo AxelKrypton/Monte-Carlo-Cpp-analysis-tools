@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 	{
 		int numberOfBins = 1005;
 		
-		double expectedMean = 0.56125906512982415;
+		double expectedMean = 5.61305299427553583e-01;
 		double expectedError = 3.44121381077520906E-004;
 
 		EstimateAndError expectedEstimateAndError(expectedMean, expectedError);
