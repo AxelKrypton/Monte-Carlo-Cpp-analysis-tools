@@ -140,11 +140,6 @@ DataSample calcSkewness(DataSample & in1, DataSample & in2)
 	return in1 / (in2 ^ (3. / 2));
 }
 
-double calculateJacknifeEstimator(DataSample & sampleIn)
-{
-	return sampleIn.getNthMoment(1);
-}
-
 EstimateAndError jackknifeAnalysis(DataSample sample1, DataSample sample2, DataSample (*function)(DataSample&, DataSample&) )
 {
 	JackknifeEstimators jackSample1(sample1);

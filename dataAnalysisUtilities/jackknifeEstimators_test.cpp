@@ -4,6 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <iostream>
+#include "binnedDataSample.hpp"
 #include "jackknifeEstimators.hpp"
 
 #include "TestDataSample.hpp"

@@ -8,37 +8,21 @@
 #ifndef JACKKNIFEESTIMATORS_HPP_
 #define JACKKNIFEESTIMATORS_HPP_
 
-#include "binnedDataSample.hpp"
-#include <iostream>
+#include "DataSample.hpp"
 
 //todo: add fcts. for mean and error
 //todo: overload constructor to add function
 class JackknifeEstimators: public DataSample
 {
 public:
-	JackknifeEstimators(int numberOfElementsIn) :
-		DataSample(numberOfElementsIn)
-	{
-		checkIfJackknifeCanBePerformed(numberOfElements);
-	};
-
-	JackknifeEstimators(DataSample sampleIn) :
-		DataSample(sampleIn)
-	{
-		int normalization = getJackknifeNormalization();
-		double sumOfDataSampleElements = sampleIn.sum();
-		//todo: do this removing specific elements -> less rounding errors
-		setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
-	};
+	JackknifeEstimators(int numberOfElementsIn);
+	JackknifeEstimators(DataSample sampleIn);
 
 	double getJackknifeVariance();
 	double getJackknifeError();
-
 protected:
-	DataSampleBasic calculatePseudoValues();
 	int getJackknifeNormalization();
 	void checkIfJackknifeCanBePerformed(int n);
-	//todo: is this simply blocked binning and not jackknifing?
 	DataSampleBasic createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize);
 };
 
@@ -56,6 +40,7 @@ private:
 	void checkIfJackknifeCanBePerformedWithBinsize(int binsize);
 };
 
+double calculateJacknifeEstimator(DataSample & sampleIn);
 double calculateJacknifeError(DataSample & sampleIn);
 
 #endif /* JACKKNIFEESTIMATORS_HPP_ */

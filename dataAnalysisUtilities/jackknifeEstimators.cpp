@@ -1,5 +1,22 @@
 #include "jackknifeEstimators.hpp"
 
+#include "binnedDataSample.hpp"
+
+JackknifeEstimators::JackknifeEstimators(int numberOfElementsIn) :
+DataSample(numberOfElementsIn)
+{
+	checkIfJackknifeCanBePerformed(numberOfElements);
+}
+
+JackknifeEstimators::JackknifeEstimators(DataSample sampleIn) :
+DataSample(sampleIn)
+{
+	int normalization = getJackknifeNormalization();
+	double sumOfDataSampleElements = sampleIn.sum();
+	//todo: do this removing specific elements -> less rounding errors
+	setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
+}
+
 //todo: the following fcts. are just copied here during refactoring!
 
 void checkDiscardedElements(int valueIn, std::string descriptionIn, int numberOfElements)
@@ -42,6 +59,11 @@ double JackknifeEstimators::getJackknifeError()
 	return sqrt(getJackknifeVariance());
 }
 
+double calculateJacknifeEstimator(DataSample & sampleIn)
+{
+	return sampleIn.getNthMoment(1);
+}
+
 int JackknifeEstimators::getJackknifeNormalization()
 {
 	checkIfJackknifeCanBePerformed(numberOfElements);
@@ -52,29 +74,6 @@ void JackknifeEstimators::checkIfJackknifeCanBePerformed(int n)
 {
 	if(n <= 1 || n > numberOfElements)
 		throw std::invalid_argument("Cannot create jackknifeEstimators with these parameters!");
-}
-
-DataSampleBasic JackknifeEstimators::calculatePseudoValues()
-{
-	//this is for f(X) = Mean(X)
-	DataSampleBasic tmp(numberOfElements);
-	double mean = calcNthMoment(1);
-
-	for (int iteration = 0; iteration < numberOfElements; iteration++)
-	{
-		double value = 0;
-
-		DataSample tmp2( removeIthElement(iteration) );
-		double mean2 = tmp2.getNthMoment(1);
-
-		//this is the correct line, with mean equal to f(X_[i])
-//		value = numberOfElements * mean - (numberOfElements - 1) * mean2;
-		//but numerically, this is bad, and analytically it reads
-		value = values[iteration];
-
-		tmp[iteration] = value;
-	}
-	return tmp;
 }
 
 DataSampleBasic JackknifeEstimators::createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize)

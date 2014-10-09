@@ -7,7 +7,7 @@ add_library(dataAnalysisUtilities
 	DataSampleAnalyzer.cpp
 )
 
-target_link_libraries(dataAnalysisUtilities IO)
+target_link_libraries(dataAnalysisUtilities IO Parameters)
 
 configure_file(datafile.example datafile.example COPYONLY)
 configure_file(datafile2.example datafile2.example COPYONLY)
