@@ -30,6 +30,13 @@ double JackknifeEstimators::getJackknifeVariance()
 	return tmp.getNthMoment(1) * getJackknifeNormalization();
 }
 
+double calculateJacknifeError(DataSample & sampleIn)
+{
+	int jackknifeNormalization = sampleIn.getNumberOfElements() - 1;
+	DataSample tmp ( (sampleIn - sampleIn.getNthMoment(1) )^( (double(2)) )  );
+	return tmp.getNthMoment(1) * jackknifeNormalization;
+}
+
 double JackknifeEstimators::getJackknifeError()
 {
 	return sqrt(getJackknifeVariance());

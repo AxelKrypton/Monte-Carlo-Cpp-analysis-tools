@@ -154,10 +154,11 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 	
 	JackknifeEstimators jackSample1(binnedSample1);
 	JackknifeEstimators jackSample2(binnedSample2);
-	//this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
-	JackknifeEstimators skewnessSample(jackSample1 / (jackSample2 ^ (3. / 2)));
 	
-	error = skewnessSample.getJackknifeError();
+	//this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
+	DataSample skewnessSample = jackSample1 / (jackSample2 ^ (3. / 2));
+	
+	error = calculateJacknifeError(skewnessSample);
 	
 	return EstimateAndError(skewness, error);
 }

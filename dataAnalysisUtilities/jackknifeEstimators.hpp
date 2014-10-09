@@ -56,4 +56,6 @@ private:
 	void checkIfJackknifeCanBePerformedWithBinsize(int binsize);
 };
 
+double calculateJacknifeError(DataSample & sampleIn);
+
 #endif /* JACKKNIFEESTIMATORS_HPP_ */
