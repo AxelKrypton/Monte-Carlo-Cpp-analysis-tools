@@ -7,7 +7,7 @@ int main(int argc, const char ** argv)
 	try
 	{
 		Parameters parameters(argc, argv);
-	    DatafileAnalyzer analyzer(parameters.file, parameters);
+		DatafileAnalyzer analyzer(parameters);
 	}
 	//todo: move catch block into own function?
 	catch ( wrongBinningParameter &e)

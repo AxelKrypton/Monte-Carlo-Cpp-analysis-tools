@@ -6,10 +6,10 @@
 class DatafileAnalyzer
 {
 public:
-	DatafileAnalyzer(std::string filename, Parameters parameters)
+	DatafileAnalyzer(Parameters parameters)
 	{
 		//TODO: add parameters offset and column
-		DataSample data(filename);
+		DataSample data(parameters.file);
 		DataSampleAnalyzer analyzer(data, parameters);
 	}
 };
