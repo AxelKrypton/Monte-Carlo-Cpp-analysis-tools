@@ -274,7 +274,7 @@ static std::string getFilenameForAutocorrelation(Parameters parameters)
 	return parameters.file + "_auto";
 }
 
-EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters)
+void calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters)
 {
 	std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(sample, parameters);
 

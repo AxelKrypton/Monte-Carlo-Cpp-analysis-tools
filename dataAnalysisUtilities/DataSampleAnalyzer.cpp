@@ -58,7 +58,7 @@ BinderAnalyzer::BinderAnalyzer(DataSample &sample, const Parameters parameters):
 AutocorrelationAnalyzer::AutocorrelationAnalyzer(DataSample &sample, Parameters parameters):
 	AnalyzerWrapperBasic("Autocorrelation", getFilenameForObservables(parameters))
 {
-	estimateAndError = calcAutocorrelationAndErrorOfDataSample(sample, parameters);
+	calcAutocorrelationAndErrorOfDataSample(sample, parameters);
 }
 
 AnalyzerWrapperBasic::AnalyzerWrapperBasic(std::string name, std::string outputFilename):
