@@ -4,6 +4,7 @@ add_library(dataAnalysisUtilities
 	binnedDataSample.cpp
 	jackknifeEstimators.cpp
 	dataAnalysisUtilities.cpp
+	DataSampleAnalyzer.cpp
 )
 
 target_link_libraries(dataAnalysisUtilities IO)
