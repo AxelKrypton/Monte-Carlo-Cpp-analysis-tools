@@ -193,15 +193,7 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
 	DataSample binnedSample1 = performBinning(fourthCentralMoment, parameters);
 	DataSample binnedSample2 = performBinning(secondCentralMoment, parameters);	
 
-	JackknifeEstimators jackSample1(binnedSample1);
-	JackknifeEstimators jackSample2(binnedSample2);
-	
-	DataSample binderSample = calcBinder(jackSample1, jackSample2);
-
-	double binder = binderSample.getNthMoment(1);
-	double error = calculateJacknifeError(binderSample);
-
-	return EstimateAndError(binder, error);
+	return jackknifeAnalysis(binnedSample1, binnedSample2, calcBinder);
 }
 
 /*
