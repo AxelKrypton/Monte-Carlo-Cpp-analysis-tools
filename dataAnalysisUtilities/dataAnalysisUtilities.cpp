@@ -140,31 +140,37 @@ DataSample calcSkewness(DataSample & in1, DataSample & in2)
 	return in1 / (in2 ^ (3. / 2));
 }
 
+double calculateJacknifeEstimator(DataSample & sampleIn)
+{
+	return sampleIn.getNthMoment(1);
+}
+
+EstimateAndError jackknifeAnalysis(DataSample sample1, DataSample sample2, DataSample (*function)(DataSample&, DataSample&) )
+{
+	JackknifeEstimators jackSample1(sample1);
+	JackknifeEstimators jackSample2(sample2);
+	
+	DataSample functionAppliedToEstimators = function(jackSample1, jackSample2);
+	
+	double estimate = calculateJacknifeEstimator(functionAppliedToEstimators);
+	double error = calculateJacknifeError(functionAppliedToEstimators);
+	
+	return EstimateAndError(estimate, error);
+}
+
 EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
 	/**
 		* Skewness gamma_1 is defined as:
 		*   gamma_1 = <(x-mu)^3> / <(x-mu)^2>^(3/2)
 		*/
-	double skewness = 0.;
-	double error = 0.;
-	
-	skewness = sampleIn.getNthCentralMoment(3) / pow (sampleIn.getNthCentralMoment(2),(3./2.) );
-	
 	DataSample thirdCentralMomentSample = (sampleIn - sampleIn.getNthMoment(1)) ^ 3;
 	DataSample secondCentralMomentSample = (sampleIn - sampleIn.getNthMoment(1)) ^ 2;	
-	
+
 	DataSample binnedSample1 = performBinning(thirdCentralMomentSample, parameters);
 	DataSample binnedSample2 = performBinning(secondCentralMomentSample, parameters);
 	
-	JackknifeEstimators jackSample1(binnedSample1);
-	JackknifeEstimators jackSample2(binnedSample2);
-	
-	DataSample skewnessSample = calcSkewness(jackSample1, jackSample2);
-	
-	error = calculateJacknifeError(skewnessSample);
-	
-	return EstimateAndError(skewness, error);
+	return jackknifeAnalysis(binnedSample1, binnedSample2, calcSkewness);
 }
 
 DataSample calcBinder(DataSample & in1, DataSample & in2)
@@ -181,9 +187,6 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
 	 * The Kurtosis gamma_2 is defined as:
 	 *   gamma_2 = beta_2 - 3
 	 */
-	double binder = sampleIn.getNthCentralMoment(4) / pow (sampleIn.getNthCentralMoment(2),2. );
-	double error = 0.;
-	
 	DataSample fourthCentralMoment = (sampleIn - sampleIn.getNthMoment(1)) ^ 4;
 	DataSample secondCentralMoment = (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
 	
@@ -195,8 +198,9 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
 	
 	DataSample binderSample = calcBinder(jackSample1, jackSample2);
 
-	error = calculateJacknifeError(binderSample);
-	
+	double binder = binderSample.getNthMoment(1);
+	double error = calculateJacknifeError(binderSample);
+
 	return EstimateAndError(binder, error);
 }
 
