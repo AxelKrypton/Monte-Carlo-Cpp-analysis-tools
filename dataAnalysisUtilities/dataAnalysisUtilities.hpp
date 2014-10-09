@@ -1,22 +1,14 @@
 #ifndef DATAANALYSISUTILITIES_HPP_
 #define DATAANALYSISUTILITIES_HPP_
 
-#include <iostream>
-#include "binnedDataSample.hpp"
 #include "DataSample.hpp"
 #include "../Parameters/Parameters.hpp"
-#include "../IO/io_utilities.hpp"
 
 class EstimateAndError
 {
 public:
-	EstimateAndError() :
-		estimate(0.), error(0.)
-	{}
-
-	EstimateAndError(double mean, double error) :
-		estimate(mean), error(error)
-	{}
+	EstimateAndError();
+	EstimateAndError(double mean, double error);
 
 	double estimate;
 	double error;
@@ -32,6 +24,5 @@ void calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters par
 
 std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEstimatesOfDataSample(DataSample & sample, Parameters parameters);
 std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(DataSample & sample, Parameters parameters);
-
 
 #endif /* DATAANALYSISUTILITIES_HPP_ */
