@@ -72,17 +72,24 @@ void checkEstimateAndError(EstimateAndError expectedEstimateAndError, EstimateAn
 
 BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 
-	static void checkMeanErrorWithBinsize(std::string file, int binsize, EstimateAndError expected, double testPrecision)
+	Parameters createParameters(int binsize, std::string file = "noFileGiven")
 	{
 		std::string argumentFile = "--file=" + file;
 		std::string argumentBinsize = "--binsize=" + boost::lexical_cast<std::string>(binsize);
 		const char * arguments[] = {"foo", argumentFile.c_str(), argumentBinsize.c_str()};
 		Parameters parameters(3, arguments);
+		
+		return parameters;
+	}
+
+	static void checkMeanAndErrorWithBinsize(std::string file, int binsize, EstimateAndError expected, double testPrecision)
+	{
+		Parameters parameters = createParameters(binsize, file);
 
 		DataSample sample(file);
 		DataSample binnedData = performBinningFromBinsize(sample, binsize);
 
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample, parameters);
+		EstimateAndError meanAndError = calcMeanAndErrorOfUncorrelatedDataSample(binnedData);
 		checkEstimateAndError(expected, meanAndError, testPrecision);
 	}
 
@@ -97,18 +104,18 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 		double expectedError = 3.44121381077520906E-004;
 		
 		EstimateAndError expectedEstimateAndError(expectedMean, expectedError);
-		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedEstimateAndError, precisionOfDataInFileInPercent);
+		checkMeanAndErrorWithBinsize(fileThatDoesExist, binsize, expectedEstimateAndError, precisionOfDataInFileInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(error2)
 	{
 		int binsize = 100;
 
-		double expectedError = 1.1564370727055974e-03;
 		double expectedMean = 0.56125906512982415;
+		double expectedError = 1.1564370727055974e-03;
 
 		EstimateAndError expectedEstimateAndError(expectedMean, expectedError);
-		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedEstimateAndError, precisionOfDataInFileInPercent);
+		checkMeanAndErrorWithBinsize(fileThatDoesExist, binsize, expectedEstimateAndError, precisionOfDataInFileInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(error3)
@@ -120,62 +127,90 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 		
 		BOOST_CHECK_CLOSE(sample.getNthMoment(1), binnedData.getNthMoment(1),precisionOfDataInFileInPercent );
 	}
+	
+	BOOST_AUTO_TEST_CASE(error4)
+	{
+		int binsize = 100;
+		Parameters parameters = createParameters(binsize);
+		
+		DataSample sample(fileThatDoesExist);
+		DataSample binnedData = performBinningFromBinsize(sample, binsize);
+		
+		EstimateAndError meanAndErrorFromBinnedDataSample = calcMeanAndErrorOfUncorrelatedDataSample(binnedData);
+		EstimateAndError meanAndErrorFromDataSample = calcMeanAndErrorOfDataSample(sample, parameters);
+		
+		checkEstimateAndError(meanAndErrorFromBinnedDataSample, meanAndErrorFromDataSample, precisionOfDataInFileInPercent);
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 
-	static void checkMeanErrorWithNumberOfBins(std::string file, int numberOfBins, double expectedValue, double testPrecision)
+	//This file has 1005 entries, from which 5 are discarded when binning with number of bins 10
+	std::string fileThatDoesExist = "datafile.example";
+	double precisionOfDataInFileInPercent = 1e-10;
+	int numberOfBins = 10;
+
+	Parameters createParameters(int numberOfBins, std::string file = "noFileGiven")
 	{
 		std::string argumentFile = "--file=" + file;
 		std::string argumentBinsize = "--numberOfBins=" + boost::lexical_cast<std::string>(numberOfBins);
 		const char * arguments[] = {"foo", argumentFile.c_str(), argumentBinsize.c_str()};
 		Parameters parameters(3, arguments);
+		
+		return parameters;
+	}
+	
+	static void checkMeanErrorWithNumberOfBins(std::string file, int numberOfBins, EstimateAndError expected, double testPrecision)
+	{
+		Parameters parameters = createParameters(numberOfBins, file);
 
 		DataSample sample(file);
+		DataSample binnedData = performBinningFromNumberOfBins(sample, numberOfBins);
 
 		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample, parameters);
-		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
+		checkEstimateAndError(expected, meanAndError, testPrecision);
 	}
 
 	BOOST_AUTO_TEST_CASE(error1)
 	{
-		std::string fileThatDoesExist = "datafile.example";
 		int numberOfBins = 1005;
-		double precisionOfDataInFileInPercent = 1e-10;
-		double expectedValue = 3.44121381077520906E-004;
+		
+		double expectedMean = 0.56125906512982415;
+		double expectedError = 3.44121381077520906E-004;
 
-		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
+		EstimateAndError expectedEstimateAndError(expectedMean, expectedError);
+		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedEstimateAndError, precisionOfDataInFileInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(error2)
 	{
-		std::string fileThatDoesExist = "datafile.example";
-		double precisionOfDataInFileInPercent = 1e-10;
-		int numberOfBins = 10;
-		double expectedValue = 1.1564370727055974e-03;
+		double expectedMean = 0.56125906512982415;
+		double expectedError = 1.1564370727055974e-03;
 
-		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
+		EstimateAndError expectedEstimateAndError(expectedMean, expectedError);
+		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedEstimateAndError, precisionOfDataInFileInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(error3)
 	{
-		std::string fileThatDoesExist = "datafile2.example";
-		double precisionOfDataInFileInPercent = 1e-10;
-		int numberOfBins = 10;
-		double expectedValue = 1.14688734781786292E-003;
-
-		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
+		DataSample sample(fileThatDoesExist);
+		DataSample binnedData = performBinningFromNumberOfBins(sample, numberOfBins);
+		
+		BOOST_CHECK_CLOSE(sample.getNthMoment(1), binnedData.getNthMoment(1), precisionOfDataInFileInPercent );
 	}
-
+	
 	BOOST_AUTO_TEST_CASE(error4)
 	{
-		std::string fileThatDoesExist = "datafile2.example";
-		double precisionOfDataInFileInPercent = 1e-10;
-		int numberOfBins = 100;
-		double expectedValue = 8.02188322114928275E-004;
-
-		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedValue, precisionOfDataInFileInPercent);
+		Parameters parameters = createParameters(numberOfBins);
+		
+		DataSample sample(fileThatDoesExist);
+		DataSample binnedData = performBinningFromNumberOfBins(sample, numberOfBins);
+		
+		EstimateAndError meanAndErrorFromBinnedDataSample = calcMeanAndErrorOfUncorrelatedDataSample(binnedData);
+		EstimateAndError meanAndErrorFromDataSample = calcMeanAndErrorOfDataSample(sample, parameters);
+		
+		checkEstimateAndError(meanAndErrorFromBinnedDataSample, meanAndErrorFromDataSample, precisionOfDataInFileInPercent);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
