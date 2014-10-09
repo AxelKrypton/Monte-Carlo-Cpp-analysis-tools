@@ -11,6 +11,7 @@ EstimateAndError::EstimateAndError(double mean, double error) :
 	estimate(mean), error(error)
 {}
 
+
 DataSample performBinning(DataSample & rawData, const Parameters parameters)
 {
 	BinnedDataSample binnedData;
@@ -28,7 +29,6 @@ DataSample performBinning(DataSample & rawData, const Parameters parameters)
 	}
 	return binnedData;
 }
-
 
 static double meanOfDataSample(DataSample & sampleIn)
 {
@@ -53,6 +53,13 @@ static double unbiasedVarianceOfDataSample(DataSample & sampleIn)
 	return double(sampleIn.getNumberOfElements()) / double(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthCentralMoment(2);
 }
 
+/**
+ * Note that the unbiased estimate of the 
+ * variance of the mean is the same as the 
+ * error coming from a jackknife analysis,
+ * as the pseudovalues for the mean
+ * are again the original data points.
+ */
 static double unbiasedVarianceOfMean(DataSample & sampleIn)
 {
 	return 1. / double(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthCentralMoment(2);
@@ -78,15 +85,9 @@ static double unbiasedErrorOfVariance(DataSample & sampleIn)
 
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
-	double mean;
-	double error;
-	
 	DataSample binnedData = performBinning(sampleIn, parameters);
 
-	mean = meanOfDataSample(sampleIn);
-	error = sqrt( unbiasedVarianceOfMean(binnedData) );
-
-	return EstimateAndError(mean, error);
+	return calcMeanAndErrorOfUncorrelatedDataSample(binnedData);
 }
 
 EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)

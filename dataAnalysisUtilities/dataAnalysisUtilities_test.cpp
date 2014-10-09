@@ -60,10 +60,19 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
+#include <iomanip>
+
+void checkEstimateAndError(EstimateAndError expectedEstimateAndError, EstimateAndError calculatedEstimateAndError, double testPrecision)
+{
+	BOOST_CHECK_CLOSE(expectedEstimateAndError.error, calculatedEstimateAndError.error, testPrecision);
+	BOOST_CHECK_CLOSE(expectedEstimateAndError.estimate, calculatedEstimateAndError.estimate, testPrecision);
+}
+
+#include "binnedDataSample.hpp"
 
 BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 
-	static void checkMeanErrorWithBinsize(std::string file, int binsize, double expectedValue, double testPrecision)
+	static void checkMeanErrorWithBinsize(std::string file, int binsize, EstimateAndError expected, double testPrecision)
 	{
 		std::string argumentFile = "--file=" + file;
 		std::string argumentBinsize = "--binsize=" + boost::lexical_cast<std::string>(binsize);
@@ -71,39 +80,45 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 		Parameters parameters(3, arguments);
 
 		DataSample sample(file);
+		DataSample binnedData = performBinningFromBinsize(sample, binsize);
 
 		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample, parameters);
-		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
+		checkEstimateAndError(expected, meanAndError, testPrecision);
 	}
 
+	//This file has 1005 entries, from which 5 are discarded when binning with binsize 100
+	std::string fileThatDoesExist = "datafile.example";
+	double precisionOfDataInFileInPercent = 1e-10;
+	
 	BOOST_AUTO_TEST_CASE(error1)
 	{
-		std::string fileThatDoesExist = "datafile.example";
 		int binsize = 1;
-		double precisionOfDataInFileInPercent = 1e-10;
+		double expectedMean = 5.61305299427553583e-01;
 		double expectedError = 3.44121381077520906E-004;
-
-		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedError, precisionOfDataInFileInPercent);
+		
+		EstimateAndError expectedEstimateAndError(expectedMean, expectedError);
+		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedEstimateAndError, precisionOfDataInFileInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(error2)
 	{
-		std::string fileThatDoesExist = "datafile.example";
 		int binsize = 100;
-		double precisionOfDataInFileInPercent = 1e-10;
-		double expectedError = 1.1564370727055974e-03;
 
-		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedError, precisionOfDataInFileInPercent);
+		double expectedError = 1.1564370727055974e-03;
+		double expectedMean = 0.56125906512982415;
+
+		EstimateAndError expectedEstimateAndError(expectedMean, expectedError);
+		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedEstimateAndError, precisionOfDataInFileInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(error3)
 	{
-		std::string fileThatDoesExist = "datafile2.example";
-		double precisionOfDataInFileInPercent = 1e-10;
 		int binsize = 100;
-		double expectedValue = 1.14688734781786292E-003;
-
-		checkMeanErrorWithBinsize(fileThatDoesExist, binsize, expectedValue, precisionOfDataInFileInPercent);
+		
+		DataSample sample(fileThatDoesExist);
+		DataSample binnedData = performBinningFromBinsize(sample, binsize);
+		
+		BOOST_CHECK_CLOSE(sample.getNthMoment(1), binnedData.getNthMoment(1),precisionOfDataInFileInPercent );
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
