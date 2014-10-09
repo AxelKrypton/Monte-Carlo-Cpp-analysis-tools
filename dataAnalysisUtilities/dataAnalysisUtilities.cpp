@@ -1,5 +1,24 @@
 # include "dataAnalysisUtilities.hpp"
 
+DataSample performBinning(DataSample & rawData, const Parameters parameters)
+{
+	BinnedDataSample binnedData;
+	if ( parameters.useBinning)
+	{
+			std::cout << "Perform binning on data sample..." << std::endl;
+			if ( parameters.useNumberOfBinsForBinning)
+			{
+				binnedData = (BinnedDataSample) BinnedDataSampleFromNumberOfBins(rawData, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
+			}
+			else
+			{
+				binnedData = (BinnedDataSample) BinnedDataSampleFromBinsize(rawData, parameters.binsize, parameters.binningMustFitDataSampleSize);
+			}
+	}
+	return binnedData;
+}
+
+
 static double meanOfDataSample(DataSample & sampleIn)
 {
 	return sampleIn.getNthMoment(1);
@@ -46,13 +65,15 @@ static double unbiasedErrorOfVariance(DataSample & sampleIn)
 	return sqrt( unbiasedVarianceOfMean(varianceSample) );
 }
 
-EstimateAndError calcMeanAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn)
+EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
 	double mean;
 	double error;
+	
+	DataSample binnedData = performBinning(sampleIn, parameters);
 
-	mean = meanOfDataSample(sampleIn.getRawData());
-	error = sqrt( unbiasedVarianceOfMean(sampleIn.getBinnedData()) );
+	mean = meanOfDataSample(sampleIn);
+	error = sqrt( unbiasedVarianceOfMean(binnedData) );
 
 	return EstimateAndError(mean, error);
 }
@@ -79,13 +100,15 @@ EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampl
 	return EstimateAndError(variance, error);
 }
 
-EstimateAndError calcVarianceAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn)
+EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
 	double variance;
 	double error;
 
-	variance = unbiasedVarianceOfDataSample(sampleIn.getRawData());
-	error = unbiasedErrorOfVariance(sampleIn.getBinnedData());
+	DataSample binnedData = performBinning(sampleIn, parameters);
+	
+	variance = unbiasedVarianceOfDataSample(sampleIn);
+	error = unbiasedErrorOfVariance(binnedData);
 
 	return EstimateAndError(variance, error);
 }
@@ -93,7 +116,7 @@ EstimateAndError calcVarianceAndErrorOfDataSample(RawAndBinnedDataSample & sampl
 //todo: this include should not be necessary in the end
 #include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
 
-EstimateAndError calcSkewnessAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn, Parameters parameters)
+EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
 	/**
 		* Skewness gamma_1 is defined as:
@@ -102,10 +125,10 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(RawAndBinnedDataSample & sampl
 	double skewness = 0.;
 	double error = 0.;
 	
-	skewness = sampleIn.getRawData().getNthCentralMoment(3) / pow (sampleIn.getRawData().getNthCentralMoment(2),(3./2.) );
+	skewness = sampleIn.getNthCentralMoment(3) / pow (sampleIn.getNthCentralMoment(2),(3./2.) );
 	
-	DataSample thirdCentralMoment = (sampleIn.getRawData() - sampleIn.getRawData().getNthMoment(1)) ^ 3;
-	DataSample secondCentralMoment = (sampleIn.getRawData() - sampleIn.getRawData().getNthMoment(1)) ^ 2;
+	DataSample thirdCentralMoment = (sampleIn - sampleIn.getNthMoment(1)) ^ 3;
+	DataSample secondCentralMoment = (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
 	
 	BinnedDataSample * binnedSample1 = NULL;
 	BinnedDataSample * binnedSample2 = NULL;
@@ -132,7 +155,7 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(RawAndBinnedDataSample & sampl
 }
 
 //todo: repair: this is acutally binder, rename? print also kurtosis?
-EstimateAndError calcKurtosisAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn, Parameters parameters)
+EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
 	/**
 	 * The Fourth Std. Moment beta_2 is defined as:
@@ -141,11 +164,11 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(RawAndBinnedDataSample & sampl
 	 * The Kurtosis gamma_2 is defined as:
 	 *   gamma_2 = beta_2 - 3
 	 */
-	double kurtosis = sampleIn.getRawData().getNthCentralMoment(4) / pow (sampleIn.getRawData().getNthCentralMoment(2),2. );
+	double kurtosis = sampleIn.getNthCentralMoment(4) / pow (sampleIn.getNthCentralMoment(2),2. );
 	double error = 0.;
 	
-	DataSample fourthCentralMoment = (sampleIn.getRawData() - sampleIn.getRawData().getNthMoment(1)) ^ 4;
-	DataSample secondCentralMoment = (sampleIn.getRawData() - sampleIn.getRawData().getNthMoment(1)) ^ 2;
+	DataSample fourthCentralMoment = (sampleIn - sampleIn.getNthMoment(1)) ^ 4;
+	DataSample secondCentralMoment = (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
 	
 	DataSample * binnedSample1 = NULL;
 	DataSample * binnedSample2 = NULL;

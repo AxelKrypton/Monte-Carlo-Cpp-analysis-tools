@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 
 		RawAndBinnedDataSample sample(file, parameters);
 
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample);
+		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample.getRawData(), parameters);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 
 		RawAndBinnedDataSample sample(file, parameters);
 
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample);
+		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample.getRawData(), parameters);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 	
 		RawAndBinnedDataSample sample(gaussianData, parameters);
 
-		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(sample);
+		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(sample.getRawData(), parameters);
 		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedVariance, expectedPrecisionInPercent);
 		BOOST_CHECK_SMALL(varianceAndError.error, expectedError);
 }
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 	
 		RawAndBinnedDataSample sample(gaussianData, parameters);
 
-		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
+		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample.getRawData(), parameters);
 		BOOST_CHECK_CLOSE(skewnessAndError.estimate, expectedSkewness, expectedPrecisionInPercent);
 		BOOST_CHECK_SMALL(skewnessAndError.error, expectedError);
 	}
@@ -292,12 +292,13 @@ BOOST_AUTO_TEST_SUITE(kurtosisAndError)
 	
 		RawAndBinnedDataSample sample(gaussianData, parameters);
 
-		EstimateAndError kurtosisAndError = calcKurtosisAndErrorOfDataSample(sample, parameters);
+		EstimateAndError kurtosisAndError = calcKurtosisAndErrorOfDataSample(sample.getRawData(), parameters);
 		BOOST_CHECK_CLOSE(kurtosisAndError.estimate, expectedKurtosis, expectedPrecisionInPercent);
 		BOOST_CHECK_SMALL(kurtosisAndError.error, expectedError);
 	}
 	
 BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 
 	BOOST_AUTO_TEST_CASE(noBinning)

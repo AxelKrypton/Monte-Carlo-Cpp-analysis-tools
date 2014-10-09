@@ -34,11 +34,11 @@ private:
 };
 
 EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
-EstimateAndError calcMeanAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn);
+EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
-EstimateAndError calcVarianceAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn);
-EstimateAndError calcSkewnessAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn, Parameters parameters);
-EstimateAndError calcKurtosisAndErrorOfDataSample(RawAndBinnedDataSample & sampleIn, Parameters parameters);
+EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
+EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
+EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters);
 
 std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEstimatesOfDataSample(DataSample & sample, Parameters parameters);
