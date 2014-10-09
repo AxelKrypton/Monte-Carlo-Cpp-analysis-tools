@@ -336,7 +336,7 @@ BOOST_AUTO_TEST_SUITE(binderAndError)
 		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
 		
 		double expectedKurtosis = 3.;
-		double expectedError = 1e-2;
+		double expectedError = 1e-4;
 
 		double expectedPrecisionInPercent = 1;
 

@@ -167,6 +167,11 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 	return EstimateAndError(skewness, error);
 }
 
+DataSample calcBinder(DataSample & in1, DataSample & in2)
+{
+	return in1 / (in2 ^ 2);
+}
+
 EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
 	/**
@@ -176,7 +181,7 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
 	 * The Kurtosis gamma_2 is defined as:
 	 *   gamma_2 = beta_2 - 3
 	 */
-	double kurtosis = sampleIn.getNthCentralMoment(4) / pow (sampleIn.getNthCentralMoment(2),2. );
+	double binder = sampleIn.getNthCentralMoment(4) / pow (sampleIn.getNthCentralMoment(2),2. );
 	double error = 0.;
 	
 	DataSample fourthCentralMoment = (sampleIn - sampleIn.getNthMoment(1)) ^ 4;
@@ -187,11 +192,12 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
 
 	JackknifeEstimators jackSample1(binnedSample1);
 	JackknifeEstimators jackSample2(binnedSample2);
-	//this calculates x_i / y_i^2, where x_i and y_i are the jackknife estimators of the fourth and second moment
-	JackknifeEstimators kurtosisSample(jackSample1 / (jackSample2 ^ 2));
-	error = kurtosisSample.getJackknifeError();
 	
-	return EstimateAndError(kurtosis, error);
+	DataSample binderSample = calcBinder(jackSample1, jackSample2);
+
+	error = calculateJacknifeError(binderSample);
+	
+	return EstimateAndError(binder, error);
 }
 
 /*
