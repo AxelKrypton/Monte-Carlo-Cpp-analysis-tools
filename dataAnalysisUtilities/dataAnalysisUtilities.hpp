@@ -38,7 +38,7 @@ EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters 
 EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
 EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
-EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
+EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters parameters);
 
 std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEstimatesOfDataSample(DataSample & sample, Parameters parameters);

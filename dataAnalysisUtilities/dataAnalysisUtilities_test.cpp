@@ -276,7 +276,7 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 	
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(kurtosisAndError)
+BOOST_AUTO_TEST_SUITE(binderAndError)
 
 	BOOST_AUTO_TEST_CASE(withBinning)
 	{
@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_SUITE(kurtosisAndError)
 	
 		RawAndBinnedDataSample sample(gaussianData, parameters);
 
-		EstimateAndError kurtosisAndError = calcKurtosisAndErrorOfDataSample(sample.getRawData(), parameters);
+		EstimateAndError kurtosisAndError = calcBinderAndErrorOfDataSample(sample.getRawData(), parameters);
 		BOOST_CHECK_CLOSE(kurtosisAndError.estimate, expectedKurtosis, expectedPrecisionInPercent);
 		BOOST_CHECK_SMALL(kurtosisAndError.error, expectedError);
 	}

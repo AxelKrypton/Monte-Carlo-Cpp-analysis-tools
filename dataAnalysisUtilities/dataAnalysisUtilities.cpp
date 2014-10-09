@@ -154,8 +154,7 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 	return EstimateAndError(skewness, error);
 }
 
-//todo: repair: this is acutally binder, rename? print also kurtosis?
-EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
+EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
 	/**
 	 * The Fourth Std. Moment beta_2 is defined as:
