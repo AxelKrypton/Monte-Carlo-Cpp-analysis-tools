@@ -3,16 +3,7 @@
 
 #include "DataSample.hpp"
 #include "../Parameters/Parameters.hpp"
-
-class EstimateAndError
-{
-public:
-	EstimateAndError();
-	EstimateAndError(double mean, double error);
-
-	double estimate;
-	double error;
-};
+#include "EstimateAndError.hpp"
 
 DataSample performBinning(DataSample & rawData, const Parameters parameters);
 

@@ -2,6 +2,7 @@
 
 #include "binnedDataSample.hpp"
 #include "../IO/io_utilities.hpp"
+#include "jackknifeAnalysis.hpp"
 
 DataSample performBinning(DataSample & rawData, const Parameters parameters)
 {
@@ -132,25 +133,9 @@ EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn, Paramet
 	return calcVarianceAndError(sampleIn, parameters, true);
 }
 
-//todo: this include should not be necessary in the end
-#include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
-
 DataSample calcSkewness(DataSample & in1, DataSample & in2)
 {
 	return in1 / (in2 ^ (3. / 2));
-}
-
-EstimateAndError jackknifeAnalysis(DataSample sample1, DataSample sample2, DataSample (*function)(DataSample&, DataSample&) )
-{
-	JackknifeEstimators jackSample1(sample1);
-	JackknifeEstimators jackSample2(sample2);
-	
-	DataSample functionAppliedToEstimators = function(jackSample1, jackSample2);
-	
-	double estimate = calculateJacknifeEstimator(functionAppliedToEstimators);
-	double error = calculateJacknifeError(functionAppliedToEstimators);
-	
-	return EstimateAndError(estimate, error);
 }
 
 EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
@@ -225,6 +210,10 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
  *        This is up to the user, but if it is not given, then it is set to 10 (in principle fine for a data sample
  *        with more than 1000 data).
  */
+
+//todo: this include should not be necessary in the end
+#include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
+
 static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(DataSample & sample, int time);
 static std::vector<BinnedDataSampleFromNumberOfBins> calcAutocorrelationFunctionValuesBinnedSets(DataSample & sample, Parameters parameters);
 
@@ -318,12 +307,4 @@ static std::vector<BinnedDataSampleFromNumberOfBins> calcAutocorrelationFunction
 	return autocorrelationFunctionValuesBinnedSets;
 }
 
-
-EstimateAndError::EstimateAndError() :
-	estimate(0.), error(0.)
-{}
-
-EstimateAndError::EstimateAndError(double mean, double error) :
-	estimate(mean), error(error)
-{}
 

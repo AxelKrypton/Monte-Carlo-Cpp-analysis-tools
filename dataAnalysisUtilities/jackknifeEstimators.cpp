@@ -17,8 +17,6 @@ DataSample(sampleIn)
 	setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
 }
 
-//todo: the following fcts. are just copied here during refactoring!
-
 void checkDiscardedElements(int valueIn, std::string descriptionIn, int numberOfElements)
 {
 	int discardedElements = numberOfElements % valueIn;
@@ -47,21 +45,9 @@ double JackknifeEstimators::getJackknifeVariance()
 	return tmp.getNthMoment(1) * getJackknifeNormalization();
 }
 
-double calculateJacknifeError(DataSample & sampleIn)
-{
-	int jackknifeNormalization = sampleIn.getNumberOfElements() - 1;
-	DataSample tmp ( (sampleIn - sampleIn.getNthMoment(1) )^( (double(2)) )  );
-	return tmp.getNthMoment(1) * jackknifeNormalization;
-}
-
 double JackknifeEstimators::getJackknifeError()
 {
 	return sqrt(getJackknifeVariance());
-}
-
-double calculateJacknifeEstimator(DataSample & sampleIn)
-{
-	return sampleIn.getNthMoment(1);
 }
 
 int JackknifeEstimators::getJackknifeNormalization()
