@@ -14,20 +14,22 @@ EstimateAndError::EstimateAndError(double mean, double error) :
 
 DataSample performBinning(DataSample & rawData, const Parameters parameters)
 {
-	BinnedDataSample binnedData;
-	if ( parameters.useBinning)
+	if ( parameters.useBinning )
 	{
 			std::cout << "Perform binning on data sample..." << std::endl;
 			if ( parameters.useNumberOfBinsForBinning)
 			{
-				binnedData = (BinnedDataSample) BinnedDataSampleFromNumberOfBins(rawData, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
+				return performBinningFromNumberOfBins(rawData, parameters.numberOfBins, parameters.adjustDataSampleSizeToBinning, parameters.binningMustFitDataSampleSize);
 			}
 			else
 			{
-				binnedData = (BinnedDataSample) BinnedDataSampleFromBinsize(rawData, parameters.binsize, parameters.binningMustFitDataSampleSize);
+				return performBinningFromBinsize(rawData, parameters.binsize, parameters.adjustDataSampleSizeToBinning, parameters.binningMustFitDataSampleSize);
 			}
 	}
-	return binnedData;
+	else
+	{
+		throw std::invalid_argument("Binning requested, but have different inputparameters!");
+	}
 }
 
 static double meanOfDataSample(DataSample & sampleIn)
