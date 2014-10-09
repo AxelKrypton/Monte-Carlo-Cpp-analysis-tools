@@ -177,22 +177,11 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
 	DataSample fourthCentralMoment = (sampleIn - sampleIn.getNthMoment(1)) ^ 4;
 	DataSample secondCentralMoment = (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
 	
-	DataSample * binnedSample1 = NULL;
-	DataSample * binnedSample2 = NULL;
-	
-	if ( parameters.useNumberOfBinsForBinning)
-	{
-		binnedSample1 = new BinnedDataSampleFromNumberOfBins(fourthCentralMoment, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
-		binnedSample2 = new BinnedDataSampleFromNumberOfBins(secondCentralMoment, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
-	}
-	else
-	{
-		binnedSample1 = new BinnedDataSampleFromBinsize(fourthCentralMoment, parameters.binsize, parameters.binningMustFitDataSampleSize);
-		binnedSample2 = new BinnedDataSampleFromBinsize(secondCentralMoment, parameters.binsize, parameters.binningMustFitDataSampleSize);
-	}
-	
-	JackknifeEstimatorsFromBinnedDataSample jackSample1(*binnedSample1);
-	JackknifeEstimatorsFromBinnedDataSample jackSample2(*binnedSample2);
+	DataSample binnedSample1 = performBinning(fourthCentralMoment, parameters);
+	DataSample binnedSample2 = performBinning(secondCentralMoment, parameters);	
+
+	JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
+	JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
 	//this calculates x_i / y_i^2, where x_i and y_i are the jackknife estimators of the fourth and second moment
 	JackknifeEstimators kurtosisSample(jackSample1 / (jackSample2 ^ 2));
 	error = kurtosisSample.getJackknifeError();
