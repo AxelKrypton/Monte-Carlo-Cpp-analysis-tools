@@ -87,17 +87,11 @@ DataSampleBasic JackknifeEstimators::createJackknifeEstimatorsWithBinning(int nu
 	return binnedDataSample;
 }
 
-JackknifeEstimatorsFromBinnedDataSample::JackknifeEstimatorsFromBinnedDataSample(DataSample sampleIn) :
-JackknifeEstimators(sampleIn)
-{
-	int normalization = getJackknifeNormalization();
-	double sumOfDataSampleElements = sampleIn.sum();
-	setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
-}
-
+//TODO: remove both "setValues(sampleIn)". They are "undoing" the setting from the constructor of JackknifeEstimators.
 JackknifeEstimatorsFromBinningWithNumberOfBins::JackknifeEstimatorsFromBinningWithNumberOfBins(DataSample sampleIn, int numberOfBins) :
 	JackknifeEstimators(sampleIn)
 {
+	setValues(sampleIn);
 	checkIfJackknifeCanBePerformed(numberOfBins);
 	int binsize = calcBinsize(numberOfBins, sampleIn.getNumberOfElements());
 	setValues( createJackknifeEstimatorsWithBinning(numberOfBins, binsize) );
@@ -106,6 +100,7 @@ JackknifeEstimatorsFromBinningWithNumberOfBins::JackknifeEstimatorsFromBinningWi
 JackknifeEstimatorsFromBinningWithBinsize::JackknifeEstimatorsFromBinningWithBinsize(DataSample sampleIn, int binsize) :
 	JackknifeEstimators(sampleIn)
 {
+	setValues(sampleIn);
 	checkIfJackknifeCanBePerformedWithBinsize(binsize);
 	int numberOfBins = calcBinsize(binsize, sampleIn.getNumberOfElements());
 	setValues( createJackknifeEstimatorsWithBinning(numberOfBins, binsize) );

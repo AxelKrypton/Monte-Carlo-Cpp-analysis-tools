@@ -16,21 +16,19 @@
 class JackknifeEstimators: public DataSample
 {
 public:
-
 	JackknifeEstimators(int numberOfElementsIn) :
 		DataSample(numberOfElementsIn)
 	{
 		checkIfJackknifeCanBePerformed(numberOfElements);
-		DataSampleBasic tmp = calculatePseudoValues();
-		setValues(tmp);
 	};
 
 	JackknifeEstimators(DataSample sampleIn) :
 		DataSample(sampleIn)
 	{
-		checkIfJackknifeCanBePerformed(numberOfElements);
-		DataSampleBasic tmp = calculatePseudoValues();
-		setValues(tmp);
+		int normalization = getJackknifeNormalization();
+		double sumOfDataSampleElements = sampleIn.sum();
+		//todo: do this removing specific elements -> less rounding errors
+		setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
 	};
 
 	double getJackknifeVariance();
@@ -42,14 +40,6 @@ protected:
 	void checkIfJackknifeCanBePerformed(int n);
 	//todo: is this simply blocked binning and not jackknifing?
 	DataSampleBasic createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize);
-};
-
-//todo: this is based on the jackknife prescription from Berg and needs to be changed!
-//todo: or perhaps only use these for mean and variance?
-class JackknifeEstimatorsFromBinnedDataSample: public JackknifeEstimators
-{
-public:
-	JackknifeEstimatorsFromBinnedDataSample(DataSample sampleIn);
 };
 
 class JackknifeEstimatorsFromBinningWithNumberOfBins: public JackknifeEstimators

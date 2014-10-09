@@ -152,8 +152,8 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 	DataSample binnedSample1 = performBinning(thirdCentralMomentSample, parameters);
 	DataSample binnedSample2 = performBinning(secondCentralMomentSample, parameters);
 	
-	JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
-	JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
+	JackknifeEstimators jackSample1(binnedSample1);
+	JackknifeEstimators jackSample2(binnedSample2);
 	//this calculates x_i / y_i, where x_i and y_i are the jackknife estimators of the third and second moment
 	JackknifeEstimators skewnessSample(jackSample1 / (jackSample2 ^ (3. / 2)));
 	
@@ -180,8 +180,8 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
 	DataSample binnedSample1 = performBinning(fourthCentralMoment, parameters);
 	DataSample binnedSample2 = performBinning(secondCentralMoment, parameters);	
 
-	JackknifeEstimatorsFromBinnedDataSample jackSample1(binnedSample1);
-	JackknifeEstimatorsFromBinnedDataSample jackSample2(binnedSample2);
+	JackknifeEstimators jackSample1(binnedSample1);
+	JackknifeEstimators jackSample2(binnedSample2);
 	//this calculates x_i / y_i^2, where x_i and y_i are the jackknife estimators of the fourth and second moment
 	JackknifeEstimators kurtosisSample(jackSample1 / (jackSample2 ^ 2));
 	error = kurtosisSample.getJackknifeError();
@@ -234,7 +234,7 @@ std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEstimat
 
 	std::vector<EstimateAndError> result;
 	for(int time=0; time<parameters.timeMaxAutocorrelationFunction; time++){
-		JackknifeEstimatorsFromBinnedDataSample jackSample(autocorrelationFunctionValuesBinnedSets[time]);
+		JackknifeEstimators jackSample(autocorrelationFunctionValuesBinnedSets[time]);
 		result.push_back(EstimateAndError(autocorrelationFunctionValuesBinnedSets[time].getNthMoment(1), jackSample.getJackknifeError()));
 	}
 
@@ -258,7 +258,7 @@ std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEstimatesOf
 
 	std::vector<EstimateAndError> result;
 	for(int time=0; time<parameters.timeMaxAutocorrelationFunction; time++){
-		JackknifeEstimatorsFromBinnedDataSample jackSample(integratedTimeBinnedSets[time]);
+		JackknifeEstimators jackSample(integratedTimeBinnedSets[time]);
 		result.push_back(EstimateAndError(integratedTimeBinnedSets[time].getNthMoment(1), jackSample.getJackknifeError()));
 	}
 
