@@ -1,5 +1,5 @@
-#ifndef DATASAMPLEANALYZER_HPP_
-#define DATASAMPLEANALYZER_HPP_
+#ifndef DATASAMPLE_HPP_
+#define DATASAMPLE_HPP_
 
 #include "DataSampleBasic.hpp"
 
