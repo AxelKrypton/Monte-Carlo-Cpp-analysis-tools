@@ -334,5 +334,49 @@ BOOST_AUTO_TEST_SUITE(binningWithBinsizeAndNumberOfBins)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(resizeRawDataDuringBinning)
 
+	//file has 21 entries, first 20 are 1, last one is zero
+	std::string filename = "datafile3.example";
+	
+	BOOST_AUTO_TEST_CASE(test1)
+	{
+		int numberOfElements = 543;
+		int numberOfBins = 1;
+		DataSample sample(numberOfElements);
 
+		DataSample binnedSample = performBinningFromNumberOfBins(sample, numberOfBins, false);
+		BOOST_REQUIRE_EQUAL(sample.getNumberOfElements(), numberOfElements);
+	}
+	
+	BOOST_AUTO_TEST_CASE(test2)
+	{
+		int numberOfElements = 543;
+		int numberOfBins = 5;
+		DataSample sample(numberOfElements);
+
+		DataSample binnedSample = performBinningFromNumberOfBins(sample, numberOfBins, true);
+		BOOST_REQUIRE_EQUAL(sample.getNumberOfElements(), numberOfElements - numberOfElements % numberOfBins);
+	}
+	
+	BOOST_AUTO_TEST_CASE(test3)
+	{
+		int numberOfElements = 543;
+		int binsize = 5;
+		DataSample sample(numberOfElements);
+
+		DataSample binnedSample = performBinningFromBinsize(sample, binsize, false);
+		BOOST_REQUIRE_EQUAL(sample.getNumberOfElements(), numberOfElements);
+	}
+	
+	BOOST_AUTO_TEST_CASE(test4)
+	{
+		int numberOfElements = 543;
+		int binsize = 5;
+		DataSample sample(numberOfElements);
+
+		DataSample binnedSample = performBinningFromBinsize(sample, binsize, true);
+		BOOST_REQUIRE_EQUAL(sample.getNumberOfElements(), numberOfElements - numberOfElements % binsize);
+	}
+	
+BOOST_AUTO_TEST_SUITE_END()

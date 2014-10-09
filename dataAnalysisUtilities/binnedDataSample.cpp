@@ -91,3 +91,35 @@ BinnedDataSampleFromBinsize::BinnedDataSampleFromBinsize(DataSampleBasic sampleI
 	setValues(performBinning(sampleIn));
 }
 
+void resizeRawDataSample(DataSample & rawData, BinnedDataSample & binnedData, bool adjustDataSampleSizeToBinning)
+{
+	if( adjustDataSampleSizeToBinning && !binnedData.doesBinningFitBinsize() )
+	{
+		std::cout << "# Adjusting data sample size..." << std::endl;
+		rawData = rawData.removeLastNElements(binnedData.getNumberOfDiscardedElements() );
+	}
+	else if (!binnedData.doesBinningFitBinsize() )
+	{
+		std::cout << "# WARNING: Elements are discarded for binned quantities only!" << std::endl;
+	}
+}
+
+DataSample performBinningFromNumberOfBins(DataSample & rawData, int numberOfBins, bool adjustDataSampleSizeToBinning, bool binningMustFitDataSampleSize)
+{
+	BinnedDataSample binnedData;
+	binnedData = (BinnedDataSample) BinnedDataSampleFromNumberOfBins(rawData, numberOfBins, binningMustFitDataSampleSize);
+	
+	resizeRawDataSample(rawData, binnedData, adjustDataSampleSizeToBinning);
+	
+	return binnedData;
+}
+
+DataSample performBinningFromBinsize(DataSample & rawData, int binsize, bool adjustDataSampleSizeToBinning, bool binningMustFitDataSampleSize)
+{
+	BinnedDataSample binnedData;
+	binnedData = (BinnedDataSample) BinnedDataSampleFromBinsize(rawData, binsize, binningMustFitDataSampleSize);
+	
+	resizeRawDataSample(rawData, binnedData, adjustDataSampleSizeToBinning);
+	
+	return binnedData;
+}

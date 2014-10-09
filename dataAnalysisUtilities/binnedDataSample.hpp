@@ -47,4 +47,8 @@ protected:
 	void calcNumberOfBins(int elementsOfSample);
 };
 
+DataSample performBinningFromNumberOfBins(DataSample & rawData, int numberOfBins, bool adjustDataSampleSizeToBinning = true, bool binningMustFitDataSampleSize = false);
+
+DataSample performBinningFromBinsize(DataSample & rawData, int binsize, bool adjustDataSampleSizeToBinning = true, bool binningMustFitDataSampleSize = false);
+
 #endif /* BINNEDDATASAMPLE_HPP_ */
