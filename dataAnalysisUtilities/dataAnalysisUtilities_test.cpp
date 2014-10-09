@@ -352,45 +352,6 @@ BOOST_AUTO_TEST_SUITE(binderAndError)
 	
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
-
-	BOOST_AUTO_TEST_CASE(noBinning)
-	{
-		std::string fileThatDoesExist = "datafile.example";
-		double elementsInFile = 1005.;
-		const char * arguments[] = {"foo", "foo", "--useBinning"};
-		Parameters parameters(3, arguments);
-		DataSample tmp(fileThatDoesExist);
-		
-		BOOST_CHECK_EQUAL(elementsInFile, tmp.getNumberOfElements());
-	}
-
-	BOOST_AUTO_TEST_CASE(binningWithNumberOfBins)
-	{
-		std::string fileThatDoesExist = "datafile.example";
-		const char * arguments[] = {"foo", "foo"};
-		Parameters parameters(2, arguments);
-
-		int expectedNumberOfElements = parameters.numberOfBins;
-		DataSample tmp(fileThatDoesExist);
-		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getNumberOfElements());
-	}
-
-	BOOST_AUTO_TEST_CASE(binningWithBinsize)
-	{
-		std::string fileThatDoesExist = "datafile.example";
-		double elementsInFile = 1005.;
-		const char * arguments[] = {"foo", "foo", "--binsize=10"};
-		Parameters parameters(3, arguments);
-
-		int expectedNumberOfElements = (int) elementsInFile / 10;
-		DataSample tmp(fileThatDoesExist);
-		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getNumberOfElements());
-	}
-
-BOOST_AUTO_TEST_SUITE_END()
-
-
 BOOST_AUTO_TEST_SUITE(autocorrelation)
 
 	BOOST_AUTO_TEST_CASE(corrFuncTestVsBerg)

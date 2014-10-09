@@ -3,15 +3,6 @@
 #include "binnedDataSample.hpp"
 #include "../IO/io_utilities.hpp"
 
-EstimateAndError::EstimateAndError() :
-	estimate(0.), error(0.)
-{}
-
-EstimateAndError::EstimateAndError(double mean, double error) :
-	estimate(mean), error(error)
-{}
-
-
 DataSample performBinning(DataSample & rawData, const Parameters parameters)
 {
 	if ( parameters.useBinning )
@@ -348,5 +339,11 @@ static std::vector<BinnedDataSampleFromNumberOfBins> calcAutocorrelationFunction
 }
 
 
+EstimateAndError::EstimateAndError() :
+	estimate(0.), error(0.)
+{}
 
+EstimateAndError::EstimateAndError(double mean, double error) :
+	estimate(mean), error(error)
+{}
 
