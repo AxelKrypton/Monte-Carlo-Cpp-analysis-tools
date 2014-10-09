@@ -22,17 +22,6 @@ public:
 	double error;
 };
 
-class RawAndBinnedDataSample
-{
-public:
-	RawAndBinnedDataSample(std::string filename, Parameters parameters);
-	DataSample & getRawData() {return rawData;}
-	BinnedDataSample & getBinnedData() {return binnedData;}
-private:
-	DataSample rawData;
-	BinnedDataSample binnedData;
-};
-
 EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);

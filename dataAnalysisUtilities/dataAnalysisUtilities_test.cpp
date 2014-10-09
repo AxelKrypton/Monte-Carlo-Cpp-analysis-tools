@@ -70,9 +70,9 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 		const char * arguments[] = {"foo", argumentFile.c_str(), argumentBinsize.c_str()};
 		Parameters parameters(3, arguments);
 
-		RawAndBinnedDataSample sample(file, parameters);
+		DataSample sample(file);
 
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample.getRawData(), parameters);
+		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample, parameters);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
@@ -117,9 +117,9 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 		const char * arguments[] = {"foo", argumentFile.c_str(), argumentBinsize.c_str()};
 		Parameters parameters(3, arguments);
 
-		RawAndBinnedDataSample sample(file, parameters);
+		DataSample sample(file);
 
-		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample.getRawData(), parameters);
+		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample, parameters);
 		BOOST_CHECK_CLOSE(meanAndError.error, expectedValue, testPrecision);
 	}
 
@@ -244,9 +244,9 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
 		Parameters parameters(3, arguments);
 	
-		RawAndBinnedDataSample sample(gaussianData, parameters);
+		DataSample sample(gaussianData);
 
-		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(sample.getRawData(), parameters);
+		EstimateAndError varianceAndError = calcVarianceAndErrorOfDataSample(sample, parameters);
 		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedVariance, expectedPrecisionInPercent);
 		BOOST_CHECK_SMALL(varianceAndError.error, expectedError);
 }
@@ -267,9 +267,9 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
 		Parameters parameters(3, arguments);
 	
-		RawAndBinnedDataSample sample(gaussianData, parameters);
+		DataSample sample(gaussianData);
 
-		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample.getRawData(), parameters);
+		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
 		BOOST_CHECK_CLOSE(skewnessAndError.estimate, expectedSkewness, expectedPrecisionInPercent);
 		BOOST_CHECK_SMALL(skewnessAndError.error, expectedError);
 	}
@@ -290,9 +290,9 @@ BOOST_AUTO_TEST_SUITE(binderAndError)
 		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
 		Parameters parameters(3, arguments);
 	
-		RawAndBinnedDataSample sample(gaussianData, parameters);
+		DataSample sample(gaussianData);
 
-		EstimateAndError kurtosisAndError = calcBinderAndErrorOfDataSample(sample.getRawData(), parameters);
+		EstimateAndError kurtosisAndError = calcBinderAndErrorOfDataSample(sample, parameters);
 		BOOST_CHECK_CLOSE(kurtosisAndError.estimate, expectedKurtosis, expectedPrecisionInPercent);
 		BOOST_CHECK_SMALL(kurtosisAndError.error, expectedError);
 	}
@@ -307,9 +307,9 @@ BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 		double elementsInFile = 1005.;
 		const char * arguments[] = {"foo", "foo", "--useBinning"};
 		Parameters parameters(3, arguments);
-		RawAndBinnedDataSample tmp(fileThatDoesExist, parameters);
+		DataSample tmp(fileThatDoesExist);
 		
-		BOOST_CHECK_EQUAL(elementsInFile, tmp.getRawData().getNumberOfElements());
+		BOOST_CHECK_EQUAL(elementsInFile, tmp.getNumberOfElements());
 	}
 
 	BOOST_AUTO_TEST_CASE(binningWithNumberOfBins)
@@ -319,8 +319,8 @@ BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 		Parameters parameters(2, arguments);
 
 		int expectedNumberOfElements = parameters.numberOfBins;
-		RawAndBinnedDataSample tmp(fileThatDoesExist, parameters);
-		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getBinnedData().getNumberOfElements());
+		DataSample tmp(fileThatDoesExist);
+		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getNumberOfElements());
 	}
 
 	BOOST_AUTO_TEST_CASE(binningWithBinsize)
@@ -331,8 +331,8 @@ BOOST_AUTO_TEST_SUITE(createDataSampleFromFile)
 		Parameters parameters(3, arguments);
 
 		int expectedNumberOfElements = (int) elementsInFile / 10;
-		RawAndBinnedDataSample tmp(fileThatDoesExist, parameters);
-		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getBinnedData().getNumberOfElements());
+		DataSample tmp(fileThatDoesExist);
+		BOOST_CHECK_EQUAL(expectedNumberOfElements, tmp.getNumberOfElements());
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

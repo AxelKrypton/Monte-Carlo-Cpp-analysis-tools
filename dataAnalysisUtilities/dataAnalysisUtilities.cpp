@@ -291,43 +291,44 @@ void calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters par
 	writeEstimateAndErrorArraysToFile("auto", estimates, errors, filename);
 }
 
-RawAndBinnedDataSample::RawAndBinnedDataSample(std::string filename, Parameters parameters)
-{
-	rawData = DataSample(filename);
-	if ( parameters.useBinning)
-	{
-		if (parameters.calcAutocorrelation)
-		{
-			std::cout << "Do not perform binning as the autocorrelation should be estimated!" << std::endl;
-			binnedData = BinnedDataSampleFromBinsize(rawData, 1, parameters.binningMustFitDataSampleSize);
-		}
-		else
-		{
-			std::cout << "Perform binning on data sample..." << std::endl;
-			if ( parameters.useNumberOfBinsForBinning)
-			{
-				binnedData = BinnedDataSampleFromNumberOfBins(rawData, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
-			}
-			else
-			{
-				binnedData = BinnedDataSampleFromBinsize(rawData, parameters.binsize, parameters.binningMustFitDataSampleSize);
-			}
-		}
-	}
-	else
-	{
-		binnedData = BinnedDataSampleFromBinsize(rawData, 1, parameters.binningMustFitDataSampleSize);
-	}
-	if( parameters.adjustDataSampleSizeToBinning && !binnedData.doesBinningFitBinsize() )
-	{
-		std::cout << "# Adjusting data sample size..." << std::endl;
-		rawData = rawData.removeLastNElements(binnedData.getNumberOfDiscardedElements() );
-	}
-	else if (!binnedData.doesBinningFitBinsize() )
-	{
-		std::cout << "# WARNING: Elements are discarded for binned quantities only!" << std::endl;
-	}
-}
+//TODO: implement the adjusting of the raw sample in the new fcts.!
+// RawAndBinnedDataSample::RawAndBinnedDataSample(std::string filename, Parameters parameters)
+// {
+// 	rawData = DataSample(filename);
+// 	if ( parameters.useBinning)
+// 	{
+// 		if (parameters.calcAutocorrelation)
+// 		{
+// 			std::cout << "Do not perform binning as the autocorrelation should be estimated!" << std::endl;
+// 			binnedData = BinnedDataSampleFromBinsize(rawData, 1, parameters.binningMustFitDataSampleSize);
+// 		}
+// 		else
+// 		{
+// 			std::cout << "Perform binning on data sample..." << std::endl;
+// 			if ( parameters.useNumberOfBinsForBinning)
+// 			{
+// 				binnedData = BinnedDataSampleFromNumberOfBins(rawData, parameters.numberOfBins, parameters.binningMustFitDataSampleSize);
+// 			}
+// 			else
+// 			{
+// 				binnedData = BinnedDataSampleFromBinsize(rawData, parameters.binsize, parameters.binningMustFitDataSampleSize);
+// 			}
+// 		}
+// 	}
+// 	else
+// 	{
+// 		binnedData = BinnedDataSampleFromBinsize(rawData, 1, parameters.binningMustFitDataSampleSize);
+// 	}
+// 	if( parameters.adjustDataSampleSizeToBinning && !binnedData.doesBinningFitBinsize() )
+// 	{
+// 		std::cout << "# Adjusting data sample size..." << std::endl;
+// 		rawData = rawData.removeLastNElements(binnedData.getNumberOfDiscardedElements() );
+// 	}
+// 	else if (!binnedData.doesBinningFitBinsize() )
+// 	{
+// 		std::cout << "# WARNING: Elements are discarded for binned quantities only!" << std::endl;
+// 	}
+// }
 
 /*****************************************************************************************/
 static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(DataSample & sample, int time)
