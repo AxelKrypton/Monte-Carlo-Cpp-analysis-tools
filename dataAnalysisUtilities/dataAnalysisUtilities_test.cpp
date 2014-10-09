@@ -290,11 +290,11 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		std::string gaussianData = "gaussianNumbers_0_1_0_3.dat";
 		
 		double expectedVariance = 1.;
-		double expectedError = 1e-3;
+		double expectedError = 5e-3;
 
 		double expectedPrecisionInPercent = 1;
 
-		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
+		const char * arguments[] = {"foo", "--binsize=1000", gaussianData.c_str()};
 		Parameters parameters(3, arguments);
 	
 		DataSample sample(gaussianData);
