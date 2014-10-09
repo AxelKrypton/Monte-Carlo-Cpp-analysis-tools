@@ -14,6 +14,8 @@ public:
 	double error;
 };
 
+DataSample performBinning(DataSample & rawData, const Parameters parameters);
+
 EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);

@@ -38,24 +38,6 @@ static double meanOfDataSample(DataSample & sampleIn)
 }
 
 /**
- * A biased estimate of the sample variance is the naive
- *   definition, the second central moment.
- * An unbiased estimate of variance of the sample is
- *   n/(n-1) * biasedEstimator(varianceOfSample)
- * and the estimate of the variance of the mean of the sample is always:
- *   varianceEstimator(sample) / n
- * because of the central limit theorem.
- * See B.A. Berg,
- * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis"
- * Note that for the mean the unbiased variance yields
- * the same error as jackknifing.
- */
-static double unbiasedVarianceOfDataSample(DataSample & sampleIn)
-{
-	return double(sampleIn.getNumberOfElements()) / double(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthCentralMoment(2);
-}
-
-/**
  * Note that the unbiased estimate of the 
  * variance of the mean is the same as the 
  * error coming from a jackknife analysis,
@@ -65,24 +47,6 @@ static double unbiasedVarianceOfDataSample(DataSample & sampleIn)
 static double unbiasedVarianceOfMean(DataSample & sampleIn)
 {
 	return 1. / double(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthCentralMoment(2);
-}
-
-static double unbiasedErrorOfVariance(DataSample & sampleIn)
-{
-	/**
-	 * A Jackknife analysis of the (naive) sample variance
-	 *   1/N Sum ( sample[i] - mean )^2
-	 * yields that the pseudovalues are
-	 *   N/(N-1) Sum ( sample[i] - mean )^2
-	 * (Example 3 in "Jackknife.pdf").
-	 * This means that the jackknife error estimate is
-	 *   sqrt(1/(N-1) * (Variance of the pseudo-values) )
-	 * Hence, one can generate a new sample with each entry x_j
-	 * the "variance" of entry x_j ( (x_j - mean)^2 ) and treat
-	 * it the same way as an error on a mean.
-	 */
-	DataSample varianceSample = (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
-	return sqrt( unbiasedVarianceOfMean(varianceSample) );
 }
 
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
@@ -103,28 +67,77 @@ EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)
 	return EstimateAndError(mean, error);
 }
 
-EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)
+/**
+ * A Jackknife analysis of the (naive) sample variance
+ *   1/N Sum ( sample[i] - mean )^2
+ * yields that the pseudovalues are
+ *   N/(N-1) Sum ( sample[i] - mean )^2
+ * (Example 3 in "Jackknife.pdf").
+ * This means that the jackknife error estimate is
+ *   sqrt(1/(N-1) * (Variance of the pseudo-values) )
+ * Hence, one can generate a new sample with each entry x_j
+ * the "variance" of entry x_j ( (x_j - mean)^2 ) and treat
+ * it the same way as an error on a mean.
+ */
+static double unbiasedErrorOfVariance(DataSample & varianceSample)
+{
+	return sqrt( unbiasedVarianceOfMean(varianceSample) );
+}
+
+/**
+ * A biased estimate of the sample variance is the naive
+ *   definition, the second central moment.
+ * An unbiased estimate of variance of the sample is
+ *   n/(n-1) * biasedEstimator(varianceOfSample)
+ * and the estimate of the variance of the mean of the sample is always:
+ *   varianceEstimator(sample) / n
+ * because of the central limit theorem.
+ * See B.A. Berg,
+ * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis"
+ * Note that for the mean the unbiased variance yields
+ * the same error as jackknifing.
+ */
+static double unbiasedVarianceOfDataSample(DataSample & sampleIn)
+{
+	return double(sampleIn.getNumberOfElements()) / double(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthCentralMoment(2);
+}
+
+static DataSample createVarianceSample(DataSample sampleIn)
+{
+	return (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
+}
+
+EstimateAndError calcVarianceAndError(DataSample & sampleIn, Parameters parameters, bool shouldUseBinning = false)
 {
 	double variance;
 	double error;
 
 	variance = unbiasedVarianceOfDataSample(sampleIn);
-	error = unbiasedErrorOfVariance(sampleIn);
+	
+	DataSample varianceSample = createVarianceSample(sampleIn);
+	if ( shouldUseBinning )
+	{
+		DataSample binnedData = performBinning(varianceSample, parameters);
+		error = unbiasedErrorOfVariance(binnedData);
+	}
+	else
+	{
+		error = unbiasedErrorOfVariance(varianceSample);
+	}
 
 	return EstimateAndError(variance, error);
 }
 
+EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)
+{
+	const char * dummyArguments[] = {"foo", "dummyFile"};
+	Parameters dummy(2, dummyArguments);
+	return calcVarianceAndError(sampleIn, dummy);
+}
+
 EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
-	double variance;
-	double error;
-
-	DataSample binnedData = performBinning(sampleIn, parameters);
-	
-	variance = unbiasedVarianceOfDataSample(sampleIn);
-	error = unbiasedErrorOfVariance(binnedData);
-
-	return EstimateAndError(variance, error);
+	return calcVarianceAndError(sampleIn, parameters, true);
 }
 
 //todo: this include should not be necessary in the end

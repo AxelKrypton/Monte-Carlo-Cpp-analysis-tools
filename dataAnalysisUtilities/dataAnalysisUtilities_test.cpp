@@ -60,7 +60,6 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
-#include <iomanip>
 
 void checkEstimateAndError(EstimateAndError expectedEstimateAndError, EstimateAndError calculatedEstimateAndError, double testPrecision)
 {
@@ -215,6 +214,8 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+#include <iomanip>
+
 BOOST_AUTO_TEST_SUITE(varianceAndError)
 
 	double expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
@@ -236,11 +237,10 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedValue, doublePrecisionInPercent);
 	}
 
-	static void testVarianceAndError(DataSample * sample, double expectedVariance, double expectedError, double testPrecision)
+	static void testVarianceAndError(DataSample * sample, EstimateAndError expected, double testPrecision)
 	{
 		EstimateAndError varianceAndError = calcVarianceAndErrorOfUncorrelatedDataSample(*sample);
-		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedVariance, testPrecision);
-		BOOST_CHECK_CLOSE(varianceAndError.error, expectedError, testPrecision);
+		checkEstimateAndError(expected, varianceAndError, testPrecision);
 	}
 
 	BOOST_AUTO_TEST_CASE(test1)
@@ -248,10 +248,11 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		int numberOfElements = 2674;
 		DataSample sample(numberOfElements);
 
-		double expectedMean = 0.;
+		double expectedVariance = 0.;
 		double expectedError = 0.;
-
-		testVarianceAndError(&sample, expectedMean, expectedError, doublePrecisionInPercent);
+		
+		EstimateAndError expected(expectedVariance, expectedError);
+		testVarianceAndError(&sample, expected, doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(test2)
@@ -260,10 +261,11 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		TestDataSample testSample(numberOfElements, ones);
 		DataSample* sample = testSample.getDataSample();
 
-		double expectedMean = 0.;
+		double expectedVariance = 0.;
 		double expectedError = 0.;
 
-		testVarianceAndError(sample, expectedMean, expectedError, doublePrecisionInPercent);
+		EstimateAndError expected(expectedVariance, expectedError);
+		testVarianceAndError(sample, expected, doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(test3)
@@ -279,7 +281,8 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		//the difference in the error estimate exceeds 1e-13, most likely due to rounding errors.
 		double testPrecision = doublePrecisionInPercent*1e3;
 
-		testVarianceAndError(sample, expectedVariance, expectedError, testPrecision);
+		EstimateAndError expected(expectedVariance, expectedError);
+		testVarianceAndError(sample, expected, testPrecision);
 	}
 
 	BOOST_AUTO_TEST_CASE(withBinning)
