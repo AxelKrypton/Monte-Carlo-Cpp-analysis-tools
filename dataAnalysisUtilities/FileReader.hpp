@@ -57,6 +57,9 @@ public:
 
 		if(isAnyEntryBad != NULL)
 			*isAnyEntryBad = anyBadEntry;
+		
+		std::cout << "# read " << data.size() << " data points from file \"" << filename << "\"" << std::endl;
+		
 		return DataSampleBasic( std::valarray<double>(data.data(), data.size()) );
 	}
 

@@ -8,8 +8,7 @@ class DatafileAnalyzer
 public:
 	DatafileAnalyzer(Parameters parameters)
 	{
-		//TODO: add parameters offset and column
-		DataSample data(parameters.file);
+		DataSample data(parameters.file, parameters.column, parameters.offset);
 		DataSampleAnalyzer analyzer(data, parameters);
 	}
 };
