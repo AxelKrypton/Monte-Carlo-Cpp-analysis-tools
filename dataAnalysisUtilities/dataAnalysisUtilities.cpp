@@ -150,11 +150,6 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 	return jackknifeAnalysis(binnedSample1, binnedSample2, calcSkewness);
 }
 
-DataSample calcBinder(DataSample & in1, DataSample & in2)
-{
-	return in1 / (in2 ^ 2);
-}
-
 EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
 	/**
@@ -169,6 +164,8 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
 	
 	DataSample binnedSample1 = performBinning(fourthCentralMoment, parameters);
 	DataSample binnedSample2 = performBinning(secondCentralMoment, parameters);	
+	
+	auto calcBinder = [] (DataSample & in1, DataSample & in2) -> DataSample { return in1 / (in2 ^ 2.); };
 
 	return jackknifeAnalysis(binnedSample1, binnedSample2, calcBinder);
 }
