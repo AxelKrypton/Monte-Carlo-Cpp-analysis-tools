@@ -6,6 +6,7 @@
 #include "dataAnalysisUtilities.hpp"
 
 #include "TestDataSample.hpp"
+#include "binning.hpp"
 
 BOOST_AUTO_TEST_SUITE(meanAndError)
 

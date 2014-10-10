@@ -1,6 +1,6 @@
 # include "dataAnalysisUtilities.hpp"
 
-#include "binnedDataSample.hpp"
+#include "binning.hpp"
 #include "../IO/io_utilities.hpp"
 #include "jackknifeAnalysis.hpp"
 
@@ -206,7 +206,8 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
  */
 
 //todo: this include should not be necessary in the end
-#include "../dataAnalysisUtilities/jackknifeEstimators.hpp"
+#include "jackknifeEstimators.hpp"
+#include "binnedDataSample.hpp"
 
 static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(DataSample & sample, int time);
 static std::vector<BinnedDataSampleFromNumberOfBins> calcAutocorrelationFunctionValuesBinnedSets(DataSample & sample, Parameters parameters);

@@ -6,6 +6,7 @@ add_library(dataAnalysisUtilities
 	dataAnalysisUtilities.cpp
 	DataSampleAnalyzer.cpp
 	jackknifeAnalysis.cpp
+	binning.cpp
 )
 
 target_link_libraries(dataAnalysisUtilities IO Parameters)

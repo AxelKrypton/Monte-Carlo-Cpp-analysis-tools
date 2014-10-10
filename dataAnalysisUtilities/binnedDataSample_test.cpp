@@ -4,6 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "binnedDataSample.hpp"
+#include "binning.hpp"
 
 #include "TestDataSample.hpp"
 #include "../executables/exceptions.hpp"
