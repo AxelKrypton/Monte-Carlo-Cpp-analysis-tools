@@ -17,6 +17,7 @@ Parameters::Parameters(int argc, const char ** argv)
 		("analysisOutputFilePrefix", po::value<std::string>(&analysisOutputFilePrefix)->default_value(""), "Prefix for filename of analysis results")
 		("analysisOutputFilePostfix", po::value<std::string>(&analysisOutputFilePostfix)->default_value("_stat"), "Postfix for filename of analysis results")
 		("offset,o", po::value<int>(&offset)->default_value(0), "Discard first <offset> values of data")
+		("column,c", po::value<int>(&column)->default_value(1), "Read data from column number <column> (must be >= 1)")
 		("analyzeMean", po::value<bool>(&analyzeMean)->default_value(true)->implicit_value(false), "Analyse data for mean")
 		("analyzeVariance", po::value<bool>(&analyzeVariance)->default_value(true)->implicit_value(false), "Analyse data for variance")
 		("analyzeSkewness", po::value<bool>(&analyzeSkewness)->default_value(true)->implicit_value(false), "Analyse data for skewness")
@@ -104,6 +105,7 @@ void Parameters::printParameters()
 	std::cout << "# Options:" << std::endl;
 	std::cout << "###############################" << std::endl;
 	std::cout << "# Datafile:\t" << file << std::endl;
+	std::cout << "# Use column:\t" << column << std::endl;
 	std::cout << "# Offset:\t" << offset << std::endl;
 	//todo: add output of observables which are analyzed
 	std::cout << "###############################" << std::endl;

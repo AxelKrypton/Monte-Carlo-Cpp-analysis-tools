@@ -98,6 +98,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		int offset_default = 0;
 		BOOST_REQUIRE_EQUAL(offset_default, createParametersForDefaultCheck().offset);
 	}
+	
+	BOOST_AUTO_TEST_CASE(column)
+	{
+		int column_default = 1;
+		BOOST_REQUIRE_EQUAL(column_default, createParametersForDefaultCheck().column);
+	}
 
 	BOOST_AUTO_TEST_CASE(useBinning)
 	{
@@ -268,7 +274,21 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		std::string argumentName = "-o";
 		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).offset);
 	}
+	
+	BOOST_AUTO_TEST_CASE(column1)
+	{
+		int newValue = 999;
+		std::string argumentName = "--column";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).column);
+	}
 
+	BOOST_AUTO_TEST_CASE(column2)
+	{
+		int newValue = 999;
+		std::string argumentName = "-c";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).column);
+	}
+	
 	static Parameters createParametersForArgumentSettingCheck_implicitOption(std::string argumentName)
 	{
 		std::string argument = argumentName;

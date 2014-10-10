@@ -20,6 +20,7 @@ public:
 	int numberOfBinsForAutocorrelation;
 	int timeMaxAutocorrelationFunction;
 	int offset;
+	int column;
 	bool useBinning;
 	bool useNumberOfBinsForBinning;
 	bool calcAutocorrelation;
