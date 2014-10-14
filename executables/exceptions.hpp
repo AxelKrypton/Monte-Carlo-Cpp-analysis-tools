@@ -2,6 +2,7 @@
 #define EXCEPTIONS_HPP_
 
 #include <exception>
+#include <stdexcept> 
 
 class wrongBinningParameter : public std::invalid_argument {
 public:
