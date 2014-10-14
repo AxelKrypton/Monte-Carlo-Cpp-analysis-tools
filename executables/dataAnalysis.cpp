@@ -1,3 +1,4 @@
+#include "../Parameters/Parameters.hpp"
 #include "../dataAnalysisUtilities/datafileAnalyzer.hpp"
 #include "exceptions.hpp"
 #include "exitCodes.hpp"

@@ -1,6 +1,6 @@
 // use the boost test framework
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE dataSample
+#define BOOST_TEST_MODULE parameters
 #include <boost/test/unit_test.hpp>
 #include <boost/lexical_cast.hpp>
 
