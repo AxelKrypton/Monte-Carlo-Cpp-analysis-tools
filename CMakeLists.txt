@@ -51,6 +51,8 @@ target_link_libraries(StAT ${StAT_USED_LIBS})
 ## The actual executables (frontends)
 add_executable(dataAnalysis executables/dataAnalysis.cpp)
 target_link_libraries(dataAnalysis StAT)
+add_executable(reweighting executables/reweighting.cpp)
+target_link_libraries(reweighting StAT)
 
 #include scripts-directory
 add_subdirectory("${CMAKE_SOURCE_DIR}/Scripts")
