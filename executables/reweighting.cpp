@@ -1,12 +1,14 @@
 #include "../Parameters/Parameters.hpp"
 #include "exceptions.hpp"
 #include "exitCodes.hpp"
+#include "../Reweighting/Reweighter.hpp"
 
 int main(int argc, const char ** argv)
 {
 	try
 	{
 		Parameters parameters(argc, argv);
+		Reweighter reweighter(parameters.file);
 	}
 	//todo: move catch block into own function?
 	catch ( wrongBinningParameter &e)

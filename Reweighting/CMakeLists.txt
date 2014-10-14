@@ -4,7 +4,7 @@ add_library(Reweighting
         ReweightingDataHandler.cpp
 	Reweighter.cpp
 )
-#target_link_libraries(Reweighting dataAnalysisUtilities)
+target_link_libraries(Reweighting dataAnalysisUtilities)
 
 #This is to copy a files to the build directory
 add_custom_target(ReweightingFiles ALL
