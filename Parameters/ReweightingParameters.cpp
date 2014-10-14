@@ -14,7 +14,7 @@ ReweightingParameters::ReweightingParameters(int argc, const char ** argv)
 	desc.add_options()
 		("help,h", "Produce this help message")
 		("file,f", po::value<std::string>(&inputfile), "Inputfile containing metainformation for reweighting procedure.")
-		("numberOfNewPoints", po::value<uint>(&numberOfNewPoints)->default_value(1), "Number of new points to produce with reweighting.")
+		("numberOfNewPoints", po::value<uint>(&numberOfNewPoints)->default_value(2), "Number of new points to produce with reweighting.")
 		("newRange_high", po::value<double>(&newRange_high)->default_value(2), "Upper limit of new range of to cover with reweighting.")
 		("newRange_low", po::value<double>(&newRange_low)->default_value(1), "Lower limit of new range of to cover with reweighting.");
 

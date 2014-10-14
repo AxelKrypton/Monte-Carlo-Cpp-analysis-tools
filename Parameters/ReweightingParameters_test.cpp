@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_SUITE(defaults)
 
 	BOOST_AUTO_TEST_CASE(numberOfNewPoints)
 	{
-		int defaultValue = 1;
+		uint defaultValue = 2;
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfNewPoints() );
 	}
 	
