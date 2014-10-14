@@ -1,14 +1,23 @@
-#include "../Parameters/Parameters.hpp"
 #include "exceptions.hpp"
 #include "exitCodes.hpp"
+#include "../Parameters/ReweightingParameters.hpp"
 #include "../Reweighting/Reweighter.hpp"
 
 int main(int argc, const char ** argv)
 {
 	try
 	{
-		Parameters parameters(argc, argv);
-		Reweighter reweighter(parameters.file);
+		ReweightingParameters parameters(argc, argv);
+		
+		std::vector<std::pair<double, double> > newRanges;
+		std::vector< unsigned int> newNumPoints;
+		newRanges.push_back(std::make_pair(parameters.getNewRange_low(), parameters.getNewRange_high()));
+		newNumPoints.push_back(parameters.getNumberOfNewPoints());
+		
+		Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints);
+		
+		std::vector<double> simulatedLogZ = reweighter.getLogZAtSimulatedPoints();
+		std::vector<double> newLogZ = reweighter.getLogZAtNewPoints();
 	}
 	//todo: move catch block into own function?
 	catch ( wrongBinningParameter &e)
