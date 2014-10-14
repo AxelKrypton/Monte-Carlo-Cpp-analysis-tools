@@ -5,8 +5,6 @@
 #include "../Parameters/Parameters.hpp"
 #include "EstimateAndError.hpp"
 
-DataSample performBinning(DataSample & rawData, const Parameters parameters);
-
 EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters);
 EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn);
