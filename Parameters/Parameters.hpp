@@ -37,4 +37,10 @@ private:
 	void checkParsedArguments(po::variables_map & vm, po::options_description & desc);
 };
 
+class ReweightingParameters : public Parameters
+{
+public:
+	ReweightingParameters(int argc, const char ** argv) : Parameters(argc, argv) {};
+};
+
 #endif /* PARAMETERS_HPP_ */

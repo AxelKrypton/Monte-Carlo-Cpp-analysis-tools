@@ -477,3 +477,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).binningMustFitDataSampleSize);
 	}
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(ReweightingParameters_build)
+
+	BOOST_AUTO_TEST_CASE(invalidArgument)
+	{
+		int numberOfArguments = 2;
+		const char * argumentWithFile[] = {"foo", "someFilename"};
+		BOOST_CHECK_NO_THROW(ReweightingParameters parameters(numberOfArguments, argumentWithFile));
+	}
+	
+BOOST_AUTO_TEST_SUITE_END()
