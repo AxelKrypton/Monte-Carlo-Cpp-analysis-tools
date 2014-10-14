@@ -1,6 +1,7 @@
 # include "dataAnalysisUtilities.hpp"
 
 #include "binning.hpp"
+#include "binnedDataSample.hpp"
 #include "../IO/io_utilities.hpp"
 #include "jackknifeAnalysis.hpp"
 
@@ -184,11 +185,6 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
  *        This is up to the user, but if it is not given, then it is set to 10 (in principle fine for a data sample
  *        with more than 1000 data).
  */
-
-//todo: this include should not be necessary in the end
-#include "jackknifeEstimators.hpp"
-#include "binnedDataSample.hpp"
-
 static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(DataSample & sample, int time);
 static std::vector<BinnedDataSampleFromNumberOfBins> calcAutocorrelationFunctionValuesBinnedSets(DataSample & sample, Parameters parameters);
 
@@ -199,9 +195,9 @@ std::vector<EstimateAndError> calcArrayOfAutocorrelationFunctionsAndErrorEstimat
 	autocorrelationFunctionValuesBinnedSets = calcAutocorrelationFunctionValuesBinnedSets(sample, parameters);
 
 	std::vector<EstimateAndError> result;
+    auto identicalFunction = [] (DataSample& in) -> DataSample { return in; };
 	for(int time=0; time<parameters.timeMaxAutocorrelationFunction; time++){
-		JackknifeEstimators jackSample(autocorrelationFunctionValuesBinnedSets[time]);
-		result.push_back(EstimateAndError(autocorrelationFunctionValuesBinnedSets[time].getNthMoment(1), jackSample.getJackknifeError()));
+        result.push_back(jackknifeAnalysis(autocorrelationFunctionValuesBinnedSets[time], identicalFunction));
 	}
 
 	return result;
@@ -223,10 +219,10 @@ std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEstimatesOf
 	}
 
 	std::vector<EstimateAndError> result;
+    auto identicalFunction = [] (DataSample& in) -> DataSample { return in; };
 	for(int time=0; time<parameters.timeMaxAutocorrelationFunction; time++){
-		JackknifeEstimators jackSample(integratedTimeBinnedSets[time]);
-		result.push_back(EstimateAndError(integratedTimeBinnedSets[time].getNthMoment(1), jackSample.getJackknifeError()));
-	}
+        result.push_back(jackknifeAnalysis(integratedTimeBinnedSets[time], identicalFunction));
+    }
 
 	return result;
 }
