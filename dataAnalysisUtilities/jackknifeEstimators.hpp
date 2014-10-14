@@ -18,8 +18,8 @@ public:
 	JackknifeEstimators(int numberOfElementsIn);
 	JackknifeEstimators(DataSample sampleIn);
 
-	double getJackknifeVariance();
-	double getJackknifeError();
+    double getJackknifeVariance();
+    double getJackknifeError();
 protected:
 	int getJackknifeNormalization();
 	void checkIfJackknifeCanBePerformed(int n);

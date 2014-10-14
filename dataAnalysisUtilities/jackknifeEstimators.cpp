@@ -41,13 +41,13 @@ int calcNumberOfBins(int binsize, int numberOfElements)
 
 double JackknifeEstimators::getJackknifeVariance()
 {
-	DataSample tmp ( (*this - getNthMoment(1) )^( (double(2)) )  );
-	return tmp.getNthMoment(1) * getJackknifeNormalization();
+    DataSample tmp ( (*this - getNthMoment(1) )^( (double(2)) )  );
+    return tmp.getNthMoment(1) * getJackknifeNormalization();
 }
 
 double JackknifeEstimators::getJackknifeError()
 {
-	return sqrt(getJackknifeVariance());
+    return sqrt(getJackknifeVariance());
 }
 
 int JackknifeEstimators::getJackknifeNormalization()
