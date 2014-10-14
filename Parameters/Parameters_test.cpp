@@ -1,6 +1,6 @@
 // use the boost test framework
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE dataSample
+#define BOOST_TEST_MODULE parameters
 #include <boost/test/unit_test.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -476,15 +476,4 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		std::string argumentName = "--adjustDataSampleSizeToBinning";
 		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).binningMustFitDataSampleSize);
 	}
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE(ReweightingParameters_build)
-
-	BOOST_AUTO_TEST_CASE(invalidArgument)
-	{
-		int numberOfArguments = 2;
-		const char * argumentWithFile[] = {"foo", "someFilename"};
-		BOOST_CHECK_NO_THROW(ReweightingParameters parameters(numberOfArguments, argumentWithFile));
-	}
-	
 BOOST_AUTO_TEST_SUITE_END()
