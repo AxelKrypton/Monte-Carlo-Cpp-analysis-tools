@@ -1,13 +1,13 @@
 #include "exceptions.hpp"
 #include "exitCodes.hpp"
-#include "../Parameters/ReweightingParameters.hpp"
+#include "../Parameters/LqcdReweightingParameters.hpp"
 #include "../Reweighting/Reweighter.hpp"
 
 int main(int argc, const char ** argv)
 {
 	try
 	{
-		ReweightingParameters parameters(argc, argv);
+		LqcdReweightingParameters parameters(argc, argv);
 		
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints;
@@ -16,8 +16,7 @@ int main(int argc, const char ** argv)
 		
 		Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints);
 		
-		std::vector<double> simulatedLogZ = reweighter.getLogZAtSimulatedPoints();
-		std::vector<double> newLogZ = reweighter.getLogZAtNewPoints();
+		std::vector<std::vector<EstimateAndError> > result = reweighter.calculateAndGetReweightedObservables();
 	}
 	//todo: move catch block into own function?
 	catch ( wrongBinningParameter &e)
