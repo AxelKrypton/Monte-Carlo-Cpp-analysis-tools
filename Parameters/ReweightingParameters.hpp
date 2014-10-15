@@ -13,6 +13,8 @@ class ReweightingParameters
 public:
 	ReweightingParameters(int argc, const char ** argv);
 	
+	void printParameters();
+	
 	std::string getInputfile();
 	uint getNumberOfNewPoints();
 	double getNewRange_low();
