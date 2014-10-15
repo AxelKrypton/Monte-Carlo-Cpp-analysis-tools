@@ -4,7 +4,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "ReweightingParameters.hpp"
+#include "LqcdReweightingParameters.hpp"
 
 BOOST_AUTO_TEST_SUITE(ReweightingParameters_build)
 

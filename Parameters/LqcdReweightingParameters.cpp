@@ -1,4 +1,4 @@
-#include "ReweightingParameters.hpp"
+#include "LqcdReweightingParameters.hpp"
 
 ReweightingParameters::ReweightingParameters(int argc, const char ** argv) 
 {
@@ -6,11 +6,6 @@ ReweightingParameters::ReweightingParameters(int argc, const char ** argv)
 	po::variables_map vm;
 	po::positional_options_description positionalOptions;
 
-	//todo: Maybe it would be nicer to put the observables into a vector
-	/**
-	 * Apparently, when using short options with int one has to do "-n99"
-	 * because otherwise the empty space causes an error.
-	 */
 	desc.add_options()
 		("help,h", "Produce this help message")
 		("file,f", po::value<std::string>(&inputfile), "Inputfile containing metainformation for reweighting procedure.")
