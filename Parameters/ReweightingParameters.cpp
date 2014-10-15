@@ -17,10 +17,10 @@ ReweightingParameters::ReweightingParameters(int argc, const char ** argv)
 		("numberOfNewPoints", po::value<uint>(&numberOfNewPoints)->default_value(2), "Number of new points to produce with reweighting.")
 		("newRange_high", po::value<double>(&newRange_high)->default_value(2), "Upper limit of new range of to cover with reweighting.")
 		("newRange_low", po::value<double>(&newRange_low)->default_value(1), "Lower limit of new range of to cover with reweighting.")
-		("deactivateReweightingForMean", po::value<bool>(&deactivateReweightingForMean)->default_value(false), "Do not perform reweighting for the mean of the data.")
-		("deactivateReweightingForVariance", po::value<bool>(&deactivateReweightingForVariance)->default_value(false), "Do not perform reweighting for the variance of the data.")
-		("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false), "Do not perform reweighting for the skewness of the data.")
-		("deactivateReweightingForBinder", po::value<bool>(&deactivateReweightingForBinder)->default_value(false), "Do not perform reweighting for the binder cumulant of the data.");
+		("deactivateReweightingForMean", po::value<bool>(&deactivateReweightingForMean)->default_value(false)->implicit_value(true), "Do not perform reweighting for the mean of the data.")
+		("deactivateReweightingForVariance", po::value<bool>(&deactivateReweightingForVariance)->default_value(false)->implicit_value(true), "Do not perform reweighting for the variance of the data.")
+		("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false)->implicit_value(true), "Do not perform reweighting for the skewness of the data.")
+		("deactivateReweightingForBinder", po::value<bool>(&deactivateReweightingForBinder)->default_value(false)->implicit_value(true), "Do not perform reweighting for the binder cumulant of the data.");
 		
 	//option "file" can be given without option description
 	positionalOptions.add("file", 1);

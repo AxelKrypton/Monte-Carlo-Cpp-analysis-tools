@@ -143,5 +143,69 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		std::string argumentName = "--newRange_low";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewRange_low() );
 	}
+	
+	static ReweightingParameters createReweightingParametersForArgumentSettingCheck_implicitOption(std::string argumentName)
+	{
+		std::string argument = argumentName;
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+		return ReweightingParameters(numberOfArguments, arguments);
+	}
+	
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForMean_implicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--deactivateReweightingForMean";
+		BOOST_REQUIRE_EQUAL(newValue, createReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForMean() );
+	}
+	
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForMean_explicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--deactivateReweightingForMean";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForMean() );
+	}
 
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForVariance_implicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--deactivateReweightingForVariance";
+		BOOST_REQUIRE_EQUAL(newValue, createReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForVariance() );
+	}
+	
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForVariance_explicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--deactivateReweightingForVariance";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForVariance() );
+	}
+
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForSkewness_implicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--deactivateReweightingForSkewness";
+		BOOST_REQUIRE_EQUAL(newValue, createReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForSkewness() );
+	}
+	
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForSkewness_explicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--deactivateReweightingForSkewness";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForSkewness() );
+	}
+	
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForBinder_implicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--deactivateReweightingForBinder";
+		BOOST_REQUIRE_EQUAL(newValue, createReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForBinder() );
+	}
+	
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForBinder_explicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--deactivateReweightingForBinder";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForBinder() );
+	}
+	
 BOOST_AUTO_TEST_SUITE_END()
