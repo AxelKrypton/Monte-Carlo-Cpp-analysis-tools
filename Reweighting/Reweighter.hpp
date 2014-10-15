@@ -107,7 +107,7 @@ protected:
     void calculateAndSetLogZAtSimulatedPoints();
     std::vector<double> calculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut);
     void prepareObservablesBeforeReweighting(std::vector<double> &);
-    void restoreObservablesAfterReweighting(std::vector<double>, std::vector<std::vector<std::valarray<double> > > *jackknifePartialPred);
+    void restoreObservablesAfterReweighting(std::vector<double>, std::valarray<std::vector<std::vector<double> > > *jackknifePartialPred);
     std::vector<std::vector<double> > calculateReweightedObservableValues(bool useBinnedData = false,
                                                                           const int entryToBeLeftOut = -1,
                                                                           std::vector<double> *logZAtSimulationPointToBeUsed = NULL,

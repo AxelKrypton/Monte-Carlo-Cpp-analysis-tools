@@ -314,9 +314,6 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
 		
 		double expectedSkewness = 1.;
-		double expectedError = 1e-4;
-
-		double expectedPrecisionInPercent = 1;
 
 		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
 		Parameters parameters(3, arguments);
@@ -324,8 +321,12 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 		DataSample sample(gaussianData);
 
 		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
-		BOOST_CHECK_CLOSE(skewnessAndError.estimate, expectedSkewness, expectedPrecisionInPercent);
-		BOOST_CHECK_SMALL(skewnessAndError.error, expectedError);
+        double NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
+                fabs(skewnessAndError.estimate - expectedSkewness) / skewnessAndError.error;
+
+        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
+        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue > 0.5);
+        BOOST_WARN(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 1);
 	}
 	
 BOOST_AUTO_TEST_SUITE_END()
@@ -337,9 +338,6 @@ BOOST_AUTO_TEST_SUITE(binderAndError)
 		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
 		
 		double expectedKurtosis = 3.;
-		double expectedError = 1e-4;
-
-		double expectedPrecisionInPercent = 1;
 
 		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
 		Parameters parameters(3, arguments);
@@ -347,8 +345,12 @@ BOOST_AUTO_TEST_SUITE(binderAndError)
 		DataSample sample(gaussianData);
 
 		EstimateAndError kurtosisAndError = calcBinderAndErrorOfDataSample(sample, parameters);
-		BOOST_CHECK_CLOSE(kurtosisAndError.estimate, expectedKurtosis, expectedPrecisionInPercent);
-		BOOST_CHECK_SMALL(kurtosisAndError.error, expectedError);
+        double NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
+                fabs(kurtosisAndError.estimate - expectedKurtosis) / kurtosisAndError.error;
+
+        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
+        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue > 0.5);
+        BOOST_WARN(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 1);
 	}
 	
 BOOST_AUTO_TEST_SUITE_END()
@@ -382,8 +384,8 @@ BOOST_AUTO_TEST_SUITE(autocorrelation)
 		 * but only 3.e-10 in the boost check of the error.
 		 */
 		for(uint i=0; i<result.size(); i++){
-			BOOST_CHECK_CLOSE(result[i].estimate, referenceCorrFuncValues[i], 3.e-10);
-			BOOST_CHECK_CLOSE(result[i].error, referenceCorrFuncErrors[i], 3.e-10);
+            BOOST_REQUIRE_CLOSE(result[i].estimate, referenceCorrFuncValues[i], 3.e-10);
+            BOOST_REQUIRE_CLOSE(result[i].error, referenceCorrFuncErrors[i], 3.e-10);
 		}
 	}
 

@@ -4,10 +4,11 @@
 #include "Reweighter.hpp"
 #include "SimulationData.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
+#include "../dataAnalysisUtilities/jackknifeAnalysis.hpp"
 
 static void writeNewPoints(std::vector<std::vector<double> >&, std::vector<std::vector<double> >, std::vector<double>, int=0, int=0);
 static void findIflogZHasToBeCalculated(std::vector<double>, std::vector<int>&);
-static void assignMeanValuesToEstimateAndError(std::vector<std::vector<double> >, std::vector<std::vector<EstimateAndError> >&);
+//static void assignMeanValuesToEstimateAndError(std::vector<std::vector<double> >, std::vector<std::vector<EstimateAndError> >&);
 static double logarithmic_sum(double, double);
 
 /*****************************************************************************************/
@@ -114,33 +115,40 @@ void ReweighterAbstract::setPrecisionToCalculateLogZ(double precisionToCalculate
  */
 std::vector<std::vector<EstimateAndError> > ReweighterAbstract::calculateAndGetReweightedObservables(){
     std::cout << "==========================================================\n";
-    std::cout << " Starting reweighting of observables...\n\n";
-    std::vector<double> minimumOfEachObservable(reweightingDataHandler.numberOfObservablesToBeReweighted, std::numeric_limits<double>::max());
-    prepareObservablesBeforeReweighting(minimumOfEachObservable);
-    assignMeanValuesToEstimateAndError(calculateReweightedObservableValues(), observablesAtNewPoints);
+    std::cout << " Starting reweighting of observables...\n";
     size_t numberOfNewPoints = valuesOfNewParameters.size();
     size_t numberOfBinsUsedToBinData = reweightingDataHandler.numberOfBinsToBeUsed;
-    std::vector<std::vector<std::valarray<double> > > jackknife(numberOfNewPoints,
-                                                                std::vector<std::valarray<double> >(reweightingDataHandler.numberOfObservablesToBeReweighted,
-                                                                                                    std::valarray<double>(numberOfBinsUsedToBinData)));
-    for(size_t i=0; i<numberOfNewPoints; i++){
-        for(size_t j=0; j<(size_t)reweightingDataHandler.numberOfObservablesToBeReweighted; j++){
-            for(size_t k=0; k<numberOfBinsUsedToBinData; k++){
+    size_t numberOfObservables = reweightingDataHandler.numberOfObservablesToBeReweighted;
+    std::vector<double> minimumOfEachObservable(numberOfObservables, std::numeric_limits<double>::max());
+    prepareObservablesBeforeReweighting(minimumOfEachObservable);
+//    assignMeanValuesToEstimateAndError(calculateReweightedObservableValues(), observablesAtNewPoints);
 
-            }
+    std::valarray<std::vector<std::vector<double> > >
+            jackknifeEstimators(std::vector<std::vector<double> >(numberOfNewPoints,
+                                                        std::vector<double>(numberOfObservables)),
+                                numberOfBinsUsedToBinData);
+    std::cout << "   Calculating the Jackknife estimators... \n";
+    for(size_t i=0; i<numberOfBinsUsedToBinData; i++){
+        std::vector<double> logZAtSimulatedPointsLeavingOutOneEntry =
+                calculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(i);
+        std::vector<double> logZAtNewPointsLeavingOutOneEntry =
+                calculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(i, logZAtSimulatedPointsLeavingOutOneEntry);
+        jackknifeEstimators[i] =
+                calculateReweightedObservableValues(true, i, &logZAtSimulatedPointsLeavingOutOneEntry,
+                                                             &logZAtNewPointsLeavingOutOneEntry);
+    }
+    std::cout << "   ...done!\n";
+    restoreObservablesAfterReweighting(minimumOfEachObservable, &jackknifeEstimators);
+    for(size_t i=0; i<numberOfNewPoints; i++){
+        for(size_t j=0; j<numberOfObservables; j++){
+            std::valarray<double> jackknifeEstimatorsPerPointAndObs(numberOfBinsUsedToBinData);
+            for(size_t k=0; k<numberOfBinsUsedToBinData; k++)
+                jackknifeEstimatorsPerPointAndObs[k] = jackknifeEstimators[k][i][j];
+            observablesAtNewPoints[i][j].estimate = calculateJacknifeEstimate(DataSample(jackknifeEstimatorsPerPointAndObs));
+            observablesAtNewPoints[i][j].error = calculateJacknifeError(DataSample(jackknifeEstimatorsPerPointAndObs));
         }
     }
-
-    /*
-     * implement Jakknife error: the restore has to be done before the calculation of the error itself!!!
-     */
-    restoreObservablesAfterReweighting(minimumOfEachObservable, NULL);
-
-
-    //Here calculate error!
-
-
-    std::cout << " \n...reweighting of observables done!\n";
+    std::cout << " ...reweighting of observables done!\n";
     std::cout << "==========================================================\n";
     return observablesAtNewPoints;
 }
@@ -470,29 +478,35 @@ void ReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<double>
 }
 
 void ReweighterAbstract::restoreObservablesAfterReweighting(std::vector<double> minimumOfEachObservable,
-                              std::vector<std::vector<std::valarray<double> > > *jackknifePartialPred){
+                                  std::valarray<std::vector<std::vector<double> > > *jackknifePartialPred){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
-    //Exponential and shift, if necessary, BOTH on raw/binned data AND on values at new points + Jackknife partial predicitions
-    for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
-        for(int indexObservable=numberOfReweightingParameters; indexObservable<reweightingDataHandler.simulationRawDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++){
-            reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].applyFunction(exp);
-            reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable].applyFunction(exp);
-            for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
-                observablesAtNewPoints[indexNewPoint][indexObservable].estimate = exp(observablesAtNewPoints[indexNewPoint][indexObservable].estimate);
-                if(jackknifePartialPred != NULL){
-                    (*jackknifePartialPred)[indexNewPoint][indexObservable] = exp((*jackknifePartialPred)[indexNewPoint][indexObservable]);
+    //Exponential and shift, if necessary, BOTH on raw/binned data AND on values at new points (Jackknife partial predicitions)
+    for(int indexObservable=0; indexObservable<reweightingDataHandler.numberOfObservablesToBeReweighted; indexObservable++){
+        for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
+            reweightingDataHandler.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] =
+                    reweightingDataHandler.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
+            reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] =
+                    reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
+        }
+        for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
+//            observablesAtNewPoints[indexNewPoint][indexObservable].estimate = exp(observablesAtNewPoints[indexNewPoint][indexObservable].estimate);
+            if(jackknifePartialPred != NULL){
+                for(size_t indexBin=0; indexBin<(*jackknifePartialPred).size(); indexBin++){
+                    (*jackknifePartialPred)[indexBin][indexNewPoint][indexObservable] = exp((*jackknifePartialPred)[indexBin][indexNewPoint][indexObservable]);
                     if(minimumOfEachObservable[indexObservable-numberOfReweightingParameters] < 0)
-                        (*jackknifePartialPred)[indexNewPoint][indexObservable] += 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
+                        (*jackknifePartialPred)[indexBin][indexNewPoint][indexObservable] += 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
                 }
             }
-            if(minimumOfEachObservable[indexObservable-numberOfReweightingParameters] < 0){
-                if(indexSimulation == 0)
-                    std::cout << "  Observable number " << indexObservable-numberOfReweightingParameters << " restored!\n";
-                reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable] += 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
-                reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable] += 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
-            }
-        }
-    }
+         }
+         if(minimumOfEachObservable[indexObservable] < 0){
+             std::cout << "  Observable number " << indexObservable << " restored!\n";
+             for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
+                reweightingDataHandler.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] += 2*minimumOfEachObservable[indexObservable];
+                reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] += 2*minimumOfEachObservable[indexObservable];
+             }
+         }
+     }
+
 }
 
 
@@ -547,19 +561,19 @@ static void writeNewPoints(std::vector<std::vector<double> >&  valuesOfNewParame
 }
 
 
-static void assignMeanValuesToEstimateAndError(std::vector<std::vector<double> > meanValues,
-                                               std::vector<std::vector<EstimateAndError> >& estimateAndError){
-    if(meanValues.size() != estimateAndError.size())
-        throw std::invalid_argument("Invalid sizes in assignMeanValuesToEstimateAndError!");
-    for(size_t i=0; i<meanValues.size(); i++){
-        if(meanValues[i].size() != estimateAndError[i].size())
-            throw std::invalid_argument("Invalid sizes in assignMeanValuesToEstimateAndError!");
-        for(size_t j=0; j<meanValues.size(); j++){
-            estimateAndError[i][j].estimate = meanValues[i][j];
-            estimateAndError[i][j].error = 0.0;
-        }
-    }
-}
+//static void assignMeanValuesToEstimateAndError(std::vector<std::vector<double> > meanValues,
+//                                               std::vector<std::vector<EstimateAndError> >& estimateAndError){
+//    if(meanValues.size() != estimateAndError.size())
+//        throw std::invalid_argument("Invalid sizes in assignMeanValuesToEstimateAndError!");
+//    for(size_t i=0; i<meanValues.size(); i++){
+//        if(meanValues[i].size() != estimateAndError[i].size())
+//            throw std::invalid_argument("Invalid sizes in assignMeanValuesToEstimateAndError!");
+//        for(size_t j=0; j<meanValues[i].size(); j++){
+//            estimateAndError[i][j].estimate = meanValues[i][j];
+//            estimateAndError[i][j].error = 0.0;
+//        }
+//    }
+//}
 
 
 /*

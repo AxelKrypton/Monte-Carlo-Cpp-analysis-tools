@@ -56,7 +56,7 @@ public:
     }
 
     void testRestoreObservablesAfterReweighting(std::vector<double>& minima,\
-                                                std::vector<std::vector<std::valarray<double> > >* jack){
+                                                std::valarray<std::vector<std::vector<double> > >* jack){
         restoreObservablesAfterReweighting(minima, jack);
     }
 
@@ -79,6 +79,10 @@ public:
             }
         }
         return observables;
+    }
+
+    std::vector<std::vector<EstimateAndError> > testCalculateAndGetReweightedObservables(){
+        return calculateAndGetReweightedObservables();
     }
 };
 
@@ -611,6 +615,41 @@ BOOST_AUTO_TEST_SUITE(observables)
                 reweighter.testCalculateReweightedObservableValues(true, pointToBeLeftOut, &logZSim, &logZNew);
         for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
             BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], exp(valuesObsNewPoints[i][0]), 1.e-8);
+    }
+
+    BOOST_AUTO_TEST_CASE(observables5)
+    {
+        /*
+         * In this test we start to test the function calculateAndGetReweightedObservables.
+         * The first trivial code is to compare the value of the observable regardless to the
+         * error. This has basically already been tested in "observables2" but here we call
+         * a different function in which the preparation and the restoring of the observables is done.
+         * Again we have to calculate the logZ manually since the Tester class doesn't do that in the
+         * constructor/setters.
+         *
+         * REMARK: Actually there is an important difference between this test case and "observables2".
+         *         Here we reweight the observables using as value the jackknife estimate that is
+         *         different and in general more accurate for the result. That is why the precision in
+         *         this test is 1.e-4 (the reference values are still those of "observables2").
+         */
+        std::string fileThatDoesExist = "RealTestData/configfile_4";
+        std::vector<std::pair<double, double> > newRanges;
+        std::vector< unsigned int> newNumPoints(1, 30);
+        newRanges.push_back(std::make_pair(5.348, 5.3509));
+        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
+        double referenceValuesObsNewPoints[] = {0.51320168201844, 0.51325851090442, 0.51331616521147, 0.51337465130085,
+                                                0.51343397516939, 0.51349414242501, 0.51355515826122, 0.51361702743295,
+                                                0.51367975423067, 0.51374334245435, 0.51380779538793, 0.51387311577323,
+                                                0.51393930578366, 0.51400636699839, 0.51407430037612, 0.51414310623005,
+                                                0.51421278420172, 0.51428333323675, 0.51435475156028, 0.51442703665301,
+                                                0.51450018522894, 0.51457419321289, 0.51464905571958, 0.51472476703396,
+                                                0.51480132059263, 0.51487870896691, 0.51495692384690, 0.51503595602794,
+                                                0.51511579539832, 0.51519643092919};
+        reweighter.testCalculateLogZAtSimulatedPoints();
+        reweighter.testCalculateLogZAtNewPoints();
+        std::vector<std::vector<EstimateAndError> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
+        for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].estimate, 1.e-4);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

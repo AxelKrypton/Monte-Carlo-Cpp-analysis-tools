@@ -4,9 +4,11 @@
 #include "DataSample.hpp"
 #include "EstimateAndError.hpp"
 
-double calculateJacknifeEstimator(DataSample & sampleIn);
-double calculateJacknifeError(DataSample & sampleIn);
+double calculateJacknifeEstimate(DataSample sampleWithJackknifeEstimators);
+double calculateJacknifeError(DataSample sampleWithJackknifeEstimators);
 
-EstimateAndError jackknifeAnalysis(DataSample sample1, DataSample sample2, DataSample (*function)(DataSample&, DataSample&) );
+EstimateAndError jackknifeAnalysis(DataSample sampleWithUncorrelatedData, DataSample (*function)(DataSample &) );
+EstimateAndError jackknifeAnalysis(DataSample sampleWithUncorrelatedData1,
+                                   DataSample sampleWithUncorrelatedData2, DataSample (*function)(DataSample&, DataSample&) );
 
 #endif
