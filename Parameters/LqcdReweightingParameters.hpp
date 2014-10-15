@@ -1,5 +1,5 @@
-#ifndef REWEIGHTINGPARAMETERS_HPP_
-#define REWEIGHTINGPARAMETERS_HPP_
+#ifndef LQCDREWEIGHTINGPARAMETERS_HPP_
+#define LQCDREWEIGHTINGPARAMETERS_HPP_
 
 #include "iostream"
 #include <boost/program_options.hpp>
@@ -8,10 +8,10 @@ namespace po = boost::program_options;
 
 
 //TODO: Merge with other Parameters class
-class ReweightingParameters
+class LqcdReweightingParameters
 {
 public:
-	ReweightingParameters(int argc, const char ** argv);
+	LqcdReweightingParameters(int argc, const char ** argv);
 	
 	void printParameters();
 	

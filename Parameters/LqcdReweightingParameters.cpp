@@ -1,6 +1,6 @@
 #include "LqcdReweightingParameters.hpp"
 
-ReweightingParameters::ReweightingParameters(int argc, const char ** argv) 
+LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** argv) 
 {
 	po::options_description desc("   Options for reweighting of data.");
 	po::variables_map vm;
@@ -26,11 +26,11 @@ ReweightingParameters::ReweightingParameters(int argc, const char ** argv)
 	printParameters();
 }
 
-void ReweightingParameters::checkParsedArguments(po::variables_map & vm, po::options_description & desc)
+void LqcdReweightingParameters::checkParsedArguments(po::variables_map & vm, po::options_description & desc)
 {
 	if(vm.count("help")) { // see http://stackoverflow.com/questions/5395503/required-and-optional-arguments-using-boost-library-program-options as to why this is done before po::notifiy(vm)
 		std::cout << desc << '\n';
-		throw ReweightingParameters::parse_aborted();
+		throw LqcdReweightingParameters::parse_aborted();
 	}
 
 	if (! vm.count("file"))
@@ -39,7 +39,7 @@ void ReweightingParameters::checkParsedArguments(po::variables_map & vm, po::opt
 	}
 }
 
-void ReweightingParameters::printParameters()
+void LqcdReweightingParameters::printParameters()
 {
 	std::string separator = "###################################################";
 	
@@ -88,42 +88,42 @@ void ReweightingParameters::printParameters()
 	std::cout << separator << std::endl;
 }
 
-uint ReweightingParameters::getNumberOfNewPoints()
+uint LqcdReweightingParameters::getNumberOfNewPoints()
 {
 	return numberOfNewPoints;
 }
 
-std::string ReweightingParameters::getInputfile()
+std::string LqcdReweightingParameters::getInputfile()
 {
 	return inputfile;
 }
 
-double ReweightingParameters::getNewRange_low()
+double LqcdReweightingParameters::getNewRange_low()
 {
 	return newRange_low;
 }
 
-double ReweightingParameters::getNewRange_high()
+double LqcdReweightingParameters::getNewRange_high()
 {
 	return newRange_high;
 }
 
-bool ReweightingParameters::getDeactivateReweightingForMean()
+bool LqcdReweightingParameters::getDeactivateReweightingForMean()
 {
 	return deactivateReweightingForMean;
 }
 
-bool ReweightingParameters::getDeactivateReweightingForVariance()
+bool LqcdReweightingParameters::getDeactivateReweightingForVariance()
 {
 	return deactivateReweightingForVariance;
 }
 
-bool ReweightingParameters::getDeactivateReweightingForSkewness()
+bool LqcdReweightingParameters::getDeactivateReweightingForSkewness()
 {
 	return deactivateReweightingForSkewness;
 }
 
-bool ReweightingParameters::getDeactivateReweightingForBinder()
+bool LqcdReweightingParameters::getDeactivateReweightingForBinder()
 {
 	return deactivateReweightingForBinder;
 }
