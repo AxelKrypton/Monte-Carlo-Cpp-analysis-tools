@@ -17,6 +17,10 @@ public:
 	uint getNumberOfNewPoints();
 	double getNewRange_low();
 	double getNewRange_high();
+	bool getDeactivateReweightingForMean();
+	bool getDeactivateReweightingForVariance();
+	bool getDeactivateReweightingForSkewness();
+	bool getDeactivateReweightingForBinder();
 	
 	struct parse_aborted {};
 	
@@ -27,6 +31,10 @@ private:
 	uint numberOfNewPoints;
 	double newRange_low;
 	double newRange_high;
+	bool deactivateReweightingForMean;
+	bool deactivateReweightingForVariance;
+	bool deactivateReweightingForSkewness;
+	bool deactivateReweightingForBinder;
 };
 
 #endif

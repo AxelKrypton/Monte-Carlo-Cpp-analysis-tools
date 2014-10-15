@@ -64,6 +64,30 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		double defaultValue = 1.;
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNewRange_low() );
 	}
+	
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForMean)
+	{
+		bool defaultValue = false;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForMean() );
+	}
+	
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForVariance)
+	{
+		bool defaultValue = false;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForVariance() );
+	}
+	
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForSkewness)
+	{
+		bool defaultValue = false;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForSkewness() );
+	}
+	
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForBinder)
+	{
+		bool defaultValue = false;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForBinder() );
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
