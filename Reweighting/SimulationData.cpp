@@ -43,6 +43,7 @@ SimulationData::SimulationData(std::map<std::string, double> simulationParameter
 		}
 	}
 
+    //TODO: This call limits the use of this class to the Reweighting case
 	checkIfDatafileWasGood(simulationRawData, filenameIn);
 }
 
@@ -79,6 +80,14 @@ std::string SimulationData::getDatafileName(){
 DataSampleBasic& SimulationData::operator[](int index)
 {
 	return simulationRawData.at(index);
+}
+
+
+void SimulationData::appendNewColumnOfData(DataSampleBasic sampleIn)
+{
+    if(simulationRawData[0].getNumberOfElements() != sampleIn.getNumberOfElements())
+        throw std::invalid_argument("Column of data has the wrong number of entries and cannot be appended!");
+    simulationRawData.push_back(sampleIn);
 }
 
 /*****************************************************************************************/

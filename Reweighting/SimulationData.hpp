@@ -17,6 +17,7 @@ public:
 	std::map<std::string, double> getSimulationParameters();
     std::string getDatafileName();
 	DataSampleBasic& operator[](int index);
+    void appendNewColumnOfData(DataSampleBasic sampleIn);
 
 private:
 	std::map<std::string, double> simulationParameters;
