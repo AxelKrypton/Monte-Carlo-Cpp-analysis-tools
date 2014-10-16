@@ -1,23 +1,26 @@
 #include "exceptions.hpp"
 #include "exitCodes.hpp"
-#include "../Parameters/ReweightingParameters.hpp"
+#include "../Parameters/LqcdReweightingParameters.hpp"
 #include "../Reweighting/Reweighter.hpp"
+#include "../IO/io_utilities.hpp"
 
 int main(int argc, const char ** argv)
 {
 	try
 	{
-		ReweightingParameters parameters(argc, argv);
+		LqcdReweightingParameters parameters(argc, argv);
 		
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints;
-		newRanges.push_back(std::make_pair(parameters.getNewRange_low(), parameters.getNewRange_high()));
-		newNumPoints.push_back(parameters.getNumberOfNewPoints());
+		newRanges.push_back(std::make_pair(parameters.getNewBetaRange_low(), parameters.getNewBetaRange_high()));
+		newNumPoints.push_back(parameters.getNumberOfNewBetaPoints());
 		
 		Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints);
 		
-		std::vector<double> simulatedLogZ = reweighter.getLogZAtSimulatedPoints();
-		std::vector<double> newLogZ = reweighter.getLogZAtNewPoints();
+		std::vector<std::vector<EstimateAndError> > reweightedObservables = reweighter.calculateAndGetReweightedObservables();
+		std::vector<std::vector<double> > newBetaValues = reweighter.getValuesOfNewParameters();
+		
+		writeReweightingResultsToFile(newBetaValues, reweightedObservables );
 	}
 	//todo: move catch block into own function?
 	catch ( wrongBinningParameter &e)
