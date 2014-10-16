@@ -99,7 +99,12 @@ void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaVa
 {
 	uint numberOfNewPoints = reweightedObservables.size();
 	uint numberOfObservables = reweightedObservables[0].size();
+	if ( numberOfObservables <= 0 )
+	{
+		throw std::invalid_argument("Number of observables must be greater than 0! Aborting!");
+	}
 	uint numberOfQuantities = reweightedObservables[0].size() / numberOfObservables;
+
 	//todo: make this an argument
 	std::vector<std::string> observableNames(1, "mean" );
 	std::vector<ReweightedData> ReweightedQuantities;
