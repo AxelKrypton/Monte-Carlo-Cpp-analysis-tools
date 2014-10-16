@@ -2,16 +2,16 @@
 
 LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** argv) 
 {
-	po::options_description desc("   Options for reweighting data from LQCD simulations.\nUsage: \"--<optionName>=<value>\" (or \"-<shortOptionName><value>\")\nNote that boolean options can be changed from their default value implicitly, ie without giving explicitly true or false in the command line.\nFor example, \"--useBinning\" equals \"--useBinning=false\" (as the default value is true)");
+	po::options_description desc("   Options for reweighting data from LQCD simulations.\nNOTE: Reweighting is currently implemented in beta only!\nUsage: \"--<optionName>=<value>\" (or \"-<shortOptionName><value>\")\nNote that boolean options can be changed from their default value implicitly, ie without giving explicitly true or false in the command line.\nFor example, \"--useBinning\" equals \"--useBinning=false\" (as the default value is true)");
 	po::variables_map vm;
 	po::positional_options_description positionalOptions;
 
 	desc.add_options()
 		("help,h", "Produce this help message")
 		("file,f", po::value<std::string>(&inputfile), "Inputfile containing metainformation for reweighting procedure.")
-		("numberOfNewPoints", po::value<uint>(&numberOfNewPoints)->default_value(2), "Number of new points to produce with reweighting.")
-		("newRange_high", po::value<double>(&newRange_high)->default_value(2), "Upper limit of new range of to cover with reweighting.")
-		("newRange_low", po::value<double>(&newRange_low)->default_value(1), "Lower limit of new range of to cover with reweighting.")
+		("numberOfNewBetaPoints", po::value<uint>(&numberOfNewBetaPoints)->default_value(2), "Number of new points to produce with reweighting.")
+		("newBetaRange_high", po::value<double>(&newBetaRange_high)->default_value(2), "Upper limit of new beta range of to cover with reweighting.")
+		("newBetaRange_low", po::value<double>(&newBetaRange_low)->default_value(1), "Lower limit of new beta range of to cover with reweighting.")
 		("deactivateReweightingForMean", po::value<bool>(&deactivateReweightingForMean)->default_value(false)->implicit_value(true), "Do not perform reweighting for the mean of the data.")
 		("deactivateReweightingForVariance", po::value<bool>(&deactivateReweightingForVariance)->default_value(false)->implicit_value(true), "Do not perform reweighting for the variance of the data.")
 		("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false)->implicit_value(true), "Do not perform reweighting for the skewness of the data.")
@@ -49,8 +49,8 @@ void LqcdReweightingParameters::printParameters()
 	std::cout << "# Inputfile:\t" << inputfile << std::endl;
 	std::cout << separator << std::endl;
 	std::cout << "# Reweighting parameters:" << std::endl;
-	std::cout << "# New beta range:\t[" << newRange_low << ":" << newRange_high << "]" << std::endl;
-	std::cout << "# New points:\t\t" << numberOfNewPoints << std::endl;
+	std::cout << "# New beta range:\t[" << newBetaRange_low << ":" << newBetaRange_high << "]" << std::endl;
+	std::cout << "# New beta points:\t\t" << numberOfNewBetaPoints << std::endl;
 	std::cout << separator << std::endl;
 	std::cout << "# Observables:" << std::endl;
 	if ( deactivateReweightingForMean )
@@ -88,9 +88,9 @@ void LqcdReweightingParameters::printParameters()
 	std::cout << separator << std::endl;
 }
 
-uint LqcdReweightingParameters::getNumberOfNewPoints()
+uint LqcdReweightingParameters::getNumberOfNewBetaPoints()
 {
-	return numberOfNewPoints;
+	return numberOfNewBetaPoints;
 }
 
 std::string LqcdReweightingParameters::getInputfile()
@@ -98,14 +98,14 @@ std::string LqcdReweightingParameters::getInputfile()
 	return inputfile;
 }
 
-double LqcdReweightingParameters::getNewRange_low()
+double LqcdReweightingParameters::getNewBetaRange_low()
 {
-	return newRange_low;
+	return newBetaRange_low;
 }
 
-double LqcdReweightingParameters::getNewRange_high()
+double LqcdReweightingParameters::getNewBetaRange_high()
 {
-	return newRange_high;
+	return newBetaRange_high;
 }
 
 bool LqcdReweightingParameters::getDeactivateReweightingForMean()

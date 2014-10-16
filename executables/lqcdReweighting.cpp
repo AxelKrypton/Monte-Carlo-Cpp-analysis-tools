@@ -11,8 +11,8 @@ int main(int argc, const char ** argv)
 		
 		std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints;
-		newRanges.push_back(std::make_pair(parameters.getNewRange_low(), parameters.getNewRange_high()));
-		newNumPoints.push_back(parameters.getNumberOfNewPoints());
+		newRanges.push_back(std::make_pair(parameters.getNewBetaRange_low(), parameters.getNewBetaRange_high()));
+		newNumPoints.push_back(parameters.getNumberOfNewBetaPoints());
 		
 		Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints);
 		

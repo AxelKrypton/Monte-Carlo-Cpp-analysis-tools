@@ -50,19 +50,19 @@ BOOST_AUTO_TEST_SUITE(defaults)
 	BOOST_AUTO_TEST_CASE(numberOfNewPoints)
 	{
 		uint defaultValue = 2;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfNewPoints() );
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfNewBetaPoints() );
 	}
 	
 	BOOST_AUTO_TEST_CASE(newRange_high)
 	{
 		double defaultValue = 2.;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNewRange_high() );
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNewBetaRange_high() );
 	}
 	
 	BOOST_AUTO_TEST_CASE(newRange_low)
 	{
 		double defaultValue = 1.;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNewRange_low() );
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNewBetaRange_low() );
 	}
 	
 	BOOST_AUTO_TEST_CASE(deactivateReweightingForMean)
@@ -126,22 +126,22 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 	BOOST_AUTO_TEST_CASE(numberOfNewPoints)
 	{
 		uint newValue = 2;
-		std::string argumentName = "--numberOfNewPoints";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfNewPoints() );
+		std::string argumentName = "--numberOfNewBetaPoints";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfNewBetaPoints() );
 	}
 	
 	BOOST_AUTO_TEST_CASE(newRange_high)
 	{
 		double newValue = 65.;
-		std::string argumentName = "--newRange_high";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewRange_high() );
+		std::string argumentName = "--newBetaRange_high";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_high() );
 	}
 	
 	BOOST_AUTO_TEST_CASE(newRange_low)
 	{
 		double newValue = 14.;
-		std::string argumentName = "--newRange_low";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewRange_low() );
+		std::string argumentName = "--newBetaRange_low";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_low() );
 	}
 	
 	static LqcdReweightingParameters createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(std::string argumentName)

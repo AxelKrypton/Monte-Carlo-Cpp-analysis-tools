@@ -16,9 +16,9 @@ public:
 	void printParameters();
 	
 	std::string getInputfile();
-	uint getNumberOfNewPoints();
-	double getNewRange_low();
-	double getNewRange_high();
+	uint getNumberOfNewBetaPoints();
+	double getNewBetaRange_low();
+	double getNewBetaRange_high();
 	bool getDeactivateReweightingForMean();
 	bool getDeactivateReweightingForVariance();
 	bool getDeactivateReweightingForSkewness();
@@ -30,9 +30,9 @@ private:
 	void checkParsedArguments(po::variables_map & vm, po::options_description & desc);
 	
 	std::string inputfile;
-	uint numberOfNewPoints;
-	double newRange_low;
-	double newRange_high;
+	uint numberOfNewBetaPoints;
+	double newBetaRange_low;
+	double newBetaRange_high;
 	bool deactivateReweightingForMean;
 	bool deactivateReweightingForVariance;
 	bool deactivateReweightingForSkewness;
