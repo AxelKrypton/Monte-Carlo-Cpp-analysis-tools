@@ -2,6 +2,7 @@
 #include "exitCodes.hpp"
 #include "../Parameters/LqcdReweightingParameters.hpp"
 #include "../Reweighting/Reweighter.hpp"
+#include "../IO/io_utilities.hpp"
 
 int main(int argc, const char ** argv)
 {
@@ -16,7 +17,10 @@ int main(int argc, const char ** argv)
 		
 		Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints);
 		
-		std::vector<std::vector<EstimateAndError> > result = reweighter.calculateAndGetReweightedObservables();
+		std::vector<std::vector<EstimateAndError> > reweightedObservables = reweighter.calculateAndGetReweightedObservables();
+		std::vector<std::vector<double> > newBetaValues = reweighter.getValuesOfNewParameters();
+		
+		writeReweightingResultsToFile(newBetaValues, reweightedObservables );
 	}
 	//todo: move catch block into own function?
 	catch ( wrongBinningParameter &e)
