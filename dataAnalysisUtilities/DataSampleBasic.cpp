@@ -221,6 +221,23 @@ DataSampleBasic operator^(DataSampleBasic sampleIn, double n)
 	return sampleIn ^= n;
 }
 
+bool operator==(DataSampleBasic lhs, DataSampleBasic rhs)
+{
+    if(lhs.getNumberOfElements() != rhs.getNumberOfElements())
+        return false;
+
+   std::valarray<bool> comp(lhs.getNumberOfElements());
+   for(int i=0; i<lhs.getNumberOfElements(); i++)
+       comp[i] = (lhs[i]==rhs[i]);
+
+   return comp.min();
+}
+
+bool operator!=(DataSampleBasic lhs, DataSampleBasic rhs)
+{
+   return !(lhs==rhs);
+}
+
 int DataSampleBasic::getNumberOfElements()
 {
 	return numberOfElements;

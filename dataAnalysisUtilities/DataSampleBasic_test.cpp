@@ -541,6 +541,18 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_REQUIRE_CLOSE(divided.sum(), 1., doublePrecisionInPercent);
 	}
 
+    BOOST_AUTO_TEST_CASE(comparison)
+    {
+        int numberOfElements = 66;
+        DataSampleBasic sample1(makeValarrayWithOnes(numberOfElements));
+        DataSampleBasic sample2(makeValarrayWithOnes(numberOfElements));
+        DataSampleBasic sample3(makeValarrayWithOnes(numberOfElements+1));
+        BOOST_REQUIRE(sample1 == sample2);
+        BOOST_REQUIRE(sample1 != sample3);
+        sample1[0]=3.14;
+        BOOST_REQUIRE(sample1 != sample2);
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(slice)
