@@ -66,7 +66,38 @@ SimulationDataContainer::getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(in
 }
 
 
+/*****************************************************************************************/
 
+SimulationDataContainerWithCentralMomentsPerData::SimulationDataContainerWithCentralMomentsPerData()
+    : SimulationDataContainer() {}
+
+SimulationDataContainerWithCentralMomentsPerData::
+   SimulationDataContainerWithCentralMomentsPerData(std::string configurationFile,
+                                                    std::vector<unsigned int> whichColumns,
+                                                    std::vector<unsigned int> whichCentralMoments)
+    : SimulationDataContainer(configurationFile), whichColumns(whichColumns), whichCentralMoments(whichCentralMoments)
+{
+    for(int i=0; i<getNumberOfDatafiles(); i++){
+        for(size_t j=0; j<whichColumns.size(); j++){
+            if(whichColumns[j] >= (unsigned int)simulationDataSet[i].getNumberOfDataSample())
+                throw std::out_of_range("Columns specified not valid to add central moments!");
+            for(size_t k=0; k<whichCentralMoments.size(); k++){
+                DataSample temporarySample = simulationDataSet[i][whichColumns[j]];
+                simulationDataSet[i].appendNewColumnOfData((temporarySample -
+                                                            temporarySample.getNthMoment(1)) ^ (int)whichCentralMoments[k]);
+            }
+        }
+    }
+}
+
+
+std::vector<unsigned int> SimulationDataContainerWithCentralMomentsPerData::getWhichColumns(){
+    return whichColumns;
+}
+
+std::vector<unsigned int> SimulationDataContainerWithCentralMomentsPerData::getWhichCentralMoments(){
+    return whichCentralMoments;
+}
 
 
 /*****************************************************************************************/

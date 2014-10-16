@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "SimulationDataContainer.hpp"
+#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePrecisionInPercent
 
 BOOST_AUTO_TEST_SUITE(build)
 
@@ -127,6 +128,57 @@ BOOST_AUTO_TEST_SUITE(BinningContainer)
 BOOST_AUTO_TEST_SUITE_END()
 
 
+BOOST_AUTO_TEST_SUITE(InsertCentralMoments)
+
+    BOOST_AUTO_TEST_CASE(getters)
+    {
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
+        std::vector<unsigned int> columns;
+        std::vector<unsigned int> centralMoments;
+        columns.push_back(3);
+        columns.push_back(1);
+        columns.push_back(2);
+        centralMoments.push_back(0);
+        BOOST_REQUIRE_THROW(SimulationDataContainerWithCentralMomentsPerData simDataCont(fileThatDoesExist, columns, centralMoments), std::out_of_range);
+        columns[0]=0;
+        SimulationDataContainerWithCentralMomentsPerData simDataCont(fileThatDoesExist, columns, centralMoments);
+        BOOST_REQUIRE(columns == simDataCont.getWhichColumns());
+        BOOST_REQUIRE(centralMoments == simDataCont.getWhichCentralMoments());
+    }
+
+    BOOST_AUTO_TEST_CASE(InsertCentralMoments1)
+    {
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
+        std::vector<unsigned int> columns;
+        std::vector<unsigned int> centralMoments;
+        columns.push_back(0);
+        columns.push_back(1);
+        columns.push_back(2);
+        centralMoments.push_back(0);
+        centralMoments.push_back(1);
+        SimulationDataContainerWithCentralMomentsPerData simDataCont(fileThatDoesExist, columns, centralMoments);
+        const int newNumberOfColumns = 9;
+        const double columnsFirstMomentFirstFile[3][3] = {-0.3, 0.0, 0.3, -0.3, 0.0, 0.3, 29./30, 19./15, -67./30};
+        for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++)
+            BOOST_REQUIRE_EQUAL(simDataCont[i].getNumberOfDataSample(), newNumberOfColumns);
+        for(int i=0; i<3; i+=2){
+            BOOST_REQUIRE_CLOSE(simDataCont[0][4][i], columnsFirstMomentFirstFile[0][i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][6][i], columnsFirstMomentFirstFile[1][i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][8][i], columnsFirstMomentFirstFile[2][i], doublePrecisionInPercent);
+        }
+        BOOST_REQUIRE_SMALL(simDataCont[0][4][1], doublePrecisionInPercent);
+        BOOST_REQUIRE_SMALL(simDataCont[0][6][1], doublePrecisionInPercent);
+        BOOST_REQUIRE_CLOSE(simDataCont[0][8][1], columnsFirstMomentFirstFile[2][1], doublePrecisionInPercent);
+        for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
+            for(int j=0; j<3; j++){
+                BOOST_REQUIRE_EQUAL(simDataCont[i][3][j], 1.0);
+                BOOST_REQUIRE_EQUAL(simDataCont[i][5][j], 1.0);
+                BOOST_REQUIRE_EQUAL(simDataCont[i][7][j], 1.0);
+            }
+        }
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 
 
