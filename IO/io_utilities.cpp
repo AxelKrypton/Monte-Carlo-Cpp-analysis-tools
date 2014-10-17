@@ -52,9 +52,9 @@ public:
 	ReweightedData(std::string quantityNameIn, std::vector<std::string> observableNamesIn) :
 	quantityName(quantityNameIn), observableNames(observableNamesIn) {}
 	
-	void append(double betaValue, std::vector<EstimateAndError> estimateAndError)
+	void append(double betaValue, Observables observables)
 	{
-		std::pair<double, std::vector<EstimateAndError> > tmpPair(betaValue, estimateAndError );
+		std::pair<double, Observables > tmpPair(betaValue, observables );
 		values.push_back( tmpPair );
 	}
 	
@@ -62,7 +62,7 @@ public:
 	{
 		std::string specificFilename = "reweightedData_" + quantityName;
 		std::cout << "# Writing reweighted data for \"" << quantityName << "\" to file \"" << specificFilename << "\"" << std::endl;
-		uint numberOfObservables = values[0].second.size();
+		uint numberOfObservables = observableNames.size();
 		std::ofstream outputstream;
 		outputstream.open(specificFilename.c_str(), std::ios::app);
 		if(outputstream.is_open()) {
@@ -76,10 +76,10 @@ public:
 			for (uint index = 0; index < values.size(); index ++)
 			{
 				outputstream << std::scientific << values[index].first << "\t" ;
-				for (uint index2 = 0; index2 < numberOfObservables; index2 ++)
-				{
-					outputstream << values[index].second[index2].estimate << "\t" << values[index].second[index2].error ;
-				}
+				outputstream << values[index].second.mean.estimate << "\t" << values[index].second.mean.error<< "\t" ;
+				outputstream << values[index].second.susceptibility.estimate << "\t" << values[index].second.susceptibility.error << "\t";
+				outputstream << values[index].second.skewness.estimate << "\t" << values[index].second.skewness.error << "\t";
+				outputstream << values[index].second.binderCumulant.estimate << "\t" << values[index].second.binderCumulant.error ;
 				outputstream << std::endl;
 			}
 			outputstream.close();
@@ -92,28 +92,11 @@ public:
 private:
 	std::string quantityName;
 	std::vector<std::string> observableNames;
-	std::vector < std::pair<double, std::vector<EstimateAndError> > > values;
+	std::vector < std::pair<double, Observables> > values;
 };
 
-void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<EstimateAndError> > & reweightedData)
+void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
 {
-	for ( uint i = 0; i < reweightedData.size(); i++)
-	{
-		for (uint j = 0; j < reweightedData[0].size(); j++)
-		{
-			std::cout << i << " " << j << " " << 
-			"beta: " << boost::lexical_cast<std::string>(newBetaValues[i][0]) <<  "\t" <<  
-			"value: " << boost::lexical_cast<std::string>(reweightedData[i][j].estimate) << std::endl;
-		}
-		
-	}
-	
-	
-	
-	
-	
-	
-	
 	//todo: make this an argument
 	std::vector<std::string> quantityNames(1, "plaq" );
 	quantityNames.push_back( "poly_re");
@@ -123,30 +106,21 @@ void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaVa
 	quantityNames.push_back( "poly_ph");
 	uint numberOfQuantitiesExpected = quantityNames.size();
 	std::vector<std::string> observableNames(1, "mean" );
-	uint numberOfObservablesExpected = observableNames.size();
+	observableNames.push_back("susc");
+	observableNames.push_back("skew");
+	observableNames.push_back("binder");
 	
 	uint numberOfNewPoints = reweightedData.size();
-	uint numberOfReweightedDataTotal = reweightedData[0].size();
+	uint numberOfQuantities = reweightedData[0].size();
 	
-	if ( numberOfReweightedDataTotal <= 0 )
+	if ( numberOfQuantities <= 0 )
 	{
-		throw std::invalid_argument("Number of reweighted datasets must be greater than 0! Aborting!");
+		throw std::invalid_argument("Number of reweighted quantities must be greater than 0! Aborting!");
 	}
-	std::cout << "Found " << numberOfReweightedDataTotal << " reweighted datasets." << std::endl;
-	
-	uint numberOfObservables = numberOfReweightedDataTotal / numberOfQuantitiesExpected;
-	if ( numberOfObservables != numberOfObservablesExpected)
+	if ( numberOfQuantities !=  numberOfQuantitiesExpected)
 	{
-		throw std::invalid_argument("Got wrong number of observables! Expected " + boost::lexical_cast<std::string>(numberOfObservablesExpected) + ", got " + boost::lexical_cast<std::string>(numberOfObservables) + " instead. Aborting!");
+		throw std::invalid_argument("Did not get all expected quantities. Aborting!");
 	}
-	if ( numberOfReweightedDataTotal % numberOfQuantitiesExpected != 0)
-	{
-		throw std::invalid_argument("Did not get all observables for all quantities! Aborting!");
-	}
-	std::cout << "Expected " << numberOfQuantitiesExpected << " reweighted quantities." << std::endl;
-	std::cout << "Found " << numberOfObservables << " different observable(s) for each quantity." << std::endl;
-	
-
 	if ( newBetaValues.size() != numberOfNewPoints )
 	{
 		throw std::invalid_argument("Number of new beta points and reweighted observables does not match! Aborting!");
@@ -155,32 +129,21 @@ void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaVa
 	{
 		throw std::invalid_argument("Found new values for more than one parameter! Aborting!");
 	}
+	std::cout << "# Found " << numberOfQuantities << " reweighted quantities." << std::endl;
 	
 	std::vector<ReweightedData> ReweightedQuantities;
 	for (uint quantityIndex = 0; quantityIndex < numberOfQuantitiesExpected; quantityIndex++)
 	{
-// 		std::cout << "quant: " << quantityIndex << std::endl;
 		ReweightedData tmp( "quantity" + boost::lexical_cast<std::string>(quantityIndex + 1), observableNames );
 			
 		for (uint iteration=0; iteration < numberOfNewPoints; iteration ++)
 		{
-// 			std::cout << "iter: " << iteration << std::endl;
-// 			std::cout << newBetaValues[iteration][0] << std::endl;
-				
-			std::vector<EstimateAndError> observables;
-			for( uint observableIndex = 0; observableIndex < numberOfObservables; observableIndex ++)
-			{
-// 				std::cout << "obs: " << observableIndex << std::endl;
-				uint index = quantityIndex + observableIndex*numberOfQuantitiesExpected;
-// 				std::cout << "idx: " << index << std::endl;
-// 				std::cout << "value: " << boost::lexical_cast<std::string>(reweightedData[iteration][index].estimate) << std::endl;
-				observables.push_back( reweightedData[iteration][index] );
-			}
-			tmp.append( newBetaValues[iteration][0], observables ) ;
+			uint index = quantityIndex;
+			tmp.append( newBetaValues[iteration][0], reweightedData[iteration][index] ) ;
 		}
 		ReweightedQuantities.push_back (tmp);
 	}
-	std::cout << "print to file" << std::endl;
+
 	for(uint iteration = 0; iteration < numberOfQuantitiesExpected; iteration ++)
 	{
 		ReweightedQuantities[iteration].printToFile();
