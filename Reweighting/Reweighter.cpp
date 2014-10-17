@@ -146,6 +146,7 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
             for(size_t m=0; m<3; m++){ //loop on the number of moments inserted, for the moment manually set
                 for(size_t k=0; k<numberOfBinsUsedToBinData; k++)
                     jackknifeEstimatorsPerPointAndObs[m+1][k] = jackknifeEstimators[k][i][numberOfObservablesGivenAsInput+j*3+m];
+
             }
             evaluateEstimateAndErrorOfObservableFromEstimators(observablesAtNewPoints[i][j],
                                                                jackknifeEstimatorsPerPointAndObs);
@@ -436,8 +437,8 @@ std::vector<std::vector<double> > ReweighterAbstract::calculateReweightedObserva
                     outputValuesOfObservables[indexNewPoint][indexObservable] =
                             (indexSimulation1 == 0 && (indexConfiguration == 0 || firstValue)) ? newTerm :
                             logarithmic_sum(outputValuesOfObservables[indexNewPoint][indexObservable], newTerm);
-                    firstValue = false;
                 }
+                firstValue = false;
             }
         }
         for(int indexObservable=0; indexObservable<reweightingDataHandler.numberOfObservablesToBeReweighted; indexObservable++)
