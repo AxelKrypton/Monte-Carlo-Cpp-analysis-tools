@@ -132,20 +132,19 @@ void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaVa
 	std::cout << "# Found " << numberOfQuantities << " reweighted quantities." << std::endl;
 	
 	std::vector<ReweightedData> ReweightedQuantities;
-	for (uint quantityIndex = 0; quantityIndex < numberOfQuantitiesExpected; quantityIndex++)
+	for (uint quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)
 	{
 		ReweightedData tmp( "quantity" + boost::lexical_cast<std::string>(quantityIndex + 1), observableNames );
-			
+
 		for (uint iteration=0; iteration < numberOfNewPoints; iteration ++)
 		{
-			uint index = quantityIndex;
-			tmp.append( newBetaValues[iteration][0], reweightedData[iteration][index] ) ;
+			tmp.append( newBetaValues[iteration][0], reweightedData[iteration][quantityIndex] ) ;
 		}
 		ReweightedQuantities.push_back (tmp);
 	}
 
-	for(uint iteration = 0; iteration < numberOfQuantitiesExpected; iteration ++)
+	for(uint quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex ++)
 	{
-		ReweightedQuantities[iteration].printToFile();
+		ReweightedQuantities[quantityIndex].printToFile();
 	}
 }
