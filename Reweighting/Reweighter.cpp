@@ -147,6 +147,12 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
                 for(size_t k=0; k<numberOfBinsUsedToBinData; k++)
                     jackknifeEstimatorsPerPointAndObs[m+1][k] = jackknifeEstimators[k][i][numberOfObservablesGivenAsInput+j*4+m];
             }
+//            if(i==0){
+//                std::cout << "\n Estimators first new point Obs "<< j << ":\n" << std::endl;
+
+
+//                std::cout << "" << std::endl;
+//            }
 
             evaluateEstimateAndErrorOfObservableFromEstimators(observablesAtNewPoints[i][j],
                                                                jackknifeEstimatorsPerPointAndObs);
