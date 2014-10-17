@@ -66,39 +66,25 @@ SimulationDataContainer::getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(in
 }
 
 
-/*****************************************************************************************/
-
-SimulationDataContainerWithCentralMomentsPerData::SimulationDataContainerWithCentralMomentsPerData()
-    : SimulationDataContainer() {}
-
-SimulationDataContainerWithCentralMomentsPerData::
-   SimulationDataContainerWithCentralMomentsPerData(std::string configurationFile,
-                                                    std::vector<unsigned int> whichColumns,
-                                                    std::vector<unsigned int> whichCentralMoments)
-    : SimulationDataContainer(configurationFile), whichColumns(whichColumns), whichCentralMoments(whichCentralMoments)
+SimulationDataContainer SimulationDataContainer::insertCentralMomentsPerData(std::vector<unsigned int> whichColumns,
+                                                                             std::vector<unsigned int> whichCentralMoments)
 {
-    for(int i=0; i<getNumberOfDatafiles(); i++){
+    SimulationDataContainer newSimDataCont(*this);
+
+    for(int i=0; i<newSimDataCont.getNumberOfDatafiles(); i++){
         for(size_t j=0; j<whichColumns.size(); j++){
-            if(whichColumns[j] >= (unsigned int)simulationDataSet[i].getNumberOfDataSample())
+            if((int)whichColumns[j] >= newSimDataCont.simulationDataSet[i].getNumberOfDataSample())
                 throw std::out_of_range("Columns specified not valid to add central moments!");
             for(size_t k=0; k<whichCentralMoments.size(); k++){
-                DataSample temporarySample = simulationDataSet[i][whichColumns[j]];
-                simulationDataSet[i].appendNewColumnOfData((temporarySample -
-                                                            temporarySample.getNthMoment(1)) ^ (int)whichCentralMoments[k]);
+                DataSample temporarySample = newSimDataCont.simulationDataSet[i][whichColumns[j]];
+                newSimDataCont.simulationDataSet[i].appendNewColumnOfData((temporarySample -
+                                                       temporarySample.getNthMoment(1)) ^ (int)whichCentralMoments[k]);
             }
         }
     }
+
+    return newSimDataCont;
 }
-
-
-std::vector<unsigned int> SimulationDataContainerWithCentralMomentsPerData::getWhichColumns(){
-    return whichColumns;
-}
-
-std::vector<unsigned int> SimulationDataContainerWithCentralMomentsPerData::getWhichCentralMoments(){
-    return whichCentralMoments;
-}
-
 
 /*****************************************************************************************/
 /******************************* STATIC FUNCTIONS ****************************************/
