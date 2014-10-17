@@ -17,10 +17,10 @@ int main(int argc, const char ** argv)
 		
 		Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints);
 		
-        std::vector<std::vector<Observables> > reweightedObservables = reweighter.calculateAndGetReweightedObservables();
+		std::vector<std::vector<Observables> > reweightedObservables = reweighter.calculateAndGetReweightedObservables();
 		std::vector<std::vector<double> > newBetaValues = reweighter.getValuesOfNewParameters();
 		
-        //writeReweightingResultsToFile(newBetaValues, reweightedObservables );
+		writeReweightingResultsToFile(newBetaValues, reweightedObservables );
 	}
 	//todo: move catch block into own function?
 	catch ( wrongBinningParameter &e)
