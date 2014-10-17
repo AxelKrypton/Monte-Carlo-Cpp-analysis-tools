@@ -81,7 +81,7 @@ public:
         return observables;
     }
 
-    std::vector<std::vector<EstimateAndError> > testCalculateAndGetReweightedObservables(){
+    std::vector<std::vector<Observables> > testCalculateAndGetReweightedObservables(){
         return calculateAndGetReweightedObservables();
     }
 };
@@ -492,10 +492,10 @@ BOOST_AUTO_TEST_SUITE(observables)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
         ReweighterTest reweighter(fileThatDoesExist);
-        const int numberOfObservablesInFiles = 1;
+        const int numberOfObservablesInFiles = 4; //1 obs given + 3 central moments
         const double referenceMinimumOfObservables = -3.9;
-        const double referenceOriginalRawObservables[] = {1.3, 1.6, -1.9, 2.3, -2.6, 2.9, -3.3, -3.6, -3.9};
-        const double referenceOriginalBinnedObservables[] = {0.333333333333333, 0.866666666666667, -3.6};
+        const double referenceOriginalRawObservables[] = {1.3, 1.6, -1.9, 2.3, -2.6, 2.9, -3.3, 3.6, -3.9};
+        const double referenceOriginalBinnedObservables[] = {0.333333333333333, 0.866666666666667, -1.2};
         std::valarray<double> referencePreparedRawObservables(referenceOriginalRawObservables, 9);
         std::valarray<double> referencePreparedBinnedObservables(referenceOriginalBinnedObservables, 3);
         referencePreparedRawObservables = log(referencePreparedRawObservables - 2*referenceMinimumOfObservables);
@@ -534,7 +534,7 @@ BOOST_AUTO_TEST_SUITE(observables)
         std::vector< unsigned int> newNumPoints(1, 30);
         newRanges.push_back(std::make_pair(5.348, 5.3509));
         ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
-        const int numberOfObservablesInFiles = 1;
+        const int numberOfObservablesInFiles = 4; //1 obs given + 3 central moments
         double referenceValuesObsNewPoints[] = {0.51136048194686, 0.51141566283263, 0.51147120976833, 0.51152713131180,
                                                 0.51158343617809, 0.51164013323921, 0.51169723151890, 0.51175474019037,
                                                 0.51181266857210, 0.51187102612138, 0.51192982243020, 0.51198906722145,
@@ -563,7 +563,7 @@ BOOST_AUTO_TEST_SUITE(observables)
         newRanges.push_back(std::make_pair(5.348, 5.3509));
         ReweighterTest reweighter(fileThatDoesExist);
         reweighter.setNewParameters(newRanges, newNumPoints);
-        const int numberOfObservablesInFiles = 1;
+        const int numberOfObservablesInFiles = 4; //1 obs given + 3 central moments
         const int pointToBeLeftOut = 1652;
         double referenceValuesObsNewPoints[] = {0.51136310124219, 0.51141833777545, 0.51147393929166, 0.51152991432649,
                                                 0.51158627157410, 0.51164301988718, 0.51170016827126, 0.51175772587953,
@@ -596,7 +596,7 @@ BOOST_AUTO_TEST_SUITE(observables)
         newRanges.push_back(std::make_pair(5.348, 5.3509));
         ReweighterTest reweighter(fileThatDoesExist);
         reweighter.setNewParameters(newRanges, newNumPoints);
-        const int numberOfObservablesInFiles = 1;
+        const int numberOfObservablesInFiles = 4; //1 obs given + 3 central moments
         const int pointToBeLeftOut = 0;
         double referenceValuesObsNewPoints[] = {0.51136053648952, 0.51141575105339, 0.51147133146101, 0.51152728623366,
                                                 0.51158362405415, 0.51164035375839, 0.51169748433664, 0.51175502492514,
@@ -647,9 +647,9 @@ BOOST_AUTO_TEST_SUITE(observables)
                                                 0.51511579539832, 0.51519643092919};
         reweighter.testCalculateLogZAtSimulatedPoints();
         reweighter.testCalculateLogZAtNewPoints();
-        std::vector<std::vector<EstimateAndError> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
+        std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
         for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].estimate, 1.e-4);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-4);
     }
 
     BOOST_AUTO_TEST_CASE(observables6)
@@ -697,10 +697,10 @@ BOOST_AUTO_TEST_SUITE(observables)
                                                 0.0005119523373, 0.0005175764449, 0.0005230820069};
         reweighter.testCalculateLogZAtSimulatedPoints();
         reweighter.testCalculateLogZAtNewPoints();
-        std::vector<std::vector<EstimateAndError> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
+        std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
         for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].estimate, 2.e-4);
-            BOOST_REQUIRE_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].error, 45);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 2.e-4);
+            BOOST_REQUIRE_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].mean.error, 45);
         }
     }
 
@@ -718,18 +718,19 @@ BOOST_AUTO_TEST_SUITE(observables)
         ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
         reweighter.testCalculateLogZAtSimulatedPoints();
         reweighter.testCalculateLogZAtNewPoints();
-        std::vector<std::vector<EstimateAndError> > valuesObsNewPoints1 = reweighter.testCalculateAndGetReweightedObservables();
+        std::vector<std::vector<Observables> > valuesObsNewPoints1 = reweighter.testCalculateAndGetReweightedObservables();
         std::vector<std::vector<double> > valuesNewPoints1 = reweighter.getValuesOfNewParameters();
         newNumPoints[0]=21;
         reweighter.setNewNumberOfPointsOfParameters(newNumPoints);
         reweighter.testCalculateLogZAtSimulatedPoints();
         reweighter.testCalculateLogZAtNewPoints();
-        std::vector<std::vector<EstimateAndError> > valuesObsNewPoints2 = reweighter.testCalculateAndGetReweightedObservables();
+        std::vector<std::vector<Observables> > valuesObsNewPoints2 = reweighter.testCalculateAndGetReweightedObservables();
         std::vector<std::vector<double> > valuesNewPoints2 = reweighter.getValuesOfNewParameters();
         for(size_t i=0; i<valuesNewPoints1.size(); i++){
             for(size_t j=0; j<valuesNewPoints2.size(); j++){
                 if(valuesNewPoints2[j] == valuesNewPoints1[i])
-                    BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].estimate, valuesObsNewPoints2[j][0].estimate, doublePrecisionInPercent);
+                    BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.estimate,
+                                        valuesObsNewPoints2[j][0].mean.estimate, doublePrecisionInPercent);
             }
         }
     }

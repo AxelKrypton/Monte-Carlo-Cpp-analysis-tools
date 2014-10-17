@@ -5,6 +5,7 @@
 #include "SimulationData.hpp"
 #include "../dataAnalysisUtilities/binnedDataSample.hpp"
 
+static void printBinsizesActuallyUsed(SimulationDataContainer, const int);
 static std::vector<int> extractValuesOfBinsizes(SimulationDataContainer, std::string);
 static bool isLastEntryPresentMoreThanOnce(std::vector<std::vector<double> >);
 static void extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(SimulationData, std::vector<std::string>&, const std::vector<std::string>&);
@@ -27,13 +28,27 @@ ReweightingDataHandler::ReweightingDataHandler() {
 }
 
 ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn)
-    : configurationFile(configurationFileIn), simulationRawDataContainer(configurationFileIn), simulationBinnedDataContainer(simulationRawDataContainer)
+    : configurationFile(configurationFileIn),
+      simulationRawDataContainer(configurationFileIn), simulationBinnedDataContainer(simulationRawDataContainer)
 {
-    numberOfObservablesToBeReweighted = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
-    checkCorrectnessOfConfigurationFileForReweighting(simulationRawDataContainer, ReweightingDataHandler::metaParameters, numberOfObservablesToBeReweighted);
+    numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
+    checkCorrectnessOfConfigurationFileForReweighting(simulationRawDataContainer, ReweightingDataHandler::metaParameters, numberOfObservablesGivenAsInput);
     numberOfBinsToBeUsed = getNumberOfBinsToBeUsed(simulationRawDataContainer, ReweightingDataHandler::metaParameters);
     //Print information about binsizes actually used
     printBinsizesActuallyUsed(simulationRawDataContainer, numberOfBinsToBeUsed);
+    //Evaluate central moments per data and append them to the raw data container
+    std::vector<unsigned int> columnsOfObservables;
+    unsigned int centralMomentsNeededTmp[] = {2,3,4};
+    std::vector<unsigned int> centralMomentsNeeded (centralMomentsNeededTmp, centralMomentsNeededTmp + sizeof(centralMomentsNeededTmp) / sizeof(unsigned int) );
+    for(size_t i=getNamesOfParametersIgnoringMetaParameters().size(); (int)i<simulationRawDataContainer[0].getNumberOfDataSample(); i++)
+        columnsOfObservables.push_back(i);
+    simulationRawDataContainer = simulationRawDataContainer.insertCentralMomentsPerData(columnsOfObservables,
+                                                                                        centralMomentsNeeded);
+    numberOfObservablesToBeReweighted = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
+
+    std::cout << "obs_giv = " << numberOfObservablesGivenAsInput << std::endl;
+    std::cout << "obs_rew = " << numberOfObservablesToBeReweighted << std::endl;
+
     //Perform binning on the data
     std::pair<SimulationDataContainer, std::vector<int> >
             binnedDataAndLeftOutEntries = simulationRawDataContainer.getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(numberOfBinsToBeUsed);
