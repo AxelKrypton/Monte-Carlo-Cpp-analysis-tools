@@ -50,6 +50,7 @@ private:
     std::string configurationFile;
     SimulationDataContainer simulationRawDataContainer;
     SimulationDataContainer simulationBinnedDataContainer;
+    int numberOfObservablesGivenAsInput;
     int numberOfObservablesToBeReweighted;
 
     /*

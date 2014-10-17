@@ -4,6 +4,7 @@
 #include "SimulationDataContainer.hpp"
 #include "ReweightingDataHandler.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
+#include "../dataAnalysisUtilities/Observables.hpp"
 
 /*
  * The idea underlying the implementation of the Reweighter class is that the user construct a
@@ -90,7 +91,7 @@ public:
     virtual void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                                   std::vector<unsigned int> newNumberOfPointsOfParametersIn) = 0;
     //Other functionalities
-    std::vector<std::vector<EstimateAndError> > calculateAndGetReweightedObservables();
+    std::vector<std::vector<Observables> > calculateAndGetReweightedObservables();
 
 protected:
     ReweighterAbstract();
@@ -162,7 +163,7 @@ private:
 	std::vector<std::vector<double> >  valuesOfNewParameters;
 	std::vector<double> logZAtSimulatedPoints;
 	std::vector<double> logZAtNewPoints;
-    std::vector<std::vector<EstimateAndError> > observablesAtNewPoints;
+    std::vector<std::vector<Observables> > observablesAtNewPoints;
 
 	//Todo: think whether keep these two objects as members or not
 	//Note: the following two elements could be unified in c++11 with std::tuple
