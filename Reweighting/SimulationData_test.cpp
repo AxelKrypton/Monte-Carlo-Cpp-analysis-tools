@@ -188,3 +188,20 @@ BOOST_AUTO_TEST_SUITE(AccessOperator)
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(AppendColumn)
+
+    BOOST_AUTO_TEST_CASE(AppendColumn1)
+    {
+        std::string fileThatDoesExist = "GeneralTestFiles/input_test_file_1";
+        std::map<std::string, double> filledMap;
+        filledMap["beta"] = 4.0;
+        SimulationData simData(filledMap, fileThatDoesExist);
+        BOOST_REQUIRE_THROW(simData.appendNewColumnOfData(DataSampleBasic(std::valarray<double>(3.14, 4))), std::invalid_argument);
+        DataSampleBasic referenceSample(std::valarray<double>(3.14, 3));
+        simData.appendNewColumnOfData(referenceSample);
+        BOOST_REQUIRE(referenceSample == simData[simData.getNumberOfDataSample()-1]);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()

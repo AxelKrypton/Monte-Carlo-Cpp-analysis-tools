@@ -561,21 +561,6 @@ static void writeNewPoints(std::vector<std::vector<double> >&  valuesOfNewParame
 }
 
 
-//static void assignMeanValuesToEstimateAndError(std::vector<std::vector<double> > meanValues,
-//                                               std::vector<std::vector<EstimateAndError> >& estimateAndError){
-//    if(meanValues.size() != estimateAndError.size())
-//        throw std::invalid_argument("Invalid sizes in assignMeanValuesToEstimateAndError!");
-//    for(size_t i=0; i<meanValues.size(); i++){
-//        if(meanValues[i].size() != estimateAndError[i].size())
-//            throw std::invalid_argument("Invalid sizes in assignMeanValuesToEstimateAndError!");
-//        for(size_t j=0; j<meanValues[i].size(); j++){
-//            estimateAndError[i][j].estimate = meanValues[i][j];
-//            estimateAndError[i][j].error = 0.0;
-//        }
-//    }
-//}
-
-
 /*
  * Here a tool to sum quantities using logarithms is developed.
  * Basically, eq.(8.12) of Barkema is implemented.

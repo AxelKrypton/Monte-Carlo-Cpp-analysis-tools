@@ -69,5 +69,7 @@ DataSampleBasic operator/(double factor, DataSampleBasic sampleIn);
 DataSampleBasic operator/(DataSampleBasic lhs, DataSampleBasic rhs);
 DataSampleBasic operator^(DataSampleBasic sampleIn, int n);
 DataSampleBasic operator^(DataSampleBasic sampleIn, double n);
+bool operator==(DataSampleBasic lhs, DataSampleBasic rhs);
+bool operator!=(DataSampleBasic lhs, DataSampleBasic rhs);
 
 #endif /* DATASAMPLEBASIC_HPP_ */

@@ -325,8 +325,7 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
                 fabs(skewnessAndError.estimate - expectedSkewness) / skewnessAndError.error;
 
         BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
-        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue > 0.5);
-        BOOST_WARN(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 1);
+        BOOST_WARN( fabs(skewnessAndError.error/skewnessAndError.estimate) < 0.001 );
 	}
 	
 BOOST_AUTO_TEST_SUITE_END()
@@ -349,8 +348,7 @@ BOOST_AUTO_TEST_SUITE(binderAndError)
                 fabs(kurtosisAndError.estimate - expectedKurtosis) / kurtosisAndError.error;
 
         BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
-        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue > 0.5);
-        BOOST_WARN(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 1);
+        BOOST_WARN( fabs(kurtosisAndError.error/kurtosisAndError.estimate) < 0.001 );
 	}
 	
 BOOST_AUTO_TEST_SUITE_END()
