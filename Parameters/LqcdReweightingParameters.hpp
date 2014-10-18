@@ -16,6 +16,7 @@ public:
 	void printParameters();
 	
 	std::string getInputfile();
+	std::string getOutputfilePrefix();
 	uint getNumberOfNewBetaPoints();
 	double getNewBetaRange_low();
 	double getNewBetaRange_high();
@@ -30,6 +31,7 @@ private:
 	void checkParsedArguments(po::variables_map & vm, po::options_description & desc);
 	
 	std::string inputfile;
+	std::string outputfilePrefix;
 	uint numberOfNewBetaPoints;
 	double newBetaRange_low;
 	double newBetaRange_high;

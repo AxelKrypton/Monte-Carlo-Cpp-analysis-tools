@@ -88,6 +88,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		bool defaultValue = false;
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForBinder() );
 	}
+	
+	BOOST_AUTO_TEST_CASE(outputfilePrefix)
+	{
+		std::string defaultValue = "reweightedData";
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getOutputfilePrefix() );
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -206,6 +212,21 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		bool newValue = true;
 		std::string argumentName = "--deactivateReweightingForBinder";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForBinder() );
+	}
+	
+	static LqcdReweightingParameters createParametersForArgumentSettingCheck_string(std::string argumentName, std::string newValue)
+	{
+		std::string argument = argumentName + "=" + newValue;
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+		return LqcdReweightingParameters(numberOfArguments, arguments);
+	}
+	
+	BOOST_AUTO_TEST_CASE(outputfilePrefix)
+	{
+		std::string newValue = "abcdefg";
+		std::string argumentName = "--outputfilePrefix";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_string(argumentName, newValue).getOutputfilePrefix() );
 	}
 	
 BOOST_AUTO_TEST_SUITE_END()
