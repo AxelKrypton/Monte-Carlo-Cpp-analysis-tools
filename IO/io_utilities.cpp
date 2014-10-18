@@ -49,9 +49,9 @@ void writeEstimateAndErrorArraysToFile(std::string estimateName, std::vector<dou
 class LqcdReweightedData
 {
 public:
-	LqcdReweightedData(std::string quantityNameIn) : quantityName(quantityNameIn)
+	LqcdReweightedData(std::string quantityNameIn, std::string outputfilePrefix) : quantityName(quantityNameIn)
 	{
-		filename = "reweightedData_" + quantityName;
+		filename = outputfilePrefix + "_" + quantityName;
 	}
 	
 	void append(double betaValue, Observables observables)
@@ -105,7 +105,7 @@ static void checkInputSizes(std::vector<std::vector<double> > & newBetaValues, s
 	std::cout << "# Found " << numberOfQuantities << " reweighted quantities." << std::endl;
 }
 
-void writeLqcdReweightingResultsToFile(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
+void writeLqcdReweightingResultsToFile(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData, std::string outputfilePrefix)
 {
 	checkInputSizes(newBetaValues, reweightedData);
 	
@@ -115,7 +115,7 @@ void writeLqcdReweightingResultsToFile(std::vector<std::vector<double> > & newBe
 	
 	for (uint quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)
 	{
-		LqcdReweightedData reweightedQuantity( "quantity" + boost::lexical_cast<std::string>(quantityIndex + 1) );
+		LqcdReweightedData reweightedQuantity( "quantity" + boost::lexical_cast<std::string>(quantityIndex + 1), outputfilePrefix );
 
 		for (uint iteration=0; iteration < numberOfNewPoints; iteration ++)
 		{
