@@ -62,26 +62,14 @@ public:
 	{
 		std::string specificFilename = "reweightedData_" + quantityName;
 		std::cout << "# Writing reweighted data for \"" << quantityName << "\" to file \"" << specificFilename << "\"" << std::endl;
-		uint numberOfObservables = values[0].second.observableNames.size();
 		std::ofstream outputstream;
 		outputstream.open(specificFilename.c_str(), std::ios::app);
 		if(outputstream.is_open()) {
-			outputstream << "# beta\t\t";
-			for (uint index2 = 0; index2 < numberOfObservables; index2 ++)
-			{
-				outputstream << values[0].second.observableNames[index2] << "\t\terror\t\t";
-			}
-			outputstream  << std::endl;
+			outputstream << "# beta\t\t" << values[0].second.getMetaInformation() << std::endl;
 			
 			for (uint index = 0; index < values.size(); index ++)
 			{
-				outputstream << std::scientific;
-				outputstream << values[index].first << "\t" ;
-				outputstream << values[index].second.mean.estimate << "\t" << values[index].second.mean.error<< "\t" ;
-				outputstream << values[index].second.susceptibility.estimate << "\t" << values[index].second.susceptibility.error << "\t";
-				outputstream << values[index].second.skewness.estimate << "\t" << values[index].second.skewness.error << "\t";
-				outputstream << values[index].second.binderCumulant.estimate << "\t" << values[index].second.binderCumulant.error ;
-				outputstream << std::endl;
+				outputstream << std::scientific << values[index].first << "\t" << values[index].second.getValuesAsString() << std::endl;
 			}
 			outputstream.close();
 		} 

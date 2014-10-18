@@ -14,6 +14,28 @@ public:
 												observableNames.push_back("skew");
 												observableNames.push_back("binder");
 										}
+										
+		std::string getMetaInformation()
+		{
+			std::string metaInfos = "";
+			for (uint index = 0; index < observableNames.size(); index ++)
+			{
+				metaInfos += observableNames[index] + "\t\terror\t\t";
+			}
+			return metaInfos;
+		}
+		
+		std::string getValuesAsString()
+		{
+			std::stringstream values;
+			values << std::scientific;
+			values << mean.estimate << "\t" << mean.error<< "\t" ;
+			values << susceptibility.estimate << "\t" << susceptibility.error << "\t";
+			values << skewness.estimate << "\t" << skewness.error << "\t";
+			values << binderCumulant.estimate << "\t" << binderCumulant.error ;
+			return values.str();
+		}
+
     /*
      * Here in the following the observables we deal with around in the
      * library, together with their definition (thinking to a sample set X
