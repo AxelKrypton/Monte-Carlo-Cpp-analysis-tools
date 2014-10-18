@@ -46,11 +46,13 @@ void writeEstimateAndErrorArraysToFile(std::string estimateName, std::vector<dou
 	}
 }
 
-class ReweightedData
+class LqcdReweightedData
 {
 public:
-	ReweightedData(std::string quantityNameIn) :
-	quantityName(quantityNameIn) {}
+	LqcdReweightedData(std::string quantityNameIn) : quantityName(quantityNameIn)
+	{
+		filename = "reweightedData_" + quantityName;
+	}
 	
 	void append(double betaValue, Observables observables)
 	{
@@ -60,16 +62,15 @@ public:
 	
 	void printToFile()
 	{
-		std::string specificFilename = "reweightedData_" + quantityName;
-		std::cout << "# Writing reweighted data for \"" << quantityName << "\" to file \"" << specificFilename << "\"" << std::endl;
+		std::cout << "# Writing reweighted data for \"" << quantityName << "\" to file \"" << filename << "\"" << std::endl;
 		std::ofstream outputstream;
-		outputstream.open(specificFilename.c_str(), std::ios::app);
+		outputstream.open(filename.c_str(), std::ios::app);
 		if(outputstream.is_open()) {
 			outputstream << "# beta\t\t" << values[0].second.getMetaInformation() << std::endl;
 			
 			for (uint index = 0; index < values.size(); index ++)
 			{
-				outputstream << std::scientific << values[index].first << "\t" << values[index].second.getValuesAsString() << std::endl;
+				outputstream << std::scientific << values[index].first << "\t" << values[index].second.getObservablesAsString() << std::endl;
 			}
 			outputstream.close();
 		} 
@@ -80,6 +81,7 @@ public:
 	
 private:
 	std::string quantityName;
+	std::string filename;
 	std::vector < std::pair<double, Observables> > values;
 };
 
@@ -103,17 +105,17 @@ static void checkInputSizes(std::vector<std::vector<double> > & newBetaValues, s
 	std::cout << "# Found " << numberOfQuantities << " reweighted quantities." << std::endl;
 }
 
-void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
+void writeLqcdReweightingResultsToFile(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
 {
 	checkInputSizes(newBetaValues, reweightedData);
 	
-	std::vector<ReweightedData> ReweightedQuantities;
+	std::vector<LqcdReweightedData> ReweightedQuantities;
 	uint numberOfNewPoints = reweightedData.size();
 	uint numberOfQuantities = reweightedData[0].size();
 	
 	for (uint quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)
 	{
-		ReweightedData reweightedQuantity( "quantity" + boost::lexical_cast<std::string>(quantityIndex + 1) );
+		LqcdReweightedData reweightedQuantity( "quantity" + boost::lexical_cast<std::string>(quantityIndex + 1) );
 
 		for (uint iteration=0; iteration < numberOfNewPoints; iteration ++)
 		{

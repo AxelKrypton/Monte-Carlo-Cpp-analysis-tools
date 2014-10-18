@@ -25,7 +25,7 @@ public:
 			return metaInfos;
 		}
 		
-		std::string getValuesAsString()
+		std::string getObservablesAsString()
 		{
 			std::stringstream values;
 			values << std::scientific;
