@@ -49,8 +49,8 @@ void writeEstimateAndErrorArraysToFile(std::string estimateName, std::vector<dou
 class ReweightedData
 {
 public:
-	ReweightedData(std::string quantityNameIn, std::vector<std::string> observableNamesIn) :
-	quantityName(quantityNameIn), observableNames(observableNamesIn) {}
+	ReweightedData(std::string quantityNameIn) :
+	quantityName(quantityNameIn) {}
 	
 	void append(double betaValue, Observables observables)
 	{
@@ -62,20 +62,21 @@ public:
 	{
 		std::string specificFilename = "reweightedData_" + quantityName;
 		std::cout << "# Writing reweighted data for \"" << quantityName << "\" to file \"" << specificFilename << "\"" << std::endl;
-		uint numberOfObservables = observableNames.size();
+		uint numberOfObservables = values[0].second.observableNames.size();
 		std::ofstream outputstream;
 		outputstream.open(specificFilename.c_str(), std::ios::app);
 		if(outputstream.is_open()) {
 			outputstream << "# beta\t\t";
 			for (uint index2 = 0; index2 < numberOfObservables; index2 ++)
 			{
-				outputstream << observableNames[index2] << "\t\terror\t\t";
+				outputstream << values[0].second.observableNames[index2] << "\t\terror\t\t";
 			}
 			outputstream  << std::endl;
 			
 			for (uint index = 0; index < values.size(); index ++)
 			{
-				outputstream << std::scientific << values[index].first << "\t" ;
+				outputstream << std::scientific;
+				outputstream << values[index].first << "\t" ;
 				outputstream << values[index].second.mean.estimate << "\t" << values[index].second.mean.error<< "\t" ;
 				outputstream << values[index].second.susceptibility.estimate << "\t" << values[index].second.susceptibility.error << "\t";
 				outputstream << values[index].second.skewness.estimate << "\t" << values[index].second.skewness.error << "\t";
@@ -91,17 +92,11 @@ public:
 	
 private:
 	std::string quantityName;
-	std::vector<std::string> observableNames;
 	std::vector < std::pair<double, Observables> > values;
 };
 
-void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
+static void checkInputSizes(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
 {
-	std::vector<std::string> observableNames(1, "mean" );
-	observableNames.push_back("susc");
-	observableNames.push_back("skew");
-	observableNames.push_back("binder");
-	
 	uint numberOfNewPoints = reweightedData.size();
 	uint numberOfQuantities = reweightedData[0].size();
 	
@@ -118,17 +113,26 @@ void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaVa
 		throw std::invalid_argument("Found new values for more than one parameter! Aborting!");
 	}
 	std::cout << "# Found " << numberOfQuantities << " reweighted quantities." << std::endl;
+}
+
+void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
+{
+	checkInputSizes(newBetaValues, reweightedData);
 	
 	std::vector<ReweightedData> ReweightedQuantities;
+	uint numberOfNewPoints = reweightedData.size();
+	uint numberOfQuantities = reweightedData[0].size();
+	
 	for (uint quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)
 	{
-		ReweightedData tmp( "quantity" + boost::lexical_cast<std::string>(quantityIndex + 1), observableNames );
+		ReweightedData reweightedQuantity( "quantity" + boost::lexical_cast<std::string>(quantityIndex + 1) );
 
 		for (uint iteration=0; iteration < numberOfNewPoints; iteration ++)
 		{
-			tmp.append( newBetaValues[iteration][0], reweightedData[iteration][quantityIndex] ) ;
+			reweightedQuantity.append( newBetaValues[iteration][0], reweightedData[iteration][quantityIndex] ) ;
 		}
-		ReweightedQuantities.push_back (tmp);
+		
+		ReweightedQuantities.push_back (reweightedQuantity);
 	}
 
 	for(uint quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex ++)
