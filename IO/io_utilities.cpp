@@ -97,14 +97,6 @@ private:
 
 void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
 {
-	//todo: make this an argument
-	std::vector<std::string> quantityNames(1, "plaq" );
-	quantityNames.push_back( "poly_re");
-	quantityNames.push_back( "poly_im");
-	quantityNames.push_back( "poly_im_abs");
-	quantityNames.push_back( "poly_sq");
-	quantityNames.push_back( "poly_ph");
-	uint numberOfQuantitiesExpected = quantityNames.size();
 	std::vector<std::string> observableNames(1, "mean" );
 	observableNames.push_back("susc");
 	observableNames.push_back("skew");
@@ -116,10 +108,6 @@ void writeReweightingResultsToFile(std::vector<std::vector<double> > & newBetaVa
 	if ( numberOfQuantities <= 0 )
 	{
 		throw std::invalid_argument("Number of reweighted quantities must be greater than 0! Aborting!");
-	}
-	if ( numberOfQuantities !=  numberOfQuantitiesExpected)
-	{
-		throw std::invalid_argument("Did not get all expected quantities. Aborting!");
 	}
 	if ( newBetaValues.size() != numberOfNewPoints )
 	{
