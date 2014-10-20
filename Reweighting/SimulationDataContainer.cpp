@@ -77,8 +77,9 @@ SimulationDataContainer SimulationDataContainer::insertCentralMomentsPerData(std
                 throw std::out_of_range("Columns specified not valid to add central moments!");
             for(size_t k=0; k<whichCentralMoments.size(); k++){
                 DataSample temporarySample = newSimDataCont.simulationDataSet[i][whichColumns[j]];
-                newSimDataCont.simulationDataSet[i].appendNewColumnOfData((temporarySample -
-                                                       temporarySample.getNthMoment(1)) ^ (int)whichCentralMoments[k]);
+                newSimDataCont.simulationDataSet[i].appendNewColumnOfData(temporarySample ^ (int)whichCentralMoments[k]);
+                /*newSimDataCont.simulationDataSet[i].appendNewColumnOfData((temporarySample -
+		  temporarySample.getNthMoment(1)) ^ (int)whichCentralMoments[k]);*/
             }
         }
     }

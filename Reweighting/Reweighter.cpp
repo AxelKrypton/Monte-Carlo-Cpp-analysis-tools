@@ -148,6 +148,7 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
                     jackknifeEstimatorsPerPointAndObs[m+1][k] = jackknifeEstimators[k][i][numberOfObservablesGivenAsInput+j*3+m];
 
             }
+
             evaluateEstimateAndErrorOfObservableFromEstimators(observablesAtNewPoints[i][j],
                                                                jackknifeEstimatorsPerPointAndObs);
 
@@ -155,6 +156,7 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
 //            observablesAtNewPoints[i][j].error = calculateJacknifeError(DataSample(jackknifeEstimatorsPerPointAndObs[0]));
         }
     }
+
     std::cout << " ...reweighting of observables done!\n";
     std::cout << "==========================================================\n";
     return observablesAtNewPoints;
@@ -547,15 +549,19 @@ static void evaluateEstimateAndErrorOfObservableFromEstimators(Observables& obs,
     //Calculate mean
     obs.mean.estimate = calculateJacknifeEstimate(estimatorData);
     obs.mean.error = calculateJacknifeError(estimatorData);
-    //Calculate susceptibility
-    obs.susceptibility.estimate = calculateJacknifeEstimate(estimatorSecondMomentPerData);
-    obs.susceptibility.error = calculateJacknifeError(estimatorSecondMomentPerData);
+    //Calculate susceptibility --->  x2-x1^2
+    DataSample functionAppliedToEstimators = estimatorSecondMomentPerData - (estimatorData ^ 2);
+    obs.susceptibility.estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
+    obs.susceptibility.error = calculateJacknifeError(functionAppliedToEstimators);
     //Calculate skewness
-    DataSample functionAppliedToEstimators = estimatorThirdMomentPerData / (estimatorSecondMomentPerData ^ (3. / 2));
+    functionAppliedToEstimators = (estimatorThirdMomentPerData - ((3*estimatorSecondMomentPerData ) * estimatorData)
+                                   + (2*(estimatorData ^ 3))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 1.5);
     obs.skewness.estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
     obs.skewness.error = calculateJacknifeError(functionAppliedToEstimators);
     //Calculate binder cumulant
-    functionAppliedToEstimators = estimatorFourthMomentPerData / (estimatorSecondMomentPerData ^ 2.);
+    functionAppliedToEstimators = (estimatorFourthMomentPerData -((4*estimatorThirdMomentPerData) * estimatorData)
+                                   + (6*estimatorSecondMomentPerData) * (estimatorData ^ 2)
+                                   - (3*(estimatorData ^ 4))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 2);
     obs.binderCumulant.estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
     obs.binderCumulant.error = calculateJacknifeError(functionAppliedToEstimators);
 }
