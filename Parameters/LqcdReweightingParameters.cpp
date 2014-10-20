@@ -9,6 +9,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
 	desc.add_options()
 		("help,h", "Produce this help message")
 		("file,f", po::value<std::string>(&inputfile), "Inputfile containing metainformation for reweighting procedure.")
+		("outputfilePrefix", po::value<std::string>(&outputfilePrefix)->default_value("reweightedData"), "Prefix for output file.")
 		("numberOfNewBetaPoints", po::value<uint>(&numberOfNewBetaPoints)->default_value(2), "Number of new points to produce with reweighting.")
 		("newBetaRange_high", po::value<double>(&newBetaRange_high)->default_value(2), "Upper limit of new beta range of to cover with reweighting.")
 		("newBetaRange_low", po::value<double>(&newBetaRange_low)->default_value(1), "Lower limit of new beta range of to cover with reweighting.")
@@ -96,6 +97,11 @@ uint LqcdReweightingParameters::getNumberOfNewBetaPoints()
 std::string LqcdReweightingParameters::getInputfile()
 {
 	return inputfile;
+}
+
+std::string LqcdReweightingParameters::getOutputfilePrefix()
+{
+	return outputfilePrefix;
 }
 
 double LqcdReweightingParameters::getNewBetaRange_low()

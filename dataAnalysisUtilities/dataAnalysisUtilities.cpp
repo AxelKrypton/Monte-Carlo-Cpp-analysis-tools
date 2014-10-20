@@ -80,6 +80,8 @@ static DataSample createVarianceSample(DataSample sampleIn)
 	return (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
 }
 
+
+#include "binnedDataSample.hpp"
 EstimateAndError calcVarianceAndError(DataSample & sampleIn, Parameters parameters, bool shouldUseBinning = false)
 {
 	double variance = 0.;
@@ -90,6 +92,8 @@ EstimateAndError calcVarianceAndError(DataSample & sampleIn, Parameters paramete
 	{
 		DataSample binnedData = performBinning(varianceSample, parameters);
 		error = unbiasedErrorOfVariance(binnedData);
+		// todo: improve!
+		performBinning(sampleIn, parameters);
 	}
 	else
 	{
