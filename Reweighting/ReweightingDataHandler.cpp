@@ -38,12 +38,11 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn)
     printBinsizesActuallyUsed(simulationRawDataContainer, numberOfBinsToBeUsed);
     //Evaluate central moments per data and append them to the raw data container
     std::vector<unsigned int> columnsOfObservables;
-    unsigned int centralMomentsNeededTmp[] = {2,3,4};
-    std::vector<unsigned int> centralMomentsNeeded (centralMomentsNeededTmp, centralMomentsNeededTmp + sizeof(centralMomentsNeededTmp) / sizeof(unsigned int) );
+    unsigned int momentsNeededTmp[] = {2,3,4};
+    std::vector<unsigned int> momentsNeeded (momentsNeededTmp, momentsNeededTmp + sizeof(momentsNeededTmp) / sizeof(unsigned int) );
     for(size_t i=getNamesOfParametersIgnoringMetaParameters().size(); (int)i<simulationRawDataContainer[0].getNumberOfDataSample(); i++)
         columnsOfObservables.push_back(i);
-    simulationRawDataContainer = simulationRawDataContainer.insertCentralMomentsPerData(columnsOfObservables,
-                                                                                        centralMomentsNeeded);
+    simulationRawDataContainer = simulationRawDataContainer.insertMomentsPerData(columnsOfObservables, momentsNeeded);
     numberOfObservablesToBeReweighted = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
 
     std::cout << "obs_giv = " << numberOfObservablesGivenAsInput << std::endl;

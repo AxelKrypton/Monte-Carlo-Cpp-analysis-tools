@@ -66,7 +66,7 @@ SimulationDataContainer::getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(in
 }
 
 
-SimulationDataContainer SimulationDataContainer::insertCentralMomentsPerData(std::vector<unsigned int> whichColumns,
+SimulationDataContainer SimulationDataContainer::insertMomentsPerData(std::vector<unsigned int> whichColumns,
                                                                              std::vector<unsigned int> whichCentralMoments)
 {
     SimulationDataContainer newSimDataCont(*this);
@@ -78,8 +78,6 @@ SimulationDataContainer SimulationDataContainer::insertCentralMomentsPerData(std
             for(size_t k=0; k<whichCentralMoments.size(); k++){
                 DataSample temporarySample = newSimDataCont.simulationDataSet[i][whichColumns[j]];
                 newSimDataCont.simulationDataSet[i].appendNewColumnOfData(temporarySample ^ (int)whichCentralMoments[k]);
-                /*newSimDataCont.simulationDataSet[i].appendNewColumnOfData((temporarySample -
-		  temporarySample.getNthMoment(1)) ^ (int)whichCentralMoments[k]);*/
             }
         }
     }

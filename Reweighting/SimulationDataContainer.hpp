@@ -12,7 +12,7 @@ public:
 	int getNumberOfSimulationParameters(int fileNumber);
     std::pair<SimulationDataContainer, std::vector<int> > getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(int numberOfBinsToBeUsed);
     SimulationData& operator[](int index);
-    SimulationDataContainer insertCentralMomentsPerData(std::vector<unsigned int> whichColumns,
+    SimulationDataContainer insertMomentsPerData(std::vector<unsigned int> whichColumns,
                                                         std::vector<unsigned int> whichCentralMoments);
 
 protected:
@@ -21,13 +21,12 @@ protected:
 };
 
 /*
- * In the above class the method insertCentralMomentsPerData is thought to facilitate the reweighting
+ * In the above class the method insertMomentsPerData is thought to facilitate the reweighting
  * of more complicated observables, like combinations of higher moments. We will use the
- * name CentralMomentsPerData meaning the power of the distance of such data from the mean value
- * of that kind of data. For example, including in the container the 3rd central moment per data
- * of the second column, then, per each SimulationData object in the SimulationDataContainer,
- * one column (i.e. a DataSampleBasic object) containing (O2-mean(O2))^3 will be appended
- * (where O2 is each entry of the second column and mean(O2) is the mean of the second column).
+ * name MomentsPerData meaning the power of such data. For example, including in the container
+ * the 3rd moment per data of the second column, then, per each SimulationData object in
+ * the SimulationDataContainer, one column (i.e. a DataSampleBasic object) containing
+ * (O2)^3 will be appended (where O2 is each entry of the second column).
  *
  * REMARK: The number of columns ranges from ZERO on.
  */

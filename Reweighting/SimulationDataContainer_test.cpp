@@ -135,25 +135,22 @@ BOOST_AUTO_TEST_SUITE(InsertCentralMoments)
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         SimulationDataContainer simDataCont(fileThatDoesExist);
         std::vector<unsigned int> columns;
-        std::vector<unsigned int> centralMoments;
+        std::vector<unsigned int> moments;
         columns.push_back(0);
         columns.push_back(1);
         columns.push_back(2);
-        centralMoments.push_back(0);
-        centralMoments.push_back(1);
-        simDataCont = simDataCont.insertCentralMomentsPerData(columns, centralMoments);
+        moments.push_back(0);
+        moments.push_back(1);
+        simDataCont = simDataCont.insertMomentsPerData(columns, moments);
         const int newNumberOfColumns = 9;
-        const double columnsFirstMomentFirstFile[3][3] = {-0.3, 0.0, 0.3, -0.3, 0.0, 0.3, 29./30, 19./15, -67./30};
+        const double columnsFirstMomentFirstFile[3][3] = {1.1, 1.4, 1.7, 1.2, 1.5, 1.8, 1.3, 1.6, -1.9};
         for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++)
             BOOST_REQUIRE_EQUAL(simDataCont[i].getNumberOfDataSample(), newNumberOfColumns);
-        for(int i=0; i<3; i+=2){
+        for(int i=0; i<3; i++){
             BOOST_REQUIRE_CLOSE(simDataCont[0][4][i], columnsFirstMomentFirstFile[0][i], doublePrecisionInPercent);
             BOOST_REQUIRE_CLOSE(simDataCont[0][6][i], columnsFirstMomentFirstFile[1][i], doublePrecisionInPercent);
             BOOST_REQUIRE_CLOSE(simDataCont[0][8][i], columnsFirstMomentFirstFile[2][i], doublePrecisionInPercent);
         }
-        BOOST_REQUIRE_SMALL(simDataCont[0][4][1], doublePrecisionInPercent);
-        BOOST_REQUIRE_SMALL(simDataCont[0][6][1], doublePrecisionInPercent);
-        BOOST_REQUIRE_CLOSE(simDataCont[0][8][1], columnsFirstMomentFirstFile[2][1], doublePrecisionInPercent);
         for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
             for(int j=0; j<3; j++){
                 BOOST_REQUIRE_EQUAL(simDataCont[i][3][j], 1.0);
