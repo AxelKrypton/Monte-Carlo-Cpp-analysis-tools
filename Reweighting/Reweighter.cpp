@@ -9,7 +9,8 @@
 static void writeNewPoints(std::vector<std::vector<double> >&, std::vector<std::vector<double> >, std::vector<double>, int=0, int=0);
 static void findIflogZHasToBeCalculated(std::vector<double>, std::vector<int>&);
 static double logarithmic_sum(double, double);
-static void evaluateEstimateAndErrorOfObservableFromEstimators(Observables&, std::vector<std::valarray<double> >);
+static void evaluateErrorOfObservablesPerPointFromEstimators(Observables&, std::vector<std::valarray<double> >);
+static void evaluateEstimateOfObservablesPerPointFromMoments(Observables&, std::vector<double>);
 
 /*****************************************************************************************/
 
@@ -122,6 +123,9 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
     size_t numberOfObservablesToBeReweighted = reweightingDataHandler.numberOfObservablesToBeReweighted;
     std::vector<double> minimumOfEachObservable(numberOfObservablesToBeReweighted, std::numeric_limits<double>::max());
     prepareObservablesBeforeReweighting(minimumOfEachObservable);
+    std::cout << "   Calculating the moments of observables at new points... \n";
+    std::vector<std::vector<double> > reweightedObservablesFromRawData = calculateReweightedObservableValues();
+    std::cout << "   ...done!\n";
     std::valarray<std::vector<std::vector<double> > >
             jackknifeEstimators(std::vector<std::vector<double> >(numberOfNewPoints,
                                                                   std::vector<double>(numberOfObservablesToBeReweighted)),
@@ -137,23 +141,22 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
                                                              &logZAtNewPointsLeavingOutOneEntry);
     }
     std::cout << "   ...done!\n";
-    restoreObservablesAfterReweighting(minimumOfEachObservable, &jackknifeEstimators);
+    restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &jackknifeEstimators);
     for(size_t i=0; i<numberOfNewPoints; i++){
         for(size_t j=0; j<numberOfObservablesGivenAsInput; j++){ //The size here below is set to 4 manually for the moment!
             std::vector<std::valarray<double> > jackknifeEstimatorsPerPointAndObs(4, std::valarray<double>(numberOfBinsUsedToBinData));
+            std::vector<double> momentsPerPointAndObs(4, 0.0);
+            momentsPerPointAndObs[0] = reweightedObservablesFromRawData[i][j];
             for(size_t k=0; k<numberOfBinsUsedToBinData; k++)
                     jackknifeEstimatorsPerPointAndObs[0][k] = jackknifeEstimators[k][i][j];
             for(size_t m=0; m<3; m++){ //loop on the number of moments inserted, for the moment manually set
+                momentsPerPointAndObs[m+1] = reweightedObservablesFromRawData[i][numberOfObservablesGivenAsInput+j*3+m];
                 for(size_t k=0; k<numberOfBinsUsedToBinData; k++)
                     jackknifeEstimatorsPerPointAndObs[m+1][k] = jackknifeEstimators[k][i][numberOfObservablesGivenAsInput+j*3+m];
 
             }
-
-            evaluateEstimateAndErrorOfObservableFromEstimators(observablesAtNewPoints[i][j],
-                                                               jackknifeEstimatorsPerPointAndObs);
-
-//            observablesAtNewPoints[i][j].estimate = calculateJacknifeEstimate(DataSample(jackknifeEstimatorsPerPointAndObs[0]));
-//            observablesAtNewPoints[i][j].error = calculateJacknifeError(DataSample(jackknifeEstimatorsPerPointAndObs[0]));
+            evaluateEstimateOfObservablesPerPointFromMoments(observablesAtNewPoints[i][j], momentsPerPointAndObs);
+            evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], jackknifeEstimatorsPerPointAndObs);
         }
     }
 
@@ -491,7 +494,8 @@ void ReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<double>
 }
 
 void ReweighterAbstract::restoreObservablesAfterReweighting(std::vector<double> minimumOfEachObservable,
-                                  std::valarray<std::vector<std::vector<double> > > *jackknifePartialPred){
+                                     std::vector<std::vector<double> > *reweightedObservablesFromRawData,
+                                     std::valarray<std::vector<std::vector<double> > > *jackknifePartialPred){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
     //Exponential and shift, if necessary, BOTH on raw/binned data AND on values at new points (Jackknife partial predicitions)
     for(int indexObservable=0; indexObservable<reweightingDataHandler.numberOfObservablesToBeReweighted; indexObservable++){
@@ -502,13 +506,17 @@ void ReweighterAbstract::restoreObservablesAfterReweighting(std::vector<double> 
                     reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
         }
         for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
-//            observablesAtNewPoints[indexNewPoint][indexObservable].estimate = exp(observablesAtNewPoints[indexNewPoint][indexObservable].estimate);
             if(jackknifePartialPred != NULL){
                 for(size_t indexBin=0; indexBin<(*jackknifePartialPred).size(); indexBin++){
                     (*jackknifePartialPred)[indexBin][indexNewPoint][indexObservable] = exp((*jackknifePartialPred)[indexBin][indexNewPoint][indexObservable]);
                     if(minimumOfEachObservable[indexObservable] < 0)
                         (*jackknifePartialPred)[indexBin][indexNewPoint][indexObservable] += 2*minimumOfEachObservable[indexObservable];
                 }
+            }
+            if(reweightedObservablesFromRawData != NULL){
+                (*reweightedObservablesFromRawData)[indexNewPoint][indexObservable] = exp((*reweightedObservablesFromRawData)[indexNewPoint][indexObservable]);
+                if(minimumOfEachObservable[indexObservable] < 0)
+                    (*reweightedObservablesFromRawData)[indexNewPoint][indexObservable] += 2*minimumOfEachObservable[indexObservable];
             }
          }
          if(minimumOfEachObservable[indexObservable] < 0){
@@ -535,36 +543,44 @@ SimulationDataContainer ReweighterAbstract::getSimulationDataContainer(bool raw)
 /*****************************************************************************************/
 
 /*
- * In the following function we use the jackknife method to estimate the observable
- * and the error. ATTENTION: it is understood that the first valarray in the vector
+ * In the following functions we use the jackknife method to estimate the observable
+ * error. ATTENTION: it is understood that the first valarray in the vector "est"
  * contains the estimators of the observable given as input and the following contain
  * the central moments that have been asked to be calculated (so far manually set to 2,3,4).
  */
-static void evaluateEstimateAndErrorOfObservableFromEstimators(Observables& obs, std::vector<std::valarray<double> > est){
+static void evaluateEstimateOfObservablesPerPointFromMoments(Observables& obs, std::vector<double> moments){
+    double x1 = moments[0];
+    double x2 = moments[1];
+    double x3 = moments[2];
+    double x4 = moments[3];
+    obs.mean.estimate = x1;
+    obs.susceptibility.estimate = x2-x1*x1;
+    obs.skewness.estimate = (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5));
+    obs.binderCumulant.estimate = (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0));
+}
+
+static void evaluateErrorOfObservablesPerPointFromEstimators(Observables& obs, std::vector<std::valarray<double> > est){
     DataSample estimatorData(est[0]);
     DataSample estimatorSecondMomentPerData(est[1]);
     DataSample estimatorThirdMomentPerData(est[2]);
     DataSample estimatorFourthMomentPerData(est[3]);
 
-    //Calculate mean
-    obs.mean.estimate = calculateJacknifeEstimate(estimatorData);
+    //Mean error
     obs.mean.error = calculateJacknifeError(estimatorData);
-    //Calculate susceptibility --->  x2-x1^2
+    //Susceptibility error
     DataSample functionAppliedToEstimators = estimatorSecondMomentPerData - (estimatorData ^ 2);
-    obs.susceptibility.estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
     obs.susceptibility.error = calculateJacknifeError(functionAppliedToEstimators);
-    //Calculate skewness
+    //Skewness error
     functionAppliedToEstimators = (estimatorThirdMomentPerData - ((3*estimatorSecondMomentPerData ) * estimatorData)
                                    + (2*(estimatorData ^ 3))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 1.5);
-    obs.skewness.estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
     obs.skewness.error = calculateJacknifeError(functionAppliedToEstimators);
-    //Calculate binder cumulant
+    //Binder cumulant error
     functionAppliedToEstimators = (estimatorFourthMomentPerData -((4*estimatorThirdMomentPerData) * estimatorData)
                                    + (6*estimatorSecondMomentPerData) * (estimatorData ^ 2)
                                    - (3*(estimatorData ^ 4))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 2);
-    obs.binderCumulant.estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
     obs.binderCumulant.error = calculateJacknifeError(functionAppliedToEstimators);
 }
+
 
 /*
  * In the following function, we decide to calculate logZ at those simulated points for which in

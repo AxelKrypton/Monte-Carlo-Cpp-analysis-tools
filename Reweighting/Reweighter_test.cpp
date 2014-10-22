@@ -56,8 +56,9 @@ public:
     }
 
     void testRestoreObservablesAfterReweighting(std::vector<double>& minima,\
+                                                std::vector<std::vector<double> > *rewObsFromRawData,
                                                 std::valarray<std::vector<std::vector<double> > >* jack){
-        restoreObservablesAfterReweighting(minima, jack);
+        restoreObservablesAfterReweighting(minima, rewObsFromRawData, jack);
     }
 
     std::vector<std::vector<double> > testCalculateReweightedObservableValues(bool useBinnedData = false,
@@ -505,7 +506,7 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
         reweighter.testPrepareObservablesBeforeReweighting(minimumOfObservables);
         std::vector<std::vector<double> > preparedRawObservables = reweighter.getObservablesFromSimulationData(true, numberOfObservablesInFiles);
         std::vector<std::vector<double> > preparedBinnedObservables = reweighter.getObservablesFromSimulationData(false, numberOfObservablesInFiles);
-        reweighter.testRestoreObservablesAfterReweighting(minimumOfObservables, NULL);
+        reweighter.testRestoreObservablesAfterReweighting(minimumOfObservables, NULL, NULL);
         std::vector<std::vector<double> > restoredRawObservables = reweighter.getObservablesFromSimulationData(true, numberOfObservablesInFiles);
         std::vector<std::vector<double> > restoredBinnedObservables = reweighter.getObservablesFromSimulationData(false, numberOfObservablesInFiles);
         BOOST_REQUIRE_EQUAL(referenceMinimumOfObservables, minimumOfObservables[0]);
@@ -631,19 +632,6 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
          * a different function in which the preparation and the restoring of the observables is done.
          * Again we have to calculate the logZ manually since the Tester class doesn't do that in the
          * constructor/setters.
-         *
-         * REMARK: Actually there is an important difference between this test case and "observables2".
-         *         Here we reweight the observables using as value the jackknife estimate that is
-         *         different and in general more accurate for the result. Observe that, even if here
-         *         we are evaluating the mean value of the observable (and it is known that for the
-         *         mean the jackknife estimate coincide with the naif estimate, since the latter is not
-         *         biased) at the new points, somehow we do not expect complete agreement with the ref.
-         *         code where the reweighted mean is just the reweighted value using all points (without
-         *         jackknife). In some sense, in the reweighting we are doing a jackknife whose estimators
-         *         at the new points are obtained from the original datasets in which a data has been ignored.
-         *
-         *         What said above justifies why the precision in this test is 1.e-4 (the reference values
-         *         are still those of "observables2").
          */
         std::string fileThatDoesExist = "RealTestData/configfile_4";
         std::vector<std::pair<double, double> > newRanges;
@@ -670,8 +658,8 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
         reweighter.testCalculateLogZAtNewPoints();
         std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
         for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-4);
-            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].mean.estimate, 1.e-4);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-8);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].mean.estimate, 1.e-8);
         }
     }
 
@@ -680,7 +668,7 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
         /*
          * Here we compare our estimate of the observables with error with the same of the Reference Code.
          * Since in the Ref. Code they are estimated using bootstrap, we cannot really compare the error.
-         * What we do, since the value itself is compatible up to 0.05%, is to check how different are the
+         * What we do, since the value itself is compatible up to 2e-5%, is to check how different are the
          * errors. But, again, due to the different methods, one cannot expect a real good agreement. The
          * reference code use bootstrap, resamplig 100 times the data, here we use jackknife. A disagreement
          * of 44% on some points is what happens here.
@@ -722,7 +710,7 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
         reweighter.testCalculateLogZAtNewPoints();
         std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
         for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 2.e-4);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 2.e-5);
             BOOST_REQUIRE_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].mean.error, 45);
         }
     }
@@ -802,8 +790,8 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
        reweighter.testCalculateLogZAtNewPoints();
        std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
        for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-           BOOST_CHECK_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 0.017);
-           BOOST_CHECK_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].susceptibility.estimate, 0.017);
+           BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 2e-7);
+           BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].susceptibility.estimate, 2e-7);
        }
    }
 
@@ -844,8 +832,8 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
        reweighter.testCalculateLogZAtNewPoints();
        std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
        for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-           BOOST_CHECK_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 0.053);
-           BOOST_CHECK_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.error, 53); //Error discrepancies between 1% and 53%
+           BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 1e-3);
+           BOOST_REQUIRE_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.error, 53); //Error discrepancies between 1% and 53%
        }
    }
 
@@ -877,6 +865,28 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
            }
        }
    }
+
+//   BOOST_AUTO_TEST_CASE(suscReweighting4)
+//   {
+//       std::string fileThatDoesExist = "RealTestData/configfile_real";
+//       std::vector<std::pair<double, double> > newRanges;
+//       std::vector< unsigned int> newNumPoints(1, 51);
+//       newRanges.push_back(std::make_pair(5.204, 5.216));
+//       ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
+//       reweighter.testCalculateLogZAtSimulatedPoints();
+//       reweighter.testCalculateLogZAtNewPoints();
+//       std::vector<std::vector<Observables> > valuesObsNewPoints1 = reweighter.testCalculateAndGetReweightedObservables();
+//       std::vector<std::vector<double> > valuesNewPoints1 = reweighter.getValuesOfNewParameters();
+//       for(size_t i=0; i<valuesNewPoints1.size(); i++){
+//           std::cout << valuesNewPoints1[i][0];
+//           std::cout << "     " << valuesObsNewPoints1[i][0].mean.estimate;
+//           std::cout << "     " << valuesObsNewPoints1[i][0].mean.error;
+//           std::cout << "     " << valuesObsNewPoints1[i][0].susceptibility.estimate;
+//           std::cout << "     " << valuesObsNewPoints1[i][0].susceptibility.error;
+//           std::cout << "     " << valuesObsNewPoints1[i][0].binderCumulant.estimate;
+//           std::cout << "     " << valuesObsNewPoints1[i][0].binderCumulant.error << "\n";
+//       }
+//   }
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -932,72 +942,28 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
        std::vector< unsigned int> newNumPoints(1, 30);
        newRanges.push_back(std::make_pair(5.348, 5.3509));
        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
-       double referenceValuesObs1NewPoints[] = {3.5206418419434,
-                                                3.4811047647748,
-                                                3.4422868065820,
-                                                3.4037911581673,
-                                                3.3654461046483,
-                                                3.3266506475774,
-                                                3.2893686947969,
-                                                3.2521701420186,
-                                                3.2146256967831,
-                                                3.1775254802705,
-                                                3.1411432046910,
-                                                3.1050859937156,
-                                                3.0694978511434,
-                                                3.0340633510535,
-                                                2.9993095138561,
-                                                2.9648235590273,
-                                                2.9310135311294,
-                                                2.8975103856420,
-                                                2.8646387372190,
-                                                2.8323858869864,
-                                                2.8006262018092,
-                                                2.7697187765980,
-                                                2.7390932438978,
-                                                2.7092074179912,
-                                                2.6799493470121,
-                                                2.6512487523515,
-                                                2.6234129853386,
-                                                2.5961946548546,
-                                                2.5698786179766,
-                                                2.5438683396179};
-       double referenceValuesObs2NewPoints[] = {3.4360361705923,
-                                                3.4024769315471,
-                                                3.3691198522261,
-                                                3.3360068854480,
-                                                3.3027327076808,
-                                                3.2694128913535,
-                                                3.2366412466910,
-                                                3.2037629166616,
-                                                3.1714853825031,
-                                                3.1388150603066,
-                                                3.1065025004356,
-                                                3.0747345427196,
-                                                3.0431198977099,
-                                                3.0115887450243,
-                                                2.9807063385440,
-                                                2.9499729504106,
-                                                2.9197574225914,
-                                                2.8897981708243,
-                                                2.8603155012882,
-                                                2.8312839862164,
-                                                2.8028490876923,
-                                                2.7747154644745,
-                                                2.7472141628739,
-                                                2.7202043831915,
-                                                2.6936680631492,
-                                                2.6677930453465,
-                                                2.6427634054841,
-                                                2.6179334597853,
-                                                2.5939597583269,
-                                                2.5705999029340};
+       double referenceValuesObs1NewPoints[] = {3.5206418419434, 3.4811047647748, 3.4422868065820, 3.4037911581673,
+                                                3.3654461046483, 3.3266506475774, 3.2893686947969, 3.2521701420186,
+                                                3.2146256967831, 3.1775254802705, 3.1411432046910, 3.1050859937156,
+                                                3.0694978511434, 3.0340633510535, 2.9993095138561, 2.9648235590273,
+                                                2.9310135311294, 2.8975103856420, 2.8646387372190, 2.8323858869864,
+                                                2.8006262018092, 2.7697187765980, 2.7390932438978, 2.7092074179912,
+                                                2.6799493470121, 2.6512487523515, 2.6234129853386, 2.5961946548546,
+                                                2.5698786179766, 2.5438683396179};
+       double referenceValuesObs2NewPoints[] = {3.4360361705923, 3.4024769315471, 3.3691198522261, 3.3360068854480,
+                                                3.3027327076808, 3.2694128913535, 3.2366412466910, 3.2037629166616,
+                                                3.1714853825031, 3.1388150603066, 3.1065025004356, 3.0747345427196,
+                                                3.0431198977099, 3.0115887450243, 2.9807063385440, 2.9499729504106,
+                                                2.9197574225914, 2.8897981708243, 2.8603155012882, 2.8312839862164,
+                                                2.8028490876923, 2.7747154644745, 2.7472141628739, 2.7202043831915,
+                                                2.6936680631492, 2.6677930453465, 2.6427634054841, 2.6179334597853,
+                                                2.5939597583269, 2.5705999029340};
        reweighter.testCalculateLogZAtSimulatedPoints();
        reweighter.testCalculateLogZAtNewPoints();
        std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
        for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-           BOOST_CHECK_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 2.5); //Discrepancy between 0.1% and 2.5%
-           BOOST_CHECK_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 2.5); //Discrepancy between 0.1% and 2.5%
+           BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 2.5); //Discrepancy between 0.1% and 2.5%
+           BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 2.5); //Discrepancy between 0.1% and 2.5%
        }
    }
 
@@ -1010,14 +976,14 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
        double referenceValuesObsNewPoints[] = {3.66375761371, 3.69650616987, 3.72457417712, 3.74795713234, 3.76569768083,
                                                3.77603512058, 3.77981435539, 3.77585380916, 3.76248663931, 3.74085560046,
-                                               3.70984835127, 3.66985581037, 3.62077841424, 3.56338601954, 3.4978082808,
+                                               3.70984835127, 3.66985581037, 3.62077841424, 3.56338601954, 3.49780828080,
                                                3.42518775556, 3.34638333564, 3.26222114882, 3.17417733627, 3.08356659523,
                                                2.99168815163, 2.89985310543, 2.80940281063, 2.72172094692, 2.63789836767,
                                                2.55917645029, 2.48659298893, 2.42106479046, 2.36336287063, 2.31420835294,
                                                2.27412768644, 2.24356543318, 2.22282868431, 2.21211398723, 2.21151026587,
-                                               2.22095366319, 2.24033742892, 2.26945464115, 2.30791289566, 2.3552991454,
-                                               2.41106011, 2.47458217738, 2.54541070229, 2.6224166152, 2.70496900329,
-                                               2.79224431553, 2.8832936502, 2.97715926384, 3.07288314386, 3.1698339234,
+                                               2.22095366319, 2.24033742892, 2.26945464115, 2.30791289566, 2.35529914540,
+                                               2.41106011000, 2.47458217738, 2.54541070229, 2.62241661520, 2.70496900329,
+                                               2.79224431553, 2.88329365020, 2.97715926384, 3.07288314386, 3.16983392340,
                                                3.26683564435};
        double referenceErrorsObsNewPoints[] = {0.803155817427, 0.769716297759, 0.734388132974, 0.697530087799,
                                                0.659649639951, 0.621180774101, 0.582751555823, 0.544858246402,
@@ -1030,18 +996,14 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
                                                0.130271809414, 0.132717417883, 0.138419590183, 0.146823608306,
                                                0.157321569099, 0.169361867275, 0.182510746409, 0.196453376009,
                                                0.210982207398, 0.225963006373, 0.241348054476, 0.257125993366,
-                                               0.273341734783, 0.290057095164, 0.3073802963, 0.325397612382,
-                                               0.34421536724, 0.363951452755, 0.384719448161};
+                                               0.273341734783, 0.290057095164, 0.307380296300, 0.325397612382,
+                                               0.344215367240, 0.363951452755, 0.384719448161};
        reweighter.testCalculateLogZAtSimulatedPoints();
        reweighter.testCalculateLogZAtNewPoints();
        std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
        for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-           std::cout.precision(12);
-           std::cout << reweighter.getValuesOfNewParameters()[i][0];
-           std::cout << "    " << valuesObsNewPoints[i][0].binderCumulant.estimate;
-           std::cout << "    " << valuesObsNewPoints[i][0].binderCumulant.error << "\n";
-           BOOST_CHECK_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 0.07);
-           BOOST_CHECK_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].binderCumulant.error, 83); //Error discrepancies between 8% and 83%
+           BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 0.05);
+           BOOST_REQUIRE_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].binderCumulant.error, 83); //Error discrepancies between 8% and 83%
        }
    }
 
