@@ -50,19 +50,19 @@ int SimulationDataContainer::getNumberOfSimulationParameters(int fileNumber)
 }
 
 std::pair<SimulationDataContainer, std::vector<int> >
-SimulationDataContainer::getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(int numberOfBinsToBeUsed){
-    SimulationDataContainer binnedSimulationDataSet(*this); //default copy ctor should be enough
+SimulationDataContainer::getUncorrelatedSimulationDataSetAndNumbersOfEntriesLeftOut(int numberOfBinsToBeUsed){
+    SimulationDataContainer uncorrelatedSimulationDataSet(*this); //default copy ctor should be enough
     std::vector<int> entriesLeftOut;
     //Here we make no check on the datafile, since they already were done in SimulationData ctor
-    for(int i=0; i<binnedSimulationDataSet.getNumberOfDatafiles(); i++){
-        for(int j=0; j<binnedSimulationDataSet[i].getNumberOfDataSample(); j++){
-            binnedSimulationDataSet[i][j] = BinnedDataSampleFromNumberOfBins(simulationDataSet[i][j],
-                                                                             numberOfBinsToBeUsed, false, false);
-        }
+    for(int i=0; i<uncorrelatedSimulationDataSet.getNumberOfDatafiles(); i++){
         int tmpSizeOfDataSample = simulationDataSet[i][0].getNumberOfElements();
+        for(int j=0; j<uncorrelatedSimulationDataSet[i].getNumberOfDataSample(); j++){
+            uncorrelatedSimulationDataSet[i][j] = simulationDataSet[i][j].sampleSlice(0, numberOfBinsToBeUsed,
+                                                                                tmpSizeOfDataSample/numberOfBinsToBeUsed);
+        }
         entriesLeftOut.push_back(tmpSizeOfDataSample - tmpSizeOfDataSample/numberOfBinsToBeUsed*numberOfBinsToBeUsed);
     }
-    return std::make_pair(binnedSimulationDataSet, entriesLeftOut);
+    return std::make_pair(uncorrelatedSimulationDataSet, entriesLeftOut);
 }
 
 

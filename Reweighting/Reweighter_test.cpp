@@ -43,12 +43,12 @@ public:
     }
 
     std::vector<double> testCalculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut){
-        return calculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(entryToBeLeftOut);
+        return calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(entryToBeLeftOut);
     }
 
     std::vector<double> testCalculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
                                                                                          std::vector<double> logZSim){
-        return calculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(entryToBeLeftOut, logZSim);
+        return calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(entryToBeLeftOut, logZSim);
     }
 
     void testPrepareObservablesBeforeReweighting(std::vector<double>& minima){
@@ -496,7 +496,7 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
         const int numberOfObservablesInFiles = 4; //1 obs given + 3 central moments
         const double referenceMinimumOfObservables = -3.9;
         const double referenceOriginalRawObservables[] = {1.3, 1.6, -1.9, 2.3, -2.6, 2.9, -3.3, 3.6, -3.9};
-        const double referenceOriginalBinnedObservables[] = {0.333333333333333, 0.866666666666667, -1.2};
+        const double referenceOriginalBinnedObservables[] = {1.3, 2.3, -3.3};
         std::valarray<double> referencePreparedRawObservables(referenceOriginalRawObservables, 9);
         std::valarray<double> referencePreparedBinnedObservables(referenceOriginalBinnedObservables, 3);
         referencePreparedRawObservables = log(referencePreparedRawObservables - 2*referenceMinimumOfObservables);

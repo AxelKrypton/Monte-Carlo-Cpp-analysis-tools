@@ -10,7 +10,7 @@ public:
     explicit SimulationDataContainer(std::string configurationFile);
 	int getNumberOfDatafiles();
 	int getNumberOfSimulationParameters(int fileNumber);
-    std::pair<SimulationDataContainer, std::vector<int> > getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(int numberOfBinsToBeUsed);
+    std::pair<SimulationDataContainer, std::vector<int> > getUncorrelatedSimulationDataSetAndNumbersOfEntriesLeftOut(int numberOfBinsToBeUsed);
     SimulationData& operator[](int index);
     SimulationDataContainer insertMomentsPerData(std::vector<unsigned int> whichColumns,
                                                         std::vector<unsigned int> whichCentralMoments);

@@ -49,7 +49,7 @@ protected:
 private:
     std::string configurationFile;
     SimulationDataContainer simulationRawDataContainer;
-    SimulationDataContainer simulationBinnedDataContainer;
+    SimulationDataContainer simulationUncorrDataContainer;
     int numberOfObservablesGivenAsInput;
     int numberOfObservablesToBeReweighted;
 

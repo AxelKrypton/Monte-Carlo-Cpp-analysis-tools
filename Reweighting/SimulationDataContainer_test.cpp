@@ -118,10 +118,10 @@ BOOST_AUTO_TEST_SUITE(BinningContainer)
         referenceEntriesToBeLeftOut[2] = 84;
         SimulationDataContainer simDataCont(fileThatDoesExist);
         std::pair<SimulationDataContainer, std::vector<int> >
-                binnedObject = simDataCont.getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(numberOfBins);
+                uncorrObject = simDataCont.getUncorrelatedSimulationDataSetAndNumbersOfEntriesLeftOut(numberOfBins);
         for(int i=0; i<3; i++){
-            BOOST_CHECK_EQUAL(binnedObject.second[i], referenceEntriesToBeLeftOut[i]);
-            BOOST_CHECK_EQUAL(binnedObject.first[i][0].getNumberOfElements(), numberOfBins);
+            BOOST_CHECK_EQUAL(uncorrObject.second[i], referenceEntriesToBeLeftOut[i]);
+            BOOST_CHECK_EQUAL(uncorrObject.first[i][0].getNumberOfElements(), numberOfBins);
         }
     }
 

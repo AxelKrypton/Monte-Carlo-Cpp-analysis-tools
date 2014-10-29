@@ -133,9 +133,9 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
     std::cout << "   Calculating the Jackknife estimators... \n";
     for(size_t i=0; i<numberOfBinsUsedToBinData; i++){
         std::vector<double> logZAtSimulatedPointsLeavingOutOneEntry =
-                calculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(i);
+                calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(i);
         std::vector<double> logZAtNewPointsLeavingOutOneEntry =
-                calculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(i, logZAtSimulatedPointsLeavingOutOneEntry);
+                calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(i, logZAtSimulatedPointsLeavingOutOneEntry);
         jackknifeEstimators[i] =
                 calculateReweightedObservableValues(true, i, &logZAtSimulatedPointsLeavingOutOneEntry,
                                                              &logZAtNewPointsLeavingOutOneEntry);
@@ -218,10 +218,10 @@ void ReweighterAbstract::calculateNewPoints(){
  *       before calling this function.
  */
 std::vector<double> ReweighterAbstract::calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated,
-                                                                 bool useBinnedData, const int entryToBeLeftOut,
+                                                                 bool useUncorrData, const int entryToBeLeftOut,
                                                                  std::vector<double>* logZAtSimulationPointToBeUsed){
 
-    SimulationDataContainer& simDataCont = (useBinnedData) ? reweightingDataHandler.simulationBinnedDataContainer
+    SimulationDataContainer& simDataCont = (useUncorrData) ? reweightingDataHandler.simulationUncorrDataContainer
                                                            : reweightingDataHandler.simulationRawDataContainer;
     if(entryToBeLeftOut >= simDataCont[0][0].getNumberOfElements())
         throw std::logic_error("A not existing data entry has been asked to be excluded calculating logZ!");
@@ -340,23 +340,23 @@ void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
     logZAtNewPoints = calculateLogZAtNewPoints(valuesOfNewParameters);
 }
 
-std::vector<double> ReweighterAbstract::calculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
+std::vector<double> ReweighterAbstract::calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
                                                                                                      std::vector<double> logZAtSimulationPointToBeUsed){
     return calculateLogZAtNewPoints(valuesOfNewParameters, true, entryToBeLeftOut, &logZAtSimulationPointToBeUsed);
 }
 
 /*
- * Here we implement a dedicated function to calculate logZ at simulated points leaving out one of the binned data.
+ * Here we implement a dedicated function to calculate logZ at simulated points leaving out one of the uncorrelated data.
  * We are aware that we duplicate somehouw the function calculateAndSetLogZAtSimulatedPoints, but we postpone
  * this to a future refactoring.
  *
  * TODO: Refactor this function making it part of \"calculateAndSetLogZAtSimulatedPoints\" that will have
- *       to be modified (separate setting and calculation, bool useBinnedData as parameter, ecc.)
+ *       to be modified (separate setting and calculation, bool useuncorredData as parameter, ecc.)
  */
-std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut){
+std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut){
 
     if(entryToBeLeftOut < 0 || entryToBeLeftOut >= reweightingDataHandler.numberOfBinsToBeUsed)
-        throw std::out_of_range("Invalid entry to be left out in \"calculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry\" function.");
+        throw std::out_of_range("Invalid entry to be left out in \"calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry\" function.");
     double residuum;
     std::vector<double> newLogZ(valuesOfSimulationParameters.size());
     std::vector<double> resultLogZ(valuesOfSimulationParameters.size(), 0.0);
@@ -399,12 +399,12 @@ std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPointsUsingBinne
  *         it is done on the purpose to keep the calculation of logZ and the observables separated.
  * TODO: Refactor calculation of logarithmOfDenominator in an own function.
  */
-std::vector<std::vector<double> > ReweighterAbstract::calculateReweightedObservableValues(bool useBinnedData,
+std::vector<std::vector<double> > ReweighterAbstract::calculateReweightedObservableValues(bool useUncorrData,
                                                                                           const int entryToBeLeftOut,
                                                                                           std::vector<double> *logZAtSimulationPointToBeUsed,
                                                                                           std::vector<double> *logZAtNewPointsToBeUsed){
 
-    SimulationDataContainer& simDataCont = (useBinnedData) ? reweightingDataHandler.simulationBinnedDataContainer
+    SimulationDataContainer& simDataCont = (useUncorrData) ? reweightingDataHandler.simulationUncorrDataContainer
                                                            : reweightingDataHandler.simulationRawDataContainer;
     if(entryToBeLeftOut >= simDataCont[0][0].getNumberOfElements())
         throw std::logic_error("A not existing data entry has been asked to be excluded reweighting observables!");
@@ -455,10 +455,7 @@ std::vector<std::vector<double> > ReweighterAbstract::calculateReweightedObserva
 
 /*
  * The preparation of the observables, as well as their restoration, has to be done also on
- * the binned data, since they are used to estimate the error (with the Jackknife method).
- * One could calculate the minimum also of the binned data, but since the goal is to have
- * positive quantities before taking the logarithm, it is enough to use the minimum of the
- * raw data that will be in general smaller or equal to the minimum of the binned data.
+ * the uncorrelated data, since they are used to estimate the error (with the Jackknife method).
  */
 void ReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<double>& minimumOfEachObservable){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
@@ -476,7 +473,7 @@ void ReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<double>
                 if(indexSimulation == 0)
                     std::cout << "  Observable number " << indexObservable-numberOfReweightingParameters << " shifted due to negative values!\n";
                 reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable] -= 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
-                reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable] -= 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
+                reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][indexObservable] -= 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
             }
             for(int indexData=0; indexData<reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].getNumberOfElements(); indexData++){
                 if(reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable][indexData] == 0.0){
@@ -488,7 +485,7 @@ void ReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<double>
                 }
             }
             reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].applyFunction(log);
-            reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][indexObservable].applyFunction(log);
+            reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][indexObservable].applyFunction(log);
         }
     }
 }
@@ -497,13 +494,13 @@ void ReweighterAbstract::restoreObservablesAfterReweighting(std::vector<double> 
                                      std::vector<std::vector<double> > *reweightedObservablesFromRawData,
                                      std::valarray<std::vector<std::vector<double> > > *jackknifePartialPred){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
-    //Exponential and shift, if necessary, BOTH on raw/binned data AND on values at new points (Jackknife partial predicitions)
+    //Exponential and shift, if necessary, BOTH on raw/uncorr data AND on values at new points (Jackknife partial predicitions)
     for(int indexObservable=0; indexObservable<reweightingDataHandler.numberOfObservablesToBeReweighted; indexObservable++){
         for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
             reweightingDataHandler.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] =
                     reweightingDataHandler.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
-            reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] =
-                    reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
+            reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] =
+                    reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
         }
         for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
             if(jackknifePartialPred != NULL){
@@ -523,7 +520,7 @@ void ReweighterAbstract::restoreObservablesAfterReweighting(std::vector<double> 
              std::cout << "  Observable number " << indexObservable << " restored!\n";
              for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
                 reweightingDataHandler.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] += 2*minimumOfEachObservable[indexObservable];
-                reweightingDataHandler.simulationBinnedDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] += 2*minimumOfEachObservable[indexObservable];
+                reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] += 2*minimumOfEachObservable[indexObservable];
              }
          }
      }
@@ -533,7 +530,7 @@ void ReweighterAbstract::restoreObservablesAfterReweighting(std::vector<double> 
 
 SimulationDataContainer ReweighterAbstract::getSimulationDataContainer(bool raw){
     return (raw == true) ? reweightingDataHandler.simulationRawDataContainer
-                         : reweightingDataHandler.simulationBinnedDataContainer;
+                         : reweightingDataHandler.simulationUncorrDataContainer;
 }
 
 

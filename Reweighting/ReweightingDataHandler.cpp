@@ -29,7 +29,7 @@ ReweightingDataHandler::ReweightingDataHandler() {
 
 ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn)
     : configurationFile(configurationFileIn),
-      simulationRawDataContainer(configurationFileIn), simulationBinnedDataContainer(simulationRawDataContainer)
+      simulationRawDataContainer(configurationFileIn), simulationUncorrDataContainer(simulationRawDataContainer)
 {
     numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
     checkCorrectnessOfConfigurationFileForReweighting(simulationRawDataContainer, ReweightingDataHandler::metaParameters, numberOfObservablesGivenAsInput);
@@ -50,14 +50,14 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn)
 
     //Perform binning on the data
     std::pair<SimulationDataContainer, std::vector<int> >
-            binnedDataAndLeftOutEntries = simulationRawDataContainer.getBinnedSimulationDataSetAndNumbersOfEntriesLeftOut(numberOfBinsToBeUsed);
+            binnedDataAndLeftOutEntries = simulationRawDataContainer.getUncorrelatedSimulationDataSetAndNumbersOfEntriesLeftOut(numberOfBinsToBeUsed);
 
-    simulationBinnedDataContainer = binnedDataAndLeftOutEntries.first;
+    simulationUncorrDataContainer = binnedDataAndLeftOutEntries.first;
     std::cout.precision(16);
     for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
         for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
             std::cout << "sim[" << i << "][" << j << "] = " << simulationRawDataContainer[i][j].getNumberOfElements() << "\t\t";
-            std::cout << "bin[" << i << "][" << j << "] = " << simulationBinnedDataContainer[i][j].getNumberOfElements() << "\n";
+            std::cout << "bin[" << i << "][" << j << "] = " << simulationUncorrDataContainer[i][j].getNumberOfElements() << "\n";
 //        for(int k=0; k<simulationDataContainer[i][j].getNumberOfElements(); k++)
 //            std::cout << simulationDataContainer[i][j][k] << "\n";
         }
@@ -71,7 +71,7 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn)
     for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
         for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
             std::cout << "sim[" << i << "][" << j << "] = " << simulationRawDataContainer[i][j].getNumberOfElements()  << "\t\t";
-            std::cout << "bin[" << i << "][" << j << "] = " << simulationBinnedDataContainer[i][j].getNumberOfElements() << "\n";
+            std::cout << "bin[" << i << "][" << j << "] = " << simulationUncorrDataContainer[i][j].getNumberOfElements() << "\n";
 //        for(int k=0; k<simulationDataContainer[i][j].getNumberOfElements(); k++)
 //            std::cout << simulationDataContainer[i][j][k] << "\n";
         }
