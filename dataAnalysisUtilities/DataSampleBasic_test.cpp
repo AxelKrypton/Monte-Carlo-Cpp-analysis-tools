@@ -587,31 +587,19 @@ BOOST_AUTO_TEST_SUITE(slice)
 		testSampleSliceInvalidArgument(numberOfElements, 0, numberOfElements+1, 1);
 	}
 
-	BOOST_AUTO_TEST_CASE(invalidArgument_5)
-	{
-		int numberOfElements = 93;
-		testSampleSliceInvalidArgument(numberOfElements, 0, numberOfElements, 0);
-	}
-
-	BOOST_AUTO_TEST_CASE(invalidArgument_6)
+    BOOST_AUTO_TEST_CASE(invalidArgument_5)
 	{
 		int numberOfElements = 77;
 		testSampleSliceInvalidArgument(numberOfElements, 0, numberOfElements, numberOfElements);
 	}
 
-	BOOST_AUTO_TEST_CASE(invalidArgument_7)
+    BOOST_AUTO_TEST_CASE(invalidArgument_6)
 	{
 		int numberOfElements = 88;
 		testSampleSliceInvalidArgument(numberOfElements, 0, numberOfElements, 2);
 	}
 
-	BOOST_AUTO_TEST_CASE(invalidArgument_8)
-	{
-		int numberOfElements = 55;
-		testSampleSliceInvalidArgument(numberOfElements, 0, 1, numberOfElements);
-	}
-
-	BOOST_AUTO_TEST_CASE(invalidArgument_9)
+    BOOST_AUTO_TEST_CASE(invalidArgument_7)
 	{
 		int numberOfElements = 66;
 		testSampleSliceInvalidArgument(numberOfElements, 1, numberOfElements, 1);

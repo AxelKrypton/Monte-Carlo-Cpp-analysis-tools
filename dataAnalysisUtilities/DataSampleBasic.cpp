@@ -274,12 +274,10 @@ void DataSampleBasic::checkSliceParameters(int start, int size, int stride)
 {
 	if( start < 0 || start >= numberOfElements)
 		throw std::invalid_argument("sampleSlice parameter \"start\" must be between 0 and (number of datapoints -1)!");
-	if( size < 1 || size > numberOfElements)
-		throw std::invalid_argument("sampleSlice parameter \"size\" must be between 1 and number of datapoints!");
-	if( stride < 1 || stride >= numberOfElements)
-		throw std::invalid_argument("sampleSlice parameter \"stride\" must be between 1 and number of datapoints!");
-	if( (start + (stride*size) ) > numberOfElements)
-		throw std::invalid_argument("product of sampleSlice parameters \"slice\" and \"stride\" must be between 1 and number of datapoints!");
+    if( size < 1)
+        throw std::invalid_argument("sampleSlice parameter \"size\" must be at least 1!");
+    if( (start + (stride*(size-1)) ) >= numberOfElements || (start + (stride*(size-1))) < 0)
+        throw std::invalid_argument("incorrect sampleSlice parameters: (start + (stride*(size-1))) must be between 0 and number of datapoints!");
 }
 
 DataSampleBasic DataSampleBasic::sampleSlice(int start, int size, int stride)
