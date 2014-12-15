@@ -11,6 +11,7 @@ static void findIflogZHasToBeCalculated(std::vector<double>, std::vector<int>&);
 static double logarithmic_sum(double, double);
 static void evaluateErrorOfObservablesPerPointFromEstimators(Observables&, std::vector<std::valarray<double> >);
 static void evaluateEstimateOfObservablesPerPointFromMoments(Observables&, std::vector<double>);
+static void evaluateObservablesPerPointFromEstimators(Observables&, std::vector<std::valarray<double> >);
 
 /*****************************************************************************************/
 
@@ -107,8 +108,17 @@ void ReweighterAbstract::setPrecisionToCalculateLogZ(double precisionToCalculate
 /*
  * In the following function the reweighting of the observables is performed. The error on the
  * reweighted quantities is estimated using the Jackknife approach, i.e. calculating here
- * the partial predictions leaving out one data from ALL data file (the first from all, the
- * second from all, etc.).
+ * the partial predictions leaving out one block of data from ALL data file (the first from all, the
+ * second from all, etc.). One could think this is not allowed, since the data that then are used
+ * in the Jackknife are raw data and hence correlated. This is not true. It can be shown that
+ * leaving out one block of contiguous data and then calculating the Jackknife estimators is equivalent
+ * make before binning on data and then calculate the Jackknife estimators leaving out one binned data.
+ * Here we do exactly this together with the reweighting. The reweighting procedure calculate implicitly
+ * the Jackknife estimator, since it gives the mean value of the observable at the new beta. One could
+ * wonder why not to procede in the standard way: first bin the data and then do Jackknife. This,
+ * together with the reweighting, is wrong! Implicitly in the reweighting procedure, a weight is given
+ * to each configuration and this cannot be done on the binned data. Hence one must use raw Monte
+ * Carlo data doing reweighting!
  *
  * NOTE: In order to reweight, the use of logarithms is highly encouraged. Hence we have to
  *       be sure that each observable is positive before taking the logarithm. This is achieved
@@ -123,40 +133,42 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
     size_t numberOfObservablesToBeReweighted = reweightingDataHandler.numberOfObservablesToBeReweighted;
     std::vector<double> minimumOfEachObservable(numberOfObservablesToBeReweighted, std::numeric_limits<double>::max());
     prepareObservablesBeforeReweighting(minimumOfEachObservable);
-    std::cout << "   Calculating the moments of observables at new points... \n";
-    std::vector<std::vector<double> > reweightedObservablesFromRawData = calculateReweightedObservableValues();
-    std::cout << "   ...done!\n";
+//    std::cout << "   Calculating the moments of observables at new points... \n";
+//    std::vector<std::vector<double> > reweightedObservablesFromRawData = calculateReweightedObservableValues();
+//    std::cout << "   ...done!\n";
     std::valarray<std::vector<std::vector<double> > >
             jackknifeEstimators(std::vector<std::vector<double> >(numberOfNewPoints,
                                                                   std::vector<double>(numberOfObservablesToBeReweighted)),
                                 numberOfBinsUsedToBinData);
     std::cout << "   Calculating the Jackknife estimators... \n";
     for(size_t i=0; i<numberOfBinsUsedToBinData; i++){
+        std::cout << "    Estimator " << i << "... \n";
         std::vector<double> logZAtSimulatedPointsLeavingOutOneEntry =
-                calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(i);
+                calculateLogZAtSimulatedPointsUsingRawDataAndLeavingOutOneBlock(i);
         std::vector<double> logZAtNewPointsLeavingOutOneEntry =
-                calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(i, logZAtSimulatedPointsLeavingOutOneEntry);
+                calculateLogZAtNewPointsUsingRawDataAndLeavingOutOneBlock(i, logZAtSimulatedPointsLeavingOutOneEntry);
         jackknifeEstimators[i] =
-                calculateReweightedObservableValues(true, i, &logZAtSimulatedPointsLeavingOutOneEntry,
+                calculateReweightedObservableValues(false, i, &logZAtSimulatedPointsLeavingOutOneEntry,
                                                              &logZAtNewPointsLeavingOutOneEntry);
     }
     std::cout << "   ...done!\n";
-    restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &jackknifeEstimators);
+    restoreObservablesAfterReweighting(minimumOfEachObservable, NULL, &jackknifeEstimators);
     for(size_t i=0; i<numberOfNewPoints; i++){
         for(size_t j=0; j<numberOfObservablesGivenAsInput; j++){ //The size here below is set to 4 manually for the moment!
             std::vector<std::valarray<double> > jackknifeEstimatorsPerPointAndObs(4, std::valarray<double>(numberOfBinsUsedToBinData));
-            std::vector<double> momentsPerPointAndObs(4, 0.0);
-            momentsPerPointAndObs[0] = reweightedObservablesFromRawData[i][j];
+//            std::vector<double> momentsPerPointAndObs(4, 0.0);
+//            momentsPerPointAndObs[0] = reweightedObservablesFromRawData[i][j];
             for(size_t k=0; k<numberOfBinsUsedToBinData; k++)
                     jackknifeEstimatorsPerPointAndObs[0][k] = jackknifeEstimators[k][i][j];
             for(size_t m=0; m<3; m++){ //loop on the number of moments inserted, for the moment manually set
-                momentsPerPointAndObs[m+1] = reweightedObservablesFromRawData[i][numberOfObservablesGivenAsInput+j*3+m];
+//                momentsPerPointAndObs[m+1] = reweightedObservablesFromRawData[i][numberOfObservablesGivenAsInput+j*3+m];
                 for(size_t k=0; k<numberOfBinsUsedToBinData; k++)
                     jackknifeEstimatorsPerPointAndObs[m+1][k] = jackknifeEstimators[k][i][numberOfObservablesGivenAsInput+j*3+m];
 
             }
-            evaluateEstimateOfObservablesPerPointFromMoments(observablesAtNewPoints[i][j], momentsPerPointAndObs);
-            evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], jackknifeEstimatorsPerPointAndObs);
+//            evaluateEstimateOfObservablesPerPointFromMoments(observablesAtNewPoints[i][j], momentsPerPointAndObs);
+//            evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], jackknifeEstimatorsPerPointAndObs);
+            evaluateObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], jackknifeEstimatorsPerPointAndObs);
         }
     }
 
@@ -213,17 +225,20 @@ void ReweighterAbstract::calculateNewPoints(){
  * NOTE: Eq.(8.37) is here implemented using logarithms.
  * NOTE: We implemented this function without checking the correct structure of any
  *       variable. This is because it is not a public method and will be called only
- *       by "developers". Thus memory issue can arise if one is not careful. For
- *       instance, logZAtSimulatedPoints must have the right amount of memory reserved
- *       before calling this function.
+ *       by "developers".
+ * NOTE: The blockToBeLeftOut is an integer number between 0 (included) and the number of bins
+ *       to be used (excluded). Since the block to be left out has different dimension in general
+ *       from file to file, we have here locally to calculate the size and then the begin and the end
+ *       of it. Notice that giving a negative number or a number bigger or equal to the number of bins
+ *       to be used makes the function skip no data!
  */
 std::vector<double> ReweighterAbstract::calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated,
-                                                                 bool useUncorrData, const int entryToBeLeftOut,
+                                                                 bool useUncorrData, const int blockToBeLeftOut,
                                                                  std::vector<double>* logZAtSimulationPointToBeUsed){
 
     SimulationDataContainer& simDataCont = (useUncorrData) ? reweightingDataHandler.simulationUncorrDataContainer
                                                            : reweightingDataHandler.simulationRawDataContainer;
-    if(entryToBeLeftOut >= simDataCont[0][0].getNumberOfElements())
+    if(blockToBeLeftOut >= simDataCont[0][0].getNumberOfElements())
         throw std::logic_error("A not existing data entry has been asked to be excluded calculating logZ!");
     if(logZAtSimulationPointToBeUsed == NULL)
         logZAtSimulationPointToBeUsed = &logZAtSimulatedPoints;
@@ -236,12 +251,16 @@ std::vector<double> ReweighterAbstract::calculateLogZAtNewPoints(std::vector<std
         bool firstValue = true;
         for(size_t indexSimulation1 = 0; indexSimulation1 < numberOfSimulationsDone; indexSimulation1++){
             size_t numberConfigurations1 = simDataCont[indexSimulation1][0].getNumberOfElements();
+            const int blockSize = numberConfigurations1/reweightingDataHandler.numberOfBinsToBeUsed;
+            const int blockBegin = blockToBeLeftOut*blockSize;
+            const int blockEnd = blockBegin + blockSize;
 			for(size_t indexConfiguration = 0; indexConfiguration < numberConfigurations1; indexConfiguration++){
-                if((int)indexConfiguration == entryToBeLeftOut)
+                if((int)indexConfiguration >= blockBegin && (int)indexConfiguration < blockEnd)
                     continue;
 				for(size_t indexSimulation2 = 0; indexSimulation2 < numberOfSimulationsDone; indexSimulation2++){
                     size_t numberConfigurations2 = simDataCont[indexSimulation2][0].getNumberOfElements();
-                    if(entryToBeLeftOut >= 0) numberConfigurations2--; //The number of conf has to be decreased if we leave one out!
+                    if(blockToBeLeftOut >= 0 && blockToBeLeftOut < reweightingDataHandler.numberOfBinsToBeUsed)
+                        numberConfigurations2 -= blockSize; //The number of conf has to be decreased if we leave one block out!
 					double exponent = 0.0;
 					for(size_t indexConjugatedQuantity = 0; indexConjugatedQuantity < numberOfReweightingParameters; indexConjugatedQuantity++){
 						exponent += (valuesOfParametersAtWhichLogZIsCalculated[indexNewPoint][indexConjugatedQuantity]
@@ -340,9 +359,9 @@ void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
     logZAtNewPoints = calculateLogZAtNewPoints(valuesOfNewParameters);
 }
 
-std::vector<double> ReweighterAbstract::calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
+std::vector<double> ReweighterAbstract::calculateLogZAtNewPointsUsingRawDataAndLeavingOutOneBlock(const int blockToBeLeftOut,
                                                                                                      std::vector<double> logZAtSimulationPointToBeUsed){
-    return calculateLogZAtNewPoints(valuesOfNewParameters, true, entryToBeLeftOut, &logZAtSimulationPointToBeUsed);
+    return calculateLogZAtNewPoints(valuesOfNewParameters, false, blockToBeLeftOut, &logZAtSimulationPointToBeUsed);
 }
 
 /*
@@ -353,15 +372,15 @@ std::vector<double> ReweighterAbstract::calculateLogZAtNewPointsUsingUncorrDataA
  * TODO: Refactor this function making it part of \"calculateAndSetLogZAtSimulatedPoints\" that will have
  *       to be modified (separate setting and calculation, bool useuncorredData as parameter, ecc.)
  */
-std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut){
+std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPointsUsingRawDataAndLeavingOutOneBlock(const int blockToBeLeftOut){
 
-    if(entryToBeLeftOut < 0 || entryToBeLeftOut >= reweightingDataHandler.numberOfBinsToBeUsed)
+    if(blockToBeLeftOut < 0 || blockToBeLeftOut >= reweightingDataHandler.numberOfBinsToBeUsed)
         throw std::out_of_range("Invalid entry to be left out in \"calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry\" function.");
     double residuum;
     std::vector<double> newLogZ(valuesOfSimulationParameters.size());
     std::vector<double> resultLogZ(valuesOfSimulationParameters.size(), 0.0);
     do{
-        newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters, true, entryToBeLeftOut, &resultLogZ);
+        newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters, false, blockToBeLeftOut, &resultLogZ);
         residuum = 0.0;
         //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
         for(size_t indexSimulations = 0; indexSimulations < valuesOfSimulationParameters.size(); indexSimulations++){
@@ -376,13 +395,12 @@ std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPointsUsingUncor
 }
 
 /*
- * This function just calculates the value of the observables at the new points using a given
- * SimulationDataContainer object given as parameter. Here we do not estimate any error on the
- * value, but this function will be called several times in calculateAndGetReweightedObservables
- * with different SimulationDataContainer in order to evaluate the error.
+ * This function just calculates the value of the observables at the new points. Here we do not estimate
+ * any error on the value, but this function will be called several times in calculateAndGetReweightedObservables
+ * with different parameters in order to evaluate the error.
  *
- * NOTE: From ALL the data files given in the SimulationDataContainer, the entry number "entryToBeLeftOut"
- *       is discarded in the calculation of the observables. This is to apply the Jackknife method later.
+ * NOTE: From ALL the data files given in the SimulationDataContainer, the entries in the block "blockToBeLeftOut"
+ *       are discarded in the calculation of the observables. This is to apply the Jackknife method later.
  *
  * NOTE: In this function, we consider understood that, in the SimulationDataContainer used in the calculation,
  *       the observables are "ready to be reweighted". This means that within such an object the logarithms
@@ -393,21 +411,20 @@ std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPointsUsingUncor
  *       several times).
  *
  * NOTE: Here we reweight all the column of the data container beyond the conjugated quantities.
- *       This means that also the central moments per data which have in case been added are reweighted.
+ *       This means that also the moments per data which have in case been added are reweighted.
+ * NOTE: Read last note before function calculateLogZAtNewPoints to get information about the blockToBeLeftOut.
  *
  * REMARK: Here we sort of duplicate a piece of code of the function calculateLogZAtNewPoints, but
  *         it is done on the purpose to keep the calculation of logZ and the observables separated.
  * TODO: Refactor calculation of logarithmOfDenominator in an own function.
  */
 std::vector<std::vector<double> > ReweighterAbstract::calculateReweightedObservableValues(bool useUncorrData,
-                                                                                          const int entryToBeLeftOut,
+                                                                                          const int blockToBeLeftOut,
                                                                                           std::vector<double> *logZAtSimulationPointToBeUsed,
                                                                                           std::vector<double> *logZAtNewPointsToBeUsed){
 
     SimulationDataContainer& simDataCont = (useUncorrData) ? reweightingDataHandler.simulationUncorrDataContainer
                                                            : reweightingDataHandler.simulationRawDataContainer;
-    if(entryToBeLeftOut >= simDataCont[0][0].getNumberOfElements())
-        throw std::logic_error("A not existing data entry has been asked to be excluded reweighting observables!");
     if(logZAtSimulationPointToBeUsed == NULL)
         logZAtSimulationPointToBeUsed = &logZAtSimulatedPoints;
     if(logZAtNewPointsToBeUsed == NULL)
@@ -422,12 +439,16 @@ std::vector<std::vector<double> > ReweighterAbstract::calculateReweightedObserva
         bool firstValue = true;
         for(size_t indexSimulation1 = 0; indexSimulation1 < numberOfSimulationsDone; indexSimulation1++){
             size_t numberConfigurations1 = simDataCont[indexSimulation1][0].getNumberOfElements();
+            const int blockSize = numberConfigurations1/reweightingDataHandler.numberOfBinsToBeUsed;
+            const int blockBegin = blockToBeLeftOut*blockSize;
+            const int blockEnd = blockBegin + blockSize;
             for(size_t indexConfiguration = 0; indexConfiguration < numberConfigurations1; indexConfiguration++){
-                if((int)indexConfiguration == entryToBeLeftOut)
+                if((int)indexConfiguration >= blockBegin && (int)indexConfiguration < blockEnd)
                     continue;
                 for(size_t indexSimulation2 = 0; indexSimulation2 < numberOfSimulationsDone; indexSimulation2++){
                     size_t numberConfigurations2 = simDataCont[indexSimulation2][0].getNumberOfElements();
-                    if(entryToBeLeftOut >= 0) numberConfigurations2--; //The number of conf has to be decreased if we leave one out!
+                    if(blockToBeLeftOut >= 0 && blockToBeLeftOut < reweightingDataHandler.numberOfBinsToBeUsed)
+                        numberConfigurations2 -= blockSize; //The number of conf has to be decreased if we leave one block out!
                     double exponent = 0.0;
                     for(size_t indexConjugatedQuantity = 0; indexConjugatedQuantity < numberOfReweightingParameters; indexConjugatedQuantity++){
                         exponent += (valuesOfNewParameters[indexNewPoint][indexConjugatedQuantity]
@@ -575,6 +596,33 @@ static void evaluateErrorOfObservablesPerPointFromEstimators(Observables& obs, s
     functionAppliedToEstimators = (estimatorFourthMomentPerData -((4*estimatorThirdMomentPerData) * estimatorData)
                                    + (6*estimatorSecondMomentPerData) * (estimatorData ^ 2)
                                    - (3*(estimatorData ^ 4))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 2);
+    obs.binderCumulant.error = calculateJacknifeError(functionAppliedToEstimators);
+}
+
+
+static void evaluateObservablesPerPointFromEstimators(Observables& obs, std::vector<std::valarray<double> > est){
+    DataSample estimatorData(est[0]);
+    DataSample estimatorSecondMomentPerData(est[1]);
+    DataSample estimatorThirdMomentPerData(est[2]);
+    DataSample estimatorFourthMomentPerData(est[3]);
+
+    //Mean error
+    obs.mean.estimate = calculateJacknifeEstimate(estimatorData);
+    obs.mean.error = calculateJacknifeError(estimatorData);
+    //Susceptibility error
+    DataSample functionAppliedToEstimators = estimatorSecondMomentPerData - (estimatorData ^ 2);
+    obs.susceptibility.estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
+    obs.susceptibility.error = calculateJacknifeError(functionAppliedToEstimators);
+    //Skewness error
+    functionAppliedToEstimators = (estimatorThirdMomentPerData - ((3*estimatorSecondMomentPerData ) * estimatorData)
+                                   + (2*(estimatorData ^ 3))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 1.5);
+    obs.skewness.estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
+    obs.skewness.error = calculateJacknifeError(functionAppliedToEstimators);
+    //Binder cumulant error
+    functionAppliedToEstimators = (estimatorFourthMomentPerData -((4*estimatorThirdMomentPerData) * estimatorData)
+                                   + (6*estimatorSecondMomentPerData) * (estimatorData ^ 2)
+                                   - (3*(estimatorData ^ 4))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 2);
+    obs.binderCumulant.estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
     obs.binderCumulant.error = calculateJacknifeError(functionAppliedToEstimators);
 }
 

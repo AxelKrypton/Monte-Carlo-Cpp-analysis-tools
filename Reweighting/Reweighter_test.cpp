@@ -43,12 +43,12 @@ public:
     }
 
     std::vector<double> testCalculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut){
-        return calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(entryToBeLeftOut);
+        return calculateLogZAtSimulatedPointsUsingRawDataAndLeavingOutOneBlock(entryToBeLeftOut);
     }
 
     std::vector<double> testCalculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
                                                                                          std::vector<double> logZSim){
-        return calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(entryToBeLeftOut, logZSim);
+        return calculateLogZAtNewPointsUsingRawDataAndLeavingOutOneBlock(entryToBeLeftOut, logZSim);
     }
 
     void testPrepareObservablesBeforeReweighting(std::vector<double>& minima){
@@ -578,7 +578,6 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
         reweighter.testPrepareObservablesBeforeReweighting(minimumOfObservables);
         std::vector<double> logZSim = reweighter.testCalculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(pointToBeLeftOut);
         std::vector<double> logZNew = reweighter.testCalculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(pointToBeLeftOut, logZSim);
-        BOOST_REQUIRE_THROW(reweighter.testCalculateReweightedObservableValues(false, pointToBeLeftOut+1), std::logic_error);
         //since we know the binsize is one we can reweight on the binned data even if on the reference code we used the raw data
         std::vector<std::vector<double> > valuesObsNewPoints =
                 reweighter.testCalculateReweightedObservableValues(true, pointToBeLeftOut, &logZSim, &logZNew);
@@ -628,10 +627,15 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
         /*
          * In this test we start to test the function calculateAndGetReweightedObservables.
          * The first trivial test is to compare the value of the mean regardless to the
-         * error. This has basically already been tested in "observables2" but here we call
+         * error. This has basically already been tested in "columnsReweighting2" but here we call
          * a different function in which the preparation and the restoring of the observables is done.
          * Again we have to calculate the logZ manually since the Tester class doesn't do that in the
          * constructor/setters.
+         *
+         * NOTE: Actually a crucial difference is there. We use the Jackknife estimators also for the
+         *       the value of the observable itself. One could claim this should be the same since the
+         *       observable is the mean (and the Jackknife coincides with the naif estimator for the mean).
+         *       Nevertheless we have here reweighting in between and this leads to a small discrepancy.
          */
         std::string fileThatDoesExist = "RealTestData/configfile_4";
         std::vector<std::pair<double, double> > newRanges;
@@ -658,8 +662,8 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
         reweighter.testCalculateLogZAtNewPoints();
         std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
         for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-8);
-            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].mean.estimate, 1.e-8);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-4);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].mean.estimate, 1.e-4);
         }
     }
 
@@ -668,7 +672,7 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
         /*
          * Here we compare our estimate of the observables with error with the same of the Reference Code.
          * Since in the Ref. Code they are estimated using bootstrap, we cannot really compare the error.
-         * What we do, since the value itself is compatible up to 2e-5%, is to check how different are the
+         * What we do, since the value itself is compatible up to 2e-4%, is to check how different are the
          * errors. But, again, due to the different methods, one cannot expect a real good agreement. The
          * reference code use bootstrap, resamplig 100 times the data, here we use jackknife. A disagreement
          * of 44% on some points is what happens here.
@@ -710,7 +714,7 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
         reweighter.testCalculateLogZAtNewPoints();
         std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
         for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 2.e-5);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 2.e-4);
             BOOST_REQUIRE_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].mean.error, 45);
         }
     }
@@ -790,8 +794,8 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
        reweighter.testCalculateLogZAtNewPoints();
        std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
        for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-           BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 2e-7);
-           BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].susceptibility.estimate, 2e-7);
+           BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 0.02);
+           BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].susceptibility.estimate, 0.02);
        }
    }
 
@@ -832,7 +836,7 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
        reweighter.testCalculateLogZAtNewPoints();
        std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
        for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-           BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 1e-3);
+           BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 0.06);
            BOOST_REQUIRE_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.error, 53); //Error discrepancies between 1% and 53%
        }
    }
@@ -866,27 +870,27 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
        }
    }
 
-//   BOOST_AUTO_TEST_CASE(suscReweighting4)
-//   {
-//       std::string fileThatDoesExist = "RealTestData/configfile_real";
-//       std::vector<std::pair<double, double> > newRanges;
-//       std::vector< unsigned int> newNumPoints(1, 51);
-//       newRanges.push_back(std::make_pair(5.204, 5.216));
-//       ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
-//       reweighter.testCalculateLogZAtSimulatedPoints();
-//       reweighter.testCalculateLogZAtNewPoints();
-//       std::vector<std::vector<Observables> > valuesObsNewPoints1 = reweighter.testCalculateAndGetReweightedObservables();
-//       std::vector<std::vector<double> > valuesNewPoints1 = reweighter.getValuesOfNewParameters();
-//       for(size_t i=0; i<valuesNewPoints1.size(); i++){
-//           std::cout << valuesNewPoints1[i][0];
-//           std::cout << "     " << valuesObsNewPoints1[i][0].mean.estimate;
-//           std::cout << "     " << valuesObsNewPoints1[i][0].mean.error;
-//           std::cout << "     " << valuesObsNewPoints1[i][0].susceptibility.estimate;
-//           std::cout << "     " << valuesObsNewPoints1[i][0].susceptibility.error;
-//           std::cout << "     " << valuesObsNewPoints1[i][0].binderCumulant.estimate;
-//           std::cout << "     " << valuesObsNewPoints1[i][0].binderCumulant.error << "\n";
-//       }
-//   }
+   BOOST_AUTO_TEST_CASE(suscReweighting4)
+   {
+       std::string fileThatDoesExist = "RealTestData/configfile_real";
+       std::vector<std::pair<double, double> > newRanges;
+       std::vector< unsigned int> newNumPoints(1, 51);
+       newRanges.push_back(std::make_pair(5.204, 5.216));
+       ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
+       reweighter.testCalculateLogZAtSimulatedPoints();
+       reweighter.testCalculateLogZAtNewPoints();
+       std::vector<std::vector<Observables> > valuesObsNewPoints1 = reweighter.testCalculateAndGetReweightedObservables();
+       std::vector<std::vector<double> > valuesNewPoints1 = reweighter.getValuesOfNewParameters();
+       for(size_t i=0; i<valuesNewPoints1.size(); i++){
+           std::cout << valuesNewPoints1[i][0];
+           std::cout << "     " << valuesObsNewPoints1[i][0].mean.estimate;
+           std::cout << "     " << valuesObsNewPoints1[i][0].mean.error;
+           std::cout << "     " << valuesObsNewPoints1[i][0].susceptibility.estimate;
+           std::cout << "     " << valuesObsNewPoints1[i][0].susceptibility.error;
+           std::cout << "     " << valuesObsNewPoints1[i][0].binderCumulant.estimate;
+           std::cout << "     " << valuesObsNewPoints1[i][0].binderCumulant.error << "\n";
+       }
+   }
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -962,8 +966,8 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
        reweighter.testCalculateLogZAtNewPoints();
        std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
        for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-           BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 2.5); //Discrepancy between 0.1% and 2.5%
-           BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 2.5); //Discrepancy between 0.1% and 2.5%
+           BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 0.1);
+           BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 2.5); //Discrepancy between 0.18% and 2.5%
        }
    }
 
@@ -1002,7 +1006,7 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
        reweighter.testCalculateLogZAtNewPoints();
        std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
        for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
-           BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 0.05);
+           BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 0.07);
            BOOST_REQUIRE_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].binderCumulant.error, 83); //Error discrepancies between 8% and 83%
        }
    }

@@ -103,16 +103,16 @@ protected:
 
     //Some of the following method could be static functions in the .cpp file but are here for testing purposes
     void calculateAndSetLogZAtNewPoints();
-    std::vector<double> calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
+    std::vector<double> calculateLogZAtNewPointsUsingRawDataAndLeavingOutOneBlock(const int blockToBeLeftOut,
                                                                                      std::vector<double> logZAtSimulationPointToBeUsed);
     void calculateAndSetLogZAtSimulatedPoints();
-    std::vector<double> calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut);
+    std::vector<double> calculateLogZAtSimulatedPointsUsingRawDataAndLeavingOutOneBlock(const int blockToBeLeftOut);
     void prepareObservablesBeforeReweighting(std::vector<double> &);
     void restoreObservablesAfterReweighting(std::vector<double> minimumOfEachObservable,
                                             std::vector<std::vector<double> > *reweightedObservablesFromRawData,
                                             std::valarray<std::vector<std::vector<double> > > *jackknifePartialPred);
     std::vector<std::vector<double> > calculateReweightedObservableValues(bool useUncorrData = false,
-                                                                          const int entryToBeLeftOut = -1,
+                                                                          const int blockToBeLeftOut = -1,
                                                                           std::vector<double> *logZAtSimulationPointToBeUsed = NULL,
                                                                           std::vector<double> *logZAtNewPointsToBeUsed = NULL);
     //This getter again only for testing reason
@@ -128,7 +128,7 @@ private:
     //Method in which "valuesOfNewParameters" is filled and some checks are done
     void calculateNewPoints();
     std::vector<double> calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated,
-                                                 bool useUncorrData = false, const int entryToBeLeftOut = -1,
+                                                 bool useUncorrData = false, const int blockToBeLeftOut = -1,
                                                  std::vector<double> *logZAtSimulationPointToBeUsed = NULL);
 
     //Members
