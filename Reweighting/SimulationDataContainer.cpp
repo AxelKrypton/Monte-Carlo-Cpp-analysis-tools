@@ -15,6 +15,7 @@ static bool isAnyMapEmpty(std::vector<std::map<std::string, double> >);
 static void extractInformationFromFile(std::string fileIn,
                                        std::vector<std::string>& dataFilenames,
                                        std::vector<std::map<std::string, double> >& dataParameters);
+static DataSample getMomentUsingMultipleColumns(const int, std::vector<DataSample>);
 /*****************************************************************************************/
 
 SimulationDataContainer::SimulationDataContainer()
@@ -67,20 +68,62 @@ SimulationDataContainer::getUncorrelatedSimulationDataSetAndNumbersOfEntriesLeft
 
 
 SimulationDataContainer SimulationDataContainer::insertMomentsPerData(std::vector<unsigned int> whichColumns,
-                                                                             std::vector<unsigned int> whichCentralMoments)
+                                                                      std::vector<unsigned int> whichMoments,
+                                                                      std::vector<bool> useMultipleColumnsForMoments)
 {
     SimulationDataContainer newSimDataCont(*this);
 
+    if(whichColumns.size() != useMultipleColumnsForMoments.size())
+        throw std::invalid_argument("Wrong call to insertMomentsPerData: invalid directives for columns!");
+
     for(int i=0; i<newSimDataCont.getNumberOfDatafiles(); i++){
         for(size_t j=0; j<whichColumns.size(); j++){
-            if((int)whichColumns[j] >= newSimDataCont.simulationDataSet[i].getNumberOfDataSample())
-                throw std::out_of_range("Columns specified not valid to add central moments!");
-            for(size_t k=0; k<whichCentralMoments.size(); k++){
-                DataSample temporarySample = newSimDataCont.simulationDataSet[i][whichColumns[j]];
-                newSimDataCont.simulationDataSet[i].appendNewColumnOfData(temporarySample ^ (int)whichCentralMoments[k]);
+            if(useMultipleColumnsForMoments[j]==false){
+                if((int)whichColumns[j] >= simulationDataSet[i].getNumberOfDataSample())
+                    throw std::out_of_range("Columns specified not valid to add central moments!");
+                for(size_t k=0; k<whichMoments.size(); k++){
+                    DataSample temporarySample = newSimDataCont.simulationDataSet[i][whichColumns[j]];
+                    newSimDataCont.simulationDataSet[i].appendNewColumnOfData(temporarySample ^ (int)whichMoments[k]);
+                }
+            }else{
+                unsigned int maxMoment = *max_element(whichMoments.begin(), whichMoments.end());
+                if(int(whichColumns[j]+maxMoment-1) >= simulationDataSet[i].getNumberOfDataSample())
+                    throw std::out_of_range("Columns specified not valid to add central moments using multipleColumns!");
+                std::vector<DataSample> temporarySamples;
+                for(size_t h=0; h<maxMoment; h++)
+                    temporarySamples.push_back(simulationDataSet[i][whichColumns[j]+h]);
+                for(size_t k=0; k<whichMoments.size(); k++)
+                    newSimDataCont.simulationDataSet[i].appendNewColumnOfData(getMomentUsingMultipleColumns(whichMoments[k],
+                                                                                                            temporarySamples));
+                //Replace the column whichColumns[j] by the mean of the given columns
+                newSimDataCont.simulationDataSet[i][whichColumns[j]] = getMomentUsingMultipleColumns(1, temporarySamples);
             }
         }
     }
+
+//    for(int i=0; i<newSimDataCont[0].getNumberOfDataSample(); i++){
+//        for(int j=0; j<newSimDataCont[0][i].getNumberOfElements(); j++)
+//            std::cout << "s[0][" << i << "][" << j << "] = " << newSimDataCont[0][i][j] << "\n";
+//    }
+//    std::cout << "\n\n";
+
+    //Delete columns used to get higher moments (leaving the first)
+    for(int i=0; i<newSimDataCont.getNumberOfDatafiles(); i++){
+        for(size_t j=0; j<whichColumns.size(); j++){
+            if(useMultipleColumnsForMoments[j]==true){
+                unsigned int maxMoment = *max_element(whichMoments.begin(), whichMoments.end());
+                for(size_t k=1; k<maxMoment; k++)
+                    //Here it seems that I delete always the same columns but indeed
+                    //it is ok because when deleting the other are shifted to the left
+                    newSimDataCont.simulationDataSet[i].deleteColumnOfData(whichColumns[j]+1);
+            }
+        }
+    }
+
+//    for(int i=0; i<newSimDataCont[0].getNumberOfDataSample(); i++){
+//        for(int j=0; j<newSimDataCont[0][i].getNumberOfElements(); j++)
+//            std::cout << "s[0][" << i << "][" << j << "] = " << newSimDataCont[0][i][j] << "\n";
+//    }
 
     return newSimDataCont;
 }
@@ -166,3 +209,25 @@ static bool isAnyMapEmpty(std::vector<std::map<std::string, double> > dataParame
 	return false;
 }
 
+
+static DataSample getMomentUsingMultipleColumns(const int moment, std::vector<DataSample> tempSamples){
+    if((int)tempSamples.size() < moment)
+        throw std::invalid_argument("Too few columns given to estimate the desired moment!");
+
+    //TODO: Implement the following in a general way with recursive functions
+    if(tempSamples.size() == 4){
+        if(moment == 1)
+            return (tempSamples[0] + tempSamples[1] + tempSamples[2] + tempSamples[3])/4.;
+        else if(moment == 2)
+            return ((tempSamples[0]*tempSamples[1]) + (tempSamples[0]*tempSamples[2]) +
+                    (tempSamples[0]*tempSamples[3]) + (tempSamples[1]*tempSamples[2]) +
+                    (tempSamples[1]*tempSamples[3]) + (tempSamples[2]*tempSamples[3]))/6.;
+        else if(moment == 3)
+            return ((tempSamples[0]*tempSamples[1]*tempSamples[2]) + (tempSamples[0]*tempSamples[1]*tempSamples[3]) +
+                    (tempSamples[0]*tempSamples[2]*tempSamples[3]) + (tempSamples[1]*tempSamples[2]*tempSamples[3]))/4.;
+        else
+            return tempSamples[0]*tempSamples[1]*tempSamples[2]*tempSamples[3];
+    }else{
+        throw std::invalid_argument("Calculation of moments using multiple columns not yet implemented in the asked case!");
+    }
+}

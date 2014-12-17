@@ -136,12 +136,13 @@ BOOST_AUTO_TEST_SUITE(InsertCentralMoments)
         SimulationDataContainer simDataCont(fileThatDoesExist);
         std::vector<unsigned int> columns;
         std::vector<unsigned int> moments;
+        std::vector<bool> useMultipleColumns(3, false);
         columns.push_back(0);
         columns.push_back(1);
         columns.push_back(2);
         moments.push_back(0);
         moments.push_back(1);
-        simDataCont = simDataCont.insertMomentsPerData(columns, moments);
+        simDataCont = simDataCont.insertMomentsPerData(columns, moments, useMultipleColumns);
         const int newNumberOfColumns = 9;
         const double columnsFirstMomentFirstFile[3][3] = {1.1, 1.4, 1.7, 1.2, 1.5, 1.8, 1.3, 1.6, -1.9};
         for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++)
@@ -157,6 +158,32 @@ BOOST_AUTO_TEST_SUITE(InsertCentralMoments)
                 BOOST_REQUIRE_EQUAL(simDataCont[i][5][j], 1.0);
                 BOOST_REQUIRE_EQUAL(simDataCont[i][7][j], 1.0);
             }
+        }
+    }
+
+    BOOST_AUTO_TEST_CASE(InsertCentralMoments2)
+    {
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_4";
+        SimulationDataContainer simDataCont(fileThatDoesExist);
+        std::vector<unsigned int> columns;
+        std::vector<unsigned int> moments;
+        std::vector<bool> useMultipleColumns(1, true);
+        columns.push_back(0);
+        moments.push_back(2);
+        moments.push_back(3);
+        moments.push_back(4);
+        simDataCont = simDataCont.insertMomentsPerData(columns, moments, useMultipleColumns);
+        const int newNumberOfColumns = 4;
+        const double FirstMoment[3] = {2, 2.1, 2.2};
+        const double SecondMoment[3] = {0.688333333333333, 0.648333333333333, 0.588333333333333,};
+        const double ThirdMoment[3] = {-21.7715, -27.2085, -33.4555};
+        const double FourthMoment[3] = {-163.68, -218.484, -285.1368};
+        BOOST_REQUIRE_EQUAL(simDataCont[0].getNumberOfDataSample(), newNumberOfColumns);
+        for(int i=0; i<3; i++){
+            BOOST_REQUIRE_CLOSE(simDataCont[0][0][i], FirstMoment[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][1][i], SecondMoment[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][2][i], ThirdMoment[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][3][i], FourthMoment[i], doublePrecisionInPercent);
         }
     }
 
