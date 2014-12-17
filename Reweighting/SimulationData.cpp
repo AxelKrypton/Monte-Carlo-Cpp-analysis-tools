@@ -90,6 +90,14 @@ void SimulationData::appendNewColumnOfData(DataSampleBasic sampleIn)
     simulationRawData.push_back(sampleIn);
 }
 
+
+void SimulationData::deleteColumnOfData(const int whichColumn){
+    if(whichColumn >= getNumberOfDataSample())
+        throw std::out_of_range("Invalid specified column to be deleted!");
+    //TODO: Make this efficient without using erase
+    simulationRawData.erase(simulationRawData.begin() + whichColumn);
+}
+
 /*****************************************************************************************/
 
 //todo: use stat of sys/stat.h to check existence and access to the file

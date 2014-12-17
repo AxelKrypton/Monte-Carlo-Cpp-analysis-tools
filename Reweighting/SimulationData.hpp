@@ -18,6 +18,7 @@ public:
     std::string getDatafileName();
 	DataSampleBasic& operator[](int index);
     void appendNewColumnOfData(DataSampleBasic sampleIn);
+    void deleteColumnOfData(const int whichColumn);
 
 private:
 	std::map<std::string, double> simulationParameters;

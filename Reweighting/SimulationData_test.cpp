@@ -205,3 +205,20 @@ BOOST_AUTO_TEST_SUITE(AppendColumn)
     }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(DeleteColumn)
+
+BOOST_AUTO_TEST_CASE(DeleteColumn1)
+{
+    std::string fileThatDoesExist = "GeneralTestFiles/input_test_file_1";
+    std::map<std::string, double> filledMap;
+    filledMap["beta"] = 4.0;
+    SimulationData simData(filledMap, fileThatDoesExist);
+    BOOST_REQUIRE_THROW(simData.deleteColumnOfData(3);, std::out_of_range);
+    simData.deleteColumnOfData(1);
+    const int refNewNumberColumns = 2;
+    BOOST_REQUIRE_EQUAL(refNewNumberColumns, simData.getNumberOfDataSample());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
