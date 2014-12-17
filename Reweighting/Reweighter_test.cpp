@@ -10,12 +10,16 @@
 class ReweighterTest : public ReweighterAbstract{
 public:
     ReweighterTest() : ReweighterAbstract() {}
-    ReweighterTest(std::string configurationFileIn, double precisionToCalculateLogZ = 1.e-7)
-     : ReweighterAbstract(configurationFileIn, precisionToCalculateLogZ) {}
+    ReweighterTest(std::string configurationFileIn,
+                   std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+                   double precisionToCalculateLogZ = 1.e-7)
+     : ReweighterAbstract(configurationFileIn, obsToBeRewUsingMultipleColumns, precisionToCalculateLogZ) {}
     ReweighterTest(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
-                   std::vector<unsigned int>  newNumberOfPointsOfParametersIn, double precisionToCalculateLogZ = 1.e-7)
+                   std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
+                   std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+                   double precisionToCalculateLogZ = 1.e-7)
      : ReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
-                          newNumberOfPointsOfParametersIn, precisionToCalculateLogZ) {}
+                          newNumberOfPointsOfParametersIn, obsToBeRewUsingMultipleColumns, precisionToCalculateLogZ) {}
 
     //Setters
     void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
@@ -98,8 +102,8 @@ BOOST_AUTO_TEST_SUITE(build)
     BOOST_AUTO_TEST_CASE(build2)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
-        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, 0.0), std::range_error);
-        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, -1.), std::range_error);
+        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), 0.0), std::range_error);
+        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), -1.), std::range_error);
     }
 
     BOOST_AUTO_TEST_CASE(build3)
@@ -246,7 +250,7 @@ BOOST_AUTO_TEST_SUITE(getters)
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         ReweighterTest reweighter(fileThatDoesExist);
 		BOOST_REQUIRE_EQUAL(reweighter.getPrecisionToCalculateLogZ(), 1.e-7);
-        ReweighterTest reweighter2(fileThatDoesExist, 0.001);
+        ReweighterTest reweighter2(fileThatDoesExist, std::vector<unsigned int>(), 0.001);
 		BOOST_REQUIRE_EQUAL(reweighter2.getPrecisionToCalculateLogZ(), 0.001);
 	}
 
@@ -368,7 +372,7 @@ BOOST_AUTO_TEST_SUITE(setters)
 		newRanges.push_back(std::make_pair(4.2, 4.6));
 		newRanges.push_back(std::make_pair(0.8, 1.2));
 		newRanges.push_back(std::make_pair(-1.2e12, -1.6e12));
-        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints, 0.1);
+        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), 0.1);
         BOOST_REQUIRE_THROW(reweighter.setPrecisionToCalculateLogZ(-3.e-10), std::range_error);
         BOOST_REQUIRE_NO_THROW(reweighter.setPrecisionToCalculateLogZ(1.e-10));
         BOOST_REQUIRE_EQUAL(reweighter.getPrecisionToCalculateLogZ(), 1.e-10);
@@ -1054,9 +1058,9 @@ std::vector< unsigned int> newNumPoints(1, 30);
     {
         BOOST_REQUIRE_THROW(Reweighter reweighter, std::invalid_argument);
         BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist));
-        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, 1.e-5));
+        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, std::vector<unsigned int>(), 1.e-5));
         BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints));
-        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints, 1.e-5));
+        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), 1.e-5));
     }
 
     BOOST_AUTO_TEST_CASE(setters)

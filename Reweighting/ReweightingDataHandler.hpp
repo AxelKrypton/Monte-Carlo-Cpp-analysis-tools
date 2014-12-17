@@ -34,7 +34,8 @@ class ReweightingDataHandler {
     friend class ReweighterAbstract;
 public:
     ReweightingDataHandler();
-    ReweightingDataHandler(std::string configurationFileIn);
+    ReweightingDataHandler(std::string configurationFileIn,
+                           std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>());
     //Getters
     std::vector<std::string> getNamesOfParametersIgnoringMetaParameters();
     std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters();
@@ -45,13 +46,13 @@ public:
 
 protected:
     int numberOfBinsToBeUsed;
+    int numberOfObservablesGivenAsInput;
+    int numberOfObservablesToBeReweighted;
 
 private:
     std::string configurationFile;
     SimulationDataContainer simulationRawDataContainer;
     SimulationDataContainer simulationUncorrDataContainer;
-    int numberOfObservablesGivenAsInput;
-    int numberOfObservablesToBeReweighted;
 
     /*
      * These are metaparameters that must NOT be interpreted as reweighting parameters,

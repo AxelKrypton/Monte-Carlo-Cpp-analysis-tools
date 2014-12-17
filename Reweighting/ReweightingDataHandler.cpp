@@ -27,7 +27,8 @@ ReweightingDataHandler::ReweightingDataHandler() {
     throw std::invalid_argument("ReweightingDataHandler needs input file for construction!");
 }
 
-ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn)
+ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
+                                               std::vector<unsigned int> obsToBeRewUsingMultipleColumns)
     : configurationFile(configurationFileIn),
       simulationRawDataContainer(configurationFileIn), simulationUncorrDataContainer(simulationRawDataContainer)
 {
@@ -37,12 +38,27 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn)
     //Print information about binsizes actually used
     printBinsizesActuallyUsed(simulationRawDataContainer, numberOfBinsToBeUsed);
     //Evaluate central moments per data and append them to the raw data container
+    //TODO: So far this is hard-coded, make it general and settable by user
     std::vector<unsigned int> columnsOfObservables;
-    unsigned int momentsNeededTmp[] = {2,3,4};
-    std::vector<unsigned int> momentsNeeded (momentsNeededTmp, momentsNeededTmp + sizeof(momentsNeededTmp) / sizeof(unsigned int) );
-    for(size_t i=getNamesOfParametersIgnoringMetaParameters().size(); (int)i<simulationRawDataContainer[0].getNumberOfDataSample(); i++)
+    std::vector<bool> useMultipleColumnsForMoments;
+    std::vector<unsigned int> momentsNeeded;
+    momentsNeeded.push_back(2);
+    momentsNeeded.push_back(3);
+    momentsNeeded.push_back(4);
+    for(size_t i=getNamesOfParametersIgnoringMetaParameters().size(); (int)i<simulationRawDataContainer[0].getNumberOfDataSample();){
         columnsOfObservables.push_back(i);
-    simulationRawDataContainer = simulationRawDataContainer.insertMomentsPerData(columnsOfObservables, momentsNeeded);
+        if(find(obsToBeRewUsingMultipleColumns.begin(), obsToBeRewUsingMultipleColumns.end(), i) != obsToBeRewUsingMultipleColumns.end()){
+            useMultipleColumnsForMoments.push_back(true);
+            i+=4;
+        }else{
+            useMultipleColumnsForMoments.push_back(false);
+            i++;
+        }
+
+    }
+    simulationRawDataContainer = simulationRawDataContainer.insertMomentsPerData(columnsOfObservables, momentsNeeded, useMultipleColumnsForMoments);
+    //Here I set the number of "real" observables given as input (neglecting the multiple columns)
+    numberOfObservablesGivenAsInput = (int)columnsOfObservables.size();
     numberOfObservablesToBeReweighted = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
 
     std::cout << "obs_giv = " << numberOfObservablesGivenAsInput << std::endl;
@@ -53,29 +69,29 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn)
             binnedDataAndLeftOutEntries = simulationRawDataContainer.getUncorrelatedSimulationDataSetAndNumbersOfEntriesLeftOut(numberOfBinsToBeUsed);
 
     simulationUncorrDataContainer = binnedDataAndLeftOutEntries.first;
-    std::cout.precision(16);
-    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
-        for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
-            std::cout << "sim[" << i << "][" << j << "] = " << simulationRawDataContainer[i][j].getNumberOfElements() << "\t\t";
-            std::cout << "bin[" << i << "][" << j << "] = " << simulationUncorrDataContainer[i][j].getNumberOfElements() << "\n";
-//        for(int k=0; k<simulationDataContainer[i][j].getNumberOfElements(); k++)
-//            std::cout << simulationDataContainer[i][j][k] << "\n";
-        }
-    }
+//    std::cout.precision(16);
+//    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
+//        for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
+//            std::cout << "sim[" << i << "][" << j << "] = " << simulationRawDataContainer[i][j].getNumberOfElements() << "\t\t";
+//            std::cout << "bin[" << i << "][" << j << "] = " << simulationUncorrDataContainer[i][j].getNumberOfElements() << "\n";
+////        for(int k=0; k<simulationDataContainer[i][j].getNumberOfElements(); k++)
+////            std::cout << simulationDataContainer[i][j][k] << "\n";
+//        }
+//    }
     //Refining on the raw data
     for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
         for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
             simulationRawDataContainer[i][j] = simulationRawDataContainer[i][j].removeLastNElements(binnedDataAndLeftOutEntries.second[i]);
         }
     }
-    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
-        for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
-            std::cout << "sim[" << i << "][" << j << "] = " << simulationRawDataContainer[i][j].getNumberOfElements()  << "\t\t";
-            std::cout << "bin[" << i << "][" << j << "] = " << simulationUncorrDataContainer[i][j].getNumberOfElements() << "\n";
-//        for(int k=0; k<simulationDataContainer[i][j].getNumberOfElements(); k++)
-//            std::cout << simulationDataContainer[i][j][k] << "\n";
-        }
-    }
+//    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
+//        for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
+//            std::cout << "sim[" << i << "][" << j << "] = " << simulationRawDataContainer[i][j].getNumberOfElements()  << "\t\t";
+//            std::cout << "bin[" << i << "][" << j << "] = " << simulationUncorrDataContainer[i][j].getNumberOfElements() << "\n";
+////        for(int k=0; k<simulationDataContainer[i][j].getNumberOfElements(); k++)
+////            std::cout << simulationDataContainer[i][j][k] << "\n";
+//        }
+//    }
 
 }
 

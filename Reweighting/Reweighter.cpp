@@ -25,8 +25,10 @@ ReweighterAbstract::ReweighterAbstract() {
 }
 
 
-ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn, double precisionToCalculateLogZ)
- : reweightingDataHandler(configurationFileIn), observablesAtNewPoints(),
+ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
+                                       std::vector<unsigned int> obsToBeRewUsingMultipleColumns,
+                                       double precisionToCalculateLogZ)
+ : reweightingDataHandler(configurationFileIn, obsToBeRewUsingMultipleColumns), observablesAtNewPoints(),
    precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
 {
 	generalInitialization();
@@ -36,8 +38,9 @@ ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn, double p
 ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
                                        std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                                        std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
+                                       std::vector<unsigned int> obsToBeRewUsingMultipleColumns,
                                        double precisionToCalculateLogZ)
- : reweightingDataHandler(configurationFileIn), observablesAtNewPoints(),
+ : reweightingDataHandler(configurationFileIn, obsToBeRewUsingMultipleColumns), observablesAtNewPoints(),
    newRangesOfParameters(newRangesOfParametersIn), newNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn),
    precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
 {

@@ -11,8 +11,12 @@
 class ReweightingDataHandlerTest : public ReweightingDataHandler{
 public:
     ReweightingDataHandlerTest() : ReweightingDataHandler(){}
-    ReweightingDataHandlerTest(std::string configurationFileIn) : ReweightingDataHandler(configurationFileIn){}
+    ReweightingDataHandlerTest(std::string configurationFileIn,
+                               std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>())
+      : ReweightingDataHandler(configurationFileIn, obsToBeRewUsingMultipleColumns){}
     int getNumberOfBinsToBeUsed(){ return numberOfBinsToBeUsed;}
+    int getNumberOfObsGivenAsInput(){ return numberOfObservablesGivenAsInput;}
+    int getNumberOfObsToBeRew(){ return numberOfObservablesToBeReweighted;}
 };
 
 
@@ -73,6 +77,17 @@ BOOST_AUTO_TEST_SUITE(build)
         ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist);
         const int referenceNumberOfBins = 16;
         BOOST_REQUIRE_EQUAL(reweightingDataHandler.getNumberOfBinsToBeUsed(), referenceNumberOfBins);
+    }
+
+    BOOST_AUTO_TEST_CASE(build6)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_6";
+        std::vector<unsigned int> multipleColumns(1,1);
+        ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, multipleColumns);
+        const int referenceNumberObsGiven = 4;
+        const int referenceNumberObsRew = 16;
+        BOOST_REQUIRE_EQUAL(reweightingDataHandler.getNumberOfObsGivenAsInput(), referenceNumberObsGiven);
+        BOOST_REQUIRE_EQUAL(reweightingDataHandler.getNumberOfObsToBeRew(), referenceNumberObsRew);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

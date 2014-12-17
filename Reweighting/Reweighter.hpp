@@ -95,10 +95,13 @@ public:
 
 protected:
     ReweighterAbstract();
-    ReweighterAbstract(std::string configurationFileIn, double precisionToCalculateLogZ = 1.e-7);
+    ReweighterAbstract(std::string configurationFileIn,
+                       std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+                       double precisionToCalculateLogZ = 1.e-7);
     ReweighterAbstract(std::string configurationFileIn,
                        std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                        std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
+                       std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                        double precisionToCalculateLogZ = 1.e-7);
 
     //Some of the following method could be static functions in the .cpp file but are here for testing purposes
@@ -182,16 +185,19 @@ private:
 class Reweighter : public ReweighterAbstract{
 public:
     Reweighter() : ReweighterAbstract() {}
-    explicit Reweighter(std::string configurationFileIn, double precisionToCalculateLogZ = 1.e-7)
-     : ReweighterAbstract(configurationFileIn, precisionToCalculateLogZ) {
+    explicit Reweighter(std::string configurationFileIn,
+                        std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+                        double precisionToCalculateLogZ = 1.e-7)
+     : ReweighterAbstract(configurationFileIn, obsToBeRewUsingMultipleColumns, precisionToCalculateLogZ) {
         calculateAndSetLogZAtSimulatedPoints();
     }
     Reweighter(std::string configurationFileIn,
                std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
+               std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                double precisionToCalculateLogZ = 1.e-7)
      : ReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
-                          newNumberOfPointsOfParametersIn, precisionToCalculateLogZ) {
+                          newNumberOfPointsOfParametersIn, obsToBeRewUsingMultipleColumns, precisionToCalculateLogZ) {
         calculateAndSetLogZAtSimulatedPoints();
         calculateAndSetLogZAtNewPoints();
     }
