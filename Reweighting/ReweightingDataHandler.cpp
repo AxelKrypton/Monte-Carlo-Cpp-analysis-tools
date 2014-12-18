@@ -45,9 +45,14 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
     momentsNeeded.push_back(2);
     momentsNeeded.push_back(3);
     momentsNeeded.push_back(4);
+    std::sort(obsToBeRewUsingMultipleColumns.begin(), obsToBeRewUsingMultipleColumns.end());
+    for(size_t i=1; i<obsToBeRewUsingMultipleColumns.size(); i++){
+        if(obsToBeRewUsingMultipleColumns[i]-obsToBeRewUsingMultipleColumns[i-1]<4)
+            throw std::invalid_argument("obsToBeRewUsingMultipleColumns contains columns too close (distance<4)!");
+    }
     for(size_t i=getNamesOfParametersIgnoringMetaParameters().size(); (int)i<simulationRawDataContainer[0].getNumberOfDataSample();){
         columnsOfObservables.push_back(i);
-        if(find(obsToBeRewUsingMultipleColumns.begin(), obsToBeRewUsingMultipleColumns.end(), i) != obsToBeRewUsingMultipleColumns.end()){
+        if(find(obsToBeRewUsingMultipleColumns.begin(), obsToBeRewUsingMultipleColumns.end(), (unsigned int)(i-getNamesOfParametersIgnoringMetaParameters().size())) != obsToBeRewUsingMultipleColumns.end()){
             useMultipleColumnsForMoments.push_back(true);
             i+=4;
         }else{

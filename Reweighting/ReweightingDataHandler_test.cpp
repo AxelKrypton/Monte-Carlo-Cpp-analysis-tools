@@ -88,6 +88,8 @@ BOOST_AUTO_TEST_SUITE(build)
         const int referenceNumberObsRew = 16;
         BOOST_REQUIRE_EQUAL(reweightingDataHandler.getNumberOfObsGivenAsInput(), referenceNumberObsGiven);
         BOOST_REQUIRE_EQUAL(reweightingDataHandler.getNumberOfObsToBeRew(), referenceNumberObsRew);
+        multipleColumns.push_back(3);
+        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler2(fileThatDoesExist, multipleColumns), std::invalid_argument);
     }
 
 BOOST_AUTO_TEST_SUITE_END()
