@@ -10,12 +10,13 @@ int main(int argc, const char ** argv)
 	{
 		LqcdReweightingParameters parameters(argc, argv);
 		
-		std::vector<std::pair<double, double> > newRanges;
+        std::vector<std::pair<double, double> > newRanges;
 		std::vector< unsigned int> newNumPoints;
 		newRanges.push_back(std::make_pair(parameters.getNewBetaRange_low(), parameters.getNewBetaRange_high()));
 		newNumPoints.push_back(parameters.getNumberOfNewBetaPoints());
+        std::vector< unsigned int> obsMultipleColumns = parameters.getObservablesToBeReweightedUsingMultipleColumns();
 		
-		Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints);
+        Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints, obsMultipleColumns);
 		
 		std::vector<std::vector<Observables> > reweightedObservables = reweighter.calculateAndGetReweightedObservables();
 		std::vector<std::vector<double> > newBetaValues = reweighter.getValuesOfNewParameters();

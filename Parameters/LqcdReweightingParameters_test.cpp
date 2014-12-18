@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 	
 	static LqcdReweightingParameters createParametersForArgumentSettingCheck_string(std::string argumentName, std::string newValue)
 	{
-		std::string argument = argumentName + "=" + newValue;
+        std::string argument = argumentName + "=" +  newValue;
 		int numberOfArguments = 3;
 		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
 		return LqcdReweightingParameters(numberOfArguments, arguments);
@@ -228,5 +228,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		std::string argumentName = "--outputfilePrefix";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_string(argumentName, newValue).getOutputfilePrefix() );
 	}
+
+    BOOST_AUTO_TEST_CASE(observablesMultipleColumns)
+    {
+        std::string newValues = "5";
+        std::string argumentName = "--obsMultipleColumns";
+        std::vector<unsigned int> refValues;
+        refValues.push_back(5);
+        BOOST_REQUIRE(refValues == createParametersForArgumentSettingCheck_string(argumentName, newValues).getObservablesToBeReweightedUsingMultipleColumns() );
+    }
 	
 BOOST_AUTO_TEST_SUITE_END()

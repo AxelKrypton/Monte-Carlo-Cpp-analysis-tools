@@ -24,6 +24,7 @@ public:
 	bool getDeactivateReweightingForVariance();
 	bool getDeactivateReweightingForSkewness();
 	bool getDeactivateReweightingForBinder();
+    std::vector<unsigned int> getObservablesToBeReweightedUsingMultipleColumns();
 	
 	struct parse_aborted {};
 	
@@ -39,6 +40,7 @@ private:
 	bool deactivateReweightingForVariance;
 	bool deactivateReweightingForSkewness;
 	bool deactivateReweightingForBinder;
+    std::vector<unsigned int> observablesToBeReweightedUsingMultipleColumns;
 };
 
 #endif
