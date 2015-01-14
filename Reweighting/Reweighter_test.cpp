@@ -113,8 +113,9 @@ BOOST_AUTO_TEST_SUITE(build)
     BOOST_AUTO_TEST_CASE(build3)
     {
     	std::string fileThatDoesExist = "RealTestData/configfile_1";
-    	BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,1), 1.e-5), std::invalid_argument);
-    	BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,0), 1.e-5));
+    	BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,2), 1.e-5), std::invalid_argument);
+    	BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,0), 1.e-5), std::invalid_argument);
+    	BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,1), 1.e-5));
     }
 
 
