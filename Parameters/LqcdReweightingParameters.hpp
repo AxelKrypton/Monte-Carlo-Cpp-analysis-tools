@@ -24,8 +24,9 @@ public:
 	bool getDeactivateReweightingForVariance();
 	bool getDeactivateReweightingForSkewness();
 	bool getDeactivateReweightingForBinder();
-    std::vector<unsigned int> getObservablesToBeReweightedUsingMultipleColumns();
-	
+    std::vector<unsigned int> getColumnsToBeReweightedUsingMultipleColumns();
+	std::vector<unsigned int> getColumnsWhoseMeanIsKnownToBeZero();
+
 	struct parse_aborted {};
 	
 private:
@@ -40,7 +41,8 @@ private:
 	bool deactivateReweightingForVariance;
 	bool deactivateReweightingForSkewness;
 	bool deactivateReweightingForBinder;
-    std::vector<unsigned int> observablesToBeReweightedUsingMultipleColumns;
+    std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
+    std::vector<unsigned int> columnsWhoseMeanIsKnownToBeZero;
 };
 
 #endif

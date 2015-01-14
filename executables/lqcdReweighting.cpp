@@ -14,9 +14,10 @@ int main(int argc, const char ** argv)
 		std::vector< unsigned int> newNumPoints;
 		newRanges.push_back(std::make_pair(parameters.getNewBetaRange_low(), parameters.getNewBetaRange_high()));
 		newNumPoints.push_back(parameters.getNumberOfNewBetaPoints());
-        std::vector< unsigned int> obsMultipleColumns = parameters.getObservablesToBeReweightedUsingMultipleColumns();
+        std::vector< unsigned int> colOfObsMultipleColumns = parameters.getColumnsToBeReweightedUsingMultipleColumns();
+        std::vector< unsigned int> colOfObsWithZeroMean = parameters.getColumnsWhoseMeanIsKnownToBeZero();
 		
-        Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints, obsMultipleColumns);
+        Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints, colOfObsMultipleColumns, colOfObsWithZeroMean);
 		
 		std::vector<std::vector<Observables> > reweightedObservables = reweighter.calculateAndGetReweightedObservables();
 		std::vector<std::vector<double> > newBetaValues = reweighter.getValuesOfNewParameters();

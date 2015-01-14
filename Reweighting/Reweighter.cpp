@@ -9,8 +9,8 @@
 static void writeNewPoints(std::vector<std::vector<double> >&, std::vector<std::vector<double> >, std::vector<double>, int=0, int=0);
 static void findIflogZHasToBeCalculated(std::vector<double>, std::vector<int>&);
 static double logarithmic_sum(double, double);
-static void evaluateErrorOfObservablesPerPointFromEstimators(Observables&, std::vector<std::valarray<double> >);
-static void evaluateEstimateOfObservablesPerPointFromMoments(Observables&, std::vector<double>);
+static void evaluateErrorOfObservablesPerPointFromEstimators(Observables&, const bool, std::vector<std::valarray<double> >);
+static void evaluateEstimateOfObservablesPerPointFromMoments(Observables&, const bool, std::vector<double>);
 
 /*****************************************************************************************/
 
@@ -26,25 +26,27 @@ ReweighterAbstract::ReweighterAbstract() {
 
 
 ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
-                                       std::vector<unsigned int> obsToBeRewUsingMultipleColumns,
+                                       std::vector<unsigned int> colToBeRewUsingMultipleColumns,
+                                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
                                        double precisionToCalculateLogZ)
- : reweightingDataHandler(configurationFileIn, obsToBeRewUsingMultipleColumns), observablesAtNewPoints(),
+ : reweightingDataHandler(configurationFileIn, colToBeRewUsingMultipleColumns), observablesAtNewPoints(),
    precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
 {
-	generalInitialization();
+	generalInitialization(colWhoseMeanIsKnownToBeZero);
 }
 
 
 ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
                                        std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                                        std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
-                                       std::vector<unsigned int> obsToBeRewUsingMultipleColumns,
+                                       std::vector<unsigned int> colToBeRewUsingMultipleColumns,
+                                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
                                        double precisionToCalculateLogZ)
- : reweightingDataHandler(configurationFileIn, obsToBeRewUsingMultipleColumns), observablesAtNewPoints(),
+ : reweightingDataHandler(configurationFileIn, colToBeRewUsingMultipleColumns), observablesAtNewPoints(),
    newRangesOfParameters(newRangesOfParametersIn), newNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn),
    precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
 {
-	generalInitialization();
+	generalInitialization(colWhoseMeanIsKnownToBeZero);
 	calculateNewPoints();
 }
 
@@ -158,8 +160,8 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
                     jackknifeEstimatorsPerPointAndObs[m+1][k] = jackknifeEstimators[k][i][numberOfObservablesGivenAsInput+j*3+m];
 
             }
-            evaluateEstimateOfObservablesPerPointFromMoments(observablesAtNewPoints[i][j], momentsPerPointAndObs);
-            evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], jackknifeEstimatorsPerPointAndObs);
+            evaluateEstimateOfObservablesPerPointFromMoments(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], momentsPerPointAndObs);
+            evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], jackknifeEstimatorsPerPointAndObs);
         }
     }
 
@@ -172,10 +174,22 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
 /************************** PROTECTED OR PRIVATE METHODS *********************************/
 /*****************************************************************************************/
 
-void ReweighterAbstract::generalInitialization()
+void ReweighterAbstract::generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero)
 {
     reweightingParameterNames = reweightingDataHandler.getNamesOfParametersIgnoringMetaParameters();
     valuesOfSimulationParameters = reweightingDataHandler.getValuesOfSimulationParametersIgnoringMetaParameters();
+    meanOfObservableIsKnownToBeZero=std::vector<bool>(reweightingDataHandler.numberOfObservablesGivenAsInput, false);
+    for(size_t i=0; i<colWhoseMeanIsKnownToBeZero.size(); i++){
+    	if(colWhoseMeanIsKnownToBeZero[i]<reweightingParameterNames.size())
+    		throw std::invalid_argument("Number of column for obs. whose mean should be known to be zero referring to a column of conjugated quantity!");
+    	else if(colWhoseMeanIsKnownToBeZero[i]>=reweightingParameterNames.size()+reweightingDataHandler.numberOfObservablesGivenAsInput)
+    		throw std::invalid_argument("Invalid specified observable whose mean should be known to be zero!");
+    	meanOfObservableIsKnownToBeZero[colWhoseMeanIsKnownToBeZero[i]-reweightingParameterNames.size()]=true;
+    }
+    std::cout << "meanOfObservableIsKnownToBeZero=( ";
+    for(int i=0; i<reweightingDataHandler.numberOfObservablesGivenAsInput; i++)
+    	std::cout << meanOfObservableIsKnownToBeZero[i] << " ";
+    std::cout << ")\n\n";
     if(precisionOfIterativeProcedureToCalculateLogZ <= 0.0)
         throw std::range_error("Precision smaller than or equal to zero is nonsense!");
     logZAtSimulatedPoints.resize(valuesOfSimulationParameters.size(), 0.0);
@@ -548,37 +562,58 @@ SimulationDataContainer ReweighterAbstract::getSimulationDataContainer(bool raw)
  * contains the estimators of the observable given as input and the following contain
  * the central moments that have been asked to be calculated (so far manually set to 2,3,4).
  */
-static void evaluateEstimateOfObservablesPerPointFromMoments(Observables& obs, std::vector<double> moments){
+static void evaluateEstimateOfObservablesPerPointFromMoments(Observables& obs, const bool meanIsZero, std::vector<double> moments){
     double x1 = moments[0];
     double x2 = moments[1];
     double x3 = moments[2];
     double x4 = moments[3];
-    obs.mean.estimate = x1;
-    obs.susceptibility.estimate = x2-x1*x1;
-    obs.skewness.estimate = (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5));
-    obs.binderCumulant.estimate = (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0));
+    if(meanIsZero){
+    	obs.mean.estimate = 0.0;
+		obs.susceptibility.estimate = x2;
+		obs.skewness.estimate = x3/(pow(x2, 1.5));
+		obs.binderCumulant.estimate = x4/(pow(x2, 2.0));
+    }else{
+		obs.mean.estimate = x1;
+		obs.susceptibility.estimate = x2-x1*x1;
+		obs.skewness.estimate = (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5));
+		obs.binderCumulant.estimate = (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0));
+    }
 }
 
-static void evaluateErrorOfObservablesPerPointFromEstimators(Observables& obs, std::vector<std::valarray<double> > est){
+static void evaluateErrorOfObservablesPerPointFromEstimators(Observables& obs, const bool meanIsZero, std::vector<std::valarray<double> > est){
     DataSample estimatorData(est[0]);
     DataSample estimatorSecondMomentPerData(est[1]);
     DataSample estimatorThirdMomentPerData(est[2]);
     DataSample estimatorFourthMomentPerData(est[3]);
 
-    //Mean error
-    obs.mean.error = calculateJacknifeError(estimatorData);
-    //Susceptibility error
-    DataSample functionAppliedToEstimators = estimatorSecondMomentPerData - (estimatorData ^ 2);
-    obs.susceptibility.error = calculateJacknifeError(functionAppliedToEstimators);
-    //Skewness error
-    functionAppliedToEstimators = (estimatorThirdMomentPerData - ((3*estimatorSecondMomentPerData ) * estimatorData)
-                                   + (2*(estimatorData ^ 3))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 1.5);
-    obs.skewness.error = calculateJacknifeError(functionAppliedToEstimators);
-    //Binder cumulant error
-    functionAppliedToEstimators = (estimatorFourthMomentPerData -((4*estimatorThirdMomentPerData) * estimatorData)
-                                   + (6*estimatorSecondMomentPerData) * (estimatorData ^ 2)
-                                   - (3*(estimatorData ^ 4))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 2);
-    obs.binderCumulant.error = calculateJacknifeError(functionAppliedToEstimators);
+    if(meanIsZero){
+    	//Mean error
+		obs.mean.error = 0.0;
+		//Susceptibility error
+		DataSample functionAppliedToEstimators = estimatorSecondMomentPerData;
+		obs.susceptibility.error = calculateJacknifeError(functionAppliedToEstimators);
+		//Skewness error
+		functionAppliedToEstimators = (estimatorThirdMomentPerData) / (estimatorSecondMomentPerData ^ 1.5);
+		obs.skewness.error = calculateJacknifeError(functionAppliedToEstimators);
+		//Binder cumulant error
+		functionAppliedToEstimators = (estimatorFourthMomentPerData) / (estimatorSecondMomentPerData ^ 2);
+		obs.binderCumulant.error = calculateJacknifeError(functionAppliedToEstimators);
+    }else{
+		//Mean error
+		obs.mean.error = calculateJacknifeError(estimatorData);
+		//Susceptibility error
+		DataSample functionAppliedToEstimators = estimatorSecondMomentPerData - (estimatorData ^ 2);
+		obs.susceptibility.error = calculateJacknifeError(functionAppliedToEstimators);
+		//Skewness error
+		functionAppliedToEstimators = (estimatorThirdMomentPerData - ((3*estimatorSecondMomentPerData ) * estimatorData)
+									   + (2*(estimatorData ^ 3))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 1.5);
+		obs.skewness.error = calculateJacknifeError(functionAppliedToEstimators);
+		//Binder cumulant error
+		functionAppliedToEstimators = (estimatorFourthMomentPerData -((4*estimatorThirdMomentPerData) * estimatorData)
+									   + (6*estimatorSecondMomentPerData) * (estimatorData ^ 2)
+									   - (3*(estimatorData ^ 4))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 2);
+		obs.binderCumulant.error = calculateJacknifeError(functionAppliedToEstimators);
+    }
 }
 
 

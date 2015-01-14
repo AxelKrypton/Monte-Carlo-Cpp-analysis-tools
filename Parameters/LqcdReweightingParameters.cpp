@@ -17,7 +17,8 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
 		("deactivateReweightingForVariance", po::value<bool>(&deactivateReweightingForVariance)->default_value(false)->implicit_value(true), "Do not perform reweighting for the variance of the data.")
 		("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false)->implicit_value(true), "Do not perform reweighting for the skewness of the data.")
         ("deactivateReweightingForBinder", po::value<bool>(&deactivateReweightingForBinder)->default_value(false)->implicit_value(true), "Do not perform reweighting for the binder cumulant of the data.")
-        ("obsMultipleColumns", po::value<std::vector<unsigned int> >(&observablesToBeReweightedUsingMultipleColumns)->multitoken(), "Number of FIRST column containing observable to be reweighted using several columns for higher moments. ATTENTION: Observables ranges from ZERO!!");
+        ("obsMultipleColumns", po::value<std::vector<unsigned int> >(&columnsToBeReweightedUsingMultipleColumns)->multitoken(), "Number of FIRST column containing observable to be reweighted using several columns for higher moments. ATTENTION: Columns ranges from ZERO!")
+        ("obsWithZeroMean", po::value<std::vector<unsigned int> >(&columnsWhoseMeanIsKnownToBeZero)->multitoken(), "Number of COLUMNS containing observable whose mean is known a priori to be zero. ATTENTION: Columns ranges from ZERO!!");
 		
 	//option "file" can be given without option description
 	positionalOptions.add("file", 1);
@@ -43,7 +44,7 @@ void LqcdReweightingParameters::checkParsedArguments(po::variables_map & vm, po:
 
 void LqcdReweightingParameters::printParameters()
 {
-	std::string separator = "###################################################";
+	std::string separator = "###########################################################";
 	
 	std::cout << separator << std::endl;
 	std::cout << "# Options:" << std::endl;
@@ -53,10 +54,14 @@ void LqcdReweightingParameters::printParameters()
 	std::cout << "# Reweighting parameters:" << std::endl;
 	std::cout << "# New beta range:\t[" << newBetaRange_low << ":" << newBetaRange_high << "]" << std::endl;
     std::cout << "# New beta points:\t  " << numberOfNewBetaPoints << std::endl;
-    std::cout << "# Observables with multiple columns:  ";
-    for(size_t i=0; i<observablesToBeReweightedUsingMultipleColumns.size(); i++)
-        std::cout << observablesToBeReweightedUsingMultipleColumns[i] << " ";
+    std::cout << "# Columns of obs. to be rew. with multiple columns:  ";
+    for(size_t i=0; i<columnsToBeReweightedUsingMultipleColumns.size(); i++)
+        std::cout << columnsToBeReweightedUsingMultipleColumns[i] << " ";
     std::cout << std::endl;
+    std::cout << "# Columns of obs. whose mean is known to be zero:  ";
+        for(size_t i=0; i<columnsWhoseMeanIsKnownToBeZero.size(); i++)
+            std::cout << columnsWhoseMeanIsKnownToBeZero[i] << " ";
+        std::cout << std::endl;
 	std::cout << separator << std::endl;
 	std::cout << "# Observables:" << std::endl;
 	if ( deactivateReweightingForMean )
@@ -139,6 +144,10 @@ bool LqcdReweightingParameters::getDeactivateReweightingForBinder()
 	return deactivateReweightingForBinder;
 }
 
-std::vector<unsigned int> LqcdReweightingParameters::getObservablesToBeReweightedUsingMultipleColumns(){
-    return observablesToBeReweightedUsingMultipleColumns;
+std::vector<unsigned int> LqcdReweightingParameters::getColumnsToBeReweightedUsingMultipleColumns(){
+    return columnsToBeReweightedUsingMultipleColumns;
+}
+
+std::vector<unsigned int> LqcdReweightingParameters::getColumnsWhoseMeanIsKnownToBeZero(){
+	return columnsWhoseMeanIsKnownToBeZero;
 }

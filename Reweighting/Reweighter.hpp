@@ -96,12 +96,14 @@ public:
 protected:
     ReweighterAbstract();
     ReweighterAbstract(std::string configurationFileIn,
-                       std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+                       std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
                        double precisionToCalculateLogZ = 1.e-7);
     ReweighterAbstract(std::string configurationFileIn,
                        std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                        std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
-                       std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+                       std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
                        double precisionToCalculateLogZ = 1.e-7);
 
     //Some of the following method could be static functions in the .cpp file but are here for testing purposes
@@ -126,7 +128,7 @@ private:
 	 * Note: The following function is basically the second constructor above. We put it here because it is also the first part
 	 *       of the third constructor. In C one constructor cannot call another constructor (in c++11 one would use delegating constructors).
 	 */
-	void generalInitialization();
+	void generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero);
 
     //Method in which "valuesOfNewParameters" is filled and some checks are done
     void calculateNewPoints();
@@ -178,6 +180,10 @@ private:
 	 */
 	std::vector<std::pair<double, double> >  newRangesOfParameters;
 	std::vector<unsigned int>  newNumberOfPointsOfParameters;
+
+	//Additional parameters
+	std::vector<bool> meanOfObservableIsKnownToBeZero;  //here the indices of the vector are the
+														//number of observable, NOT of the column!
 	double precisionOfIterativeProcedureToCalculateLogZ;
 };
 
@@ -186,18 +192,22 @@ class Reweighter : public ReweighterAbstract{
 public:
     Reweighter() : ReweighterAbstract() {}
     explicit Reweighter(std::string configurationFileIn,
-                        std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+                        std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+                        std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
                         double precisionToCalculateLogZ = 1.e-7)
-     : ReweighterAbstract(configurationFileIn, obsToBeRewUsingMultipleColumns, precisionToCalculateLogZ) {
+     : ReweighterAbstract(configurationFileIn, colToBeRewUsingMultipleColumns,
+    		              colWhoseMeanIsKnownToBeZero, precisionToCalculateLogZ) {
         calculateAndSetLogZAtSimulatedPoints();
     }
     Reweighter(std::string configurationFileIn,
                std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
-               std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+               std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+               std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
                double precisionToCalculateLogZ = 1.e-7)
      : ReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
-                          newNumberOfPointsOfParametersIn, obsToBeRewUsingMultipleColumns, precisionToCalculateLogZ) {
+                          newNumberOfPointsOfParametersIn, colToBeRewUsingMultipleColumns,
+                          colWhoseMeanIsKnownToBeZero, precisionToCalculateLogZ) {
         calculateAndSetLogZAtSimulatedPoints();
         calculateAndSetLogZAtNewPoints();
     }
