@@ -29,10 +29,10 @@ protected:
  * the SimulationDataContainer, one column (i.e. a DataSampleBasic object) containing
  * (O2)^3 will be appended (where O2 is each entry of the second column).
  * The argument useMultipleColumnsForCentralMoments is to decide how to build the higher moments.
- * Its size must be equal to that of whichColumns and its entries are refered in the obvious way
+ * Its size must be equal to that of whichColumns and its entries are referred in the obvious way
  * to the columns. If any entry is false then the central moments are build in the standard way,
  * otherwise the columns starting from that specified are used to build the higher moments; as
- * many as the highest required moment says. Notice that in case of using several colums, these
+ * many as the highest required moment says. Notice that in case of using several columns, these
  * columns will be at the end substituted by one containing the mean line by line.
  *
  * Let's make an example -->  insertMomentsPerData({2,6},{2,3,4},{true, false});
