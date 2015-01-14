@@ -207,11 +207,11 @@ static void checkCorrectnessOfConfigurationFileForReweighting(SimulationDataCont
             throw std::logic_error("Configuration file for Reweighting not valid. Number of observables in datafiles not coherent!");
     }
     extractValuesOfSimulationParametersIgnoringMetaParameters(simDataCont, parValues, metaPar);
-    for(size_t i=0; i<parValues.size(); i++){
-        for(size_t j=0; j<parValues[i].size(); j++)
-            std::cout << parValues[i][j] << " ";
-        std::cout << "\n";
-    }
+//    for(size_t i=0; i<parValues.size(); i++){
+//        for(size_t j=0; j<parValues[i].size(); j++)
+//            std::cout << parValues[i][j] << " ";
+//        std::cout << "\n";
+//    }
     for(size_t i=1; i<parValues.size(); i++){
         if(isLastEntryPresentMoreThanOnce(parValues))
             throw std::logic_error("Files with same reweighting parameters cannot be accumulated, yet!");
@@ -231,14 +231,14 @@ static int getNumberOfBinsToBeUsed(SimulationDataContainer simDataCont, const st
     std::vector<int> valuesOfNumberOfBins;
     if(valuesOfBinsizes == std::vector<int>(valuesOfBinsizes.size(), 0))
         throw std::runtime_error("In the configuration file at least one binsize must be provided!");
-    for(size_t i=0; i<valuesOfBinsizes.size(); i++)
-        std::cout << "binsizes[" << i << "] = " << valuesOfBinsizes[i] << "\n";
+//    for(size_t i=0; i<valuesOfBinsizes.size(); i++)
+//        std::cout << "binsizes[" << i << "] = " << valuesOfBinsizes[i] << "\n";
 
     for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
         if(valuesOfBinsizes[i] != 0)
             valuesOfNumberOfBins.push_back(simDataCont[i][0].getNumberOfElements()/valuesOfBinsizes[i]);
     }
-    std::cout << "numBins = " << *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end()) << "\n";
+//    std::cout << "numBins = " << *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end()) << "\n";
     return *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end());
 }
 
