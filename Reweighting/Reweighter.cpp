@@ -166,7 +166,7 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
     }
 
     std::cout << " ...reweighting of observables done!\n";
-    std::cout << "==========================================================\n";
+    std::cout << "==========================================================\n\n";
     return observablesAtNewPoints;
 }
 
@@ -310,9 +310,11 @@ void ReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
      * TODO: Benchmark in real life if these two blocks can be merged, i.e. how long does the
      *       indices set up in the else here below.
      */
+    std::cout << "==========================================================\n";
+    std::cout << " Calculating LogZ At Simulated Points (precision = " << precisionOfIterativeProcedureToCalculateLogZ << ")..." << std::endl;
     if(logZAtSimulatedPoints == std::vector<double>(logZAtSimulatedPoints.size(), 0)){
 
-        double residuum;
+      double residuum, valueResiduumForOutput=1;
         std::vector<double> newLogZ(valuesOfSimulationParameters.size());
         do{
             newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters);
@@ -324,6 +326,10 @@ void ReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
                 //here one should put eq.(8.34)
             }
             logZAtSimulatedPoints = newLogZ;
+	    if(residuum < valueResiduumForOutput){
+	      std::cout << "   Residuum = " << sqrt(residuum) << std::endl;
+	      valueResiduumForOutput/=10.;
+	    }
         }while(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ);
 
     }else{
@@ -350,6 +356,8 @@ void ReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
         }while(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ);
 
     }
+    std::cout << " ...done!" << std::endl;
+    std::cout << "==========================================================\n\n";
 }
 
 
