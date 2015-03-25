@@ -60,6 +60,11 @@ protected:
 			  std::valarray<double> tmp = makeValarrayWithOnes(length);
 			  return new std::valarray<double>(tmp);
 		  }
+		  else if ( fillType == onesMinusOnes )
+		  {
+			  std::valarray<double> tmp = makeValarrayWithOnesAndMinusOnes(length);
+			  return new std::valarray<double>(tmp);
+		  }
 		  else if ( fillType == arrayPosition )
 		  {
 			  std::valarray<double> tmp = makeValarrayWithArrayPosition(length);

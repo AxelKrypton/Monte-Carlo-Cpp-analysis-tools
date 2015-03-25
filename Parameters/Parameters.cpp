@@ -18,6 +18,7 @@ Parameters::Parameters(int argc, const char ** argv)
 		("analysisOutputFilePostfix", po::value<std::string>(&analysisOutputFilePostfix)->default_value("_stat"), "Postfix for filename of analysis results")
 		("offset,o", po::value<int>(&offset)->default_value(0), "Discard first <offset> values of data")
 		("column,c", po::value<int>(&column)->default_value(1), "Read data from column number <column> (must be >= 1)")
+		("isMeanKnownToBeZero,m", po::value<bool>(&isMeanKnownToBeZero)->default_value(false)->implicit_value(true), "The mean for given column is set to zero in the observables' calculation")
 		("analyzeMean", po::value<bool>(&analyzeMean)->default_value(true)->implicit_value(false), "Analyze data for mean")
 		("analyzeVariance", po::value<bool>(&analyzeVariance)->default_value(true)->implicit_value(false), "Analyze data for variance")
 		("analyzeSkewness", po::value<bool>(&analyzeSkewness)->default_value(true)->implicit_value(false), "Analyze data for skewness")
@@ -71,7 +72,7 @@ void Parameters::checkParsedArguments(po::variables_map & vm, po::options_descri
 	 * as "count" is always true.
 	 * Hence, no default value is given in the definition of
 	 * the options but it is assigned as done below.
-	 * Probaply this can be done better with the "notifier"
+	 * Probably this can be done better with the "notifier"
 	 * functionality of boost.
 	 */
 
@@ -105,7 +106,9 @@ void Parameters::printParameters()
 	std::cout << "# Options:" << std::endl;
 	std::cout << "###############################" << std::endl;
 	std::cout << "# Datafile:\t" << file << std::endl;
-	std::cout << "# Use column:\t" << column << std::endl;
+	std::cout << "# Use column:\t" << column;
+	if(isMeanKnownToBeZero) std::cout << "\t(mean is known to be zero)";
+	std::cout << std::endl;
 	std::cout << "# Offset:\t" << offset << std::endl;
 	//todo: add output of observables which are analyzed
 	std::cout << "###############################" << std::endl;

@@ -18,6 +18,16 @@ std::valarray<double> makeValarrayWithOnes(int length)
 	return std::valarray<double>(1., length);
 }
 
+std::valarray<double> makeValarrayWithOnesAndMinusOnes(int length)
+{
+	std::valarray<double> returnValarray(1., length);
+	for (int iteration = 0; iteration < (int) returnValarray.size(); iteration ++)
+	{
+		returnValarray[iteration] = pow(-1.,iteration);
+	}
+	return returnValarray;
+}
+
 std::valarray<double> makeValarrayWithArrayPosition(int length)
 {
 	std::valarray<double> returnValarray(length);
@@ -74,6 +84,6 @@ std::valarray<double> makeValarrayWithEntriesBetweenOneAndEight(int length)
 	return returnValarray;
 }
 
-enum FillType { zeros, ones, arrayPosition, entriesSymmetricBetweenZeroAndOne, entriesBetweenOneAndEight, bigAndSmallEntries };
+enum FillType { zeros, ones, onesMinusOnes, arrayPosition, entriesSymmetricBetweenZeroAndOne, entriesBetweenOneAndEight, bigAndSmallEntries };
 
 #endif /* DATASAMPLETESTUTITLITIES_HPP_ */

@@ -105,6 +105,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(column_default, createParametersForDefaultCheck().column);
 	}
 
+	BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero)
+	{
+		bool isMeanKnownToBeZero_default = false;
+		BOOST_REQUIRE_EQUAL(isMeanKnownToBeZero_default, createParametersForDefaultCheck().isMeanKnownToBeZero);
+	}
+
 	BOOST_AUTO_TEST_CASE(useBinning)
 	{
 		bool useBinning_default = true;
@@ -378,6 +384,20 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		const char * arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
 		Parameters parameters(numberOfArguments, arguments);
 		BOOST_CHECK_EQUAL(newValue, parameters.calcAutocorrelation);
+	}
+
+	BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero1)
+	{
+		bool newValue = true;
+		std::string argumentName = "--isMeanKnownToBeZero";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).isMeanKnownToBeZero);
+	}
+
+	BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero2)
+	{
+		bool newValue = false;
+		std::string argumentName = "-m";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).isMeanKnownToBeZero);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeMean1)

@@ -4,17 +4,29 @@
 #include <boost/test/unit_test.hpp>
 
 #include "dataAnalysisUtilities.hpp"
-
 #include "TestDataSample.hpp"
 #include "binning.hpp"
+#include "binnedDataSample.hpp"
+#include <iomanip>
+
+static void checkEstimateAndError(EstimateAndError expectedEstimateAndError, EstimateAndError calculatedEstimateAndError, double testPrecision)
+{
+	BOOST_CHECK_CLOSE(expectedEstimateAndError.error, calculatedEstimateAndError.error, testPrecision);
+	BOOST_CHECK_CLOSE(expectedEstimateAndError.estimate, calculatedEstimateAndError.estimate, testPrecision);
+}
 
 BOOST_AUTO_TEST_SUITE(meanAndError)
 
-	static void testMeanAndError(DataSample * sample, double expectedMean, double expectedError)
+	static void testMeanAndError(DataSample * sample, EstimateAndError expectedMeanAndError)
 	{
+		if(expectedMeanAndError.estimate == 0.0){
+			EstimateAndError meanAndError_zeroMean = calcMeanAndErrorOfUncorrelatedDataSample(*sample, true);
+			//Trivial test, but better than nothing
+			checkEstimateAndError(expectedMeanAndError, meanAndError_zeroMean, doublePrecisionInPercent);
+		}
+		//Leave in any case this test, more significant
 		EstimateAndError meanAndError = calcMeanAndErrorOfUncorrelatedDataSample(*sample);
-		BOOST_CHECK_CLOSE(meanAndError.estimate, expectedMean, doublePrecisionInPercent);
-		BOOST_CHECK_CLOSE(meanAndError.error, expectedError, doublePrecisionInPercent);
+		checkEstimateAndError(expectedMeanAndError, meanAndError, doublePrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(test1)
@@ -22,10 +34,9 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 		int numberOfElements = 795;
 		DataSample sample(numberOfElements);
 
-		double expectedMean = 0.;
-		double expectedError = 0.;
+		EstimateAndError expectedMeanAndError(0,0);
 
-		testMeanAndError(&sample, expectedMean, expectedError);
+		testMeanAndError(&sample, expectedMeanAndError);
 	}
 
 	BOOST_AUTO_TEST_CASE(test2)
@@ -34,13 +45,12 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 		TestDataSample testSample(numberOfElements, ones);
 		DataSample* sample = testSample.getDataSample();
 
-		double expectedMean = 1.;
-		double expectedError = 0.;
+		EstimateAndError expectedMeanAndError(1,0);
 
-		testMeanAndError(sample, expectedMean, expectedError);
+		testMeanAndError(sample, expectedMeanAndError);
 	}
 
-	double expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
+	static double expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
 	{
 		double secondMoment = sample.getNthMoment(2);
 		double firstMoment = sample.getNthMoment(1);
@@ -54,25 +64,32 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 		TestDataSample testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 
-		double expectedError = sqrt( expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(*sample, numberOfElements) );
-		double expectedMean = 0.5  * (numberOfElements - 1);
+		EstimateAndError expectedMeanAndError;
+		expectedMeanAndError.estimate = 0.5  * (numberOfElements - 1);
+		expectedMeanAndError.error = sqrt( expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(*sample, numberOfElements) );
 
-		testMeanAndError(sample, expectedMean, expectedError);
+		testMeanAndError(sample, expectedMeanAndError);
+	}
+
+	BOOST_AUTO_TEST_CASE(test4)
+	{
+		int numberOfElements = 4;
+		TestDataSample testSample(numberOfElements, onesMinusOnes);
+		DataSample* sample = testSample.getDataSample();
+
+		EstimateAndError expectedMeanAndError;
+		expectedMeanAndError.estimate = 0.;
+		expectedMeanAndError.error = sqrt( 1. /(numberOfElements-1) );
+
+		testMeanAndError(sample, expectedMeanAndError);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
-void checkEstimateAndError(EstimateAndError expectedEstimateAndError, EstimateAndError calculatedEstimateAndError, double testPrecision)
-{
-	BOOST_CHECK_CLOSE(expectedEstimateAndError.error, calculatedEstimateAndError.error, testPrecision);
-	BOOST_CHECK_CLOSE(expectedEstimateAndError.estimate, calculatedEstimateAndError.estimate, testPrecision);
-}
-
-#include "binnedDataSample.hpp"
 
 BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 
-	Parameters createParameters(int binsize, std::string file = "noFileGiven")
+	static Parameters createParameters(int binsize, std::string file = "noFileGiven")
 	{
 		std::string argumentFile = "--file=" + file;
 		std::string argumentBinsize = "--binsize=" + boost::lexical_cast<std::string>(binsize);
@@ -89,6 +106,12 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 		DataSample sample(file);
 		DataSample binnedData = performBinningFromBinsize(sample, binsize);
 
+		if(expected.estimate == 0.0){
+			EstimateAndError meanAndError_zeroMean = calcMeanAndErrorOfUncorrelatedDataSample(binnedData, true);
+			//Trivial test, but better than nothing
+			checkEstimateAndError(expected, meanAndError_zeroMean, testPrecision);
+		}
+		//Leave in any case this test, more significant
 		EstimateAndError meanAndError = calcMeanAndErrorOfUncorrelatedDataSample(binnedData);
 		checkEstimateAndError(expected, meanAndError, testPrecision);
 	}
@@ -151,7 +174,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 	double precisionOfDataInFileInPercent = 1e-10;
 	int numberOfBins = 10;
 
-	Parameters createParameters(int numberOfBins, std::string file = "noFileGiven")
+	static Parameters createParameters(int numberOfBins, std::string file = "noFileGiven")
 	{
 		std::string argumentFile = "--file=" + file;
 		std::string argumentBinsize = "--numberOfBins=" + boost::lexical_cast<std::string>(numberOfBins);
@@ -168,6 +191,12 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 		DataSample sample(file);
 		DataSample binnedData = performBinningFromNumberOfBins(sample, numberOfBins);
 
+		if(expected.estimate == 0.0){
+			EstimateAndError meanAndError_zeroMean = calcMeanAndErrorOfUncorrelatedDataSample(binnedData, true);
+			//Trivial test, but better than nothing
+			checkEstimateAndError(expected, meanAndError_zeroMean, testPrecision);
+		}
+		//Leave in any case this test, more significant
 		EstimateAndError meanAndError = calcMeanAndErrorOfDataSample(sample, parameters);
 		checkEstimateAndError(expected, meanAndError, testPrecision);
 	}
@@ -215,7 +244,6 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-#include <iomanip>
 
 BOOST_AUTO_TEST_SUITE(varianceAndError)
 
@@ -225,6 +253,18 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		double firstMoment = sample.getNthMoment(1);
 		double prefactor = numberOfElements / (numberOfElements - 1.);
 		return prefactor * ( secondMoment - pow(firstMoment, 2.) );
+	}
+
+	static void testVarianceAndError(DataSample * sample, EstimateAndError expected, double testPrecision, bool isMeanKnownToBeZero = false)
+	{
+		if(isMeanKnownToBeZero){
+			EstimateAndError varianceAndError_zeroMean = calcVarianceAndErrorOfUncorrelatedDataSample(*sample, true);
+			//Trivial test, but better than nothing
+			checkEstimateAndError(expected, varianceAndError_zeroMean, testPrecision);
+		}
+		//Leave in any case this test, more significant
+		EstimateAndError varianceAndError = calcVarianceAndErrorOfUncorrelatedDataSample(*sample);
+		checkEstimateAndError(expected, varianceAndError, testPrecision);
 	}
 
 	BOOST_AUTO_TEST_CASE(variance)
@@ -238,12 +278,6 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedValue, doublePrecisionInPercent);
 	}
 
-	static void testVarianceAndError(DataSample * sample, EstimateAndError expected, double testPrecision)
-	{
-		EstimateAndError varianceAndError = calcVarianceAndErrorOfUncorrelatedDataSample(*sample);
-		checkEstimateAndError(expected, varianceAndError, testPrecision);
-	}
-
 	BOOST_AUTO_TEST_CASE(test1)
 	{
 		int numberOfElements = 2674;
@@ -253,7 +287,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		double expectedError = 0.;
 		
 		EstimateAndError expected(expectedVariance, expectedError);
-		testVarianceAndError(&sample, expected, doublePrecisionInPercent);
+		testVarianceAndError(&sample, expected, doublePrecisionInPercent, true);
 	}
 
 	BOOST_AUTO_TEST_CASE(test2)
@@ -286,6 +320,19 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		testVarianceAndError(sample, expected, testPrecision);
 	}
 
+	BOOST_AUTO_TEST_CASE(test4)
+	{
+		int numberOfElements = 2742;
+		TestDataSample testSample(numberOfElements, onesMinusOnes);
+		DataSample* sample = testSample.getDataSample();
+
+		double expectedVariance = numberOfElements/(numberOfElements-1.);
+		double expectedError = 0;
+
+		EstimateAndError expected(expectedVariance, expectedError);
+		testVarianceAndError(sample, expected, doublePrecisionInPercent, true);
+	}
+
 	BOOST_AUTO_TEST_CASE(withBinning)
 	{
 		std::string gaussianData = "gaussianNumbers_0_1_0_3.dat";
@@ -307,9 +354,10 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+
 BOOST_AUTO_TEST_SUITE(skewnessAndError)
 
-	BOOST_AUTO_TEST_CASE(withBinning)
+	BOOST_AUTO_TEST_CASE(withBinning1)
 	{
 		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
 		
@@ -328,11 +376,31 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
         BOOST_WARN( fabs(skewnessAndError.error/skewnessAndError.estimate) < 0.001 );
 	}
 	
+	BOOST_AUTO_TEST_CASE(withBinning2)
+	{
+		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
+
+		double expectedSkewness = 1.;
+
+		const char * arguments[] = {"foo", "--isMeanKnownToBeZero", "--binsize=100", gaussianData.c_str()};
+		Parameters parameters(4, arguments);
+
+		DataSample sample(gaussianData);
+
+		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
+        double NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
+                fabs(skewnessAndError.estimate - expectedSkewness) / skewnessAndError.error;
+
+        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
+        BOOST_WARN( fabs(skewnessAndError.error/skewnessAndError.estimate) < 0.001 );
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
+
 
 BOOST_AUTO_TEST_SUITE(binderAndError)
 
-	BOOST_AUTO_TEST_CASE(withBinning)
+BOOST_AUTO_TEST_CASE(withBinning1)
 	{
 		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
 		
@@ -345,6 +413,25 @@ BOOST_AUTO_TEST_SUITE(binderAndError)
 
 		EstimateAndError kurtosisAndError = calcBinderAndErrorOfDataSample(sample, parameters);
         double NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
+                fabs(kurtosisAndError.estimate - expectedKurtosis) / kurtosisAndError.error;
+
+        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
+        BOOST_WARN( fabs(kurtosisAndError.error/kurtosisAndError.estimate) < 0.001 );
+	}
+
+	BOOST_AUTO_TEST_CASE(withBinning2)
+	{
+		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
+
+		double expectedKurtosis = 3.;
+
+		const char * arguments[] = {"foo", "--isMeanKnownToBeZero", "--binsize=100", gaussianData.c_str()};
+		Parameters parameters(4, arguments);
+
+		DataSample sample(gaussianData);
+
+		EstimateAndError kurtosisAndError = calcBinderAndErrorOfDataSample(sample, parameters);
+		double NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
                 fabs(kurtosisAndError.estimate - expectedKurtosis) / kurtosisAndError.error;
 
         BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);

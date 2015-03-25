@@ -4,6 +4,7 @@
 #include "binnedDataSample.hpp"
 #include "../IO/io_utilities.hpp"
 #include "jackknifeAnalysis.hpp"
+#include "binnedDataSample.hpp"
 
 static double meanOfDataSample(DataSample & sampleIn)
 {
@@ -17,28 +18,30 @@ static double meanOfDataSample(DataSample & sampleIn)
  * as the pseudovalues for the mean
  * are again the original data points.
  */
-static double unbiasedVarianceOfMean(DataSample & sampleIn)
+static double unbiasedVarianceOfMean(DataSample & sampleIn, bool isMeanKnownToBeZero)
 {
-	return 1. / double(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthCentralMoment(2);
+	return isMeanKnownToBeZero ? 1. / double(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthMoment(2)
+							   : 1. / double(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthCentralMoment(2);
+}
+
+EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn, bool isMeanKnownToBeZero)
+{
+	double mean = 0.;
+	double error = 0.;
+
+	if(!isMeanKnownToBeZero) mean = meanOfDataSample(sampleIn);
+	error = sqrt( unbiasedVarianceOfMean(sampleIn, isMeanKnownToBeZero) );
+
+	return EstimateAndError(mean, error);
 }
 
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
 	DataSample binnedData = performBinning(sampleIn, parameters);
 
-	return calcMeanAndErrorOfUncorrelatedDataSample(binnedData);
+	return calcMeanAndErrorOfUncorrelatedDataSample(binnedData, parameters.isMeanKnownToBeZero);
 }
 
-EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)
-{
-	double mean = 0.;
-	double error = 0.;
-
-	mean = meanOfDataSample(sampleIn);
-	error = sqrt( unbiasedVarianceOfMean(sampleIn) );
-
-	return EstimateAndError(mean, error);
-}
 
 /**
  * A Jackknife analysis of the (naive) sample variance
@@ -54,7 +57,7 @@ EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)
  */
 static double unbiasedErrorOfVariance(DataSample & varianceSample)
 {
-	return sqrt( unbiasedVarianceOfMean(varianceSample) );
+	return sqrt( unbiasedVarianceOfMean(varianceSample, 0) );
 }
 
 /**
@@ -70,30 +73,29 @@ static double unbiasedErrorOfVariance(DataSample & varianceSample)
  * Note that for the mean the unbiased variance yields
  * the same error as jackknifing.
  */
-static double unbiasedVarianceOfDataSample(DataSample & sampleIn)
+static double unbiasedVarianceOfDataSample(DataSample & sampleIn, bool isMeanKnownToBeZero)
 {
-	return double(sampleIn.getNumberOfElements()) / double(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthCentralMoment(2);
+	return isMeanKnownToBeZero ? double(sampleIn.getNumberOfElements()) / double(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthMoment(2)
+							   : double(sampleIn.getNumberOfElements()) / double(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthCentralMoment(2);
 }
 
-static DataSample createVarianceSample(DataSample sampleIn)
+static DataSample createVarianceSample(DataSample sampleIn, bool isMeanKnownToBeZero)
 {
-	return (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
+	return isMeanKnownToBeZero ? (sampleIn) ^ 2 : (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
 }
 
-
-#include "binnedDataSample.hpp"
-EstimateAndError calcVarianceAndError(DataSample & sampleIn, Parameters parameters, bool shouldUseBinning = false)
+static EstimateAndError calcVarianceAndError(DataSample & sampleIn, bool isMeanKnownToBeZero , Parameters *parameters = NULL, bool shouldUseBinning = false)
 {
 	double variance = 0.;
 	double error = 0.;
 
-	DataSample varianceSample = createVarianceSample(sampleIn);
+	DataSample varianceSample = createVarianceSample(sampleIn, isMeanKnownToBeZero);
 	if ( shouldUseBinning )
 	{
-		DataSample binnedData = performBinning(varianceSample, parameters);
+		DataSample binnedData = performBinning(varianceSample, *parameters);
 		error = unbiasedErrorOfVariance(binnedData);
 		// todo: improve!
-		performBinning(sampleIn, parameters);
+		performBinning(sampleIn, *parameters);
 	}
 	else
 	{
@@ -101,21 +103,19 @@ EstimateAndError calcVarianceAndError(DataSample & sampleIn, Parameters paramete
 	}
 
 	//this must be calculated after a possible binning as this may discard some elements!
-	variance = unbiasedVarianceOfDataSample(sampleIn);
+	variance = unbiasedVarianceOfDataSample(sampleIn, isMeanKnownToBeZero);
 	
 	return EstimateAndError(variance, error);
 }
 
-EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn)
+EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampleIn, bool isMeanKnownToBeZero)
 {
-	const char * dummyArguments[] = {"foo", "dummyFile"};
-	Parameters dummy(2, dummyArguments);
-	return calcVarianceAndError(sampleIn, dummy);
+	return calcVarianceAndError(sampleIn, isMeanKnownToBeZero);
 }
 
 EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
-	return calcVarianceAndError(sampleIn, parameters, true);
+	return calcVarianceAndError(sampleIn, parameters.isMeanKnownToBeZero, &parameters, true);
 }
 
 EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
@@ -124,8 +124,8 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 		* Skewness gamma_1 is defined as:
 		*   gamma_1 = <(x-mu)^3> / <(x-mu)^2>^(3/2)
 		*/
-	DataSample thirdCentralMomentSample = (sampleIn - sampleIn.getNthMoment(1)) ^ 3;
-	DataSample secondCentralMomentSample = (sampleIn - sampleIn.getNthMoment(1)) ^ 2;	
+	DataSample thirdCentralMomentSample = parameters.isMeanKnownToBeZero ? (sampleIn) ^ 3 : (sampleIn - sampleIn.getNthMoment(1)) ^ 3;
+	DataSample secondCentralMomentSample = parameters.isMeanKnownToBeZero ? (sampleIn) ^ 2 : (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
 
 	DataSample binnedSample1 = performBinning(thirdCentralMomentSample, parameters);
 	DataSample binnedSample2 = performBinning(secondCentralMomentSample, parameters);
@@ -144,8 +144,8 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
 	 * The Kurtosis gamma_2 is defined as:
 	 *   gamma_2 = beta_2 - 3
 	 */
-	DataSample fourthCentralMoment = (sampleIn - sampleIn.getNthMoment(1)) ^ 4;
-	DataSample secondCentralMoment = (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
+	DataSample fourthCentralMoment = parameters.isMeanKnownToBeZero ? (sampleIn) ^ 4 : (sampleIn - sampleIn.getNthMoment(1)) ^ 4;
+	DataSample secondCentralMoment = parameters.isMeanKnownToBeZero ? (sampleIn) ^ 2 : (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
 	
 	DataSample binnedSample1 = performBinning(fourthCentralMoment, parameters);
 	DataSample binnedSample2 = performBinning(secondCentralMoment, parameters);	

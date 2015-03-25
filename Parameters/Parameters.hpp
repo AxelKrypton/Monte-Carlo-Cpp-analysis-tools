@@ -21,6 +21,7 @@ public:
 	int timeMaxAutocorrelationFunction;
 	int offset;
 	int column;
+	bool isMeanKnownToBeZero;
 	bool useBinning;
 	bool useNumberOfBinsForBinning;
 	bool calcAutocorrelation;
