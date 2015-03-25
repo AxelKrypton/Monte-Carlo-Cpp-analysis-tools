@@ -10,8 +10,6 @@
 
 #include "DataSample.hpp"
 
-//todo: add fcts. for mean and error
-//todo: overload constructor to add function
 class JackknifeEstimators: public DataSample
 {
 public:
@@ -19,11 +17,12 @@ public:
 	JackknifeEstimators(DataSample sampleIn);
 
 protected:
-	int getJackknifeNormalization();
 	void checkIfJackknifeCanBePerformed(int n);
 	DataSampleBasic createJackknifeEstimatorsWithBinning(int numberOfBins, int binsize);
 };
 
+
+//TODO: The following two classes are not used at all in the Project. Remove them!?
 class JackknifeEstimatorsFromBinningWithNumberOfBins: public JackknifeEstimators
 {
 public:

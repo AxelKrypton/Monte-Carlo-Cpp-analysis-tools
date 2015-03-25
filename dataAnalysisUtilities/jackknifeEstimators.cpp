@@ -11,7 +11,8 @@ DataSample(numberOfElementsIn)
 JackknifeEstimators::JackknifeEstimators(DataSample sampleIn) :
 DataSample(sampleIn)
 {
-	int normalization = getJackknifeNormalization();
+	checkIfJackknifeCanBePerformed(numberOfElements);
+	int normalization = numberOfElements - 1;
 	double sumOfDataSampleElements = sampleIn.sum();
 	//todo: do this removing specific elements -> less rounding errors
 	setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
@@ -37,12 +38,6 @@ int calcNumberOfBins(int binsize, int numberOfElements)
 {
 	checkDiscardedElements(binsize, "binsize", numberOfElements);
 	return numberOfElements / binsize;
-}
-
-int JackknifeEstimators::getJackknifeNormalization()
-{
-	checkIfJackknifeCanBePerformed(numberOfElements);
-	return numberOfElements - 1;
 }
 
 void JackknifeEstimators::checkIfJackknifeCanBePerformed(int n)

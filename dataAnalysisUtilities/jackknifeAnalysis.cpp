@@ -8,9 +8,8 @@ double calculateJacknifeEstimate(DataSample sampleWithJackknifeEstimators)
 
 double calculateJacknifeError(DataSample sampleWithJackknifeEstimators)
 {
-    int jackknifeNormalization = sampleWithJackknifeEstimators.getNumberOfElements() - 1;
     DataSample tmp ( (sampleWithJackknifeEstimators - sampleWithJackknifeEstimators.getNthMoment(1) )^( (double(2)) )  );
-    return sqrt(tmp.getNthMoment(1) * jackknifeNormalization);
+    return sqrt(tmp.getNthMoment(1) * (sampleWithJackknifeEstimators.getNumberOfElements() - 1));
 }
 
 EstimateAndError jackknifeAnalysis(DataSample sampleWithUncorrelatedData1, DataSample sampleWithUncorrelatedData2, DataSample (*function)(DataSample&, DataSample&) )
