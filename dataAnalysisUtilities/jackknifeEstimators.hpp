@@ -18,9 +18,6 @@ public:
 	JackknifeEstimators(int numberOfElementsIn);
 	JackknifeEstimators(DataSample sampleIn);
 
-	//TODO: remove this, there are stand-alone fcts. for this in jackknifeAnalysis.hpp
-    double getJackknifeVariance();
-    double getJackknifeError();
 protected:
 	int getJackknifeNormalization();
 	void checkIfJackknifeCanBePerformed(int n);
