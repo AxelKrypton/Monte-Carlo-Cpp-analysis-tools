@@ -4,7 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "DataSample.hpp"
-
+#include "dataSampleTestUtilities.hpp"
 #include "TestDataSample.hpp"
 
 //todo: add build tests
@@ -37,6 +37,16 @@ BOOST_AUTO_TEST_SUITE(zerothMoment)
 		int numberOfElements = 24e4;
 		double referenceValue = 1.;
 		TestDataSampleNthMoment tester(0, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(ZerothMoment5)
+	{
+		int numberOfElements = 32e2;
+		DataSampleBasic referenceValue(makeValarrayWithOnes(numberOfElements));
+		TestDataSampleNthMomentPerDataPoint tester1(0, numberOfElements, zeros, referenceValue);
+		TestDataSampleNthMomentPerDataPoint tester2(0, numberOfElements, ones, referenceValue);
+		TestDataSampleNthMomentPerDataPoint tester3(0, numberOfElements, arrayPosition, referenceValue);
+		TestDataSampleNthMomentPerDataPoint tester4(0, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -107,6 +117,13 @@ BOOST_AUTO_TEST_SUITE(firstMoment)
 		TestDataSampleNthMoment tester(1, numberOfElements, bigAndSmallEntries, referenceValue);
 	}
 
+	BOOST_AUTO_TEST_CASE(firstMoment10)
+	{
+		int numberOfElements = 8e2;
+		DataSampleBasic referenceValue(makeValarrayWithOnes(numberOfElements));
+		TestDataSampleNthMomentPerDataPoint tester(1, numberOfElements, ones, referenceValue);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(secondMoment)
@@ -137,6 +154,13 @@ BOOST_AUTO_TEST_SUITE(secondMoment)
 		int numberOfElements = 24;
 		double referenceValue = 0.340579710144927;
 		TestDataSampleNthMoment tester(2, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(secondMoment5)
+	{
+		int numberOfElements = 124;
+		DataSampleBasic referenceValue(makeValarrayWithOnes(numberOfElements));
+		TestDataSampleNthMomentPerDataPoint tester(2, numberOfElements, onesMinusOnes, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -171,6 +195,13 @@ BOOST_AUTO_TEST_SUITE(thirdMoment)
 		TestDataSampleNthMoment tester(3, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
+	BOOST_AUTO_TEST_CASE(sthirdMoment5)
+	{
+		int numberOfElements = 1240;
+		DataSampleBasic referenceValue(makeValarrayWithOnesAndMinusOnes(numberOfElements));
+		TestDataSampleNthMomentPerDataPoint tester(3, numberOfElements, onesMinusOnes, referenceValue);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(fourthMoment)
@@ -203,6 +234,13 @@ BOOST_AUTO_TEST_SUITE(fourthMoment)
 		TestDataSampleNthMoment tester(4, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
+	BOOST_AUTO_TEST_CASE(fourthMoment5)
+	{
+		int numberOfElements = 2124;
+		DataSampleBasic referenceValue(makeValarrayWithOnes(numberOfElements));
+		TestDataSampleNthMomentPerDataPoint tester(4, numberOfElements, onesMinusOnes, referenceValue);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(zerothCentralMoment)
@@ -214,6 +252,13 @@ BOOST_AUTO_TEST_SUITE(zerothCentralMoment)
 		TestDataSampleNthCentralMoment tester(0, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
+	BOOST_AUTO_TEST_CASE(zerothCentralMoment2)
+	{
+		int numberOfElements = 1e3;
+		DataSampleBasic referenceValue(makeValarrayWithOnes(numberOfElements));
+		TestDataSampleNthCentralMomentPerDataPoint tester(0, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(firstCentralMoment)
@@ -223,6 +268,13 @@ BOOST_AUTO_TEST_SUITE(firstCentralMoment)
 		int numberOfElements = 1e3;
 		double referenceValue = 0.;
 		TestDataSampleNthCentralMoment tester(1, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(firstCentralMoment2)
+	{
+		int numberOfElements = 1e3;
+		DataSampleBasic referenceValue(numberOfElements);
+		TestDataSampleNthCentralMomentPerDataPoint tester(1, numberOfElements, onesMinusOnes, referenceValue);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -265,6 +317,49 @@ BOOST_AUTO_TEST_SUITE(secondCentralMoment)
 		TestDataSampleNthCentralMoment tester(2, numberOfElements, entriesSymmetricBetweenZeroAndOne, referenceValue);
 	}
 
+	BOOST_AUTO_TEST_CASE(secondCentralMoment6)
+	{
+		int numberOfElements = 988;
+		DataSampleBasic referenceValue(makeValarrayWithOnes(numberOfElements));
+		TestDataSampleNthCentralMomentPerDataPoint tester(2, numberOfElements, onesMinusOnes, referenceValue);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(thirdCentralMoment)
+
+	BOOST_AUTO_TEST_CASE(thirdCentralMoment1)
+	{
+		int numberOfElements = 432;
+		double referenceValue = 0.;
+		TestDataSampleNthCentralMoment tester(3, numberOfElements, onesMinusOnes, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(thirdCentralMoment2)
+	{
+		int numberOfElements = 654;
+		DataSampleBasic referenceValue(makeValarrayWithOnesAndMinusOnes(numberOfElements));
+		TestDataSampleNthCentralMomentPerDataPoint tester(3, numberOfElements, onesMinusOnes, referenceValue);
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(fourthCentralMoment)
+
+	BOOST_AUTO_TEST_CASE(fourthCentralMoment1)
+	{
+		int numberOfElements = 12;
+		double referenceValue = 253.2291666666667;
+		TestDataSampleNthCentralMoment tester(4, numberOfElements, arrayPosition, referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(fourthCentralMoment2)
+	{
+		int numberOfElements = 65e4;
+		DataSampleBasic referenceValue(makeValarrayWithOnes(numberOfElements));
+		TestDataSampleNthCentralMomentPerDataPoint tester(4, numberOfElements, onesMinusOnes, referenceValue);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(getNthMoment)
@@ -274,6 +369,7 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 		DataSample dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(highestValueAllowed));
+		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMomentPerDataPoint(highestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentValidArgument2)
@@ -281,6 +377,7 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 		DataSample dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed));
+		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthMomentPerDataPoint(lowestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument1)
@@ -288,6 +385,7 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 		DataSample dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(highestValueAllowed + 1), std::invalid_argument);
+		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMomentPerDataPoint(highestValueAllowed + 1), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthMomentInvalidArgument2)
@@ -295,6 +393,7 @@ BOOST_AUTO_TEST_SUITE(getNthMoment)
 		DataSample dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMoment(lowestValueAllowed - 1), std::invalid_argument);
+		BOOST_REQUIRE_THROW(dataSampleInstance.getNthMomentPerDataPoint(lowestValueAllowed - 1), std::invalid_argument);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -306,6 +405,7 @@ BOOST_AUTO_TEST_SUITE(getNthCentralMoment)
 		DataSample dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthCentralMoment(highestValueAllowed));
+		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthCentralMomentPerDataPoint(highestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthCentralMomentValidArgument2)
@@ -313,6 +413,7 @@ BOOST_AUTO_TEST_SUITE(getNthCentralMoment)
 		DataSample dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthCentralMoment(lowestValueAllowed));
+		BOOST_CHECK_NO_THROW(dataSampleInstance.getNthCentralMomentPerDataPoint(lowestValueAllowed));
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthCentralMomentInvalidArgument1)
@@ -320,6 +421,7 @@ BOOST_AUTO_TEST_SUITE(getNthCentralMoment)
 		DataSample dataSampleInstance;
 		int highestValueAllowed = dataSampleInstance.getUpperLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthCentralMoment(highestValueAllowed + 1), std::invalid_argument);
+		BOOST_REQUIRE_THROW(dataSampleInstance.getNthCentralMomentPerDataPoint(highestValueAllowed + 1), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(getNthCentralMomentInvalidArgument2)
@@ -327,6 +429,7 @@ BOOST_AUTO_TEST_SUITE(getNthCentralMoment)
 		DataSample dataSampleInstance;
 		int lowestValueAllowed = dataSampleInstance.getLowerLimitForNthMoment();
 		BOOST_REQUIRE_THROW(dataSampleInstance.getNthCentralMoment(lowestValueAllowed - 1), std::invalid_argument);
+		BOOST_REQUIRE_THROW(dataSampleInstance.getNthCentralMomentPerDataPoint(lowestValueAllowed - 1), std::invalid_argument);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

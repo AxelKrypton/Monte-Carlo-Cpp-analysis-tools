@@ -5,6 +5,9 @@
 static double calcNthMomentExplicit(DataSample & sampleIn, int n);
 static double calcFirstMomentExplicit(DataSample & sampleIn);
 static double calcNthCentralMomentExplicit(DataSample & sampleIn, int n);
+static DataSampleBasic calcNthMomentPerDataPointExplicit(DataSample & sampleIn, int n);
+static DataSampleBasic calcFirstMomentPerDataPointExplicit(DataSample & sampleIn);
+static DataSampleBasic calcNthCentralMomentPerDataPointExplicit(DataSample & sampleIn, int n);
 static void checkIfNIsValid(int n, int upperLimit, int lowerLimit);
 
 void DataSample::initMoments()
@@ -12,6 +15,8 @@ void DataSample::initMoments()
 	int numberOfMoments = getNumberOfMoments();
 	moments = std::vector<Moment>(numberOfMoments);
 	centralMoments = std::vector<Moment>(numberOfMoments);
+	momentsPerDataPoint = std::vector<MomentPerDataPoint>(numberOfMoments);
+	centralMomentsPerDataPoint = std::vector<MomentPerDataPoint>(numberOfMoments);
 }
 
 double DataSample::getNthMoment(int n)
@@ -26,7 +31,11 @@ double DataSample::getNthMoment(int n)
 
 double DataSample::calcNthMoment(int n)
 {
-	if ( n == 1)
+	if ( n == 0 )
+	{
+		return 1.;
+	}
+	else if ( n == 1)
 	{
 		return calcFirstMomentExplicit(*this);
 	}
@@ -62,6 +71,60 @@ double DataSample::calcNthCentralMoment(int n)
 	}
 }
 
+DataSampleBasic DataSample::getNthMomentPerDataPoint(int n)
+{
+	checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
+	if (!momentsPerDataPoint[n].calculated)
+	{
+		momentsPerDataPoint[n].set(calcNthMomentPerDataPoint(n));
+	}
+	return momentsPerDataPoint[n].value;
+}
+
+DataSampleBasic DataSample::calcNthMomentPerDataPoint(int n)
+{
+	if ( n == 0 )
+	{
+		return DataSampleBasic(std::valarray<double>(1.0, this->getNumberOfElements()));
+	}
+	else if ( n == 1)
+	{
+		return calcFirstMomentPerDataPointExplicit(*this);
+	}
+	else
+	{
+		return calcNthMomentPerDataPointExplicit(*this, n);
+	}
+}
+
+DataSampleBasic DataSample::getNthCentralMomentPerDataPoint(int n)
+{
+	checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
+	if (!centralMomentsPerDataPoint[n].calculated)
+	{
+		centralMomentsPerDataPoint[n].set(calcNthCentralMomentPerDataPoint(n));
+	}
+	return centralMomentsPerDataPoint[n].value;
+}
+
+DataSampleBasic DataSample::calcNthCentralMomentPerDataPoint(int n)
+{
+	if ( n == 0 )
+	{
+		return DataSampleBasic(std::valarray<double>(1.0, this->getNumberOfElements()));
+	}
+	else if (n == 1)
+	{
+		return DataSampleBasic(std::valarray<double>(0.0, this->getNumberOfElements()));
+	}
+	else
+	{
+		return calcNthCentralMomentPerDataPointExplicit(*this, n);
+	}
+}
+
+
+
 int DataSample::getNumberOfMoments()
 {
 	return upperLimitForNthMoment - lowerLimitForNthMoment + 1;
@@ -76,6 +139,21 @@ int DataSample::getLowerLimitForNthMoment()
 {
 	return lowerLimitForNthMoment;
 }
+
+DataSample removeNElementsFromDataSample(DataSample sampleIn, int n)
+{
+	int numberOfElements = sampleIn.getNumberOfElements();
+	DataSampleBasic tmp = sampleIn;
+	for (int iteration = numberOfElements - 1; iteration >= numberOfElements - n; iteration --)
+	{
+		tmp = tmp.removeIthElement(iteration);
+	}
+	return DataSample(tmp);
+}
+
+
+/**************************** STATIC FUNCTIONS ****************************/
+
 
 static void checkIfNIsValid(int n, int upperLimit, int lowerLimit)
 {
@@ -95,16 +173,21 @@ static double calcFirstMomentExplicit(DataSample & sampleIn)
 
 static double calcNthCentralMomentExplicit(DataSample & sampleIn, int n)
 {
-	return ( (sampleIn - sampleIn.getNthMoment(1) )^( (double(n)) )  ).sum()  / sampleIn.getNumberOfElements();
+	return ( (sampleIn - sampleIn.getNthMoment(1) )^n ).sum()  / sampleIn.getNumberOfElements();
 }
 
-DataSample removeNElementsFromDataSample(DataSample sampleIn, int n)
+static DataSampleBasic calcNthMomentPerDataPointExplicit(DataSample & sampleIn, int n)
 {
-	int numberOfElements = sampleIn.getNumberOfElements();
-	DataSampleBasic tmp = sampleIn;
-	for (int iteration = numberOfElements - 1; iteration >= numberOfElements - n; iteration --)
-	{
-		tmp = tmp.removeIthElement(iteration);
-	}
-	return DataSample(tmp);
+	return (sampleIn^n);
 }
+
+static DataSampleBasic calcFirstMomentPerDataPointExplicit(DataSample & sampleIn)
+{
+	return sampleIn;
+}
+
+static DataSampleBasic calcNthCentralMomentPerDataPointExplicit(DataSample & sampleIn, int n)
+{
+	return ((sampleIn - sampleIn.getNthMoment(1))^n);
+}
+
