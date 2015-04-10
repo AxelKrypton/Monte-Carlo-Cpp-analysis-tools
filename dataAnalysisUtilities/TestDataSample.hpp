@@ -7,30 +7,39 @@
 #define TESTDATASAMPLE_HPP_
 
 #include "dataSampleTestUtilities.hpp"
+#include <type_traits>
 
-class TestDataSample
+
+template <class T = double> class TestDataSample
 {
 public:
-  TestDataSample(int length, FillType fillType = zeros, double referenceValue = 0.):
+  	TestDataSample(int length, FillType fillType = zeros, T* referenceValue = NULL):
 		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent), fillType(fillType)
 	{
+	  if(!(std::is_same<T, double>::value) && !(std::is_same<T, DataSampleBasic>::value))
+		  throw std::invalid_argument("TestDataSample created with an invalid template type!");
 	  std::valarray<double> * testValues = initDataSampleBasedOnFillType(length);
 	  dataSampleInstance = new DataSample(*testValues);
 	  delete testValues;
-	  actualValue = 0.;
+	  actualValue = NULL;
 	}
 
-	TestDataSample(std::string dataFilename, int column = 1, int offset = 0, double referenceValue = 0.):
+	TestDataSample(std::string dataFilename, int column = 1, int offset = 0, T* referenceValue = NULL):
 		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
 	{
-		actualValue = 0.;
+        if(!(std::is_same<T, double>::value) && !(std::is_same<T, DataSampleBasic>::value))
+        	throw std::invalid_argument("TestDataSample created with an invalid template type!");
+		actualValue = NULL;
 		dataSampleInstance = new DataSample(dataFilename, column, offset);
+		fillType = zeros;
 	}
 
-	~TestDataSample()
+	virtual ~TestDataSample()
 	{
 		testActualValueAgainstReferenceValue();
 		delete dataSampleInstance;
+		if(actualValue != NULL) delete actualValue;
+		//Do not delete referenceValue since the memory it points to is "coming from outside the class"
 	}
 
 	int getNumberOfElements()
@@ -46,7 +55,21 @@ public:
 protected:
 	void testActualValueAgainstReferenceValue()
 	{
-		BOOST_CHECK_CLOSE(actualValue, referenceValue, testPrecision);
+		/*
+		 * Here I cast T objects to double or to DataSampleBasic since the compiler doesn't know it is the case (we are inside the if)
+		 * TODO: it is quite ugly code. Think how to improve it, maybe template specialization!?
+		 */
+		if(actualValue != NULL && referenceValue != NULL){
+			if(std::is_same<T, double>::value)
+				//Here I cast T objects to DataSampleBasic since the compiler doesn't know it is the case (we are inside the if)
+				BOOST_CHECK_CLOSE(*(reinterpret_cast<double*>(actualValue)), *(reinterpret_cast<double*>(referenceValue)), testPrecision);
+			else if (std::is_same<T, DataSampleBasic>::value){
+				//Here I cast T objects to DataSampleBasic since the compiler doesn't know it is the case (we are inside the if)
+				for(int i=0; i<(*reinterpret_cast<DataSampleBasic*>(actualValue)).getNumberOfElements(); i++)
+					BOOST_CHECK_CLOSE((*reinterpret_cast<DataSampleBasic*>(actualValue))[i], (*reinterpret_cast<DataSampleBasic*>(referenceValue))[i], testPrecision);
+			} else
+				throw std::logic_error("Thrown an exception that should never be thrown! Investigate!");
+		}
 	}
 
 	std::valarray<double>* initDataSampleBasedOnFillType(int length)
@@ -87,35 +110,62 @@ protected:
 	}
 
 	DataSample * dataSampleInstance;
-	double referenceValue;
-	double actualValue;
+	T* referenceValue;
+	T* actualValue;
 	double testPrecision;
 	FillType fillType;
 };
 
-class TestDataSampleNthMoment : public TestDataSample
+class TestDataSampleNthMoment : public TestDataSample<>
 {
 public:
-	TestDataSampleNthMoment(int n, int length, FillType fillType, double referenceValue) :
-		TestDataSample(length, fillType, referenceValue)
+	TestDataSampleNthMoment(int n, int length, FillType fillType, double &referenceValue) :
+		TestDataSample(length, fillType, &referenceValue)
 	{
-		actualValue = dataSampleInstance->getNthMoment(n);
+		actualValue = new double;
+		*actualValue = dataSampleInstance->getNthMoment(n);
 	};
 	TestDataSampleNthMoment(int n, std::string dataFilename, double referenceValue = 0, int column = 1, int offset = 0.) :
-		TestDataSample(dataFilename, column, offset, referenceValue)
+		TestDataSample(dataFilename, column, offset, &referenceValue)
 	{
-		actualValue = dataSampleInstance->getNthMoment(n);
+		actualValue = new double;
+		*actualValue = dataSampleInstance->getNthMoment(n);
 	};
 };
 
 
-class TestDataSampleNthCentralMoment : public TestDataSample
+class TestDataSampleNthCentralMoment : public TestDataSample<>
 {
 public:
-	TestDataSampleNthCentralMoment(int n, int length, FillType fillType, double referenceValue) :
-		TestDataSample(length, fillType, referenceValue)
+	TestDataSampleNthCentralMoment(int n, int length, FillType fillType, double &referenceValue) :
+		TestDataSample(length, fillType, &referenceValue)
 	{
-		actualValue = dataSampleInstance->getNthCentralMoment(n);
+		actualValue = new double;
+		*actualValue = dataSampleInstance->getNthCentralMoment(n);
+	};
+};
+
+
+class TestDataSampleNthMomentPerDataPoint : public TestDataSample<DataSampleBasic>
+{
+public:
+	TestDataSampleNthMomentPerDataPoint(int n, int length, FillType fillType, DataSampleBasic &referenceValue) :
+		TestDataSample<DataSampleBasic>(length, fillType, &referenceValue)
+	{
+		actualValue = new DataSampleBasic(length);
+		*actualValue = dataSampleInstance->getNthMomentPerDataPoint(n);
+	};
+};
+
+
+class TestDataSampleNthCentralMomentPerDataPoint : public TestDataSample<DataSampleBasic>
+{
+public:
+	TestDataSampleNthCentralMomentPerDataPoint(int n, int length, FillType fillType, DataSampleBasic &referenceValue) :
+		TestDataSample<DataSampleBasic>(length, fillType, &referenceValue)
+	{
+		actualValue = new DataSampleBasic;
+		*actualValue = dataSampleInstance->getNthCentralMomentPerDataPoint(n);
 	};
 };
 

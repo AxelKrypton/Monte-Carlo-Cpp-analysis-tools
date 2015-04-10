@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 	BOOST_AUTO_TEST_CASE(test2)
 	{
 		int numberOfElements = 1542;
-		TestDataSample testSample(numberOfElements, ones);
+		TestDataSample<> testSample(numberOfElements, ones);
 		DataSample* sample = testSample.getDataSample();
 
 		EstimateAndError expectedMeanAndError(1,0);
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 	BOOST_AUTO_TEST_CASE(test3)
 	{
 		int numberOfElements = 795;
-		TestDataSample testSample(numberOfElements, arrayPosition);
+		TestDataSample<> testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 
 		EstimateAndError expectedMeanAndError;
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 	BOOST_AUTO_TEST_CASE(test4)
 	{
 		int numberOfElements = 4;
-		TestDataSample testSample(numberOfElements, onesMinusOnes);
+		TestDataSample<> testSample(numberOfElements, onesMinusOnes);
 		DataSample* sample = testSample.getDataSample();
 
 		EstimateAndError expectedMeanAndError;
@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 	BOOST_AUTO_TEST_CASE(variance)
 	{
 		int numberOfElements = 2674;
-		TestDataSample testSample(numberOfElements, arrayPosition);
+		TestDataSample<> testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 		double expectedValue = expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(*sample, numberOfElements);
 
@@ -293,7 +293,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 	BOOST_AUTO_TEST_CASE(test2)
 	{
 		int numberOfElements = 1542;
-		TestDataSample testSample(numberOfElements, ones);
+		TestDataSample<> testSample(numberOfElements, ones);
 		DataSample* sample = testSample.getDataSample();
 
 		double expectedVariance = 0.;
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 	BOOST_AUTO_TEST_CASE(test3)
 	{
 		int numberOfElements = 2345;
-		TestDataSample testSample(numberOfElements, arrayPosition);
+		TestDataSample<> testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 
 		double expectedVariance = 458447.5;
@@ -323,7 +323,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 	BOOST_AUTO_TEST_CASE(test4)
 	{
 		int numberOfElements = 2742;
-		TestDataSample testSample(numberOfElements, onesMinusOnes);
+		TestDataSample<> testSample(numberOfElements, onesMinusOnes);
 		DataSample* sample = testSample.getDataSample();
 
 		double expectedVariance = numberOfElements/(numberOfElements-1.);
