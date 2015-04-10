@@ -13,3 +13,4 @@ build
 debug
 .cproject
 .project
+.pydevproject
