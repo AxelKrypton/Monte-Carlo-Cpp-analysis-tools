@@ -6,6 +6,35 @@
 #include "jackknifeAnalysis.hpp"
 #include "binnedDataSample.hpp"
 
+static Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable){
+	Parameters tmp = parameters;
+	if(observable == "mean"){
+		tmp.binsize = tmp.binsizeMoments[1];
+		tmp.numberOfBins = tmp.numberOfBinsMoments[1];
+	}else if(observable == "variance"){
+		tmp.binsize = tmp.binsizeCentralMoments[2];
+		tmp.numberOfBins = tmp.numberOfBinsCentralMoments[2];
+	}else if(observable == "skewness"){
+		tmp.binsize = std::max(tmp.binsizeCentralMoments[2], tmp.binsizeCentralMoments[3]);
+		tmp.numberOfBins = std::min(tmp.numberOfBinsCentralMoments[2], tmp.numberOfBinsCentralMoments[3]);
+	}else if(observable == "Binder"){
+		tmp.binsize = std::max(tmp.binsizeCentralMoments[2], tmp.binsizeCentralMoments[4]);
+		tmp.numberOfBins = std::min(tmp.numberOfBinsCentralMoments[2], tmp.numberOfBinsCentralMoments[4]);
+	}else{
+		throw std::invalid_argument("Unknown observable in buildLocalParametersWithCorrectBinningInformation function!");
+	}
+	return tmp;
+}
+
+static void printBinningInformation(const Parameters& parameters, std::string observable){
+	std::cout << "### Performing binning in " << observable << " calculation using ";
+	if(parameters.useNumberOfBinsForBinning)
+		std::cout << parameters.numberOfBins << " as number of bins!\n";
+	else
+		std::cout << parameters.binsize << " as binsize!\n";
+}
+
+
 static double meanOfDataSample(DataSample & sampleIn)
 {
 	return sampleIn.getNthMoment(1);
@@ -37,7 +66,9 @@ EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn,
 
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
 {
-	DataSample binnedData = performBinning(sampleIn, parameters);
+	Parameters binningParameters = buildLocalParametersWithCorrectBinningInformation(parameters, "mean");
+	printBinningInformation(binningParameters, "MEAN");
+	DataSample binnedData = performBinning(sampleIn, binningParameters);
 
 	return calcMeanAndErrorOfUncorrelatedDataSample(binnedData, parameters.isMeanKnownToBeZero);
 }
@@ -88,10 +119,12 @@ static EstimateAndError calcVarianceAndError(DataSample& sampleIn, bool isMeanKn
 	DataSample varianceSample = isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(2) : sampleIn.getNthCentralMomentPerDataPoint(2);
 	if ( shouldUseBinning )
 	{
-		DataSample binnedData = performBinning(varianceSample, *parameters);
+		Parameters binningParameters = buildLocalParametersWithCorrectBinningInformation(*parameters, "variance");
+		printBinningInformation(binningParameters, "VARIANCE");
+		DataSample binnedData = performBinning(varianceSample, binningParameters);
 		error = unbiasedErrorOfVariance(binnedData);
 		// todo: improve!
-		performBinning(sampleIn, *parameters);
+		performBinning(sampleIn, binningParameters);
 	}
 	else
 	{
@@ -123,8 +156,10 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 	DataSample thirdCentralMomentSample = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(3) : sampleIn.getNthCentralMomentPerDataPoint(3);
 	DataSample secondCentralMomentSample = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(2) : sampleIn.getNthCentralMomentPerDataPoint(2);
 
-	DataSample binnedSample1 = performBinning(thirdCentralMomentSample, parameters);
-	DataSample binnedSample2 = performBinning(secondCentralMomentSample, parameters);
+	Parameters binningParameters = buildLocalParametersWithCorrectBinningInformation(parameters, "skewness");
+	printBinningInformation(binningParameters, "SKEWNESS");
+	DataSample binnedSample1 = performBinning(thirdCentralMomentSample, binningParameters);
+	DataSample binnedSample2 = performBinning(secondCentralMomentSample, binningParameters);
 	
 	auto calcSkewness = [] (DataSample & in1, DataSample & in2) -> DataSample { return in1 / (in2 ^ (3. / 2)); };
 	
@@ -143,8 +178,10 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
 	DataSample fourthCentralMoment = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(4) : sampleIn.getNthCentralMomentPerDataPoint(4);
 	DataSample secondCentralMoment = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(2) : sampleIn.getNthCentralMomentPerDataPoint(2);
 	
-	DataSample binnedSample1 = performBinning(fourthCentralMoment, parameters);
-	DataSample binnedSample2 = performBinning(secondCentralMoment, parameters);	
+	Parameters binningParameters = buildLocalParametersWithCorrectBinningInformation(parameters, "Binder");
+	printBinningInformation(binningParameters, "BINDER CUMULANT");
+	DataSample binnedSample1 = performBinning(fourthCentralMoment, binningParameters);
+	DataSample binnedSample2 = performBinning(secondCentralMoment, binningParameters);
 	
 	auto calcBinder = [] (DataSample & in1, DataSample & in2) -> DataSample { return in1 / (in2 ^ 2.); };
 
