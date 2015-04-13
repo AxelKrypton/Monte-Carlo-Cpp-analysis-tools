@@ -2,7 +2,7 @@
 
 LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** argv) 
 {
-	po::options_description desc("   Options for reweighting data from LQCD simulations.\nNOTE: Reweighting is currently implemented in beta only!\nUsage: \"--<optionName>=<value>\" (or \"-<shortOptionName><value>\")\nNote that boolean options can be changed from their default value implicitly, ie without giving explicitly true or false in the command line.\nFor example, \"--useBinning\" equals \"--useBinning=false\" (as the default value is true)");
+	po::options_description desc("   Options for reweighting data from LQCD simulations.\nNOTE: Reweighting is currently implemented in beta only!\nUsage: \"--<optionName>=<value>\" (or \"-<shortOptionName><value>\")\nNote that boolean options can be changed from their default value implicitly, ie without giving explicitly true or false in the command line.\nFor example, \"--doNotUseBinning\" equals \"--doNotUseBinning true\" (as the default value is false)");
 	po::variables_map vm;
 	po::positional_options_description positionalOptions;
 

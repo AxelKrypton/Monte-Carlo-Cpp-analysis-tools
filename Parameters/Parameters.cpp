@@ -23,7 +23,7 @@ Parameters::Parameters(int argc, const char ** argv)
 		("doNotAnalyzeVariance", po::value<bool>(&doNotAnalyzeVariance)->default_value(false)->implicit_value(true), "Do NOT analyze data for variance")
 		("doNotAnalyzeSkewness", po::value<bool>(&doNotAnalyzeSkewness)->default_value(false)->implicit_value(true), "Do NOT analyze data for skewness")
 		("doNotAnalyzeBinder", po::value<bool>(&doNotAnalyzeBinderCumulant)->default_value(false)->implicit_value(true), "Do NOT analyze data for Binder Cumulant")
-		("useBinning", po::value<bool>(&useBinning)->default_value(true)->implicit_value(false), "Use binning on data")
+		("doNotUseBinning", po::value<bool>(&doNotUseBinning)->default_value(false)->implicit_value(true), "Do NOT perform binning on data")
 		("useNumberOfBinsForBinning", po::value<bool>(&useNumberOfBinsForBinning)->default_value(true)->implicit_value(false), "Perform binning based on \"numberOfBins\" parameter. If false, binning is based on \"binsize\" parameter")
 		("binningMustFitDataSampleSize", po::value<bool>(&binningMustFitDataSampleSize)->default_value(false)->implicit_value(true), "Require that no element of the data sample is discarded during binning")
 		("adjustDataSampleSizeToBinning", po::value<bool>(&adjustDataSampleSizeToBinning)->default_value(true)->implicit_value(true), "Adjust number of elements of the data sample if elements are discarded during binning")
@@ -128,7 +128,7 @@ void Parameters::printParameters()
 	std::cout << "# Offset:\t" << offset << std::endl;
 	//todo: add output of observables which are analyzed
 	std::cout << "###############################" << std::endl;
-	if (useBinning)
+	if (!doNotUseBinning)
 	{
 		std::cout << "# Perform binning with:" << std::endl;
 		if( useNumberOfBinsForBinning)

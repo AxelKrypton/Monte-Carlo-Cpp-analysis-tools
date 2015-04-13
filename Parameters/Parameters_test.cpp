@@ -111,10 +111,10 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(isMeanKnownToBeZero_default, createParametersForDefaultCheck().isMeanKnownToBeZero);
 	}
 
-	BOOST_AUTO_TEST_CASE(useBinning)
+	BOOST_AUTO_TEST_CASE(doNotUseBinning)
 	{
-		bool useBinning_default = true;
-		BOOST_REQUIRE_EQUAL(useBinning_default, createParametersForDefaultCheck().useBinning);
+		bool doNotUseBinning_default = false;
+		BOOST_REQUIRE_EQUAL(doNotUseBinning_default, createParametersForDefaultCheck().doNotUseBinning);
 	}
 
 	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning)
@@ -305,16 +305,16 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 
 	BOOST_AUTO_TEST_CASE(binning1)
 	{
-		bool newValue = false;
-		std::string argumentName = "--useBinning";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).useBinning);
+		bool newValue = true;
+		std::string argumentName = "--doNotUseBinning";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).doNotUseBinning);
 	}
 
 	BOOST_AUTO_TEST_CASE(binning2)
 	{
-		bool newValue = false;
-		std::string argumentName = "--useBinning";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).useBinning);
+		bool newValue = true;
+		std::string argumentName = "--doNotUseBinning";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).doNotUseBinning);
 	}
 
 	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning1)

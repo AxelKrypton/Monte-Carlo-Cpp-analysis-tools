@@ -4,7 +4,7 @@
 
 DataSample performBinning(DataSample & rawData, const Parameters parameters)
 {
-	if ( parameters.useBinning )
+	if ( ! parameters.doNotUseBinning )
 	{
 			std::cout << "Perform binning on data sample..." << std::endl;
 			if ( parameters.useNumberOfBinsForBinning)

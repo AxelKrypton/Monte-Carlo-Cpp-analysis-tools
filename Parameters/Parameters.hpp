@@ -26,7 +26,7 @@ public:
 	int offset;
 	int column;
 	bool isMeanKnownToBeZero;
-	bool useBinning;
+	bool doNotUseBinning;
 	bool useNumberOfBinsForBinning;
 	bool calcAutocorrelation;
 	bool doNotAnalyzeMean;
