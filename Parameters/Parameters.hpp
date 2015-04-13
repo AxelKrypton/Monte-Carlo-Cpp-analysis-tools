@@ -16,7 +16,11 @@ public:
 	std::string analysisOutputFilePrefix;
 	std::string analysisOutputFilePostfix;
 	int binsize;
+	std::vector<int> binsizeMoments;
+	std::vector<int> binsizeCentralMoments;
 	int numberOfBins;
+	std::vector<int> numberOfBinsMoments;
+	std::vector<int> numberOfBinsCentralMoments;
 	int numberOfBinsForAutocorrelation;
 	int timeMaxAutocorrelationFunction;
 	int offset;
@@ -36,6 +40,7 @@ private:
 	void printParameters();
 	void setBinningTypeParameter(bool valueIn);
 	void checkParsedArguments(po::variables_map & vm, po::options_description & desc);
+	void parseBinningInformationForMoments(std::vector<int>& vectorWithBinningInformations, const int defaultValue);
 };
 
 #endif /* PARAMETERS_HPP_ */

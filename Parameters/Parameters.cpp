@@ -24,11 +24,15 @@ Parameters::Parameters(int argc, const char ** argv)
 		("doNotAnalyzeSkewness", po::value<bool>(&doNotAnalyzeSkewness)->default_value(false)->implicit_value(true), "Do NOT analyze data for skewness")
 		("doNotAnalyzeBinder", po::value<bool>(&doNotAnalyzeBinderCumulant)->default_value(false)->implicit_value(true), "Do NOT analyze data for Binder Cumulant")
 		("useBinning", po::value<bool>(&useBinning)->default_value(true)->implicit_value(false), "Use binning on data")
-		("useNumberOfBinsForBinning", po::value<bool>(&useNumberOfBinsForBinning)->default_value(true)->implicit_value(false), "Perform binning based on \"numberOfBins\" parameter")
+		("useNumberOfBinsForBinning", po::value<bool>(&useNumberOfBinsForBinning)->default_value(true)->implicit_value(false), "Perform binning based on \"numberOfBins\" parameter. If false, binning is based on \"binsize\" parameter")
 		("binningMustFitDataSampleSize", po::value<bool>(&binningMustFitDataSampleSize)->default_value(false)->implicit_value(true), "Require that no element of the data sample is discarded during binning")
 		("adjustDataSampleSizeToBinning", po::value<bool>(&adjustDataSampleSizeToBinning)->default_value(true)->implicit_value(true), "Adjust number of elements of the data sample if elements are discarded during binning")
-		("binsize,b", po::value<int>(&binsize), "Size of bin (default: 100)")
-		("numberOfBins,n", po::value<int>(&numberOfBins), "Number of bins (default: 10)")
+		("binsize,b", po::value<int>(&binsize), "Binsize used for all moments (default: 100)")
+		("binsizeMoments", po::value<std::vector<int> >(&binsizeMoments)->multitoken(), "Binsize for Nth moment (use it giving: N1 binsize N2 binsize ...)")
+		("binsizeCentralMoments", po::value<std::vector<int> >(&binsizeCentralMoments)->multitoken(), "Binsize for Nth central moment (use it giving: N1 binsize N2 binsize ...)")
+		("numberOfBins,n", po::value<int>(&numberOfBins), "Number of bins used for all observables (default: 10)")
+		("numberOfBinsMoments", po::value<std::vector<int> >(&numberOfBinsMoments)->multitoken(), "Number of bins for Nth moment (use it giving: N1 numberOfBins N2 numberOfBins ...)")
+		("numberOfBinsCentralMoments", po::value<std::vector<int> >(&numberOfBinsCentralMoments)->multitoken(), "Number of bins for Nth central moment (use it giving: N1 numberOfBins N2 numberOfBins ...)")
 		("calcAutocorrelation,a", po::value<bool>(&calcAutocorrelation)->default_value(false)->implicit_value(true), "Estimate autocorrelation of data. In this case no other observable is evaluated!")
 		("numberOfBinsForAutocorrelation", po::value<int>(&numberOfBinsForAutocorrelation), "Number of bins for the estimate of the autocorrelation time (default: 10)")
 		("timeMaxAutocorrelationFunction", po::value<int>(&timeMaxAutocorrelationFunction), "Maximum data distance for the estimate of the autocorrelation function (needed parameter).")
@@ -76,15 +80,27 @@ void Parameters::checkParsedArguments(po::variables_map & vm, po::options_descri
 	 * functionality of boost.
 	 */
 
-	//check if numberOfBins or binsize have been set, otherwise set them.
-	if(!vm.count("numberOfBins"))
-	{
-		numberOfBins = 10;
-	}
-	if(!vm.count("binsize"))
-	{
-		binsize = 100;
-	}
+	//check if numberOfBins has been set, otherwise set them.
+	if(!vm.count("numberOfBins")) numberOfBins = 10;
+	//check structure of numberOfBins(Central)Moment and parse it
+	if ((numberOfBinsMoments.size()%2) != 0)
+		throw std::invalid_argument("Option --numberOfBinsMoments incomplete!");
+	parseBinningInformationForMoments(numberOfBinsMoments, numberOfBins);
+	if ((numberOfBinsCentralMoments.size()%2) != 0)
+		throw std::invalid_argument("Option --numberOfBinsCentralMoments incomplete!");
+	parseBinningInformationForMoments(numberOfBinsCentralMoments, numberOfBins);
+
+	//check if binsize has been set, otherwise set them.
+	if(!vm.count("binsize")) binsize = 100;
+	//check structure of binsize(Central)Moment and parse it
+	if ((binsizeMoments.size()%2) != 0)
+			throw std::invalid_argument("Option --binsizeMoments incomplete!");
+	parseBinningInformationForMoments(binsizeMoments, binsize);
+	if ((binsizeCentralMoments.size()%2) != 0)
+			throw std::invalid_argument("Option --binsizeCentralMoments incomplete!");
+	parseBinningInformationForMoments(binsizeCentralMoments, binsize);
+
+	//check if numberOfBinsForAutocorrelation has been set, otherwise set them.
 	if(!vm.count("numberOfBinsForAutocorrelation"))
 	{
 		numberOfBinsForAutocorrelation = 10;
@@ -117,11 +133,19 @@ void Parameters::printParameters()
 		std::cout << "# Perform binning with:" << std::endl;
 		if( useNumberOfBinsForBinning)
 		{
-			std::cout << "# Number of bins:\t" << numberOfBins << std::endl;
+			std::cout << "# Number of bins:\n";
+			for(size_t i=0; i<numberOfBinsMoments.size(); i++)
+				std::cout << "#   - moment " << i << ": " << numberOfBinsMoments[i] << std::endl;
+			for(size_t i=0; i<numberOfBinsCentralMoments.size(); i++)
+				std::cout << "#   - central moment " << i << ": " << numberOfBinsCentralMoments[i] << std::endl;
 		}
 		else
 		{
-			std::cout << "# Binsize:\t" << binsize << std::endl;
+			std::cout << "# Binsize:\n";
+			for(size_t i=0; i<binsizeMoments.size(); i++)
+				std::cout << "#   - moment " << i << ": " << binsizeMoments[i] << std::endl;
+			for(size_t i=0; i<binsizeCentralMoments.size(); i++)
+				std::cout << "#   - central moment " << i << ": " << binsizeCentralMoments[i] << std::endl;
 		}
 		if( binningMustFitDataSampleSize )
 		{
@@ -144,3 +168,32 @@ void Parameters::printParameters()
 	}
 	std::cout << "###############################" << std::endl;
 }
+
+/*
+ * The following function parses the input vector where there should be the information for binning as
+ *   n_1 x_1 n_2 x_2 n_3 x_3 ...
+ * where n_i are the moments and x_i the binning information (either binsize or number of bins).
+ * In this function the input vector is used to create an output vector that will have as many entries
+ * as the max{x_i} and that will have all the entries set to the default binning information (either
+ * binsize or numberOfbins) except the n_i entries that will be set to x_i.
+ */
+void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithBinningInformations, const int defaultValue){
+	std::vector<std::vector<int> > auxVector(2);
+	for(size_t i=0; i<vectorWithBinningInformations.size(); i+=2){
+		auxVector[0].push_back(vectorWithBinningInformations[i]);
+		auxVector[1].push_back(vectorWithBinningInformations[i+1]);
+	}
+	vectorWithBinningInformations.clear();
+	//Minimum 4 moments. TODO: Improve in the sense that this 4 should not be hard coded!!
+	int totalNumberOfMoments = (auxVector[0].size() == 0) ? 4 : std::max(4, *std::max_element(auxVector[0].begin(),auxVector[0].end()));
+	for(int i=0; i<=totalNumberOfMoments; i++){
+		std::vector<int>::iterator it;
+		it = find(auxVector[0].begin(), auxVector[0].end(), i);
+		if(it != auxVector[0].end())
+			vectorWithBinningInformations.push_back(auxVector[1][it - auxVector[0].begin()]);
+		else
+			vectorWithBinningInformations.push_back(defaultValue);
+	}
+}
+
+

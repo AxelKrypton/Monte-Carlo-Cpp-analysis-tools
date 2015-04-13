@@ -350,6 +350,130 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
 	}
 
+	BOOST_AUTO_TEST_CASE(binsizeMoments1)
+	{
+		std::string argument1 = "--binsizeMoments";
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(binsizeMoments2)
+	{
+		/*
+		 * It seems that I have to separate the arguments to test a multitoken option!
+		 *    http://stackoverflow.com/questions/2539077/boost-program-options-parsing-multiple-argument-list
+		 */
+		int numberOfArguments = 7;
+		const char * arguments[] = {"foo", "-f dummyFile", "--binsizeMoments=1", "100", "2", "200", "3"};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(binsizeMoments3)
+	{
+		std::vector<int> referenceValue;
+		referenceValue.push_back(100);
+		referenceValue.push_back(200);
+		referenceValue.push_back(100);
+		referenceValue.push_back(100);
+		referenceValue.push_back(400);
+		int numberOfArguments = 6;
+		const char * arguments[] = {"foo", "-f dummyFile", "--binsizeMoments=1", "200", "4", "400"};
+		BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
+		Parameters parameters(numberOfArguments, arguments);
+		BOOST_REQUIRE(parameters.binsizeMoments == referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(binsizeCentralMoments1)
+	{
+		std::string argument1 = "--binsizeCentralMoments";
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(binsizeCentralMoments2)
+	{
+		int numberOfArguments = 7;
+		const char * arguments[] = {"foo", "-f dummyFile", "--binsizeCentralMoments=1", "100", "2", "200", "3"};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(binsizeCentralMoments3)
+	{
+		std::vector<int> referenceValue;
+		referenceValue.push_back(100);
+		referenceValue.push_back(200);
+		referenceValue.push_back(100);
+		referenceValue.push_back(100);
+		referenceValue.push_back(400);
+		int numberOfArguments = 6;
+		const char * arguments[] = {"foo", "-f dummyFile", "--binsizeCentralMoments=1", "200", "4", "400"};
+		BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
+		Parameters parameters(numberOfArguments, arguments);
+		BOOST_REQUIRE(parameters.binsizeCentralMoments == referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(numberOfBinsMoments1)
+	{
+		std::string argument1 = "--numberOfBinsMoments";
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(numberOfBinsMoments2)
+	{
+		int numberOfArguments = 7;
+		const char * arguments[] = {"foo", "-f dummyFile", "--numberOfBinsMoments=1", "10", "2", "20", "3"};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(numberOfBinsMoments3)
+	{
+		std::vector<int> referenceValue;
+		referenceValue.push_back(10);
+		referenceValue.push_back(20);
+		referenceValue.push_back(10);
+		referenceValue.push_back(10);
+		referenceValue.push_back(40);
+		int numberOfArguments = 6;
+		const char * arguments[] = {"foo", "-f dummyFile", "--numberOfBinsMoments=1", "20", "4", "40"};
+		BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
+		Parameters parameters(numberOfArguments, arguments);
+		BOOST_REQUIRE(parameters.numberOfBinsMoments == referenceValue);
+	}
+
+	BOOST_AUTO_TEST_CASE(numberOfBinsCentralMoments1)
+	{
+		std::string argument1 = "--numberOfBinsCentralMoments";
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
+	}
+
+	BOOST_AUTO_TEST_CASE(numberOfBinsCentralMoments2)
+	{
+		int numberOfArguments = 7;
+		const char * arguments[] = {"foo", "-f dummyFile", "--numberOfBinsCentralMoments=1", "10", "2", "20", "3"};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(numberOfBinsCentralMoments3)
+	{
+		std::vector<int> referenceValue;
+		referenceValue.push_back(10);
+		referenceValue.push_back(20);
+		referenceValue.push_back(10);
+		referenceValue.push_back(10);
+		referenceValue.push_back(40);
+		int numberOfArguments = 6;
+		const char * arguments[] = {"foo", "-f dummyFile", "--numberOfBinsCentralMoments=1", "20", "4", "40"};
+		BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
+		Parameters parameters(numberOfArguments, arguments);
+		BOOST_REQUIRE(parameters.numberOfBinsCentralMoments == referenceValue);
+	}
+
 	BOOST_AUTO_TEST_CASE(calcAutocorrelation1)
 	{
 		bool newValue = true;
