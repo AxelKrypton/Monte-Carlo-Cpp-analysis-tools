@@ -79,17 +79,13 @@ static double unbiasedVarianceOfDataSample(DataSample & sampleIn, bool isMeanKno
 							   : double(sampleIn.getNumberOfElements()) / double(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthCentralMoment(2);
 }
 
-static DataSample createVarianceSample(DataSample sampleIn, bool isMeanKnownToBeZero)
-{
-	return isMeanKnownToBeZero ? (sampleIn) ^ 2 : (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
-}
-
-static EstimateAndError calcVarianceAndError(DataSample & sampleIn, bool isMeanKnownToBeZero , Parameters *parameters = NULL, bool shouldUseBinning = false)
+//TODO: Bad to pass both isMeanKnownToBeZero and parameters that contains the first. Once done the todo in  dataAnalysisUtilities.hpp, this is basically solved!
+static EstimateAndError calcVarianceAndError(DataSample& sampleIn, bool isMeanKnownToBeZero , Parameters *parameters = NULL, bool shouldUseBinning = false)
 {
 	double variance = 0.;
 	double error = 0.;
 
-	DataSample varianceSample = createVarianceSample(sampleIn, isMeanKnownToBeZero);
+	DataSample varianceSample = isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(2) : sampleIn.getNthCentralMomentPerDataPoint(2);
 	if ( shouldUseBinning )
 	{
 		DataSample binnedData = performBinning(varianceSample, *parameters);
@@ -124,8 +120,8 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 		* Skewness gamma_1 is defined as:
 		*   gamma_1 = <(x-mu)^3> / <(x-mu)^2>^(3/2)
 		*/
-	DataSample thirdCentralMomentSample = parameters.isMeanKnownToBeZero ? (sampleIn) ^ 3 : (sampleIn - sampleIn.getNthMoment(1)) ^ 3;
-	DataSample secondCentralMomentSample = parameters.isMeanKnownToBeZero ? (sampleIn) ^ 2 : (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
+	DataSample thirdCentralMomentSample = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(3) : sampleIn.getNthCentralMomentPerDataPoint(3);
+	DataSample secondCentralMomentSample = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(2) : sampleIn.getNthCentralMomentPerDataPoint(2);
 
 	DataSample binnedSample1 = performBinning(thirdCentralMomentSample, parameters);
 	DataSample binnedSample2 = performBinning(secondCentralMomentSample, parameters);
@@ -144,8 +140,8 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
 	 * The Kurtosis gamma_2 is defined as:
 	 *   gamma_2 = beta_2 - 3
 	 */
-	DataSample fourthCentralMoment = parameters.isMeanKnownToBeZero ? (sampleIn) ^ 4 : (sampleIn - sampleIn.getNthMoment(1)) ^ 4;
-	DataSample secondCentralMoment = parameters.isMeanKnownToBeZero ? (sampleIn) ^ 2 : (sampleIn - sampleIn.getNthMoment(1)) ^ 2;
+	DataSample fourthCentralMoment = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(4) : sampleIn.getNthCentralMomentPerDataPoint(4);
+	DataSample secondCentralMoment = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(2) : sampleIn.getNthCentralMomentPerDataPoint(2);
 	
 	DataSample binnedSample1 = performBinning(fourthCentralMoment, parameters);
 	DataSample binnedSample2 = performBinning(secondCentralMoment, parameters);	
