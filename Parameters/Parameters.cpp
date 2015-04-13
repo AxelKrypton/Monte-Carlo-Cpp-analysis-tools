@@ -24,7 +24,6 @@ Parameters::Parameters(int argc, const char ** argv)
 		("doNotAnalyzeSkewness", po::value<bool>(&doNotAnalyzeSkewness)->default_value(false)->implicit_value(true), "Do NOT analyze data for skewness")
 		("doNotAnalyzeBinder", po::value<bool>(&doNotAnalyzeBinderCumulant)->default_value(false)->implicit_value(true), "Do NOT analyze data for Binder Cumulant")
 		("doNotUseBinning", po::value<bool>(&doNotUseBinning)->default_value(false)->implicit_value(true), "Do NOT perform binning on data")
-		("useNumberOfBinsForBinning", po::value<bool>(&useNumberOfBinsForBinning)->default_value(true)->implicit_value(false), "Perform binning based on \"numberOfBins\" parameter. If false, binning is based on \"binsize\" parameter")
 		("binningMustFitDataSampleSize", po::value<bool>(&binningMustFitDataSampleSize)->default_value(false)->implicit_value(true), "Require that no element of the data sample is discarded during binning")
 		("adjustDataSampleSizeToBinning", po::value<bool>(&adjustDataSampleSizeToBinning)->default_value(true)->implicit_value(true), "Adjust number of elements of the data sample if elements are discarded during binning")
 		("binsize,b", po::value<int>(&binsize), "Binsize used for all moments (default: 100)")
@@ -67,19 +66,31 @@ void Parameters::checkParsedArguments(po::variables_map & vm, po::options_descri
 	/**
 	 * For the binning one has to know if it should be
 	 * performed with numberOfBins or with binsize parameter.
-	 * This can be judged with the "useNumberOfBinsForBinning"
-	 * parameter. However, it should be that this value
-	 * is changed automatically if a binsize is given in the
-	 * command line.
-	 * If a default value is assigned, the option is regarded as set.
-	 * This makes it difficult to see what was in the command line
-	 * as "count" is always true.
+	 * That's what the variable useNumberOfBinsForBinning is for.
+	 * Its value should be changed automatically if a binsize or
+	 * a numberOfBins is given in the command line. If a default
+	 * value is assigned to an option, the option is always regarded
+	 * as set, even if the user didn't specify it. This makes
+	 * difficult to see what was given in the command line,
+	 * since "count" is always true.
 	 * Hence, no default value is given in the definition of
 	 * the options but it is assigned as done below.
-	 * Probably this can be done better with the "notifier"
+	 * Maybe this can be done better with the "notifier"
 	 * functionality of boost.
 	 */
+	useNumberOfBinsForBinning = false;
+	if( (vm.count("numberOfBins") || vm.count("numberOfBinsMoments") || vm.count("numberOfBinsCentralMoments")) ){
+	    if( (vm.count("binsize") || vm.count("binsizeMoments") || vm.count("binsizeCentralMoments")) ){
+	    	throw std::invalid_argument("Not clear what binning parameter to use, both \"numberOfBins\" and \"binsize\" have been set. Aborting!");
+	    }
+	    useNumberOfBinsForBinning = true;
+	}
 
+	/*
+	 * TODO: Think whether the following two blocks of code on binsize
+	 *       and numberOfBins should always both be executed or whether
+	 *       only the one according to "useNumberOfBinsForBinning" should be done.
+	 */
 	//check if numberOfBins has been set, otherwise set them.
 	if(!vm.count("numberOfBins")) numberOfBins = 10;
 	//check structure of numberOfBins(Central)Moment and parse it
@@ -105,14 +116,7 @@ void Parameters::checkParsedArguments(po::variables_map & vm, po::options_descri
 	{
 		numberOfBinsForAutocorrelation = 10;
 	}
-	if(vm.count("binsize"))
-	{
-		if(vm.count("numberOfBins"))
-		{
-			throw std::invalid_argument("Not clear what binning parameter to use, both \"numberOfBins\" and \"binsize\" have been set. Aborting!");
-		}
-		useNumberOfBinsForBinning = false;
-	}
+
 
 }
 

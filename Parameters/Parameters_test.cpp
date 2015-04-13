@@ -119,8 +119,8 @@ BOOST_AUTO_TEST_SUITE(defaults)
 
 	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning)
 	{
-		bool defaultValue = true;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().useNumberOfBinsForBinning);
+		   bool defaultValue = false;
+		   BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().useNumberOfBinsForBinning);
 	}
 
 	BOOST_AUTO_TEST_CASE(calcAutocorrelation)
@@ -317,29 +317,15 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).doNotUseBinning);
 	}
 
-	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning1)
+	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning_implicitByNumberOfbins)
 	{
-		bool newValue = false;
-		std::string argumentName = "--useNumberOfBinsForBinning";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).useNumberOfBinsForBinning);
-	}
-
-	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning2)
-	{
-		bool newValue = false;
-		std::string argumentName = "--useNumberOfBinsForBinning";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).useNumberOfBinsForBinning);
-	}
-
-	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning_implicitByBinsize)
-	{
-		bool newValue = false;
+		bool newValue = true;
 		int newValueBinsize = 99;
-		std::string argumentName = "--binsize";
+		std::string argumentName = "--numberOfBins";
 		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValueBinsize).useNumberOfBinsForBinning);
 	}
 
-	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning_invalidArgument)
+	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning_invalidArgument1)
 	{
 		int newValueBinsize = 99;
 
@@ -347,6 +333,26 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		std::string argument2 = "--numberOfBins=" + boost::lexical_cast<std::string>(newValueBinsize);
 		int numberOfArguments = 4;
 		const char * arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning_invalidArgument2)
+	{
+		int newValueBinsize = 99;
+
+		std::string argument1 = "--binsize=" + boost::lexical_cast<std::string>(newValueBinsize);
+		int numberOfArguments = 5;
+		const char * arguments[] = {"foo", "-f dummyFile", argument1.c_str(), "--numberOfBinsMoments=2", "20"};
+		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
+	}
+
+	BOOST_AUTO_TEST_CASE(useNumberOfBinsForBinning_invalidArgument3)
+	{
+		int newValueNumberOfBins = 9;
+
+		std::string argument1 = "--numberOfBins=" + boost::lexical_cast<std::string>(newValueNumberOfBins);
+		int numberOfArguments = 5;
+		const char * arguments[] = {"foo", "-f dummyFile", argument1.c_str(), "--binsizeCentralMoments=3", "500"};
 		BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
 	}
 
