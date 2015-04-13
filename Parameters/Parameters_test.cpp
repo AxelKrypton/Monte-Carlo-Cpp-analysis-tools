@@ -131,26 +131,26 @@ BOOST_AUTO_TEST_SUITE(defaults)
 
 	BOOST_AUTO_TEST_CASE(analyzeMean)
 	{
-		bool analyzeMean_default = true;
-		BOOST_REQUIRE_EQUAL(analyzeMean_default, createParametersForDefaultCheck().analyzeMean);
+		bool doNotAnalyzeMean_default = false;
+		BOOST_REQUIRE_EQUAL(doNotAnalyzeMean_default, createParametersForDefaultCheck().doNotAnalyzeMean);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeVariance)
 	{
-		bool analyzeVariance_default = true;
-		BOOST_REQUIRE_EQUAL(analyzeVariance_default, createParametersForDefaultCheck().analyzeVariance);
+		bool doNotAnalyzeVariance_default = false;
+		BOOST_REQUIRE_EQUAL(doNotAnalyzeVariance_default, createParametersForDefaultCheck().doNotAnalyzeVariance);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeSkewness)
 	{
-		bool analyzeSkewness_default = true;
-		BOOST_REQUIRE_EQUAL(analyzeSkewness_default, createParametersForDefaultCheck().analyzeSkewness);
+		bool doNotAnalyzeSkewness_default = false;
+		BOOST_REQUIRE_EQUAL(doNotAnalyzeSkewness_default, createParametersForDefaultCheck().doNotAnalyzeSkewness);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeKurtosis)
 	{
-		bool analyzeKurtosis_default = true;
-		BOOST_REQUIRE_EQUAL(analyzeKurtosis_default, createParametersForDefaultCheck().analyzeKurtosis);
+		bool doNotAnalyzeBinderCumulant_default = false;
+		BOOST_REQUIRE_EQUAL(doNotAnalyzeBinderCumulant_default, createParametersForDefaultCheck().doNotAnalyzeBinderCumulant);
 	}
 
 	BOOST_AUTO_TEST_CASE(analysisOutputFilePrefix)
@@ -403,57 +403,57 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 	BOOST_AUTO_TEST_CASE(analyzeMean1)
 	{
 		bool newValue = true;
-		std::string argumentName = "--analyzeMean";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).analyzeMean);
+		std::string argumentName = "--doNotAnalyzeMean";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).doNotAnalyzeMean);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeMean2)
 	{
-		bool newValue = false;
-		std::string argumentName = "--analyzeMean";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).analyzeMean);
+		bool newValue = true;
+		std::string argumentName = "--doNotAnalyzeMean";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).doNotAnalyzeMean);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeVariance1)
 	{
 		bool newValue = true;
-		std::string argumentName = "--analyzeVariance";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).analyzeVariance);
+		std::string argumentName = "--doNotAnalyzeVariance";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).doNotAnalyzeVariance);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeVariance2)
 	{
-		bool newValue = false;
-		std::string argumentName = "--analyzeVariance";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).analyzeVariance);
+		bool newValue = true;
+		std::string argumentName = "--doNotAnalyzeVariance";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).doNotAnalyzeVariance);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeSkewness1)
 	{
 		bool newValue = true;
-		std::string argumentName = "--analyzeSkewness";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).analyzeSkewness);
+		std::string argumentName = "--doNotAnalyzeSkewness";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).doNotAnalyzeSkewness);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeSkewness2)
 	{
-		bool newValue = false;
-		std::string argumentName = "--analyzeSkewness";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).analyzeSkewness);
+		bool newValue = true;
+		std::string argumentName = "--doNotAnalyzeSkewness";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).doNotAnalyzeSkewness);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeKurtosis1)
 	{
 		bool newValue = true;
-		std::string argumentName = "--analyzeKurtosis";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).analyzeKurtosis);
+		std::string argumentName = "--doNotAnalyzeBinder";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).doNotAnalyzeBinderCumulant);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeKurtosis2)
 	{
-		bool newValue = false;
-		std::string argumentName = "--analyzeKurtosis";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).analyzeKurtosis);
+		bool newValue = true;
+		std::string argumentName = "--doNotAnalyzeBinder";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).doNotAnalyzeBinderCumulant);
 	}
 
 	BOOST_AUTO_TEST_CASE(analysisOutputFilePrefix)

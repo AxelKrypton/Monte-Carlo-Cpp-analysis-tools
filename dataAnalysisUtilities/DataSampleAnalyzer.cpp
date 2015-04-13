@@ -13,19 +13,19 @@ parameters(parametersIn)
 	}
 	else
 	{
-		if(parameters.analyzeMean)
+		if(!parameters.doNotAnalyzeMean)
 		{
 			MeanAnalyzer(sample, parameters);
 		}
-		if(parameters.analyzeVariance)
+		if(!parameters.doNotAnalyzeVariance)
 		{
 			VarianceAnalyzer(sample, parameters);
 		}
-		if(parameters.analyzeSkewness)
+		if(!parameters.doNotAnalyzeSkewness)
 		{
 			SkewnessAnalyzer(sample, parameters);
 		}
-		if(parameters.analyzeKurtosis)
+		if(!parameters.doNotAnalyzeBinderCumulant)
 		{
 			BinderAnalyzer(sample, parameters);
 		}

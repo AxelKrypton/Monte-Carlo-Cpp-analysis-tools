@@ -25,10 +25,10 @@ public:
 	bool useBinning;
 	bool useNumberOfBinsForBinning;
 	bool calcAutocorrelation;
-	bool analyzeMean;
-	bool analyzeVariance;
-	bool analyzeSkewness;
-	bool analyzeKurtosis;
+	bool doNotAnalyzeMean;
+	bool doNotAnalyzeVariance;
+	bool doNotAnalyzeSkewness;
+	bool doNotAnalyzeBinderCumulant;
 	bool binningMustFitDataSampleSize;
 	bool adjustDataSampleSizeToBinning;
 
