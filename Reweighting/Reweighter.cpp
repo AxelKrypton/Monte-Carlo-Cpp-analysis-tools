@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <limits>
 #include <sstream>
+#include <string>
 #include "Reweighter.hpp"
 #include "SimulationData.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
@@ -11,7 +12,7 @@ static void findIflogZHasToBeCalculated(std::vector<double>, std::vector<int>&);
 static double logarithmic_sum(double, double);
 static void evaluateErrorOfObservablesPerPointFromEstimators(Observables&, const bool, std::vector<std::valarray<double> >);
 static void evaluateEstimateOfObservablesPerPointFromMoments(Observables&, const bool, std::vector<double>);
-static Reweighter::ErrorCalculationMethod getErrorCalculationMethod(std::string);
+static std::pair<Reweighter::ErrorCalculationMethod, std::string> getErrorCalculationMethod(std::string);
 
 /*****************************************************************************************/
 
@@ -31,7 +32,7 @@ ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
                                        std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
                                        std::string errorMethodIn, double precisionToCalculateLogZ)
  : reweightingDataHandler(configurationFileIn, colToBeRewUsingMultipleColumns), observablesAtNewPoints(),
-   precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
+   precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ), bootstrapNumber(NULL)
 {
 	generalInitialization(colWhoseMeanIsKnownToBeZero, errorMethodIn);
 }
@@ -45,7 +46,7 @@ ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
                                        std::string errorMethodIn, double precisionToCalculateLogZ)
  : reweightingDataHandler(configurationFileIn, colToBeRewUsingMultipleColumns), observablesAtNewPoints(),
    newRangesOfParameters(newRangesOfParametersIn), newNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn),
-   precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
+   precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ), bootstrapNumber(NULL)
 {
 	generalInitialization(colWhoseMeanIsKnownToBeZero, errorMethodIn);
 	calculateNewPoints();
@@ -182,7 +183,12 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
 
 void ReweighterAbstract::generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero, std::string errorMethodIn)
 {
-	errorMethod = getErrorCalculationMethod(errorMethodIn);
+	std::pair<Reweighter::ErrorCalculationMethod, std::string> temporaryPair = getErrorCalculationMethod(errorMethodIn);
+	errorMethod = temporaryPair.first;
+	if(temporaryPair.second != "unset"){
+		bootstrapNumber=new int;
+		*bootstrapNumber = std::stoi( temporaryPair.second );
+	}
 	reweightingParameterNames = reweightingDataHandler.getNamesOfParametersIgnoringMetaParameters();
     valuesOfSimulationParameters = reweightingDataHandler.getValuesOfSimulationParametersIgnoringMetaParameters();
     meanOfObservableIsKnownToBeZero=std::vector<bool>(reweightingDataHandler.numberOfObservablesGivenAsInput, false);
@@ -682,8 +688,14 @@ static double logarithmic_sum(double logx1, double logx2){
 }
 
 
-static Reweighter::ErrorCalculationMethod getErrorCalculationMethod(std::string errorMethodIn)
+static std::pair<Reweighter::ErrorCalculationMethod, std::string> getErrorCalculationMethod(std::string errorMethodIn)
 {
+	std::vector<std::string> resultOfSplit;
+	boost::split(resultOfSplit, errorMethodIn, boost::is_any_of(" _-,."));
+	if(resultOfSplit.size() > 2){
+		throw std::invalid_argument("The error method \"" + errorMethodIn + "\" contains more than once any of the char \" _-,.\"! Aborting...");
+	}
+	errorMethodIn=resultOfSplit[0];
 	boost::algorithm::to_lower(errorMethodIn);
 	std::map<std::string, Reweighter::ErrorCalculationMethod> m;
 	m["jackknife"] = Reweighter::jackknife;
@@ -693,7 +705,14 @@ static Reweighter::ErrorCalculationMethod getErrorCalculationMethod(std::string 
 
 	Reweighter::ErrorCalculationMethod errorMethodOut = m[errorMethodIn];
 	if(errorMethodOut) {
-			return errorMethodOut;
+		if(errorMethodOut == Reweighter::jackknife){
+			if(resultOfSplit.size() == 2)
+				throw std::invalid_argument("The Jackknife error method does not require any further information!! Aborting...");
+			return std::pair<Reweighter::ErrorCalculationMethod, std::string>(errorMethodOut, "unset");
+		}else if(errorMethodOut == Reweighter::bootstrap){
+			return (resultOfSplit.size() == 2) ? std::pair<Reweighter::ErrorCalculationMethod, std::string>(errorMethodOut, resultOfSplit[1])
+					                           : std::pair<Reweighter::ErrorCalculationMethod, std::string>(errorMethodOut, "100");
+		}
 	} else {
 			throw std::invalid_argument("The error method \"" + errorMethodIn + "\" is not valid! Aborting...");
 	}
