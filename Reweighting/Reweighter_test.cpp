@@ -13,17 +13,17 @@ public:
     ReweighterTest(std::string configurationFileIn,
                    std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                    std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
-                   double precisionToCalculateLogZ = 1.e-7)
+                   std::string errorMethodIn = "jackknife", double precisionToCalculateLogZ = 1.e-7)
      : ReweighterAbstract(configurationFileIn, colToBeRewUsingMultipleColumns,
-    		              colWhoseMeanIsKnownToBeZero, precisionToCalculateLogZ) {}
+    		              colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {}
     ReweighterTest(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                    std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
                    std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                    std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
-                   double precisionToCalculateLogZ = 1.e-7)
+                   std::string errorMethodIn = "jackknife", double precisionToCalculateLogZ = 1.e-7)
      : ReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
                           newNumberOfPointsOfParametersIn, colToBeRewUsingMultipleColumns,
-                          colWhoseMeanIsKnownToBeZero, precisionToCalculateLogZ) {}
+                          colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {}
 
     //Setters
     void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
@@ -103,23 +103,39 @@ BOOST_AUTO_TEST_SUITE(build)
         BOOST_REQUIRE_THROW(ReweighterTest reweighter, std::invalid_argument);
 	}
 
-    BOOST_AUTO_TEST_CASE(build2)
+	BOOST_AUTO_TEST_CASE(build2)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
-        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), 0.0), std::range_error);
-        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), -1.), std::range_error);
+        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "unknown"), std::invalid_argument);
+        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), ""), std::invalid_argument);
+        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack"));
+        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jackknife"));
+        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "JaCk"));
+        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jAcKKniFe"));
+        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot"));
+        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "bootstrap"));
+        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "bOOt"));
+        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "BooTSTRap"));
+
     }
 
-    BOOST_AUTO_TEST_CASE(build3)
+	BOOST_AUTO_TEST_CASE(build3)
     {
-    	std::string fileThatDoesExist = "RealTestData/configfile_1";
-    	BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,2), 1.e-5), std::invalid_argument);
-    	BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,0), 1.e-5), std::invalid_argument);
-    	BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,1), 1.e-5));
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
+        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack", 0.0), std::range_error);
+        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack", -1.), std::range_error);
     }
-
 
     BOOST_AUTO_TEST_CASE(build4)
+    {
+    	std::string fileThatDoesExist = "RealTestData/configfile_1";
+    	BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,2), "boot", 1.e-5), std::invalid_argument);
+    	BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,0), "jack", 1.e-5), std::invalid_argument);
+    	BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,1), "jack", 1.e-5));
+    }
+
+
+    BOOST_AUTO_TEST_CASE(build5)
 	{
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
@@ -142,7 +158,7 @@ BOOST_AUTO_TEST_SUITE(build)
         BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints));
 	}
 
-    BOOST_AUTO_TEST_CASE(build5)
+    BOOST_AUTO_TEST_CASE(build6)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_2";
         ReweighterTest reweighter(fileThatDoesExist);
@@ -152,7 +168,7 @@ BOOST_AUTO_TEST_SUITE(build)
             BOOST_REQUIRE_EQUAL(reweighter.getLogZAtSimulatedPoints()[i], referenceLogZAtSimulatedPoints[i]);
     }
 
-    BOOST_AUTO_TEST_CASE(build6)
+    BOOST_AUTO_TEST_CASE(build7)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
         ReweighterTest reweighter(fileThatDoesExist);
@@ -263,7 +279,7 @@ BOOST_AUTO_TEST_SUITE(getters)
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         ReweighterTest reweighter(fileThatDoesExist);
 		BOOST_REQUIRE_EQUAL(reweighter.getPrecisionToCalculateLogZ(), 1.e-7);
-        ReweighterTest reweighter2(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), 0.001);
+        ReweighterTest reweighter2(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack", 0.001);
 		BOOST_REQUIRE_EQUAL(reweighter2.getPrecisionToCalculateLogZ(), 0.001);
 	}
 
@@ -385,7 +401,7 @@ BOOST_AUTO_TEST_SUITE(setters)
 		newRanges.push_back(std::make_pair(4.2, 4.6));
 		newRanges.push_back(std::make_pair(0.8, 1.2));
 		newRanges.push_back(std::make_pair(-1.2e12, -1.6e12));
-        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), std::vector<unsigned int>(), 0.1);
+        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot", 0.1);
         BOOST_REQUIRE_THROW(reweighter.setPrecisionToCalculateLogZ(-3.e-10), std::range_error);
         BOOST_REQUIRE_NO_THROW(reweighter.setPrecisionToCalculateLogZ(1.e-10));
         BOOST_REQUIRE_EQUAL(reweighter.getPrecisionToCalculateLogZ(), 1.e-10);
@@ -733,6 +749,52 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
     }
 
     BOOST_AUTO_TEST_CASE(meanReweighting3)
+        {
+            /*
+             * Here we compare our estimate of the observables with error with the same of the Reference Code.
+             * Now that we implemented also bootstrap, also the error has to match!
+             */
+            std::string fileThatDoesExist = "RealTestData/configfile_5";
+            std::vector<std::pair<double, double> > newRanges;
+            std::vector< unsigned int> newNumPoints(1, 51);
+            newRanges.push_back(std::make_pair(5.348, 5.363));
+            ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot");
+            double referenceValuesObsNewPoints[] = {0.5116222366607, 0.5117708109991, 0.5119229431982, 0.5120788380495,
+                                                    0.5122387183650, 0.5124028249557, 0.5125714162663, 0.5127447675902,
+                                                    0.5129231697944, 0.5131069274668, 0.5132963564092, 0.5134917803835,
+                                                    0.5136935270402, 0.5139019229535, 0.5141172877143, 0.5143399270515,
+                                                    0.5145701249893, 0.5148081350933, 0.5150541709091, 0.5153083957655,
+                                                    0.5155709121835, 0.5158417512059, 0.5161208620410, 0.5164081024727,
+                                                    0.5167032305472, 0.5170058980666, 0.5173156464176, 0.5176319052190,
+                                                    0.5179539941819, 0.5182811284495, 0.5186124275148, 0.5189469276189,
+                                                    0.5192835973224, 0.5196213557414, 0.5199590927561, 0.5202956903662,
+                                                    0.5206300442829, 0.5209610848380, 0.5212877963393, 0.5216092341180,
+                                                    0.5219245386777, 0.5222329465491, 0.5225337976607, 0.5228265392424,
+                                                    0.5231107264513, 0.5233860200586, 0.5236521816392, 0.5239090667638,
+                                                    0.5241566167174, 0.5243948492488, 0.5246238488203};
+            double referenceErrorsObsNewPoints[] = {0.0008030982720, 0.0007802295133, 0.0007576602812, 0.0007354310230,
+                                                    0.0007135806103, 0.0006921468735, 0.0006711672542, 0.0006506795537,
+                                                    0.0006307227551, 0.0006113378642, 0.0005925687297, 0.0005744627553,
+                                                    0.0005570714308, 0.0005404505755, 0.0005246601866, 0.0005097637873,
+                                                    0.0004958271770, 0.0004829165234, 0.0004710958003, 0.0004604236486,
+                                                    0.0004509498423, 0.0004427116537, 0.0004357304902, 0.0004300092360,
+                                                    0.0004255306907, 0.0004222574077, 0.0004201330569, 0.0004190852175,
+                                                    0.0004190293031, 0.0004198731524, 0.0004215217478, 0.0004238815243,
+                                                    0.0004268638477, 0.0004303873788, 0.0004343792351, 0.0004387750320,
+                                                    0.0004435180391, 0.0004485577642, 0.0004538483259, 0.0004593469343,
+                                                    0.0004650127288, 0.0004708061028, 0.0004766885469, 0.0004826229349,
+                                                    0.0004885741132, 0.0004945096355, 0.0005004004760, 0.0005062216043,
+                                                    0.0005119523373, 0.0005175764449, 0.0005230820069};
+            reweighter.testCalculateLogZAtSimulatedPoints();
+            reweighter.testCalculateLogZAtNewPoints();
+            std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
+            for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
+                BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 2.e-5);
+                BOOST_REQUIRE_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].mean.error, 2.e-5);
+            }
+        }
+
+    BOOST_AUTO_TEST_CASE(meanReweighting4)
     {
         /*
          * A final test for the observables is to repeat the reweighting in the same range, but different
@@ -855,6 +917,48 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
    }
 
    BOOST_AUTO_TEST_CASE(suscReweighting3)
+   {
+       std::string fileThatDoesExist = "RealTestData/configfile_5";
+       std::vector<std::pair<double, double> > newRanges;
+       std::vector< unsigned int> newNumPoints(1, 51);
+       newRanges.push_back(std::make_pair(5.348, 5.363));
+       ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot");
+       double referenceValuesObsNewPoints[] = {1.18041718360e-05, 1.20823773460e-05, 1.23763242581e-05, 1.26874539116e-05,
+                                               1.30172179636e-05, 1.33670535187e-05, 1.37383525289e-05, 1.41324251032e-05,
+                                               1.45504564428e-05, 1.49934585608e-05, 1.54622119757e-05, 1.59572046249e-05,
+                                               1.64785617539e-05, 1.70259724256e-05, 1.75986118885e-05, 1.81950634321e-05,
+                                               1.88132425221e-05, 1.94503264212e-05, 2.01026959059e-05, 2.07658925071e-05,
+                                               2.14345985314e-05, 2.21026456327e-05, 2.27630572981e-05, 2.34081306522e-05,
+                                               2.40295599071e-05, 2.46186033309e-05, 2.51662913313e-05, 2.56636700485e-05,
+                                               2.61020725004e-05, 2.64734046627e-05, 2.67704317953e-05, 2.69870487343e-05,
+                                               2.71185170846e-05, 2.71616537792e-05, 2.71149578396e-05, 2.69786667071e-05,
+                                               2.67547380208e-05, 2.64467585910e-05, 2.60597871739e-05, 2.56001429979e-05,
+                                               2.50751539847e-05, 2.44928815711e-05, 2.38618390574e-05, 2.31907176965e-05,
+                                               2.24881357849e-05, 2.17624190311e-05, 2.10214190743e-05, 2.02723743396e-05,
+                                               1.9521811838e-05, 1.8775489525e-05, 1.80383723162e-05};
+       double referenceErrorsObsNewPoints[] = {2.44940550452e-06, 2.44111599552e-06, 2.43133862951e-06, 2.42071833824e-06,
+                                               2.40990499163e-06, 2.39953374704e-06, 2.39020356185e-06, 2.38245450490e-06,
+                                               2.37674451952e-06, 2.37342726622e-06, 2.37273225289e-06, 2.37474926963e-06,
+                                               2.37941875786e-06, 2.38652960891e-06, 2.39572550632e-06, 2.40652014153e-06,
+                                               2.41832111382e-06, 2.43046137736e-06, 2.44223669617e-06, 2.45294699216e-06,
+                                               2.46193890704e-06, 2.46864689690e-06, 2.47262972406e-06, 2.47359915358e-06,
+                                               2.47143777461e-06, 2.46620291043e-06, 2.45811438546e-06, 2.44752496976e-06,
+                                               2.43487428013e-06, 2.42062941147e-06, 2.40521864071e-06, 2.38896713387e-06,
+                                               2.37204519478e-06, 2.35443895281e-06, 2.33595028638e-06, 2.31622752978e-06,
+                                               2.29482239386e-06, 2.27126325731e-06, 2.24513201703e-06, 2.21613166572e-06,
+                                               2.18413448983e-06, 2.14920505919e-06, 2.11159711326e-06, 2.07172749828e-06,
+                                               2.03013347501e-06, 1.98742090189e-06, 1.94421102233e-06, 1.90109239127e-06,
+                                               1.85858273635e-06, 1.81710327631e-06, 1.77696622364e-06};
+       reweighter.testCalculateLogZAtSimulatedPoints();
+       reweighter.testCalculateLogZAtNewPoints();
+       std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
+       for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
+           BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 1e-3);
+           BOOST_REQUIRE_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.error, 1e-3);
+       }
+   }
+
+   BOOST_AUTO_TEST_CASE(suscReweighting4)
    {
        std::string fileThatDoesExist = "RealTestData/configfile_5";
        std::vector<std::pair<double, double> > newRanges;
@@ -1027,6 +1131,46 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
    {
        std::string fileThatDoesExist = "RealTestData/configfile_5";
        std::vector<std::pair<double, double> > newRanges;
+       std::vector< unsigned int> newNumPoints(1, 51);
+       newRanges.push_back(std::make_pair(5.348, 5.363));
+       ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot");
+       double referenceValuesObsNewPoints[] = {3.66375761371, 3.69650616987, 3.72457417712, 3.74795713234, 3.76569768083,
+                                               3.77603512058, 3.77981435539, 3.77585380916, 3.76248663931, 3.74085560046,
+                                               3.70984835127, 3.66985581037, 3.62077841424, 3.56338601954, 3.49780828080,
+                                               3.42518775556, 3.34638333564, 3.26222114882, 3.17417733627, 3.08356659523,
+                                               2.99168815163, 2.89985310543, 2.80940281063, 2.72172094692, 2.63789836767,
+                                               2.55917645029, 2.48659298893, 2.42106479046, 2.36336287063, 2.31420835294,
+                                               2.27412768644, 2.24356543318, 2.22282868431, 2.21211398723, 2.21151026587,
+                                               2.22095366319, 2.24033742892, 2.26945464115, 2.30791289566, 2.35529914540,
+                                               2.41106011000, 2.47458217738, 2.54541070229, 2.62241661520, 2.70496900329,
+                                               2.79224431553, 2.88329365020, 2.97715926384, 3.07288314386, 3.16983392340,
+                                               3.26683564435};
+       double referenceErrorsObsNewPoints[] = {0.803155817427, 0.769716297759, 0.734388132974, 0.697530087799,
+                                               0.659649639951, 0.621180774101, 0.582751555823, 0.544858246402,
+                                               0.508260523635, 0.473599767875, 0.441442226967, 0.412251322589,
+                                               0.386311828149, 0.363733221674, 0.344314472611, 0.327691172763,
+                                               0.313269426192, 0.300373039427, 0.288347851941, 0.276569007168,
+                                               0.264564974073, 0.252026646327, 0.238797439711, 0.224892759252,
+                                               0.210457052107, 0.195775446726, 0.181250212666, 0.167389477654,
+                                               0.154800259571, 0.144163289874, 0.136172354444, 0.131424348833,
+                                               0.130271809414, 0.132717417883, 0.138419590183, 0.146823608306,
+                                               0.157321569099, 0.169361867275, 0.182510746409, 0.196453376009,
+                                               0.210982207398, 0.225963006373, 0.241348054476, 0.257125993366,
+                                               0.273341734783, 0.290057095164, 0.307380296300, 0.325397612382,
+                                               0.344215367240, 0.363951452755, 0.384719448161};
+       reweighter.testCalculateLogZAtSimulatedPoints();
+       reweighter.testCalculateLogZAtNewPoints();
+       std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.testCalculateAndGetReweightedObservables();
+       for(int i=0; i < reweighter.getNumberOfNewPoints(); i++){
+           BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 0.05);
+           BOOST_REQUIRE_CLOSE(referenceErrorsObsNewPoints[i], valuesObsNewPoints[i][0].binderCumulant.error, 0.05);
+       }
+   }
+
+   BOOST_AUTO_TEST_CASE(bindReweighting4)
+   {
+       std::string fileThatDoesExist = "RealTestData/configfile_5";
+       std::vector<std::pair<double, double> > newRanges;
        std::vector< unsigned int> newNumPoints(1, 11);
        newRanges.push_back(std::make_pair(5.348, 5.363));
        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
@@ -1053,10 +1197,10 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
    }
 
    /*
-    * The following test is the same as bindReweighting4
+    * The following test is the same as bindReweighting1
     * but imposing the mean of the observable zero a priori
     */
-   BOOST_AUTO_TEST_CASE(bindReweighting4)
+   BOOST_AUTO_TEST_CASE(bindReweighting5)
    {
 	  std::string fileThatDoesExist = "RealTestData/configfile_4";
 	  std::vector<std::pair<double, double> > newRanges;
@@ -1110,9 +1254,9 @@ std::vector< unsigned int> newNumPoints(1, 30);
     {
         BOOST_REQUIRE_THROW(Reweighter reweighter, std::invalid_argument);
         BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist));
-        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), 1.e-5));
+        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "bootstrap", 1.e-5));
         BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints));
-        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), std::vector<unsigned int>(), 1.e-5));
+        BOOST_REQUIRE_NO_THROW(Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), std::vector<unsigned int>(), "jackknife", 1.e-5));
     }
 
     BOOST_AUTO_TEST_CASE(setters)
