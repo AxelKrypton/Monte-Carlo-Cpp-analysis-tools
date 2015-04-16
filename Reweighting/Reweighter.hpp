@@ -76,6 +76,7 @@
 class ReweighterAbstract {
     friend class ReweightingDataHandler;
 public:
+    enum ErrorCalculationMethod { bootstrap = 1, jackknife };
     virtual ~ReweighterAbstract() {}
 	//Getters
 	std::vector<std::vector<double> > getValuesOfSimulationParameters();
@@ -98,12 +99,14 @@ protected:
     ReweighterAbstract(std::string configurationFileIn,
                        std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                        std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
+                       std::string errorMethodIn = "jackknife",
                        double precisionToCalculateLogZ = 1.e-7);
     ReweighterAbstract(std::string configurationFileIn,
                        std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                        std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
                        std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                        std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
+                       std::string errorMethodIn = "jackknife",
                        double precisionToCalculateLogZ = 1.e-7);
 
     //Some of the following method could be static functions in the .cpp file but are here for testing purposes
@@ -128,7 +131,7 @@ private:
 	 * Note: The following function is basically the second constructor above. We put it here because it is also the first part
 	 *       of the third constructor. In C one constructor cannot call another constructor (in c++11 one would use delegating constructors).
 	 */
-	void generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero);
+	void generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero, std::string errorMethodIn);
 
     //Method in which "valuesOfNewParameters" is filled and some checks are done
     void calculateNewPoints();
@@ -185,6 +188,7 @@ private:
 	std::vector<bool> meanOfObservableIsKnownToBeZero;  //here the indices of the vector are the
 														//number of observable, NOT of the column!
 	double precisionOfIterativeProcedureToCalculateLogZ;
+	ErrorCalculationMethod errorMethod;
 };
 
 
@@ -194,9 +198,9 @@ public:
     explicit Reweighter(std::string configurationFileIn,
                         std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                         std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
-                        double precisionToCalculateLogZ = 1.e-7)
+                        std::string errorMethodIn = "jackknife", double precisionToCalculateLogZ = 1.e-7)
      : ReweighterAbstract(configurationFileIn, colToBeRewUsingMultipleColumns,
-    		              colWhoseMeanIsKnownToBeZero, precisionToCalculateLogZ) {
+    		              colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {
         calculateAndSetLogZAtSimulatedPoints();
     }
     Reweighter(std::string configurationFileIn,
@@ -204,10 +208,10 @@ public:
                std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
                std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
-               double precisionToCalculateLogZ = 1.e-7)
+               std::string errorMethodIn = "jackknife", double precisionToCalculateLogZ = 1.e-7)
      : ReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
                           newNumberOfPointsOfParametersIn, colToBeRewUsingMultipleColumns,
-                          colWhoseMeanIsKnownToBeZero, precisionToCalculateLogZ) {
+                          colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {
         calculateAndSetLogZAtSimulatedPoints();
         calculateAndSetLogZAtNewPoints();
     }

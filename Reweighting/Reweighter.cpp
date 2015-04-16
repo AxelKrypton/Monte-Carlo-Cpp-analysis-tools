@@ -11,6 +11,7 @@ static void findIflogZHasToBeCalculated(std::vector<double>, std::vector<int>&);
 static double logarithmic_sum(double, double);
 static void evaluateErrorOfObservablesPerPointFromEstimators(Observables&, const bool, std::vector<std::valarray<double> >);
 static void evaluateEstimateOfObservablesPerPointFromMoments(Observables&, const bool, std::vector<double>);
+static Reweighter::ErrorCalculationMethod getErrorCalculationMethod(std::string);
 
 /*****************************************************************************************/
 
@@ -28,11 +29,11 @@ ReweighterAbstract::ReweighterAbstract() {
 ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
                                        std::vector<unsigned int> colToBeRewUsingMultipleColumns,
                                        std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
-                                       double precisionToCalculateLogZ)
+                                       std::string errorMethodIn, double precisionToCalculateLogZ)
  : reweightingDataHandler(configurationFileIn, colToBeRewUsingMultipleColumns), observablesAtNewPoints(),
    precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
 {
-	generalInitialization(colWhoseMeanIsKnownToBeZero);
+	generalInitialization(colWhoseMeanIsKnownToBeZero, errorMethodIn);
 }
 
 
@@ -41,12 +42,12 @@ ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
                                        std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
                                        std::vector<unsigned int> colToBeRewUsingMultipleColumns,
                                        std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
-                                       double precisionToCalculateLogZ)
+                                       std::string errorMethodIn, double precisionToCalculateLogZ)
  : reweightingDataHandler(configurationFileIn, colToBeRewUsingMultipleColumns), observablesAtNewPoints(),
    newRangesOfParameters(newRangesOfParametersIn), newNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn),
    precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
 {
-	generalInitialization(colWhoseMeanIsKnownToBeZero);
+	generalInitialization(colWhoseMeanIsKnownToBeZero, errorMethodIn);
 	calculateNewPoints();
 }
 
@@ -135,34 +136,39 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
             jackknifeEstimators(std::vector<std::vector<double> >(numberOfNewPoints,
                                                                   std::vector<double>(numberOfObservablesToBeReweighted)),
                                 numberOfBinsUsedToBinData);
-    std::cout << "   Calculating the Jackknife estimators... \n";
-    for(size_t i=0; i<numberOfBinsUsedToBinData; i++){
-        std::vector<double> logZAtSimulatedPointsLeavingOutOneEntry =
-                calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(i);
-        std::vector<double> logZAtNewPointsLeavingOutOneEntry =
-                calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(i, logZAtSimulatedPointsLeavingOutOneEntry);
-        jackknifeEstimators[i] =
-                calculateReweightedObservableValues(true, i, &logZAtSimulatedPointsLeavingOutOneEntry,
-                                                             &logZAtNewPointsLeavingOutOneEntry);
-    }
-    std::cout << "   ...done!\n";
-    restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &jackknifeEstimators);
-    for(size_t i=0; i<numberOfNewPoints; i++){
-        for(size_t j=0; j<numberOfObservablesGivenAsInput; j++){ //The size here below is set to 4 manually for the moment!
-            std::vector<std::valarray<double> > jackknifeEstimatorsPerPointAndObs(4, std::valarray<double>(numberOfBinsUsedToBinData));
-            std::vector<double> momentsPerPointAndObs(4, 0.0);
-            momentsPerPointAndObs[0] = reweightedObservablesFromRawData[i][j];
-            for(size_t k=0; k<numberOfBinsUsedToBinData; k++)
-                    jackknifeEstimatorsPerPointAndObs[0][k] = jackknifeEstimators[k][i][j];
-            for(size_t m=0; m<3; m++){ //loop on the number of moments inserted, for the moment manually set
-                momentsPerPointAndObs[m+1] = reweightedObservablesFromRawData[i][numberOfObservablesGivenAsInput+j*3+m];
-                for(size_t k=0; k<numberOfBinsUsedToBinData; k++)
-                    jackknifeEstimatorsPerPointAndObs[m+1][k] = jackknifeEstimators[k][i][numberOfObservablesGivenAsInput+j*3+m];
+    //Switch between different error calculation methods
+    if(errorMethod == jackknife){
+		std::cout << "   Calculating the Jackknife estimators... \n";
+		for(size_t i=0; i<numberOfBinsUsedToBinData; i++){
+			std::vector<double> logZAtSimulatedPointsLeavingOutOneEntry =
+					calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(i);
+			std::vector<double> logZAtNewPointsLeavingOutOneEntry =
+					calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(i, logZAtSimulatedPointsLeavingOutOneEntry);
+			jackknifeEstimators[i] =
+					calculateReweightedObservableValues(true, i, &logZAtSimulatedPointsLeavingOutOneEntry,
+																 &logZAtNewPointsLeavingOutOneEntry);
+		}
+		std::cout << "   ...done!\n";
+		restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &jackknifeEstimators);
+		for(size_t i=0; i<numberOfNewPoints; i++){
+			for(size_t j=0; j<numberOfObservablesGivenAsInput; j++){ //The size here below is set to 4 manually for the moment!
+				std::vector<std::valarray<double> > jackknifeEstimatorsPerPointAndObs(4, std::valarray<double>(numberOfBinsUsedToBinData));
+				std::vector<double> momentsPerPointAndObs(4, 0.0);
+				momentsPerPointAndObs[0] = reweightedObservablesFromRawData[i][j];
+				for(size_t k=0; k<numberOfBinsUsedToBinData; k++)
+						jackknifeEstimatorsPerPointAndObs[0][k] = jackknifeEstimators[k][i][j];
+				for(size_t m=0; m<3; m++){ //loop on the number of moments inserted, for the moment manually set
+					momentsPerPointAndObs[m+1] = reweightedObservablesFromRawData[i][numberOfObservablesGivenAsInput+j*3+m];
+					for(size_t k=0; k<numberOfBinsUsedToBinData; k++)
+						jackknifeEstimatorsPerPointAndObs[m+1][k] = jackknifeEstimators[k][i][numberOfObservablesGivenAsInput+j*3+m];
 
-            }
-            evaluateEstimateOfObservablesPerPointFromMoments(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], momentsPerPointAndObs);
-            evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], jackknifeEstimatorsPerPointAndObs);
-        }
+				}
+				evaluateEstimateOfObservablesPerPointFromMoments(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], momentsPerPointAndObs);
+				evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], jackknifeEstimatorsPerPointAndObs);
+			}
+		}
+    }else if(errorMethod == bootstrap){
+    	throw std::invalid_argument("Bootstrap error still to be implemented!");
     }
 
     std::cout << " ...reweighting of observables done!\n";
@@ -174,9 +180,10 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
 /************************** PROTECTED OR PRIVATE METHODS *********************************/
 /*****************************************************************************************/
 
-void ReweighterAbstract::generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero)
+void ReweighterAbstract::generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero, std::string errorMethodIn)
 {
-    reweightingParameterNames = reweightingDataHandler.getNamesOfParametersIgnoringMetaParameters();
+	errorMethod = getErrorCalculationMethod(errorMethodIn);
+	reweightingParameterNames = reweightingDataHandler.getNamesOfParametersIgnoringMetaParameters();
     valuesOfSimulationParameters = reweightingDataHandler.getValuesOfSimulationParametersIgnoringMetaParameters();
     meanOfObservableIsKnownToBeZero=std::vector<bool>(reweightingDataHandler.numberOfObservablesGivenAsInput, false);
     for(size_t i=0; i<colWhoseMeanIsKnownToBeZero.size(); i++){
@@ -303,7 +310,7 @@ void ReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
      * but this is unnecessary since in the constructor we used the method resize() on the vector.
      *
      * NOTE: Since maybe in the configurationFile some values of logZ have been provided, here
-     *       we have to skip those points for which logZ has not to bee calculated. Nevertheless
+     *       we have to skip those points for which logZ has not to be calculated. Nevertheless
      *       this means quite some overhead, so we split the code into two blocks (if no value
      *       of logZ is provided and if some is given).
      *
@@ -372,11 +379,11 @@ std::vector<double> ReweighterAbstract::calculateLogZAtNewPointsUsingUncorrDataA
 
 /*
  * Here we implement a dedicated function to calculate logZ at simulated points leaving out one of the uncorrelated data.
- * We are aware that we duplicate somehouw the function calculateAndSetLogZAtSimulatedPoints, but we postpone
+ * We are aware that we duplicate somehow the function calculateAndSetLogZAtSimulatedPoints, but we postpone
  * this to a future refactoring.
  *
  * TODO: Refactor this function making it part of \"calculateAndSetLogZAtSimulatedPoints\" that will have
- *       to be modified (separate setting and calculation, bool useuncorredData as parameter, ecc.)
+ *       to be modified (separate setting and calculation, bool useUncorredData as parameter, ecc.)
  */
 std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut){
 
@@ -673,5 +680,24 @@ static double logarithmic_sum(double logx1, double logx2){
   return (logx1 >= logx2) ? logx1 + log1p(exp(logx2-logx1)) :
                              logx2 + log1p(exp(logx1-logx2));
 }
+
+
+static Reweighter::ErrorCalculationMethod getErrorCalculationMethod(std::string errorMethodIn)
+{
+	boost::algorithm::to_lower(errorMethodIn);
+	std::map<std::string, Reweighter::ErrorCalculationMethod> m;
+	m["jackknife"] = Reweighter::jackknife;
+	m["jack"] = Reweighter::jackknife;
+	m["bootstrap"] = Reweighter::bootstrap;
+	m["boot"] = Reweighter::bootstrap;
+
+	Reweighter::ErrorCalculationMethod errorMethodOut = m[errorMethodIn];
+	if(errorMethodOut) {
+			return errorMethodOut;
+	} else {
+			throw std::invalid_argument("The error method \"" + errorMethodIn + "\" is not valid! Aborting...");
+	}
+}
+
 
 
