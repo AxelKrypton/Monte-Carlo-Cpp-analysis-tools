@@ -106,33 +106,11 @@ BOOST_AUTO_TEST_SUITE(build)
 	BOOST_AUTO_TEST_CASE(build2)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
-        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "unknown"), std::invalid_argument);
-        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), ""), std::invalid_argument);
-        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "Jack_100"), std::invalid_argument);
-        BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot_100_200"), std::invalid_argument);
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jackknife"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "JaCk"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jAcKKniFe"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "bootstrap"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "bOOt"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "BooTSTRap"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot 200"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot_300"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot-400"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot,500"));
-        BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "bootstrap.1000"));
-    }
-
-	BOOST_AUTO_TEST_CASE(build3)
-    {
-        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack", 0.0), std::range_error);
         BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack", -1.), std::range_error);
     }
 
-    BOOST_AUTO_TEST_CASE(build4)
+    BOOST_AUTO_TEST_CASE(build3)
     {
     	std::string fileThatDoesExist = "RealTestData/configfile_1";
     	BOOST_REQUIRE_THROW(ReweighterTest reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(1,2), "boot", 1.e-5), std::invalid_argument);
@@ -141,7 +119,7 @@ BOOST_AUTO_TEST_SUITE(build)
     }
 
 
-    BOOST_AUTO_TEST_CASE(build5)
+    BOOST_AUTO_TEST_CASE(build4)
 	{
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 		std::vector<std::pair<double, double> > newRanges;
@@ -164,7 +142,7 @@ BOOST_AUTO_TEST_SUITE(build)
         BOOST_REQUIRE_NO_THROW(ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints));
 	}
 
-    BOOST_AUTO_TEST_CASE(build6)
+    BOOST_AUTO_TEST_CASE(build5)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_2";
         ReweighterTest reweighter(fileThatDoesExist);
@@ -174,7 +152,7 @@ BOOST_AUTO_TEST_SUITE(build)
             BOOST_REQUIRE_EQUAL(reweighter.getLogZAtSimulatedPoints()[i], referenceLogZAtSimulatedPoints[i]);
     }
 
-    BOOST_AUTO_TEST_CASE(build7)
+    BOOST_AUTO_TEST_CASE(build6)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
         ReweighterTest reweighter(fileThatDoesExist);
@@ -407,7 +385,7 @@ BOOST_AUTO_TEST_SUITE(setters)
 		newRanges.push_back(std::make_pair(4.2, 4.6));
 		newRanges.push_back(std::make_pair(0.8, 1.2));
 		newRanges.push_back(std::make_pair(-1.2e12, -1.6e12));
-        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), std::vector<unsigned int>(), "boot", 0.1);
+        ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack", 0.1);
         BOOST_REQUIRE_THROW(reweighter.setPrecisionToCalculateLogZ(-3.e-10), std::range_error);
         BOOST_REQUIRE_NO_THROW(reweighter.setPrecisionToCalculateLogZ(1.e-10));
         BOOST_REQUIRE_EQUAL(reweighter.getPrecisionToCalculateLogZ(), 1.e-10);
@@ -1295,7 +1273,7 @@ std::vector< unsigned int> newNumPoints(1, 30);
         //Reset ranges and num points because of the previous test (newRanges and newNumPoints are out of the cases)
         newNumPoints[0]=30;
         newRanges[0]=std::make_pair(5.348, 5.3509);
-        Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints);
+        Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints, std::vector<unsigned int>(), std::vector<unsigned int>(), "Jackknife");
         std::vector<double> simulatedLogZ = reweighter.getLogZAtSimulatedPoints();
         std::vector<double> newLogZ = reweighter.getLogZAtNewPoints();
         for(size_t i=0; i < reweighter.getValuesOfSimulationParameters().size(); i++)

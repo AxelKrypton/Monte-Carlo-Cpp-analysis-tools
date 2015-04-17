@@ -73,11 +73,11 @@
  *       ReweighterAbstract class to have access to private member for testing purposes.
  */
 
+
 class ReweighterAbstract {
     friend class ReweightingDataHandler;
 public:
-    enum ErrorCalculationMethod { bootstrap = 1, jackknife };
-    virtual ~ReweighterAbstract() {if(bootstrapNumber != NULL) delete bootstrapNumber;}
+    virtual ~ReweighterAbstract() {}
 	//Getters
 	std::vector<std::vector<double> > getValuesOfSimulationParameters();
 	std::vector<std::vector<double> > getValuesOfNewParameters();
@@ -131,7 +131,7 @@ private:
 	 * Note: The following function is basically the second constructor above. We put it here because it is also the first part
 	 *       of the third constructor. In C one constructor cannot call another constructor (in c++11 one would use delegating constructors).
 	 */
-	void generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero, std::string errorMethodIn);
+	void generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero);
 
     //Method in which "valuesOfNewParameters" is filled and some checks are done
     void calculateNewPoints();
@@ -188,8 +188,6 @@ private:
 	std::vector<bool> meanOfObservableIsKnownToBeZero;  //here the indices of the vector are the
 														//number of observable, NOT of the column!
 	double precisionOfIterativeProcedureToCalculateLogZ;
-	ErrorCalculationMethod errorMethod;
-	int* bootstrapNumber;
 };
 
 

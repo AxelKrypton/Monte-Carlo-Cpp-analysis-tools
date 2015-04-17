@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <chrono>
+#include <random>
 
 #include "SimulationDataContainer.hpp"
 #include "../dataAnalysisUtilities/binnedDataSample.hpp"
@@ -16,6 +18,7 @@ static void extractInformationFromFile(std::string fileIn,
                                        std::vector<std::string>& dataFilenames,
                                        std::vector<std::map<std::string, double> >& dataParameters);
 static DataSample getMomentUsingMultipleColumns(const int, std::vector<DataSample>);
+static DataSampleBasic getOneDataPerBinFromDataSample(DataSampleBasic, const int);
 /*****************************************************************************************/
 
 SimulationDataContainer::SimulationDataContainer()
@@ -50,20 +53,40 @@ int SimulationDataContainer::getNumberOfSimulationParameters(int fileNumber)
 	return simulationDataSet[fileNumber].getNumberOfSimulationParameters();
 }
 
-std::pair<SimulationDataContainer, std::vector<int> >
-SimulationDataContainer::getUncorrelatedSimulationDataSetAndNumbersOfEntriesLeftOut(int numberOfBinsToBeUsed){
-    SimulationDataContainer uncorrelatedSimulationDataSet(*this); //default copy ctor should be enough
-    std::vector<int> entriesLeftOut;
-    //Here we make no check on the datafile, since they already were done in SimulationData ctor
-    for(int i=0; i<uncorrelatedSimulationDataSet.getNumberOfDatafiles(); i++){
-        int tmpSizeOfDataSample = simulationDataSet[i][0].getNumberOfElements();
-        for(int j=0; j<uncorrelatedSimulationDataSet[i].getNumberOfDataSample(); j++){
-            uncorrelatedSimulationDataSet[i][j] = simulationDataSet[i][j].sampleSlice(0, numberOfBinsToBeUsed,
-                                                                                tmpSizeOfDataSample/numberOfBinsToBeUsed);
-        }
-        entriesLeftOut.push_back(tmpSizeOfDataSample - tmpSizeOfDataSample/numberOfBinsToBeUsed*numberOfBinsToBeUsed);
-    }
-    return std::make_pair(uncorrelatedSimulationDataSet, entriesLeftOut);
+
+SimulationDataContainer SimulationDataContainer::getUncorrelatedSimulationDataSet(std::vector<int> numberOfBinsToBeUsed, ErrorCalculationMethod errorMethod)
+{
+	SimulationDataContainer uncorrelatedSimulationDataSet(*this); //default copy ctor should be enough
+	if(errorMethod == jackknife){
+		for(int i=0; i<uncorrelatedSimulationDataSet.getNumberOfDatafiles(); i++){
+			int tmpSizeOfDataSample = simulationDataSet[i][0].getNumberOfElements();
+			for(int j=0; j<uncorrelatedSimulationDataSet[i].getNumberOfDataSample(); j++){
+				//Pick one data every binsize (the first of every bin)
+				uncorrelatedSimulationDataSet[i][j] = simulationDataSet[i][j].sampleSlice(0, numberOfBinsToBeUsed[i], tmpSizeOfDataSample/numberOfBinsToBeUsed[i]);
+			}
+		}
+	}else if(errorMethod == bootstrap){
+		for(int i=0; i<uncorrelatedSimulationDataSet.getNumberOfDatafiles(); i++){
+			for(int j=0; j<uncorrelatedSimulationDataSet[i].getNumberOfDataSample(); j++){
+				//Pick one random data every binsize
+				uncorrelatedSimulationDataSet[i][j] = getOneDataPerBinFromDataSample(simulationDataSet[i][j], numberOfBinsToBeUsed[i]);
+			}
+		}
+	}else{
+		throw std::logic_error("Invalid error method! Aborting...");
+	}
+	return uncorrelatedSimulationDataSet;
+}
+
+//parameterToBeUsed can be numberOfBins or binsize, but the function is the same because the formula does not change!
+std::vector<int> SimulationDataContainer::getNumberOfEntriesLeftOut(std::vector<int> parameterToBeUsed)
+{
+	std::vector<int> entriesLeftOut;
+	for(int i=0; i<getNumberOfDatafiles(); i++){
+		int tmpSizeOfDataSample = simulationDataSet[i][0].getNumberOfElements();
+		entriesLeftOut.push_back(tmpSizeOfDataSample - tmpSizeOfDataSample/(parameterToBeUsed[i])*(parameterToBeUsed[i]));
+	}
+	return entriesLeftOut;
 }
 
 
@@ -231,3 +254,21 @@ static DataSample getMomentUsingMultipleColumns(const int moment, std::vector<Da
         throw std::invalid_argument("Calculation of moments using multiple columns not yet implemented in the asked case!");
     }
 }
+
+
+static DataSampleBasic getOneDataPerBinFromDataSample(DataSampleBasic dataSetIn, const int numberOfBins){
+	std::cout << "num bins = " << numberOfBins << "\n";
+	DataSampleBasic dataSetOut(numberOfBins);
+	int binSize = dataSetIn.getNumberOfElements() / numberOfBins;
+	// construct a trivial random generator engine from a time-based seed:
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine generator (seed);
+	std::uniform_int_distribution<int> distribution(0, binSize-1); //bounded could be extracted, that's why binSize-1
+	//Get random entry per bin
+	for(int i=0; i<numberOfBins; i++){
+		dataSetOut[i] = dataSetIn[i*binSize + distribution(generator)];
+	}
+	return dataSetOut;
+}
+
+

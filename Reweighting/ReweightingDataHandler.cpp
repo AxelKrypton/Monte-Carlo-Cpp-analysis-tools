@@ -5,14 +5,14 @@
 #include "SimulationData.hpp"
 #include "../dataAnalysisUtilities/binnedDataSample.hpp"
 
-static void printBinsizesActuallyUsed(SimulationDataContainer, const int);
-static std::vector<int> extractValuesOfBinsizes(SimulationDataContainer, std::string);
 static bool isLastEntryPresentMoreThanOnce(std::vector<std::vector<double> >);
 static void extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(SimulationData, std::vector<std::string>&, const std::vector<std::string>&);
 static void extractValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer, std::vector<std::vector<double> >& , const std::vector<std::string>&);
 static void checkCorrectnessOfConfigurationFileForReweighting(SimulationDataContainer, const std::vector<std::string>, int);
-static int getNumberOfBinsToBeUsed(SimulationDataContainer, const std::vector<std::string>);
-static void printBinsizesActuallyUsed(SimulationDataContainer, const int);
+static std::vector<int> extractValuesOfBinsizes(SimulationDataContainer, std::string);
+static std::vector<int> getNumberOfBinsToBeUsedAndEntriesToBeLeftOut(SimulationDataContainer, const std::vector<std::string>, ErrorCalculationMethod, std::vector<int>&);
+static void printBinsizesActuallyUsed(SimulationDataContainer, std::vector<int>);
+static std::pair<ErrorCalculationMethod, std::string> getErrorCalculationMethod(std::string);
 
 /*****************************************************************************************/
 
@@ -27,16 +27,33 @@ ReweightingDataHandler::ReweightingDataHandler() {
     throw std::invalid_argument("ReweightingDataHandler needs input file for construction!");
 }
 
+/*
+ * Here in this constructor we cannot initialize properly the simulationUncorrDataContainer object,
+ * since its content depends on the error method adopted in the reweighting. Actually its content
+ * is fixed for the jackknife but it is not for the bootstrap. So it makes sense to set it here
+ * for the jackknife (especially because then for the ReweighterTest it has already been done) and
+ * se it temporary to a copy of simulationRawDataContainer for the bootstrap (later in the Reweighter
+ * we reset it when needed, see ReweighterAbstract::calculateAndGetReweightedObservables method).
+ *
+ * TODO: Refactor this constructor extracting functions!!
+ */
 ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
-                                               std::vector<unsigned int> obsToBeRewUsingMultipleColumns)
-    : configurationFile(configurationFileIn),
-      simulationRawDataContainer(configurationFileIn), simulationUncorrDataContainer(simulationRawDataContainer)
+                                               std::vector<unsigned int> obsToBeRewUsingMultipleColumns,
+                                               std::string errorMethodIn)
+    : configurationFile(configurationFileIn), simulationRawDataContainer(configurationFileIn),
+      simulationUncorrDataContainer(simulationRawDataContainer), bootstrapNumber(NULL)
 {
-    numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
+	std::pair<ErrorCalculationMethod, std::string> temporaryPair = getErrorCalculationMethod(errorMethodIn);
+	errorMethod = temporaryPair.first;
+	if(temporaryPair.second != "unset"){
+		bootstrapNumber=new int;
+		*bootstrapNumber = std::stoi( temporaryPair.second );
+	}
+	numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
     checkCorrectnessOfConfigurationFileForReweighting(simulationRawDataContainer, ReweightingDataHandler::metaParameters, numberOfObservablesGivenAsInput);
-    numberOfBinsToBeUsed = getNumberOfBinsToBeUsed(simulationRawDataContainer, ReweightingDataHandler::metaParameters);
-    //Print information about binsizes actually used
-    printBinsizesActuallyUsed(simulationRawDataContainer, numberOfBinsToBeUsed);
+	//Get number of bins and entries to be left out due to different number of bins.
+    std::vector<int> entriesToBeCutFromRawData;
+    numberOfBinsToBeUsed = getNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, ReweightingDataHandler::metaParameters, errorMethod, entriesToBeCutFromRawData);
     //Evaluate central moments per data and append them to the raw data container
     //TODO: So far this is hard-coded, make it general and settable by user
     std::vector<unsigned int> columnsOfObservables;
@@ -69,11 +86,6 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
     std::cout << "obs_giv = " << numberOfObservablesGivenAsInput << std::endl;
     std::cout << "obs_rew = " << numberOfObservablesToBeReweighted << std::endl;
 
-    //Perform binning on the data
-    std::pair<SimulationDataContainer, std::vector<int> >
-            binnedDataAndLeftOutEntries = simulationRawDataContainer.getUncorrelatedSimulationDataSetAndNumbersOfEntriesLeftOut(numberOfBinsToBeUsed);
-
-    simulationUncorrDataContainer = binnedDataAndLeftOutEntries.first;
 //    std::cout.precision(16);
 //    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
 //        for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
@@ -83,12 +95,22 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
 ////            std::cout << simulationDataContainer[i][j][k] << "\n";
 //        }
 //    }
+
+    if(errorMethod == jackknife)
+    	simulationUncorrDataContainer = simulationRawDataContainer.getUncorrelatedSimulationDataSet(numberOfBinsToBeUsed, jackknife);
+    std::cout << "entriesToBeCutFromRawData: ";
+    for(auto i: entriesToBeCutFromRawData)
+    	std::cout << i << " ";
+    std::cout << "\n";
     //Refining on the raw data
     for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
         for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
-            simulationRawDataContainer[i][j] = simulationRawDataContainer[i][j].removeLastNElements(binnedDataAndLeftOutEntries.second[i]);
+            simulationRawDataContainer[i][j] = simulationRawDataContainer[i][j].removeLastNElements(entriesToBeCutFromRawData[i]);
         }
     }
+    //This has to be done after having cut the data in order to print the right information
+    printBinsizesActuallyUsed(simulationRawDataContainer, numberOfBinsToBeUsed);
+
 //    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
 //        for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
 //            std::cout << "sim[" << i << "][" << j << "] = " << simulationRawDataContainer[i][j].getNumberOfElements()  << "\t\t";
@@ -98,6 +120,43 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
 //        }
 //    }
 
+}
+
+//Copy constructor needed since we have a raw pointer as member!
+ReweightingDataHandler::ReweightingDataHandler(const ReweightingDataHandler& objectIn)
+   : numberOfBinsToBeUsed(objectIn.numberOfBinsToBeUsed),
+     numberOfObservablesGivenAsInput(objectIn.numberOfObservablesGivenAsInput),
+     numberOfObservablesToBeReweighted(objectIn.numberOfObservablesToBeReweighted),
+     configurationFile(objectIn.configurationFile),
+     simulationRawDataContainer(objectIn.simulationRawDataContainer),
+     simulationUncorrDataContainer(objectIn.simulationUncorrDataContainer),
+     errorMethod(objectIn.errorMethod)
+{
+	if(objectIn.bootstrapNumber == NULL)
+		bootstrapNumber = NULL;
+	else
+		bootstrapNumber = new int(*(objectIn.bootstrapNumber));
+}
+
+//Equal operator needed since we have a raw pointer as member!
+ReweightingDataHandler& ReweightingDataHandler::operator=(const ReweightingDataHandler& rhs){
+	// check for "self assignment" and do nothing in that case
+	if (this == &rhs) return *this;
+	else{
+		numberOfBinsToBeUsed = rhs.numberOfBinsToBeUsed;
+		numberOfObservablesGivenAsInput = rhs.numberOfObservablesGivenAsInput;
+		numberOfObservablesToBeReweighted = rhs.numberOfObservablesToBeReweighted;
+		configurationFile = rhs.configurationFile;
+		simulationRawDataContainer = rhs.simulationRawDataContainer;
+		simulationUncorrDataContainer = rhs.simulationUncorrDataContainer;
+		errorMethod = rhs.errorMethod;
+		if(bootstrapNumber != NULL) delete bootstrapNumber;
+		if(rhs.bootstrapNumber == NULL)
+				bootstrapNumber = NULL;
+			else
+				bootstrapNumber = new int(*(rhs.bootstrapNumber));
+	}
+	return *this;
 }
 
 std::vector<std::string> ReweightingDataHandler::getNamesOfParametersIgnoringMetaParameters(){
@@ -152,7 +211,7 @@ void ReweightingDataHandler::writeNewConfigurationFileWithMetaparameters(Reweigh
             if(ReweightingDataHandler::metaParameters[j] == "logZ")
                 outputFile << reweighter.logZAtSimulatedPoints[i];
             else if(ReweightingDataHandler::metaParameters[j] == "binsize")
-                outputFile << reweighter.reweightingDataHandler.simulationRawDataContainer[i][0].getNumberOfElements()/numberOfBinsToBeUsed;
+                outputFile << reweighter.reweightingDataHandler.simulationRawDataContainer[i][0].getNumberOfElements()/numberOfBinsToBeUsed[i];
             else
                 throw std::runtime_error("Encountered unknown metaparameter writing new configuration file!");
             outputFile << "\t";
@@ -226,7 +285,18 @@ static void checkCorrectnessOfConfigurationFileForReweighting(SimulationDataCont
 }
 
 
-static int getNumberOfBinsToBeUsed(SimulationDataContainer simDataCont, const std::vector<std::string> metaPar){
+/*
+ * NOTE: In the function getNumberOfBinsToBeUsed we calculate the number
+ *       of bins using the binsize given by the user. This is fine, but if
+ *       we calculate again the binsize this could be wrong. For example,
+ *       consider 1653 and 100 as binsize. This gives [1653/100]=16 bins
+ *       but [1653/16]=103 as binsize! That's why we behave differently
+ *       in Jackknife and bootstrap.
+ */
+static std::vector<int> getNumberOfBinsToBeUsedAndEntriesToBeLeftOut(SimulationDataContainer simDataCont,
+		 	          	  	  	  	  	  	  	  	  	  	  	     const std::vector<std::string> metaPar,
+		 	          	  	  	  	  	  	  	  	  	  	  	     ErrorCalculationMethod errorMethod,
+		 	          	  	  	  	  	  	  	  	  	  	  	     std::vector<int>& entriesToBeLeftOut){
     std::vector<int> valuesOfBinsizes = extractValuesOfBinsizes(simDataCont, metaPar[1]);
     std::vector<int> valuesOfNumberOfBins;
     if(valuesOfBinsizes == std::vector<int>(valuesOfBinsizes.size(), 0))
@@ -237,9 +307,29 @@ static int getNumberOfBinsToBeUsed(SimulationDataContainer simDataCont, const st
     for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
         if(valuesOfBinsizes[i] != 0)
             valuesOfNumberOfBins.push_back(simDataCont[i][0].getNumberOfElements()/valuesOfBinsizes[i]);
+        else{
+        	if (errorMethod == bootstrap){
+        		if(simDataCont[i].getNumberOfDataSample() < 10)
+        			throw std::invalid_argument("File \"" + simDataCont[i].getDatafileName() + "\" has less than 10 data and the binsize has not been specified! Aborting...");
+        		std::cout << "WARNING: Binsize not provided for file \"" << simDataCont[i].getDatafileName() << "\". Using 10 bins!\n";
+        		valuesOfNumberOfBins.push_back(10);
+        	}
+        }
     }
-//    std::cout << "numBins = " << *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end()) << "\n";
-    return *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end());
+
+    //    std::cout << "numBins = " << *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end()) << "\n";
+    if(errorMethod == jackknife){
+    	std::vector<int> vectorToBeReturned(simDataCont.getNumberOfDatafiles(), *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end()));
+    	std::cout << "vectorToBeReturned: ";
+    	for(auto i: vectorToBeReturned)
+    		std::cout << i << " ";
+    	std::cout << "\n";
+    	entriesToBeLeftOut = simDataCont.getNumberOfEntriesLeftOut(vectorToBeReturned);
+    	return vectorToBeReturned;
+    }else{ // errorMethod == bootstrap
+    	entriesToBeLeftOut = simDataCont.getNumberOfEntriesLeftOut(valuesOfBinsizes);
+    	return valuesOfNumberOfBins;
+    }
 }
 
 
@@ -310,7 +400,7 @@ static void extractValuesOfSimulationParametersIgnoringMetaParameters(Simulation
  *            here we pass ON PURPOSE simDataCont by value and it has NOT to be changed to a const
  *            reference or worse to a reference.
  */
-static void printBinsizesActuallyUsed(SimulationDataContainer simDataCont, const int numberOfBinsToBeUsed){
+static void printBinsizesActuallyUsed(SimulationDataContainer simDataCont, std::vector<int> numberOfBinsToBeUsed){
     size_t maxLengthDataFilename = simDataCont[0].getDatafileName().length();
     for(int i=1; i<simDataCont.getNumberOfDatafiles(); i++){
         if(simDataCont[i].getDatafileName().length() > maxLengthDataFilename)
@@ -324,7 +414,7 @@ static void printBinsizesActuallyUsed(SimulationDataContainer simDataCont, const
     for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
         std::cout << simDataCont[i].getDatafileName();
         std::cout << "   Given binsize = " << simDataCont[i].getSimulationParameters()["binsize"];
-        std::cout << "    Used binsize = " << simDataCont[i][0].getNumberOfElements()/numberOfBinsToBeUsed << "\n";
+        std::cout << "    Used binsize = " << simDataCont[i][0].getNumberOfElements()/numberOfBinsToBeUsed[i] << "\n";
     }
 
     for(size_t i=0; i<maxLengthDataFilename+50; i++)
@@ -333,7 +423,40 @@ static void printBinsizesActuallyUsed(SimulationDataContainer simDataCont, const
 }
 
 
-
 static bool isLastEntryPresentMoreThanOnce(std::vector<std::vector<double> > parValues){
     return (parValues.size() > 1) && (std::find(parValues.begin(), parValues.end()-1, parValues.back()) != parValues.end()-1);
+}
+
+
+
+static std::pair<ErrorCalculationMethod, std::string> getErrorCalculationMethod(std::string errorMethodIn)
+{
+	std::vector<std::string> resultOfSplit;
+	boost::split(resultOfSplit, errorMethodIn, boost::is_any_of(" _-,."));
+	if(resultOfSplit.size() > 2){
+		throw std::invalid_argument("The error method \"" + errorMethodIn + "\" contains more than once any of the char \" _-,.\"! Aborting...");
+	}
+	errorMethodIn=resultOfSplit[0];
+	boost::algorithm::to_lower(errorMethodIn);
+	std::map<std::string, ErrorCalculationMethod> m;
+	m["jackknife"] = jackknife;
+	m["jack"] = jackknife;
+	m["bootstrap"] = bootstrap;
+	m["boot"] = bootstrap;
+
+	ErrorCalculationMethod errorMethodOut = m[errorMethodIn];
+	if(errorMethodOut) {
+		if(errorMethodOut == jackknife){
+			if(resultOfSplit.size() == 2)
+				throw std::invalid_argument("The Jackknife error method does not require any further information!! Aborting...");
+			return std::pair<ErrorCalculationMethod, std::string>(errorMethodOut, "unset");
+		}else if(errorMethodOut == bootstrap){
+			return (resultOfSplit.size() == 2) ? std::pair<ErrorCalculationMethod, std::string>(errorMethodOut, resultOfSplit[1])
+					                           : std::pair<ErrorCalculationMethod, std::string>(errorMethodOut, "100");
+		}else{
+			throw std::logic_error("Something magic seemed to be happened here, since this case should never be entered!! Aborting...");
+		}
+	} else {
+			throw std::invalid_argument("The error method \"" + errorMethodIn + "\" is not valid! Aborting...");
+	}
 }

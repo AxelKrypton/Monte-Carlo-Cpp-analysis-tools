@@ -35,7 +35,11 @@ class ReweightingDataHandler {
 public:
     ReweightingDataHandler();
     ReweightingDataHandler(std::string configurationFileIn,
-                           std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>());
+                           std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+                           std::string errorMethodIn = "bootstrap");
+    ReweightingDataHandler(const ReweightingDataHandler&);
+    ReweightingDataHandler& operator=(const ReweightingDataHandler&);
+    ~ReweightingDataHandler() { if(bootstrapNumber != NULL) delete bootstrapNumber; }
     //Getters
     std::vector<std::string> getNamesOfParametersIgnoringMetaParameters();
     std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters();
@@ -45,7 +49,7 @@ public:
     void writeNewPointsToFileWithLogZ(Reweighter reweighter, std::string outputFileName = "logZAtNewPoints");
 
 protected:
-    int numberOfBinsToBeUsed;
+    std::vector<int> numberOfBinsToBeUsed;
     int numberOfObservablesGivenAsInput;
     int numberOfObservablesToBeReweighted;
 
@@ -53,6 +57,9 @@ private:
     std::string configurationFile;
     SimulationDataContainer simulationRawDataContainer;
     SimulationDataContainer simulationUncorrDataContainer;
+	ErrorCalculationMethod errorMethod;
+	int* bootstrapNumber;
+
 
     /*
      * These are metaparameters that must NOT be interpreted as reweighting parameters,

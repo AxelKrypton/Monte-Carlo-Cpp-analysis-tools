@@ -3,6 +3,8 @@
 
 #include "SimulationData.hpp"
 
+enum ErrorCalculationMethod { bootstrap = 1, jackknife };
+
 class SimulationDataContainer
 {
 public:
@@ -10,7 +12,8 @@ public:
     explicit SimulationDataContainer(std::string configurationFile);
 	int getNumberOfDatafiles();
 	int getNumberOfSimulationParameters(int fileNumber);
-    std::pair<SimulationDataContainer, std::vector<int> > getUncorrelatedSimulationDataSetAndNumbersOfEntriesLeftOut(int numberOfBinsToBeUsed);
+    SimulationDataContainer getUncorrelatedSimulationDataSet(std::vector<int> numberOfBinsToBeUsed, ErrorCalculationMethod errorMethod);
+    std::vector<int> getNumberOfEntriesLeftOut(std::vector<int> parameterToBeUsed);
     SimulationData& operator[](int index);
     SimulationDataContainer insertMomentsPerData(std::vector<unsigned int> whichColumns,
                                                  std::vector<unsigned int> whichMoments,

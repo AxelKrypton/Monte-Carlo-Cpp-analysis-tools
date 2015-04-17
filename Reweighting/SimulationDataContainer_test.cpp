@@ -106,9 +106,9 @@ BOOST_AUTO_TEST_SUITE(AccessOperator)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(BinningContainer)
+BOOST_AUTO_TEST_SUITE(UncorrelatedContainer)
 
-    BOOST_AUTO_TEST_CASE(BinningContainer1)
+    BOOST_AUTO_TEST_CASE(UncorrelatedContainer1)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_1";
         const int numberOfBins = 100;
@@ -117,13 +117,75 @@ BOOST_AUTO_TEST_SUITE(BinningContainer)
         referenceEntriesToBeLeftOut[1] = 53;
         referenceEntriesToBeLeftOut[2] = 84;
         SimulationDataContainer simDataCont(fileThatDoesExist);
-        std::pair<SimulationDataContainer, std::vector<int> >
-                uncorrObject = simDataCont.getUncorrelatedSimulationDataSetAndNumbersOfEntriesLeftOut(numberOfBins);
+        std::vector<int> numberOfBinsVec(simDataCont.getNumberOfDatafiles(), numberOfBins);
+        SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBinsVec, jackknife);
+        std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBinsVec);
         for(int i=0; i<3; i++){
-            BOOST_CHECK_EQUAL(uncorrObject.second[i], referenceEntriesToBeLeftOut[i]);
-            BOOST_CHECK_EQUAL(uncorrObject.first[i][0].getNumberOfElements(), numberOfBins);
+            BOOST_CHECK_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
+            BOOST_CHECK_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins);
         }
     }
+
+	BOOST_AUTO_TEST_CASE(UncorrelatedContainer2)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_1";
+        const int numberOfBins = 100;
+        std::vector<int> referenceEntriesToBeLeftOut(3);
+        referenceEntriesToBeLeftOut[0] = 4;
+        referenceEntriesToBeLeftOut[1] = 53;
+        referenceEntriesToBeLeftOut[2] = 84;
+        SimulationDataContainer simDataCont(fileThatDoesExist);
+        std::vector<int> numberOfBinsVec(simDataCont.getNumberOfDatafiles(), numberOfBins);
+        SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBinsVec, bootstrap);
+        std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBinsVec);
+        for(int i=0; i<3; i++){
+            BOOST_CHECK_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
+            BOOST_CHECK_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins);
+        }
+    }
+
+	BOOST_AUTO_TEST_CASE(UncorrelatedContainer3)
+	{
+		std::string fileThatDoesExist = "RealTestData/configfile_1";
+		std::vector<int> referenceEntriesToBeLeftOut(3);
+		referenceEntriesToBeLeftOut[0] = 4;
+		referenceEntriesToBeLeftOut[1] = 13;
+		referenceEntriesToBeLeftOut[2] = 4;
+		SimulationDataContainer simDataCont(fileThatDoesExist);
+		std::vector<int> numberOfBins(simDataCont.getNumberOfDatafiles());
+		numberOfBins[0]=10;
+		numberOfBins[1]=20;
+		numberOfBins[2]=5;
+		SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBins, bootstrap);
+		std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBins);
+		for(int i=0; i<3; i++){
+			BOOST_CHECK_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
+			BOOST_CHECK_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins[i]);
+		}
+	}
+
+	BOOST_AUTO_TEST_CASE(UncorrelatedContainer4)
+	{
+		std::string fileThatDoesExist = "RealTestData/configfile_1";
+		std::vector<int> referenceEntriesToBeLeftOut(3);
+		referenceEntriesToBeLeftOut[0] = 0;
+		referenceEntriesToBeLeftOut[1] = 0;
+		referenceEntriesToBeLeftOut[2] = 0;
+		SimulationDataContainer simDataCont(fileThatDoesExist);
+		std::vector<int> numberOfBins(simDataCont.getNumberOfDatafiles());
+		//Force binsize=1 in order to check the drawn data
+		numberOfBins[0]=2304;
+		numberOfBins[1]=1653;
+		numberOfBins[2]=2584;
+		SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBins, bootstrap);
+		std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBins);
+		for(int i=0; i<3; i++){
+			BOOST_CHECK_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
+			BOOST_CHECK_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins[i]);
+			for(int j=0; j<numberOfBins[i]; j++)
+				BOOST_CHECK_EQUAL(uncorrObject[i][0][j], simDataCont[i][0][j]);
+		}
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
