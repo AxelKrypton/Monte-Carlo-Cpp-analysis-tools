@@ -110,11 +110,11 @@ protected:
                        double precisionToCalculateLogZ = 1.e-7);
 
     //Some of the following method could be static functions in the .cpp file but are here for testing purposes
+    void calculateAndSetLogZAtSimulatedPoints();
+    std::vector<double> calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut = -1);
     void calculateAndSetLogZAtNewPoints();
     std::vector<double> calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
                                                                                      std::vector<double> logZAtSimulationPointToBeUsed);
-    void calculateAndSetLogZAtSimulatedPoints();
-    std::vector<double> calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut);
     void prepareObservablesBeforeReweighting(std::vector<double> &);
     void restoreObservablesAfterReweighting(std::vector<double> minimumOfEachObservable,
                                             std::vector<std::vector<double> > *reweightedObservablesFromRawData,

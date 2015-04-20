@@ -170,6 +170,21 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
 		}
     }else if(reweightingDataHandler.errorMethod == bootstrap){
     	throw std::invalid_argument("Bootstrap error still to be implemented!");
+
+    	if(reweightingDataHandler.bootstrapNumber == NULL)
+    		throw std::logic_error("In \"calculateAndGetReweightedObservables\" bootstrapNumber unset in the bootstrap case!! Aborting...");
+    	std::valarray<std::vector<std::vector<double> > >
+    	        	            bootstrapEstimators(std::vector<std::vector<double> >(numberOfNewPoints,
+    	        	                                                                  std::vector<double>(numberOfObservablesToBeReweighted)),
+    	        	            				    *(reweightingDataHandler.bootstrapNumber));
+    	std::cout << "   Calculating the Bootstrap estimators... \n";
+    	for(int iBoot=0; iBoot<(*(reweightingDataHandler.bootstrapNumber)); iBoot++){
+    		reweightingDataHandler.simulationUncorrDataContainer =
+    				reweightingDataHandler.simulationRawDataContainer.getUncorrelatedSimulationDataSet(reweightingDataHandler.numberOfBinsToBeUsed, bootstrap);
+    		//logZ stuff...
+    	}
+    	//estimator elaboration to set observables...
+
     }else{
     	throw std::invalid_argument("Error method for some reason unknown! Aborting...");
     }

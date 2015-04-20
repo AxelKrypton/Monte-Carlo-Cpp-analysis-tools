@@ -32,7 +32,7 @@ ReweightingDataHandler::ReweightingDataHandler() {
  * since its content depends on the error method adopted in the reweighting. Actually its content
  * is fixed for the jackknife but it is not for the bootstrap. So it makes sense to set it here
  * for the jackknife (especially because then for the ReweighterTest it has already been done) and
- * se it temporary to a copy of simulationRawDataContainer for the bootstrap (later in the Reweighter
+ * set it temporary to a copy of simulationRawDataContainer for the bootstrap (later in the Reweighter
  * we reset it when needed, see ReweighterAbstract::calculateAndGetReweightedObservables method).
  *
  * TODO: Refactor this constructor extracting functions!!
@@ -51,7 +51,7 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
 	}
 	numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
     checkCorrectnessOfConfigurationFileForReweighting(simulationRawDataContainer, ReweightingDataHandler::metaParameters, numberOfObservablesGivenAsInput);
-	//Get number of bins and entries to be left out due to different number of bins.
+
     std::vector<int> entriesToBeCutFromRawData;
     numberOfBinsToBeUsed = getNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, ReweightingDataHandler::metaParameters, errorMethod, entriesToBeCutFromRawData);
     //Evaluate central moments per data and append them to the raw data container
