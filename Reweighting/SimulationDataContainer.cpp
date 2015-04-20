@@ -257,7 +257,6 @@ static DataSample getMomentUsingMultipleColumns(const int moment, std::vector<Da
 
 
 static DataSampleBasic getOneDataPerBinFromDataSample(DataSampleBasic dataSetIn, const int numberOfBins){
-	std::cout << "num bins = " << numberOfBins << "\n";
 	DataSampleBasic dataSetOut(numberOfBins);
 	int binSize = dataSetIn.getNumberOfElements() / numberOfBins;
 	// construct a trivial random generator engine from a time-based seed:
