@@ -142,12 +142,11 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
 		std::cout << "   Calculating the Jackknife estimators... \n";
 		for(size_t i=0; i<numberOfBinsUsedToBinData; i++){
 			std::vector<double> logZAtSimulatedPointsLeavingOutOneEntry =
-					calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(i);
+					calculateLogZAtSimulatedPoints(true, i);
 			std::vector<double> logZAtNewPointsLeavingOutOneEntry =
-					calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(i, logZAtSimulatedPointsLeavingOutOneEntry);
+					calculateLogZAtNewPoints(valuesOfNewParameters, true, i, &logZAtSimulatedPointsLeavingOutOneEntry);
 			jackknifeEstimators[i] =
-					calculateReweightedObservableValues(true, i, &logZAtSimulatedPointsLeavingOutOneEntry,
-																 &logZAtNewPointsLeavingOutOneEntry);
+					calculateReweightedObservableValues(true, i, &logZAtSimulatedPointsLeavingOutOneEntry, &logZAtNewPointsLeavingOutOneEntry);
 		}
 		std::cout << "   ...done!\n";
 		restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &jackknifeEstimators);
@@ -320,7 +319,8 @@ std::vector<double> ReweighterAbstract::calculateLogZAtNewPoints(std::vector<std
  *       instance, logZAtSimulatedPoints must have the right amount of memory reserved
  *       before calling this function.
  */
-void ReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
+std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPoints(bool useUncorrData, const int entryToBeLeftOut,
+        															   std::vector<double>* logZAtSimulationPointToStartFrom, bool printUserInfo){
     /*
      * Here we MUST initialize the values of the logZ to zero. Namely one should do something like
      *    logZAtSimulatedPoints.assign(valuesOfSimulationParameters.size(), 0.0);
@@ -334,30 +334,43 @@ void ReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
      * TODO: Benchmark in real life if these two blocks can be merged, i.e. how long does the
      *       indices set up in the else here below.
      */
-    std::cout << "==========================================================\n";
-    std::cout << " Calculating LogZ At Simulated Points (precision = " << precisionOfIterativeProcedureToCalculateLogZ << ")..." << std::endl;
-    if(logZAtSimulatedPoints == std::vector<double>(logZAtSimulatedPoints.size(), 0)){
+	if(entryToBeLeftOut >= reweightingDataHandler.numberOfBinsToBeUsed[0]) //Here negative values mean do not leave out entry, so no check is done!
+		throw std::out_of_range("Invalid entry to be left out in \"calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry\" function.");
 
-      double residuum, valueResiduumForOutput=1;
+	std::vector<double> resultLogZ(valuesOfSimulationParameters.size(), 0.0);
+	if(logZAtSimulationPointToStartFrom == NULL)
+		logZAtSimulationPointToStartFrom = &resultLogZ;
+    if (printUserInfo){
+    	std::cout << "==========================================================\n";
+    	std::cout << " Calculating LogZ At Simulated Points (precision = " << precisionOfIterativeProcedureToCalculateLogZ << ")..." << std::endl;
+    }
+    if(*logZAtSimulationPointToStartFrom == std::vector<double>(logZAtSimulatedPoints.size(), 0)){
+    	double residuum, valueResiduumForOutput=1;
         std::vector<double> newLogZ(valuesOfSimulationParameters.size());
         do{
-            newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters);
+            //newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters);
+            newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters, useUncorrData, entryToBeLeftOut, &resultLogZ);
             residuum = 0.0;
             //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
             for(size_t indexSimulations = 0; indexSimulations < valuesOfSimulationParameters.size(); indexSimulations++){
-                residuum += expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indexSimulations])
-                           *expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indexSimulations]);
+                residuum += expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations])
+                           *expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations]);
                 //here one should put eq.(8.34)
             }
-            logZAtSimulatedPoints = newLogZ;
-	    if(residuum < valueResiduumForOutput){
+            resultLogZ = newLogZ;
+	    if(printUserInfo && residuum < valueResiduumForOutput){
 	      std::cout << "   Residuum = " << sqrt(residuum) << std::endl;
 	      valueResiduumForOutput/=10.;
 	    }
         }while(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ);
-
+        if (printUserInfo){
+        	std::cout << " ...done!" << std::endl;
+        	std::cout << "==========================================================\n\n";
+        }
+        return resultLogZ;
     }else{
-
+    	if(*logZAtSimulationPointToStartFrom != logZAtSimulatedPoints)
+    		throw std::logic_error("So far this case must be entered only if this function is called without logZAtSimulationPointToStartFrom! Aborting");
         //Set up to skip some calculation on logZ
         std::vector<int> indicesOfParametersAtWhichLogZHasToBeCalculated;
         findIflogZHasToBeCalculated(logZAtSimulatedPoints, indicesOfParametersAtWhichLogZHasToBeCalculated);
@@ -378,54 +391,22 @@ void ReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
                 logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]] = newLogZ[indexSimulations];
             }
         }while(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ);
-
+        if (printUserInfo){
+        	std::cout << " ...done!" << std::endl;
+        	std::cout << "==========================================================\n\n";
+        }
+        return logZAtSimulatedPoints;
     }
-    std::cout << " ...done!" << std::endl;
-    std::cout << "==========================================================\n\n";
 }
 
+void ReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
+	logZAtSimulatedPoints = calculateLogZAtSimulatedPoints(false, -1, &logZAtSimulatedPoints, true);
+}
 
 void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
     logZAtNewPoints = calculateLogZAtNewPoints(valuesOfNewParameters);
 }
 
-std::vector<double> ReweighterAbstract::calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
-                                                                                                     std::vector<double> logZAtSimulationPointToBeUsed){
-    return calculateLogZAtNewPoints(valuesOfNewParameters, true, entryToBeLeftOut, &logZAtSimulationPointToBeUsed);
-}
-
-/*
- * Here we implement a dedicated function to calculate logZ at simulated points leaving out one of the uncorrelated data.
- * We are aware that we duplicate somehow the function calculateAndSetLogZAtSimulatedPoints, but we postpone
- * this to a future refactoring.
- *
- * TODO: Refactor this function making it part of \"calculateAndSetLogZAtSimulatedPoints\" that will have
- *       to be modified (separate setting and calculation, bool useUncorredData as parameter, ecc.)
- */
-std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut){
-
-    if(reweightingDataHandler.errorMethod != jackknife){
-    	throw std::invalid_argument("Function \"calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry\" should be used only with Jackknife error!");
-    }
-	if(entryToBeLeftOut < 0 || entryToBeLeftOut >= reweightingDataHandler.numberOfBinsToBeUsed[0])
-        throw std::out_of_range("Invalid entry to be left out in \"calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry\" function.");
-    double residuum;
-    std::vector<double> newLogZ(valuesOfSimulationParameters.size());
-    std::vector<double> resultLogZ(valuesOfSimulationParameters.size(), 0.0);
-    do{
-        newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters, true, entryToBeLeftOut, &resultLogZ);
-        residuum = 0.0;
-        //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
-        for(size_t indexSimulations = 0; indexSimulations < valuesOfSimulationParameters.size(); indexSimulations++){
-            residuum += expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations])
-                       *expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations]);
-            //here one should put eq.(8.34)
-        }
-        resultLogZ = newLogZ;
-    }while(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ);
-
-    return resultLogZ;
-}
 
 /*
  * This function just calculates the value of the observables at the new points using a given

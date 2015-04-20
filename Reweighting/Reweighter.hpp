@@ -111,10 +111,7 @@ protected:
 
     //Some of the following method could be static functions in the .cpp file but are here for testing purposes
     void calculateAndSetLogZAtSimulatedPoints();
-    std::vector<double> calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut = -1);
     void calculateAndSetLogZAtNewPoints();
-    std::vector<double> calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
-                                                                                     std::vector<double> logZAtSimulationPointToBeUsed);
     void prepareObservablesBeforeReweighting(std::vector<double> &);
     void restoreObservablesAfterReweighting(std::vector<double> minimumOfEachObservable,
                                             std::vector<std::vector<double> > *reweightedObservablesFromRawData,
@@ -123,6 +120,11 @@ protected:
                                                                           const int entryToBeLeftOut = -1,
                                                                           std::vector<double> *logZAtSimulationPointToBeUsed = NULL,
                                                                           std::vector<double> *logZAtNewPointsToBeUsed = NULL);
+    std::vector<double> calculateLogZAtSimulatedPoints(bool useUncorrData, const int entryToBeLeftOut,
+                                                       std::vector<double> *logZAtSimulationPointToStartFrom = NULL, bool printUserInfo = false);
+    std::vector<double> calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated,
+                                                 bool useUncorrData = false, const int entryToBeLeftOut = -1,
+                                                 std::vector<double> *logZAtSimulationPointToBeUsed = NULL);
     //This getter again only for testing reason
     SimulationDataContainer getSimulationDataContainer(bool raw = true);
 
@@ -135,9 +137,7 @@ private:
 
     //Method in which "valuesOfNewParameters" is filled and some checks are done
     void calculateNewPoints();
-    std::vector<double> calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated,
-                                                 bool useUncorrData = false, const int entryToBeLeftOut = -1,
-                                                 std::vector<double> *logZAtSimulationPointToBeUsed = NULL);
+
 
     //Members
     ReweightingDataHandler reweightingDataHandler;

@@ -50,13 +50,12 @@ public:
         return getLogZAtSimulatedPoints();
     }
 
-    std::vector<double> testCalculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut){
-        return calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(entryToBeLeftOut);
+    std::vector<double> testCalculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(const int entryToBeLeftOut){
+        return calculateLogZAtSimulatedPoints(true, entryToBeLeftOut);
     }
 
-    std::vector<double> testCalculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut,
-                                                                                         std::vector<double> logZSim){
-        return calculateLogZAtNewPointsUsingUncorrDataAndLeavingOutOneEntry(entryToBeLeftOut, logZSim);
+    std::vector<double> testCalculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(const int entryToBeLeftOut, std::vector<double> logZSim){
+        return calculateLogZAtNewPoints(getValuesOfNewParameters(), true, entryToBeLeftOut, &logZSim);
     }
 
     void testPrepareObservablesBeforeReweighting(std::vector<double>& minima){
@@ -427,7 +426,7 @@ BOOST_AUTO_TEST_SUITE(logZ)
         ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
         const int pointToBeLeftOut = 1652;
         double referenceLogZAtNewPoints[] = {1.337554308611, -38.670153942900, -98.348187380816};
-        std::vector<double> newLogZ = reweighter.testCalculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(pointToBeLeftOut);
+        std::vector<double> newLogZ = reweighter.testCalculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(pointToBeLeftOut);
         for(size_t i=0; i < reweighter.getValuesOfSimulationParameters().size(); i++)
             BOOST_REQUIRE_CLOSE(referenceLogZAtNewPoints[i], newLogZ[i], 1.e-8);
     }
@@ -441,7 +440,7 @@ BOOST_AUTO_TEST_SUITE(logZ)
         ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
         const int pointToBeLeftOut = 0;
         double referenceLogZAtNewPoints[] = {1.337625561178, -38.670359441083, -98.348790292515};
-        std::vector<double> newLogZ = reweighter.testCalculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(pointToBeLeftOut);
+        std::vector<double> newLogZ = reweighter.testCalculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(pointToBeLeftOut);
         for(size_t i=0; i < reweighter.getValuesOfSimulationParameters().size(); i++)
             BOOST_REQUIRE_CLOSE(referenceLogZAtNewPoints[i], newLogZ[i], 1.e-8);
     }
@@ -455,7 +454,7 @@ BOOST_AUTO_TEST_SUITE(logZ)
         ReweighterTest reweighter(fileThatDoesExist, newRanges, newNumPoints);
         const int pointToBeLeftOut = 1;
         double referenceLogZAtNewPoints[] = {1.337668078209, -38.670327958098, -98.348659434259};
-        std::vector<double> newLogZ = reweighter.testCalculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(pointToBeLeftOut);
+        std::vector<double> newLogZ = reweighter.testCalculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(pointToBeLeftOut);
         for(size_t i=0; i < reweighter.getValuesOfSimulationParameters().size(); i++)
             BOOST_REQUIRE_CLOSE(referenceLogZAtNewPoints[i], newLogZ[i], 1.e-8);
     }
@@ -593,7 +592,7 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
                                                 0.51307845824823, 0.51314755779579};
         std::vector<double> minimumOfObservables(numberOfObservablesInFiles, std::numeric_limits<double>::max());
         reweighter.testPrepareObservablesBeforeReweighting(minimumOfObservables);
-        std::vector<double> logZSim = reweighter.testCalculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(pointToBeLeftOut);
+        std::vector<double> logZSim = reweighter.testCalculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(pointToBeLeftOut);
         std::vector<double> logZNew = reweighter.testCalculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(pointToBeLeftOut, logZSim);
         BOOST_REQUIRE_THROW(reweighter.testCalculateReweightedObservableValues(false, pointToBeLeftOut+1), std::logic_error);
         //since we know the binsize is one we can reweight on the binned data even if on the reference code we used the raw data
@@ -626,7 +625,7 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
                                                 0.51307554198351, 0.51314463581261};
         std::vector<double> minimumOfObservables(numberOfObservablesInFiles, std::numeric_limits<double>::max());
         reweighter.testPrepareObservablesBeforeReweighting(minimumOfObservables);
-        std::vector<double> logZSim = reweighter.testCalculateLogZAtSimulatedPointsUsingBinnedDataAndLeavingOutOneEntry(pointToBeLeftOut);
+        std::vector<double> logZSim = reweighter.testCalculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry(pointToBeLeftOut);
         std::vector<double> logZNew = reweighter.testCalculateLogZAtNewPointsUsingBinnedDataAndLeavingOutOneEntry(pointToBeLeftOut, logZSim);
         //since we know the binsize is one we can reweight on the binned data even if on the reference code we used the raw data
         std::vector<std::vector<double> > valuesObsNewPoints =
