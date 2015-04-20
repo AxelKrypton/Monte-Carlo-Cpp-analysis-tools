@@ -98,6 +98,8 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
 
     if(errorMethod == jackknife)
     	simulationUncorrDataContainer = simulationRawDataContainer.getUncorrelatedSimulationDataSet(numberOfBinsToBeUsed, jackknife);
+    else
+    	simulationUncorrDataContainer = simulationRawDataContainer;
     std::cout << "entriesToBeCutFromRawData: ";
     for(auto i: entriesToBeCutFromRawData)
     	std::cout << i << " ";
