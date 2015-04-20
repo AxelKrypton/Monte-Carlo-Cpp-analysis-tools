@@ -139,7 +139,8 @@ private:
     void calculateNewPoints();
     //Method used in calculateAndGetReweightedObservables to select data to calculate observables and errors and to set them
     void calculateAndSetReweightedObservablesAndErrorsValuesFromMomentsAndEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
-    		 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation);
+    		 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation,
+    		 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 ErrorCalculationMethod errorMethod);
 
 
     //Members

@@ -6,12 +6,14 @@
 #include "SimulationData.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 #include "../dataAnalysisUtilities/jackknifeAnalysis.hpp"
+#include "../dataAnalysisUtilities/bootstrapAnalysis.hpp"
 
 static void writeNewPoints(std::vector<std::vector<double> >&, std::vector<std::vector<double> >, std::vector<double>, int=0, int=0);
 static void findIflogZHasToBeCalculated(std::vector<double>, std::vector<int>&);
 static double logarithmic_sum(double, double);
-static void evaluateErrorOfObservablesPerPointFromEstimators(Observables&, const bool, std::vector<std::valarray<double> >);
 static void evaluateEstimateOfObservablesPerPointFromMoments(Observables&, const bool, std::vector<double>);
+static void evaluateErrorOfObservablesPerPointFromEstimators(Observables&, const bool, std::vector<std::valarray<double> >, ErrorCalculationMethod);
+static double evaluateErrorBasedOnMethod(DataSample&, ErrorCalculationMethod);
 
 /*****************************************************************************************/
 
@@ -130,6 +132,7 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
     std::cout << "   Calculating the moments of observables at new points... \n";
     std::vector<std::vector<double> > reweightedObservablesFromRawData = calculateReweightedObservableValues();
     std::cout << "   ...done!\n";
+
     //Switch between different error calculation methods
     if(reweightingDataHandler.errorMethod == jackknife){
     	//reweightingDataHandler.simulationUncorrDataContainer already set for jackknife
@@ -149,10 +152,8 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
 		}
 		std::cout << "   ...done!\n";
 		restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &jackknifeEstimators);
-		calculateAndSetReweightedObservablesAndErrorsValuesFromMomentsAndEstimators(reweightedObservablesFromRawData, jackknifeEstimators);
+		calculateAndSetReweightedObservablesAndErrorsValuesFromMomentsAndEstimators(reweightedObservablesFromRawData, jackknifeEstimators, jackknife);
     }else if(reweightingDataHandler.errorMethod == bootstrap){
-    	throw std::invalid_argument("Bootstrap error still to be implemented!");
-
     	if(reweightingDataHandler.bootstrapNumber == NULL)
     		throw std::logic_error("In \"calculateAndGetReweightedObservables\" bootstrapNumber unset in the bootstrap case!! Aborting...");
     	std::valarray<std::vector<std::vector<double> > >
@@ -164,13 +165,12 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
     		reweightingDataHandler.simulationUncorrDataContainer =
     				reweightingDataHandler.simulationRawDataContainer.getUncorrelatedSimulationDataSet(reweightingDataHandler.numberOfBinsToBeUsed, bootstrap);
     		std::vector<double> logZAtSimulatedPointsUsingUncorrData = calculateLogZAtSimulatedPoints(true, -1);
-    		std::vector<double> logZAtNewPointsUsingUncorrData = calculateLogZAtNewPoints(valuesOfNewParameters, true, -1, &logZAtNewPointsUsingUncorrData);
+    		std::vector<double> logZAtNewPointsUsingUncorrData = calculateLogZAtNewPoints(valuesOfNewParameters, true, -1, &logZAtSimulatedPointsUsingUncorrData);
     		bootstrapEstimators[iBoot] = calculateReweightedObservableValues(true, -1, &logZAtSimulatedPointsUsingUncorrData, &logZAtNewPointsUsingUncorrData);
     	}
     	std::cout << "   ...done!\n";
     	restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &bootstrapEstimators);
-    	//estimator elaboration to set observables...
-
+    	calculateAndSetReweightedObservablesAndErrorsValuesFromMomentsAndEstimators(reweightedObservablesFromRawData, bootstrapEstimators, bootstrap);
     }else{
     	throw std::invalid_argument("Error method for some reason unknown! Aborting...");
     }
@@ -332,24 +332,25 @@ std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPoints(bool useU
     	std::cout << " Calculating LogZ At Simulated Points (precision = " << precisionOfIterativeProcedureToCalculateLogZ << ")..." << std::endl;
     }
     if(*logZAtSimulationPointToStartFrom == std::vector<double>(logZAtSimulatedPoints.size(), 0)){
-    	double residuum, valueResiduumForOutput=1;
+    	double residuum=0.0, valueResiduumForOutput=1;
         std::vector<double> newLogZ(valuesOfSimulationParameters.size());
-        do{
-            //newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters);
+        while(true){
             newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters, useUncorrData, entryToBeLeftOut, &resultLogZ);
-            residuum = 0.0;
             //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
             for(size_t indexSimulations = 0; indexSimulations < valuesOfSimulationParameters.size(); indexSimulations++){
                 residuum += expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations])
                            *expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations]);
                 //here one should put eq.(8.34)
             }
-            resultLogZ = newLogZ;
-	    if(printUserInfo && residuum < valueResiduumForOutput){
-	      std::cout << "   Residuum = " << sqrt(residuum) << std::endl;
-	      valueResiduumForOutput/=10.;
+            if(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ)
+            	resultLogZ = newLogZ;
+            else
+            	break;
+			if(printUserInfo && residuum < valueResiduumForOutput){
+			  std::cout << "   Residuum = " << sqrt(residuum) << std::endl;
+			  valueResiduumForOutput/=10.;
+			}
 	    }
-        }while(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ);
         if (printUserInfo){
         	std::cout << " ...done!" << std::endl;
         	std::cout << "==========================================================\n\n";
@@ -365,19 +366,24 @@ std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPoints(bool useU
         for(size_t i=0; i<indicesOfParametersAtWhichLogZHasToBeCalculated.size(); i++)
             valuesOfParametersAtWhichLogZHasToBeCalculated.push_back(valuesOfSimulationParameters[indicesOfParametersAtWhichLogZHasToBeCalculated[i]]);
         //Real calculation
-        double residuum;
+        double residuum = 0.0;
         std::vector<double> newLogZ;
-        do{
+        while(true){
             newLogZ = calculateLogZAtNewPoints(valuesOfParametersAtWhichLogZHasToBeCalculated);
-            residuum = 0.0;
             //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
             for(size_t indexSimulations = 0; indexSimulations < valuesOfParametersAtWhichLogZHasToBeCalculated.size(); indexSimulations++){
                 residuum += expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]])
                            *expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]]);
                 //here one should put eq.(8.34)
-                logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]] = newLogZ[indexSimulations];
             }
-        }while(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ);
+            if(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ){
+            	for(size_t indexSimulations = 0; indexSimulations < valuesOfParametersAtWhichLogZHasToBeCalculated.size(); indexSimulations++){
+                    logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]] = newLogZ[indexSimulations];
+            	}
+            }else{
+            	break;
+            }
+        }
         if (printUserInfo){
         	std::cout << " ...done!" << std::endl;
         	std::cout << "==========================================================\n\n";
@@ -555,7 +561,8 @@ SimulationDataContainer ReweighterAbstract::getSimulationDataContainer(bool raw)
 
 
 void ReweighterAbstract::calculateAndSetReweightedObservablesAndErrorsValuesFromMomentsAndEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
-																									 const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation)
+																									 const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation,
+																									 ErrorCalculationMethod errorMethod)
 {
 	size_t numberOfObservablesGivenAsInput = reweightingDataHandler.numberOfObservablesGivenAsInput;
 	for(size_t i=0; i<valuesOfNewParameters.size(); i++){
@@ -572,7 +579,7 @@ void ReweighterAbstract::calculateAndSetReweightedObservablesAndErrorsValuesFrom
 
 			}
 			evaluateEstimateOfObservablesPerPointFromMoments(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], momentsPerPointAndObs);
-			evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], errorEstimatorsPerPointAndObs);
+			evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], errorEstimatorsPerPointAndObs, errorMethod);
 		}
 	}
 
@@ -606,7 +613,7 @@ static void evaluateEstimateOfObservablesPerPointFromMoments(Observables& obs, c
     }
 }
 
-static void evaluateErrorOfObservablesPerPointFromEstimators(Observables& obs, const bool meanIsZero, std::vector<std::valarray<double> > est){
+static void evaluateErrorOfObservablesPerPointFromEstimators(Observables& obs, const bool meanIsZero, std::vector<std::valarray<double> > est, ErrorCalculationMethod errorMethod){
     DataSample estimatorData(est[0]);
     DataSample estimatorSecondMomentPerData(est[1]);
     DataSample estimatorThirdMomentPerData(est[2]);
@@ -617,31 +624,39 @@ static void evaluateErrorOfObservablesPerPointFromEstimators(Observables& obs, c
 		obs.mean.error = 0.0;
 		//Susceptibility error
 		DataSample functionAppliedToEstimators = estimatorSecondMomentPerData;
-		obs.susceptibility.error = calculateJacknifeError(functionAppliedToEstimators);
+		obs.susceptibility.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 		//Skewness error
 		functionAppliedToEstimators = (estimatorThirdMomentPerData) / (estimatorSecondMomentPerData ^ 1.5);
-		obs.skewness.error = calculateJacknifeError(functionAppliedToEstimators);
+		obs.skewness.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 		//Binder cumulant error
 		functionAppliedToEstimators = (estimatorFourthMomentPerData) / (estimatorSecondMomentPerData ^ 2);
-		obs.binderCumulant.error = calculateJacknifeError(functionAppliedToEstimators);
+		obs.binderCumulant.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
     }else{
 		//Mean error
-		obs.mean.error = calculateJacknifeError(estimatorData);
+		obs.mean.error = evaluateErrorBasedOnMethod(estimatorData, errorMethod);
 		//Susceptibility error
 		DataSample functionAppliedToEstimators = estimatorSecondMomentPerData - (estimatorData ^ 2);
-		obs.susceptibility.error = calculateJacknifeError(functionAppliedToEstimators);
+		obs.susceptibility.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 		//Skewness error
 		functionAppliedToEstimators = (estimatorThirdMomentPerData - ((3*estimatorSecondMomentPerData ) * estimatorData)
 									   + (2*(estimatorData ^ 3))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 1.5);
-		obs.skewness.error = calculateJacknifeError(functionAppliedToEstimators);
+		obs.skewness.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 		//Binder cumulant error
 		functionAppliedToEstimators = (estimatorFourthMomentPerData -((4*estimatorThirdMomentPerData) * estimatorData)
 									   + (6*estimatorSecondMomentPerData) * (estimatorData ^ 2)
 									   - (3*(estimatorData ^ 4))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 2);
-		obs.binderCumulant.error = calculateJacknifeError(functionAppliedToEstimators);
+		obs.binderCumulant.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
     }
 }
 
+static double evaluateErrorBasedOnMethod(DataSample& dataSample, ErrorCalculationMethod errorMethod){
+	if(errorMethod == jackknife)
+		return calculateJacknifeError(dataSample);
+	else if (errorMethod == bootstrap)
+		return calculateBootstrapError(dataSample);
+	else
+		throw std::logic_error("Unknown error method in \"evaluateErrorBasedOnMethod\"! Aborting...");
+}
 
 /*
  * In the following function, we decide to calculate logZ at those simulated points for which in
