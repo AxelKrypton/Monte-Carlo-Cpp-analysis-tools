@@ -6,6 +6,7 @@ add_library(dataAnalysisUtilities
 	dataAnalysisUtilities.cpp
 	DataSampleAnalyzer.cpp
 	jackknifeAnalysis.cpp
+	bootstrapAnalysis.cpp
 	binning.cpp
 )
 
