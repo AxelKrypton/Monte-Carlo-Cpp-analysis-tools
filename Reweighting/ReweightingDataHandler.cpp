@@ -84,16 +84,6 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
     std::cout << "obs_giv = " << numberOfObservablesGivenAsInput << std::endl;
     std::cout << "obs_rew = " << numberOfObservablesToBeReweighted << std::endl;
 
-//    std::cout.precision(16);
-//    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
-//        for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
-//            std::cout << "sim[" << i << "][" << j << "] = " << simulationRawDataContainer[i][j].getNumberOfElements() << "\t\t";
-//            std::cout << "bin[" << i << "][" << j << "] = " << simulationUncorrDataContainer[i][j].getNumberOfElements() << "\n";
-////        for(int k=0; k<simulationDataContainer[i][j].getNumberOfElements(); k++)
-////            std::cout << simulationDataContainer[i][j][k] << "\n";
-//        }
-//    }
-
     if(errorMethod == jackknife)
     	simulationUncorrDataContainer = simulationRawDataContainer.getUncorrelatedSimulationDataSet(numberOfBinsToBeUsed, jackknife);
     else
@@ -110,15 +100,6 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
     }
     //This has to be done after having cut the data in order to print the right information
     printBinsizesActuallyUsed(simulationRawDataContainer, numberOfBinsToBeUsed);
-
-//    for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
-//        for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
-//            std::cout << "sim[" << i << "][" << j << "] = " << simulationRawDataContainer[i][j].getNumberOfElements()  << "\t\t";
-//            std::cout << "bin[" << i << "][" << j << "] = " << simulationUncorrDataContainer[i][j].getNumberOfElements() << "\n";
-////        for(int k=0; k<simulationDataContainer[i][j].getNumberOfElements(); k++)
-////            std::cout << simulationDataContainer[i][j][k] << "\n";
-//        }
-//    }
 
 }
 
@@ -266,11 +247,6 @@ static void checkCorrectnessOfConfigurationFileForReweighting(SimulationDataCont
             throw std::logic_error("Configuration file for Reweighting not valid. Number of observables in datafiles not coherent!");
     }
     extractValuesOfSimulationParametersIgnoringMetaParameters(simDataCont, parValues, metaPar);
-//    for(size_t i=0; i<parValues.size(); i++){
-//        for(size_t j=0; j<parValues[i].size(); j++)
-//            std::cout << parValues[i][j] << " ";
-//        std::cout << "\n";
-//    }
     for(size_t i=1; i<parValues.size(); i++){
         if(isLastEntryPresentMoreThanOnce(parValues))
             throw std::logic_error("Files with same reweighting parameters cannot be accumulated, yet!");
@@ -301,8 +277,6 @@ static std::vector<int> getNumberOfBinsToBeUsedAndEntriesToBeLeftOut(SimulationD
     std::vector<int> valuesOfNumberOfBins;
     if(valuesOfBinsizes == std::vector<int>(valuesOfBinsizes.size(), 0))
         throw std::runtime_error("In the configuration file at least one binsize must be provided!");
-//    for(size_t i=0; i<valuesOfBinsizes.size(); i++)
-//        std::cout << "binsizes[" << i << "] = " << valuesOfBinsizes[i] << "\n";
 
     for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
         if(valuesOfBinsizes[i] != 0)
