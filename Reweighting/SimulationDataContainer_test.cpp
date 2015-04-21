@@ -121,8 +121,8 @@ BOOST_AUTO_TEST_SUITE(UncorrelatedContainer)
         SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBinsVec, jackknife);
         std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBinsVec);
         for(int i=0; i<3; i++){
-            BOOST_CHECK_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
-            BOOST_CHECK_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins);
+            BOOST_REQUIRE_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
+            BOOST_REQUIRE_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins);
         }
     }
 
@@ -139,8 +139,8 @@ BOOST_AUTO_TEST_SUITE(UncorrelatedContainer)
         SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBinsVec, bootstrap);
         std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBinsVec);
         for(int i=0; i<3; i++){
-            BOOST_CHECK_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
-            BOOST_CHECK_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins);
+            BOOST_REQUIRE_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
+            BOOST_REQUIRE_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins);
         }
     }
 
@@ -159,8 +159,8 @@ BOOST_AUTO_TEST_SUITE(UncorrelatedContainer)
 		SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBins, bootstrap);
 		std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBins);
 		for(int i=0; i<3; i++){
-			BOOST_CHECK_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
-			BOOST_CHECK_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins[i]);
+			BOOST_REQUIRE_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
+			BOOST_REQUIRE_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins[i]);
 		}
 	}
 
@@ -180,10 +180,40 @@ BOOST_AUTO_TEST_SUITE(UncorrelatedContainer)
 		SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBins, bootstrap);
 		std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBins);
 		for(int i=0; i<3; i++){
-			BOOST_CHECK_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
-			BOOST_CHECK_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins[i]);
+			BOOST_REQUIRE_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
+			BOOST_REQUIRE_EQUAL(uncorrObject[i][0].getNumberOfElements(), numberOfBins[i]);
 			for(int j=0; j<numberOfBins[i]; j++)
-				BOOST_CHECK_EQUAL(uncorrObject[i][0][j], simDataCont[i][0][j]);
+				BOOST_REQUIRE_EQUAL(uncorrObject[i][0][j], simDataCont[i][0][j]);
+		}
+	}
+
+	BOOST_AUTO_TEST_CASE(UncorrelatedContainer5)
+	{
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_5";
+		std::vector<int> referenceEntriesToBeLeftOut(1,0);
+		SimulationDataContainer simDataCont(fileThatDoesExist);
+		std::vector<int> numberOfBins(simDataCont.getNumberOfDatafiles(), 20);
+		std::vector<unsigned int> columnsForMoments(2);
+		columnsForMoments[0]=0;
+		columnsForMoments[1]=1;
+		std::vector<unsigned int> moments(3);
+		moments[0] = 0;
+		moments[1] = 1;
+		moments[2] = 3;
+		SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBins, bootstrap, columnsForMoments, moments);
+		std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBins);
+		BOOST_REQUIRE_EQUAL(entriesLeftOut[0], referenceEntriesToBeLeftOut[0]);
+		for(int j=0; j<8; j++){
+			BOOST_REQUIRE_EQUAL(uncorrObject[0][j].getNumberOfElements(), numberOfBins[0]);
+		}
+		for(int j=0; j<numberOfBins[0]; j++){
+			//Since the moment is the first, than the picked data must be equal to the original
+			BOOST_REQUIRE_EQUAL(uncorrObject[0][2][j], pow(uncorrObject[0][0][j], 0));
+			BOOST_REQUIRE_EQUAL(uncorrObject[0][3][j], pow(uncorrObject[0][0][j], 1));
+			BOOST_REQUIRE_EQUAL(uncorrObject[0][4][j], pow(uncorrObject[0][0][j], 3));
+			BOOST_REQUIRE_EQUAL(uncorrObject[0][5][j], pow(uncorrObject[0][1][j], 0));
+			BOOST_REQUIRE_EQUAL(uncorrObject[0][6][j], pow(uncorrObject[0][1][j], 1));
+			BOOST_REQUIRE_EQUAL(uncorrObject[0][7][j], pow(uncorrObject[0][1][j], 3));
 		}
 	}
 
