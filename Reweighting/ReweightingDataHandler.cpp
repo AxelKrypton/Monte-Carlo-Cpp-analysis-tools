@@ -56,9 +56,7 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
     numberOfBinsToBeUsed = getNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, ReweightingDataHandler::metaParameters, errorMethod, entriesToBeCutFromRawData);
     //Evaluate central moments per data and append them to the raw data container
     //TODO: So far this is hard-coded, make it general and settable by user
-    std::vector<unsigned int> columnsOfObservables;
     std::vector<bool> useMultipleColumnsForMoments;
-    std::vector<unsigned int> momentsNeeded;
     momentsNeeded.push_back(2);
     momentsNeeded.push_back(3);
     momentsNeeded.push_back(4);
@@ -68,7 +66,7 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
             throw std::invalid_argument("obsToBeRewUsingMultipleColumns contains columns too close (distance<4)!");
     }
     for(size_t i=getNamesOfParametersIgnoringMetaParameters().size(); (int)i<simulationRawDataContainer[0].getNumberOfDataSample();){
-        columnsOfObservables.push_back(i);
+        columnsForWhichMomentsMustBeInserted.push_back(i);
         if(find(obsToBeRewUsingMultipleColumns.begin(), obsToBeRewUsingMultipleColumns.end(), (unsigned int)(i-getNamesOfParametersIgnoringMetaParameters().size())) != obsToBeRewUsingMultipleColumns.end()){
             useMultipleColumnsForMoments.push_back(true);
             i+=4;
@@ -78,9 +76,9 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
         }
 
     }
-    simulationRawDataContainer = simulationRawDataContainer.insertMomentsPerData(columnsOfObservables, momentsNeeded, useMultipleColumnsForMoments);
+    simulationRawDataContainer = simulationRawDataContainer.insertMomentsPerData(columnsForWhichMomentsMustBeInserted, momentsNeeded, useMultipleColumnsForMoments);
     //Here I set the number of "real" observables given as input (neglecting the multiple columns)
-    numberOfObservablesGivenAsInput = (int)columnsOfObservables.size();
+    numberOfObservablesGivenAsInput = (int)columnsForWhichMomentsMustBeInserted.size();
     numberOfObservablesToBeReweighted = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
 
     std::cout << "obs_giv = " << numberOfObservablesGivenAsInput << std::endl;
@@ -319,7 +317,6 @@ static std::vector<int> getNumberOfBinsToBeUsedAndEntriesToBeLeftOut(SimulationD
         }
     }
 
-    //    std::cout << "numBins = " << *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end()) << "\n";
     if(errorMethod == jackknife){
     	std::vector<int> vectorToBeReturned(simDataCont.getNumberOfDatafiles(), *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end()));
     	std::cout << "vectorToBeReturned: ";
