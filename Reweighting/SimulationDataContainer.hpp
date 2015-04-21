@@ -12,14 +12,16 @@ public:
     explicit SimulationDataContainer(std::string configurationFile);
 	int getNumberOfDatafiles();
 	int getNumberOfSimulationParameters(int fileNumber);
-    SimulationDataContainer getUncorrelatedSimulationDataSet(std::vector<int> numberOfBinsToBeUsed, ErrorCalculationMethod errorMethod);
+    SimulationDataContainer getUncorrelatedSimulationDataSet(std::vector<int> numberOfBinsToBeUsed, ErrorCalculationMethod errorMethod,
+    														 std::vector<unsigned int> whichColumns = std::vector<unsigned int>(),
+    														 std::vector<unsigned int> whichMoments = std::vector<unsigned int>());
     std::vector<int> getNumberOfEntriesLeftOut(std::vector<int> parameterToBeUsed);
     SimulationData& operator[](int index);
     SimulationDataContainer insertMomentsPerData(std::vector<unsigned int> whichColumns,
                                                  std::vector<unsigned int> whichMoments,
                                                  std::vector<bool> useMultipleColumnsForMoments = std::vector<bool>(5, false));
 
-protected:
+private:
 	std::vector<SimulationData> simulationDataSet;
 
 };
