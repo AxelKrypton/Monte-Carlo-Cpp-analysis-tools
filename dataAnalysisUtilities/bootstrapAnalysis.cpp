@@ -1,8 +1,13 @@
 #include "bootstrapAnalysis.hpp"
 
-double calculateBootstrapError(DataSample sampleWithBootstrapEstimators)
+/*
+ * The problem of the following function, if naively implemented, is that it could return nan if
+ * the input data sample contains the same entry several times. To avoid this case we take the
+ * absolute value before the square root.
+ */
+double calculateBootstrapError(DataSample& sampleWithBootstrapEstimators)
 {
-    return sqrt(sampleWithBootstrapEstimators.getNthMoment(2) - pow(sampleWithBootstrapEstimators.getNthMoment(1), 2.));
+	return sqrt(std::abs(sampleWithBootstrapEstimators.getNthMoment(2) - pow(sampleWithBootstrapEstimators.getNthMoment(1), 2.)));
 }
 
 
