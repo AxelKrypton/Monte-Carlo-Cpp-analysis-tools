@@ -163,7 +163,9 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
     	std::cout << "   Calculating the Bootstrap estimators... \n";
     	for(int iBoot=0; iBoot<(*(reweightingDataHandler.bootstrapNumber)); iBoot++){
     		reweightingDataHandler.simulationUncorrDataContainer =
-    				reweightingDataHandler.simulationRawDataContainer.getUncorrelatedSimulationDataSet(reweightingDataHandler.numberOfBinsToBeUsed, bootstrap);
+    				reweightingDataHandler.simulationRawDataContainer.getUncorrelatedSimulationDataSet(reweightingDataHandler.numberOfBinsToBeUsed, bootstrap,
+    																								   reweightingDataHandler.columnsForWhichMomentsMustBeInserted,
+    																								   reweightingDataHandler.momentsNeeded);
     		std::vector<double> logZAtSimulatedPointsUsingUncorrData = calculateLogZAtSimulatedPoints(true, -1);
     		std::vector<double> logZAtNewPointsUsingUncorrData = calculateLogZAtNewPoints(valuesOfNewParameters, true, -1, &logZAtSimulatedPointsUsingUncorrData);
     		bootstrapEstimators[iBoot] = calculateReweightedObservableValues(true, -1, &logZAtSimulatedPointsUsingUncorrData, &logZAtNewPointsUsingUncorrData);
@@ -332,10 +334,11 @@ std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPoints(bool useU
     	std::cout << " Calculating LogZ At Simulated Points (precision = " << precisionOfIterativeProcedureToCalculateLogZ << ")..." << std::endl;
     }
     if(*logZAtSimulationPointToStartFrom == std::vector<double>(logZAtSimulatedPoints.size(), 0)){
-    	double residuum=0.0, valueResiduumForOutput=1;
+    	double residuum, valueResiduumForOutput=1;
         std::vector<double> newLogZ(valuesOfSimulationParameters.size());
         while(true){
             newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters, useUncorrData, entryToBeLeftOut, &resultLogZ);
+            residuum=0.0;
             //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
             for(size_t indexSimulations = 0; indexSimulations < valuesOfSimulationParameters.size(); indexSimulations++){
                 residuum += expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations])
@@ -366,10 +369,11 @@ std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPoints(bool useU
         for(size_t i=0; i<indicesOfParametersAtWhichLogZHasToBeCalculated.size(); i++)
             valuesOfParametersAtWhichLogZHasToBeCalculated.push_back(valuesOfSimulationParameters[indicesOfParametersAtWhichLogZHasToBeCalculated[i]]);
         //Real calculation
-        double residuum = 0.0;
+        double residuum;
         std::vector<double> newLogZ;
         while(true){
             newLogZ = calculateLogZAtNewPoints(valuesOfParametersAtWhichLogZHasToBeCalculated);
+            residuum = 0.0;
             //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
             for(size_t indexSimulations = 0; indexSimulations < valuesOfParametersAtWhichLogZHasToBeCalculated.size(); indexSimulations++){
                 residuum += expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]])
@@ -578,8 +582,12 @@ void ReweighterAbstract::calculateAndSetReweightedObservablesAndErrorsValuesFrom
 					errorEstimatorsPerPointAndObs[m+1][k] = estimatorsForErrorsCalculation[k][i][numberOfObservablesGivenAsInput+j*3+m];
 
 			}
+			for(size_t m=0; m<4; m++)
+				std::cout << "[1] = " << errorEstimatorsPerPointAndObs[m][1] << " ";
+			std::cout << "\n";
 			evaluateEstimateOfObservablesPerPointFromMoments(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], momentsPerPointAndObs);
 			evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], errorEstimatorsPerPointAndObs, errorMethod);
+			//getchar();
 		}
 	}
 
