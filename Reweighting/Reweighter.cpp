@@ -132,6 +132,7 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
     std::cout << "   Calculating the moments of observables at new points... \n";
     std::vector<std::vector<double> > reweightedObservablesFromRawData = calculateReweightedObservableValues();
     std::cout << "   ...done!\n";
+    std::vector<double> smartGuessForLogZ = logZAtSimulatedPoints;
 
     //Switch between different error calculation methods
     if(reweightingDataHandler.errorMethod == jackknife){
@@ -144,11 +145,12 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
 		std::cout << "   Calculating the Jackknife estimators... \n";
 		for(size_t i=0; i<numberOfBinsUsedToBinData; i++){
 			std::vector<double> logZAtSimulatedPointsUsingUncorrDataLeavingOutOneEntry =
-					calculateLogZAtSimulatedPoints(true, i);
+					calculateLogZAtSimulatedPoints(true, i, &smartGuessForLogZ);
 			std::vector<double> logZAtNewPointsUsingUncorrDataLeavingOutOneEntry =
 					calculateLogZAtNewPoints(valuesOfNewParameters, true, i, &logZAtSimulatedPointsUsingUncorrDataLeavingOutOneEntry);
 			jackknifeEstimators[i] =
 					calculateReweightedObservableValues(true, i, &logZAtSimulatedPointsUsingUncorrDataLeavingOutOneEntry, &logZAtNewPointsUsingUncorrDataLeavingOutOneEntry);
+			smartGuessForLogZ = logZAtSimulatedPointsUsingUncorrDataLeavingOutOneEntry;
 		}
 		std::cout << "   ...done!\n";
 		restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &jackknifeEstimators);
@@ -166,9 +168,10 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
     				reweightingDataHandler.simulationRawDataContainer.getUncorrelatedSimulationDataSet(reweightingDataHandler.numberOfBinsToBeUsed, bootstrap,
     																								   reweightingDataHandler.columnsForWhichMomentsMustBeInserted,
     																								   reweightingDataHandler.momentsNeeded);
-    		std::vector<double> logZAtSimulatedPointsUsingUncorrData = calculateLogZAtSimulatedPoints(true, -1);
+    		std::vector<double> logZAtSimulatedPointsUsingUncorrData = calculateLogZAtSimulatedPoints(true, -1, &smartGuessForLogZ);
     		std::vector<double> logZAtNewPointsUsingUncorrData = calculateLogZAtNewPoints(valuesOfNewParameters, true, -1, &logZAtSimulatedPointsUsingUncorrData);
     		bootstrapEstimators[iBoot] = calculateReweightedObservableValues(true, -1, &logZAtSimulatedPointsUsingUncorrData, &logZAtNewPointsUsingUncorrData);
+    		smartGuessForLogZ = logZAtSimulatedPointsUsingUncorrData;
     	}
     	std::cout << "   ...done!\n";
     	restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &bootstrapEstimators);
@@ -320,20 +323,21 @@ std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPoints(bool useU
      *       this means quite some overhead, so we split the code into two blocks (if no value
      *       of logZ is provided and if some is given).
      *
-     * TODO: Benchmark in real life if these two blocks can be merged, i.e. how long does the
+     * TODO: Benchmark in real life if these two blocks can be merged, i.e. how long takes the
      *       indices set up in the else here below.
      */
 	if(entryToBeLeftOut >= reweightingDataHandler.numberOfBinsToBeUsed[0]) //Here negative values mean do not leave out entry, so no check is done!
 		throw std::out_of_range("Invalid entry to be left out in \"calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry\" function.");
 
 	std::vector<double> resultLogZ(valuesOfSimulationParameters.size(), 0.0);
-	if(logZAtSimulationPointToStartFrom == NULL)
-		logZAtSimulationPointToStartFrom = &resultLogZ;
+	if(logZAtSimulationPointToStartFrom != NULL)
+		resultLogZ = *logZAtSimulationPointToStartFrom;
+
     if (printUserInfo){
     	std::cout << "==========================================================\n";
     	std::cout << " Calculating LogZ At Simulated Points (precision = " << precisionOfIterativeProcedureToCalculateLogZ << ")..." << std::endl;
     }
-    if(*logZAtSimulationPointToStartFrom == std::vector<double>(logZAtSimulatedPoints.size(), 0)){
+    if(logZAtSimulationPointToStartFrom != &logZAtSimulatedPoints || resultLogZ == std::vector<double>(logZAtSimulatedPoints.size(), 0)){
     	double residuum, valueResiduumForOutput=1;
         std::vector<double> newLogZ(valuesOfSimulationParameters.size());
         while(true){
@@ -360,8 +364,6 @@ std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPoints(bool useU
         }
         return resultLogZ;
     }else{
-    	if(*logZAtSimulationPointToStartFrom != logZAtSimulatedPoints)
-    		throw std::logic_error("So far this case must be entered only if this function is called without logZAtSimulationPointToStartFrom! Aborting");
         //Set up to skip some calculation on logZ
         std::vector<int> indicesOfParametersAtWhichLogZHasToBeCalculated;
         findIflogZHasToBeCalculated(logZAtSimulatedPoints, indicesOfParametersAtWhichLogZHasToBeCalculated);
