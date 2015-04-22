@@ -77,6 +77,12 @@ void Parameters::checkParsedArguments(po::variables_map & vm, po::options_descri
 	 * the options but it is assigned as done below.
 	 * Maybe this can be done better with the "notifier"
 	 * functionality of boost.
+	 *
+	 * TODO: Actually one can use the defaulted() method, i.e.
+	 *       check if an option was explicitly given or not via
+	 *       vm["optionName"].defaulted(). See the following link
+	 *       http://www.boost.org/doc/libs/1_58_0/doc/html/boost/program_options/variable_value.html#id1132213-bb
+	 *       for more information.
 	 */
 	useNumberOfBinsForBinning = false;
 	if( (vm.count("numberOfBins") || vm.count("numberOfBinsMoments") || vm.count("numberOfBinsCentralMoments")) ){

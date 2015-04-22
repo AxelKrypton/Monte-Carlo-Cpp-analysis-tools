@@ -26,6 +26,9 @@ public:
 	bool getDeactivateReweightingForBinder();
     std::vector<unsigned int> getColumnsToBeReweightedUsingMultipleColumns();
 	std::vector<unsigned int> getColumnsWhoseMeanIsKnownToBeZero();
+	bool getUseJackknifeAsErrorMethod();
+	bool getUseBootstrapAsErrorMethod();
+	int getNumberOfBootstrapResample();
 
 	struct parse_aborted {};
 	
@@ -41,6 +44,9 @@ private:
 	bool deactivateReweightingForVariance;
 	bool deactivateReweightingForSkewness;
 	bool deactivateReweightingForBinder;
+	bool useJackknifeAsErrorMethod;
+	bool useBootstrapAsErrorMethod;
+	int numberOfBootstrapResample;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
     std::vector<unsigned int> columnsWhoseMeanIsKnownToBeZero;
 };

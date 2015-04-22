@@ -18,7 +18,10 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
 		("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false)->implicit_value(true), "Do not perform reweighting for the skewness of the data.")
         ("deactivateReweightingForBinder", po::value<bool>(&deactivateReweightingForBinder)->default_value(false)->implicit_value(true), "Do not perform reweighting for the binder cumulant of the data.")
         ("obsMultipleColumns", po::value<std::vector<unsigned int> >(&columnsToBeReweightedUsingMultipleColumns)->multitoken(), "Number of FIRST column containing observable to be reweighted using several columns for higher moments. ATTENTION: Columns ranges from ZERO!")
-        ("obsWithZeroMean", po::value<std::vector<unsigned int> >(&columnsWhoseMeanIsKnownToBeZero)->multitoken(), "Number of COLUMNS containing observable whose mean is known a priori to be zero. ATTENTION: Columns ranges from ZERO!!");
+        ("obsWithZeroMean", po::value<std::vector<unsigned int> >(&columnsWhoseMeanIsKnownToBeZero)->multitoken(), "Number of COLUMNS containing observable whose mean is known a priori to be zero. ATTENTION: Columns ranges from ZERO!!")
+        ("useJackknifeAsErrorMethod", po::value<bool>(&useJackknifeAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Jackknife. ATTENTION: Unless the statistics is such that one has the same number of uncorrelated data points in ALL simulations, this method will make in general overestimate the errors!!!")
+        ("useBootstrapAsErrorMethod", po::value<bool>(&useBootstrapAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Bootstrap.")
+        ("numberOfBootstrapResample", po::value<int>(&numberOfBootstrapResample)->default_value(100), "Number of resample to be done in the bootstrap.");
 		
 	//option "file" can be given without option description
 	positionalOptions.add("file", 1);
@@ -40,6 +43,21 @@ void LqcdReweightingParameters::checkParsedArguments(po::variables_map & vm, po:
 	{
 		throw std::invalid_argument("No datafile given. Aborting!");
 	}
+
+	/*
+	 * The following two checks should be transformed in variadic templates or functions that take
+	 * a std::initializer_list<bool> in case the error method are more than 2.
+	 */
+
+	if ( vm["useJackknifeAsErrorMethod"].defaulted() && vm["useBootstrapAsErrorMethod"].defaulted() )
+	{
+		throw std::invalid_argument("No error method specified. Aborting!");
+	}
+
+	if ( !vm["useJackknifeAsErrorMethod"].defaulted() && !vm["useBootstrapAsErrorMethod"].defaulted() )
+	{
+		throw std::invalid_argument("More than one error method specified. Aborting!");
+	}
 }
 
 void LqcdReweightingParameters::printParameters()
@@ -52,16 +70,19 @@ void LqcdReweightingParameters::printParameters()
 	std::cout << "# Inputfile:\t" << inputfile << std::endl;
 	std::cout << separator << std::endl;
 	std::cout << "# Reweighting parameters:" << std::endl;
-	std::cout << "# New beta range:\t[" << newBetaRange_low << ":" << newBetaRange_high << "]" << std::endl;
-    std::cout << "# New beta points:\t  " << numberOfNewBetaPoints << std::endl;
-    std::cout << "# Columns of obs. to be rew. with multiple columns:  ";
+	std::cout << "#   New beta range:\t[" << newBetaRange_low << ":" << newBetaRange_high << "]" << std::endl;
+    std::cout << "#   New beta points:\t  " << numberOfNewBetaPoints << std::endl;
+    std::cout << "#   Columns of obs. to be rew. with multiple columns:  ";
     for(size_t i=0; i<columnsToBeReweightedUsingMultipleColumns.size(); i++)
         std::cout << columnsToBeReweightedUsingMultipleColumns[i] << " ";
     std::cout << std::endl;
-    std::cout << "# Columns of obs. whose mean is known to be zero:  ";
-        for(size_t i=0; i<columnsWhoseMeanIsKnownToBeZero.size(); i++)
-            std::cout << columnsWhoseMeanIsKnownToBeZero[i] << " ";
-        std::cout << std::endl;
+    std::cout << "#   Columns of obs. whose mean is known to be zero:  ";
+	for(size_t i=0; i<columnsWhoseMeanIsKnownToBeZero.size(); i++)
+		std::cout << columnsWhoseMeanIsKnownToBeZero[i] << " ";
+	std::cout << std::endl;
+	std::cout << "#   Error method used:  ";
+	if(useJackknifeAsErrorMethod) std::cout << "Jackknife\n";
+	if(useBootstrapAsErrorMethod) std::cout << "Bootstrap (" << numberOfBootstrapResample << " resample)\n";
 	std::cout << separator << std::endl;
 	std::cout << "# Observables:" << std::endl;
 	if ( deactivateReweightingForMean )
@@ -150,4 +171,19 @@ std::vector<unsigned int> LqcdReweightingParameters::getColumnsToBeReweightedUsi
 
 std::vector<unsigned int> LqcdReweightingParameters::getColumnsWhoseMeanIsKnownToBeZero(){
 	return columnsWhoseMeanIsKnownToBeZero;
+}
+
+bool LqcdReweightingParameters::getUseJackknifeAsErrorMethod()
+{
+	return useJackknifeAsErrorMethod;
+}
+
+bool LqcdReweightingParameters::getUseBootstrapAsErrorMethod()
+{
+	return useBootstrapAsErrorMethod;
+}
+
+int LqcdReweightingParameters::getNumberOfBootstrapResample()
+{
+	return numberOfBootstrapResample;
 }

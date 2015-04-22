@@ -17,8 +17,8 @@ BOOST_AUTO_TEST_SUITE(LqcdReweightingParameters_build)
 	
 	BOOST_AUTO_TEST_CASE(build1)
 	{
-		int numberOfArguments = 2;
-		const char * argumentWithFile[] = {"foo", "someFilename"};
+		int numberOfArguments = 3;
+		const char * argumentWithFile[] = {"foo", "someFilename", "--useJackknifeAsErrorMethod"};
 		BOOST_CHECK_NO_THROW(LqcdReweightingParameters parameters(numberOfArguments, argumentWithFile));
 	}
 	
@@ -42,8 +42,8 @@ BOOST_AUTO_TEST_SUITE(defaults)
 
 	static LqcdReweightingParameters createParametersForDefaultCheck()
 	{
-		int numberOfArguments = 2;
-		const char * arguments[] = {"foo", "-f dummyFile"};
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", "--useJackknifeAsErrorMethod"};
 		return LqcdReweightingParameters(numberOfArguments, arguments);
 	}
 
@@ -95,16 +95,37 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getOutputfilePrefix() );
 	}
 
+	BOOST_AUTO_TEST_CASE(useJackk)
+	{
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod"};
+		LqcdReweightingParameters paramObj(numberOfArguments, arguments);
+		bool defaultValue = false;
+		BOOST_REQUIRE_EQUAL(defaultValue, paramObj.getUseJackknifeAsErrorMethod() );
+	}
+
+	BOOST_AUTO_TEST_CASE(useBoot)
+	{
+		bool defaultValue = false;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getUseBootstrapAsErrorMethod() );
+	}
+
+	BOOST_AUTO_TEST_CASE(numberBoot)
+	{
+		int defaultValue = 100;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfBootstrapResample() );
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(setArguments)
 
 	BOOST_AUTO_TEST_CASE(filename1)
 	{
-		int numberOfArguments = 2;
+		int numberOfArguments = 3;
 		std::string filename = "someName";
 		std::string filenameArgument = "-f" + filename;
-		const char * arguments[] = {"foo", filenameArgument.c_str()};
+		const char * arguments[] = {"foo", filenameArgument.c_str(), "--useJackknifeAsErrorMethod"};
 		LqcdReweightingParameters parameters(numberOfArguments, arguments);
 
 		BOOST_CHECK(filename == parameters.getInputfile());
@@ -112,10 +133,10 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 
 	BOOST_AUTO_TEST_CASE(filename2)
 	{
-		int numberOfArguments = 2;
+		int numberOfArguments = 3;
 		std::string filename = "someName";
 		std::string filenameArgument = "--file=" + filename;
-		const char * arguments[] = {"foo", filenameArgument.c_str()};
+		const char * arguments[] = {"foo", filenameArgument.c_str(), "--useJackknifeAsErrorMethod"};
 		LqcdReweightingParameters parameters(numberOfArguments, arguments);
 
 		BOOST_CHECK(filename == parameters.getInputfile());
@@ -124,8 +145,8 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 	static LqcdReweightingParameters createParametersForArgumentSettingCheck_longOption(std::string argumentName, int newValue)
 	{
 		std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
-		int numberOfArguments = 3;
-		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+		int numberOfArguments = 4;
+		const char * arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod", argument.c_str()};
 		return LqcdReweightingParameters(numberOfArguments, arguments);
 	}
 
@@ -153,8 +174,8 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 	static LqcdReweightingParameters createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(std::string argumentName)
 	{
 		std::string argument = argumentName;
-		int numberOfArguments = 3;
-		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+		int numberOfArguments = 4;
+		const char * arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod", argument.c_str()};
 		return LqcdReweightingParameters(numberOfArguments, arguments);
 	}
 	
@@ -214,11 +235,60 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForBinder() );
 	}
 	
+	BOOST_AUTO_TEST_CASE(useJackknife_implicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--useJackknifeAsErrorMethod";
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argumentName.c_str()};
+		LqcdReweightingParameters paramObj(numberOfArguments, arguments);
+		BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseJackknifeAsErrorMethod() );
+	}
+
+	BOOST_AUTO_TEST_CASE(useJackknife_explicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--useJackknifeAsErrorMethod";
+		std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+		LqcdReweightingParameters paramObj(numberOfArguments, arguments);
+		BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseJackknifeAsErrorMethod() );
+	}
+
+	BOOST_AUTO_TEST_CASE(useBootstrap_implicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--useBootstrapAsErrorMethod";
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argumentName.c_str()};
+		LqcdReweightingParameters paramObj(numberOfArguments, arguments);
+		BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseBootstrapAsErrorMethod() );
+	}
+
+	BOOST_AUTO_TEST_CASE(useBootstrap_explicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--useBootstrapAsErrorMethod";
+		std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
+		int numberOfArguments = 3;
+		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+		LqcdReweightingParameters paramObj(numberOfArguments, arguments);
+		BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseBootstrapAsErrorMethod() );
+	}
+
+	BOOST_AUTO_TEST_CASE(bootstrapResample)
+	{
+		int newValue = 140;
+		std::string argumentName = "--numberOfBootstrapResample";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfBootstrapResample() );
+	}
+
 	static LqcdReweightingParameters createParametersForArgumentSettingCheck_string(std::string argumentName, std::string newValue)
 	{
         std::string argument = argumentName + "=" +  newValue;
-		int numberOfArguments = 3;
-		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+		int numberOfArguments = 4;
+		const char * arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod", argument.c_str()};
 		return LqcdReweightingParameters(numberOfArguments, arguments);
 	}
 	
