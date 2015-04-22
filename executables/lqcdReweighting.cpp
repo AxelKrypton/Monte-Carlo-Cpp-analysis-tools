@@ -16,8 +16,15 @@ int main(int argc, const char ** argv)
 		newNumPoints.push_back(parameters.getNumberOfNewBetaPoints());
         std::vector< unsigned int> colOfObsMultipleColumns = parameters.getColumnsToBeReweightedUsingMultipleColumns();
         std::vector< unsigned int> colOfObsWithZeroMean = parameters.getColumnsWhoseMeanIsKnownToBeZero();
+        std::string errorMethod;
+        if(parameters.getUseJackknifeAsErrorMethod())
+        	errorMethod = "Jackknife";
+        else if (parameters.getUseBootstrapAsErrorMethod())
+        	errorMethod = "Bootstrap." + std::to_string(parameters.getNumberOfBootstrapResample());
+        else
+        	throw std::runtime_error("Error method unknown! This exception should never be thrown! Bug...");
 		
-        Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints, colOfObsMultipleColumns, colOfObsWithZeroMean);
+        Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints, colOfObsMultipleColumns, colOfObsWithZeroMean, errorMethod);
 		
 		std::vector<std::vector<Observables> > reweightedObservables = reweighter.calculateAndGetReweightedObservables();
 		std::vector<std::vector<double> > newBetaValues = reweighter.getValuesOfNewParameters();
@@ -41,7 +48,7 @@ int main(int argc, const char ** argv)
 	}
 	catch (...)
 	{
-		std::cout << "Caught non-standard exception!";
+		std::cout << "Caught non-standard exception!\n\n";
 		exit(EXIT_ERROR);
 	}
 

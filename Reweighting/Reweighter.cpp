@@ -584,12 +584,8 @@ void ReweighterAbstract::calculateAndSetReweightedObservablesAndErrorsValuesFrom
 					errorEstimatorsPerPointAndObs[m+1][k] = estimatorsForErrorsCalculation[k][i][numberOfObservablesGivenAsInput+j*3+m];
 
 			}
-			for(size_t m=0; m<4; m++)
-				std::cout << "[1] = " << errorEstimatorsPerPointAndObs[m][1] << " ";
-			std::cout << "\n";
 			evaluateEstimateOfObservablesPerPointFromMoments(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], momentsPerPointAndObs);
 			evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], errorEstimatorsPerPointAndObs, errorMethod);
-			//getchar();
 		}
 	}
 

@@ -81,17 +81,11 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
     numberOfObservablesGivenAsInput = (int)columnsForWhichMomentsMustBeInserted.size();
     numberOfObservablesToBeReweighted = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
 
-    std::cout << "obs_giv = " << numberOfObservablesGivenAsInput << std::endl;
-    std::cout << "obs_rew = " << numberOfObservablesToBeReweighted << std::endl;
-
     if(errorMethod == jackknife)
     	simulationUncorrDataContainer = simulationRawDataContainer.getUncorrelatedSimulationDataSet(numberOfBinsToBeUsed, jackknife);
     else
     	simulationUncorrDataContainer = simulationRawDataContainer;
-    std::cout << "entriesToBeCutFromRawData: ";
-    for(auto i: entriesToBeCutFromRawData)
-    	std::cout << i << " ";
-    std::cout << "\n";
+
     //Refining on the raw data
     for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
         for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
@@ -293,10 +287,6 @@ static std::vector<int> getNumberOfBinsToBeUsedAndEntriesToBeLeftOut(SimulationD
 
     if(errorMethod == jackknife){
     	std::vector<int> vectorToBeReturned(simDataCont.getNumberOfDatafiles(), *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end()));
-    	std::cout << "vectorToBeReturned: ";
-    	for(auto i: vectorToBeReturned)
-    		std::cout << i << " ";
-    	std::cout << "\n";
     	entriesToBeLeftOut = simDataCont.getNumberOfEntriesLeftOut(vectorToBeReturned);
     	return vectorToBeReturned;
     }else{ // errorMethod == bootstrap
