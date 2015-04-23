@@ -2,8 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-#include <chrono>
-#include <random>
+
 
 #include "SimulationDataContainer.hpp"
 #include "../dataAnalysisUtilities/binnedDataSample.hpp"
@@ -18,7 +17,7 @@ static void extractInformationFromFile(std::string fileIn,
                                        std::vector<std::string>& dataFilenames,
                                        std::vector<std::map<std::string, double> >& dataParameters);
 static DataSample getMomentUsingMultipleColumns(const int, std::vector<DataSample>);
-static DataSampleBasic getRandomlyOneDataPerBinFromDataSample(DataSampleBasic, const int, bool);
+static DataSampleBasic getRandomlyOneDataPerBinFromDataSample(DataSampleBasic, const int, bool, std::default_random_engine* = NULL);
 /*****************************************************************************************/
 
 SimulationDataContainer::SimulationDataContainer()
@@ -55,11 +54,8 @@ int SimulationDataContainer::getNumberOfSimulationParameters(int fileNumber)
 
 
 SimulationDataContainer SimulationDataContainer::getUncorrelatedSimulationDataSet(std::vector<int> numberOfBinsToBeUsed, ErrorCalculationMethod errorMethod,
-																				  std::vector<unsigned int> whichColumns, std::vector<unsigned int> whichMoments)
+																				  std::default_random_engine *generator)
 {
-	if( (whichColumns.size() == 0) ^ (whichMoments.size() == 0) )
-		throw std::invalid_argument("Function \"getUncorrelatedSimulationDataSet\" called with only part of the optional argument! Aborting...");
-
 	SimulationDataContainer uncorrelatedSimulationDataSet(*this); //default copy ctor should be enough
 	if(errorMethod == jackknife){
 		for(int i=0; i<uncorrelatedSimulationDataSet.getNumberOfDatafiles(); i++){
@@ -70,21 +66,15 @@ SimulationDataContainer SimulationDataContainer::getUncorrelatedSimulationDataSe
 			}
 		}
 	}else if(errorMethod == bootstrap){
+		if( generator == NULL )
+			throw std::invalid_argument("Function \"getUncorrelatedSimulationDataSet\" called without random generator needed for the bootstrap case! Aborting...");
 		for(int i=0; i<uncorrelatedSimulationDataSet.getNumberOfDatafiles(); i++){
-			int numberOfOriginalColumns = uncorrelatedSimulationDataSet[i].getNumberOfDataSample() - whichColumns.size() * whichMoments.size();
-			if(numberOfOriginalColumns < 0)
-				throw std::range_error("Optional arguments to \"getUncorrelatedSimulationDataSet\" have wrong sizes!! Aborting...");
-			for(int j=0; j<numberOfOriginalColumns; j++){
-				uncorrelatedSimulationDataSet[i][j] = getRandomlyOneDataPerBinFromDataSample(simulationDataSet[i][j], numberOfBinsToBeUsed[i], false);
-				//Bin moments like original columns!
-				int matchingIndexOfWhichColumns = find(whichColumns.begin(), whichColumns.end(), j) - whichColumns.begin();
-				if( matchingIndexOfWhichColumns != (whichColumns.end() - whichColumns.begin()) ){
-					int momentToSkip = matchingIndexOfWhichColumns * whichMoments.size();
-					for(int k=0; k<(int)whichMoments.size(); k++){
-						uncorrelatedSimulationDataSet[i][numberOfOriginalColumns+momentToSkip+k] =
-								getRandomlyOneDataPerBinFromDataSample(simulationDataSet[i][numberOfOriginalColumns+momentToSkip+k], numberOfBinsToBeUsed[i], true);
-					}
-				}
+			for(int j=0; j<uncorrelatedSimulationDataSet[i].getNumberOfDataSample(); j++){
+				//Bin all columns as the first was binned!
+				if(j==0)
+					uncorrelatedSimulationDataSet[i][j] = getRandomlyOneDataPerBinFromDataSample(simulationDataSet[i][j], numberOfBinsToBeUsed[i], false, generator);
+				else
+					uncorrelatedSimulationDataSet[i][j] = getRandomlyOneDataPerBinFromDataSample(simulationDataSet[i][j], numberOfBinsToBeUsed[i], true);
 			}
 		}
 	}else{
@@ -270,8 +260,7 @@ static DataSample getMomentUsingMultipleColumns(const int moment, std::vector<Da
     }
 }
 
-
-static DataSampleBasic getRandomlyOneDataPerBinFromDataSample(DataSampleBasic dataSetIn, const int numberOfBins, bool sameIndecesAsLastTime){
+static DataSampleBasic getRandomlyOneDataPerBinFromDataSample(DataSampleBasic dataSetIn, const int numberOfBins, bool sameIndecesAsLastTime, std::default_random_engine* generator){
 	static bool firstTimeThisFunctionIsCalled = true;
 	static int dimensionDataSetLastCall;
 	static int numberOfBinsLastCall;
@@ -293,14 +282,11 @@ static DataSampleBasic getRandomlyOneDataPerBinFromDataSample(DataSampleBasic da
 		}
 	}else{
 		int binSize = dataSetIn.getNumberOfElements() / numberOfBins;
-		// construct a trivial random generator engine from a time-based seed:
-		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-		std::default_random_engine generator (seed);
 		std::uniform_int_distribution<int> distribution(0, binSize-1); //bounded could be extracted, that's why binSize-1
 		//Get random entry per bin
 		indecesUsedLastCall.clear();
 		for(int i=0; i<numberOfBins; i++){
-			indecesUsedLastCall.push_back(i*binSize + distribution(generator));
+			indecesUsedLastCall.push_back(i*binSize + distribution(*generator));
 			dataSetOut[i] = dataSetIn[indecesUsedLastCall[i]];
 		}
 		//Set variables for future calls

@@ -59,8 +59,6 @@ private:
     SimulationDataContainer simulationUncorrDataContainer;
 	ErrorCalculationMethod errorMethod;
 	int* bootstrapNumber;
-    std::vector<unsigned int> columnsForWhichMomentsMustBeInserted;
-    std::vector<unsigned int> momentsNeeded;
 
     /*
      * These are metaparameters that must NOT be interpreted as reweighting parameters,

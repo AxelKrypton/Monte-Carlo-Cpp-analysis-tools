@@ -56,6 +56,8 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
     numberOfBinsToBeUsed = getNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, ReweightingDataHandler::metaParameters, errorMethod, entriesToBeCutFromRawData);
     //Evaluate central moments per data and append them to the raw data container
     //TODO: So far this is hard-coded, make it general and settable by user
+    std::vector<unsigned int> columnsForWhichMomentsMustBeInserted;
+    std::vector<unsigned int> momentsNeeded;
     std::vector<bool> useMultipleColumnsForMoments;
     momentsNeeded.push_back(2);
     momentsNeeded.push_back(3);

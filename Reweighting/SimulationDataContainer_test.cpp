@@ -2,6 +2,7 @@
 #define BOOST_TEST_MODULE SimulationDataContainer
 #include <boost/test/unit_test.hpp>
 
+#include <random>
 #include "SimulationDataContainer.hpp"
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePrecisionInPercent
 
@@ -136,7 +137,9 @@ BOOST_AUTO_TEST_SUITE(UncorrelatedContainer)
         referenceEntriesToBeLeftOut[2] = 84;
         SimulationDataContainer simDataCont(fileThatDoesExist);
         std::vector<int> numberOfBinsVec(simDataCont.getNumberOfDatafiles(), numberOfBins);
-        SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBinsVec, bootstrap);
+        std::default_random_engine generator;
+        BOOST_REQUIRE_THROW(simDataCont.getUncorrelatedSimulationDataSet(numberOfBinsVec, bootstrap), std::invalid_argument)
+        SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBinsVec, bootstrap, &generator);
         std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBinsVec);
         for(int i=0; i<3; i++){
             BOOST_REQUIRE_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
@@ -156,7 +159,8 @@ BOOST_AUTO_TEST_SUITE(UncorrelatedContainer)
 		numberOfBins[0]=10;
 		numberOfBins[1]=20;
 		numberOfBins[2]=5;
-		SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBins, bootstrap);
+		std::default_random_engine generator;
+		SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBins, bootstrap, &generator);
 		std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBins);
 		for(int i=0; i<3; i++){
 			BOOST_REQUIRE_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
@@ -177,7 +181,8 @@ BOOST_AUTO_TEST_SUITE(UncorrelatedContainer)
 		numberOfBins[0]=2304;
 		numberOfBins[1]=1653;
 		numberOfBins[2]=2584;
-		SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBins, bootstrap);
+		std::default_random_engine generator;
+		SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBins, bootstrap, &generator);
 		std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBins);
 		for(int i=0; i<3; i++){
 			BOOST_REQUIRE_EQUAL(entriesLeftOut[i], referenceEntriesToBeLeftOut[i]);
@@ -193,14 +198,8 @@ BOOST_AUTO_TEST_SUITE(UncorrelatedContainer)
 		std::vector<int> referenceEntriesToBeLeftOut(1,0);
 		SimulationDataContainer simDataCont(fileThatDoesExist);
 		std::vector<int> numberOfBins(simDataCont.getNumberOfDatafiles(), 20);
-		std::vector<unsigned int> columnsForMoments(2);
-		columnsForMoments[0]=0;
-		columnsForMoments[1]=1;
-		std::vector<unsigned int> moments(3);
-		moments[0] = 0;
-		moments[1] = 1;
-		moments[2] = 3;
-		SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBins, bootstrap, columnsForMoments, moments);
+		std::default_random_engine generator;
+		SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBins, bootstrap, &generator);
 		std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBins);
 		BOOST_REQUIRE_EQUAL(entriesLeftOut[0], referenceEntriesToBeLeftOut[0]);
 		for(int j=0; j<8; j++){

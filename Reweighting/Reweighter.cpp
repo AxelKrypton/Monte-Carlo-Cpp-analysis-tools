@@ -2,6 +2,7 @@
 #include <limits>
 #include <sstream>
 #include <string>
+#include <chrono>
 #include "Reweighter.hpp"
 #include "SimulationData.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
@@ -163,11 +164,12 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
     	        	                                                                  std::vector<double>(numberOfObservablesToBeReweighted)),
     	        	            				    *(reweightingDataHandler.bootstrapNumber));
     	std::cout << "   Calculating the Bootstrap estimators... \n";
+		// construct a trivial random generator engine from a time-based seed:
+		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+		std::default_random_engine generator(seed);
     	for(int iBoot=0; iBoot<(*(reweightingDataHandler.bootstrapNumber)); iBoot++){
     		reweightingDataHandler.simulationUncorrDataContainer =
-    				reweightingDataHandler.simulationRawDataContainer.getUncorrelatedSimulationDataSet(reweightingDataHandler.numberOfBinsToBeUsed, bootstrap,
-    																								   reweightingDataHandler.columnsForWhichMomentsMustBeInserted,
-    																								   reweightingDataHandler.momentsNeeded);
+    				reweightingDataHandler.simulationRawDataContainer.getUncorrelatedSimulationDataSet(reweightingDataHandler.numberOfBinsToBeUsed, bootstrap, &generator);
     		std::vector<double> logZAtSimulatedPointsUsingUncorrData = calculateLogZAtSimulatedPoints(true, -1, &smartGuessForLogZ);
     		std::vector<double> logZAtNewPointsUsingUncorrData = calculateLogZAtNewPoints(valuesOfNewParameters, true, -1, &logZAtSimulatedPointsUsingUncorrData);
     		bootstrapEstimators[iBoot] = calculateReweightedObservableValues(true, -1, &logZAtSimulatedPointsUsingUncorrData, &logZAtNewPointsUsingUncorrData);
