@@ -8,6 +8,7 @@ add_library(dataAnalysisUtilities
 	jackknifeAnalysis.cpp
 	bootstrapAnalysis.cpp
 	binning.cpp
+	Observables.cpp
 )
 
 target_link_libraries(dataAnalysisUtilities IO Parameters)
@@ -33,4 +34,4 @@ add_unit_test(dataSample DataSample_test dataAnalysisUtilities)
 add_unit_test(binnedDataSample binnedDataSample_test dataAnalysisUtilities)
 add_unit_test(jackknifeEstimators jackknifeEstimators_test dataAnalysisUtilities)
 add_unit_test(dataAnalysisUtilities dataAnalysisUtilities_test dataAnalysisUtilities Parameters)
-
+add_unit_test(observables Observables_test dataAnalysisUtilities)

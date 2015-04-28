@@ -2,8 +2,7 @@
 #define SIMULATIONCONTAINERDATA_HPP_
 
 #include "SimulationData.hpp"
-
-enum ErrorCalculationMethod { bootstrap = 1, jackknife };
+#include "../dataAnalysisUtilities/Observables.hpp"
 
 class SimulationDataContainer
 {
