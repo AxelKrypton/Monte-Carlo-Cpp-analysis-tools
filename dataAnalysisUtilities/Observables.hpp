@@ -14,14 +14,14 @@ enum ErrorCalculationMethod { bootstrap = 1, jackknife };
 class Moments {
 public:
 	Moments(){};
-	double at(int whichMoment){
+	double at(const int& whichMoment){
 		if(moments.find(whichMoment) == moments.end())
 				throw std::out_of_range("Moments::[] accessed an invalid moment! Aborting...");
 			else
 				return moments[whichMoment];
 	};
-	double& operator[](int whichMoment){ return moments[whichMoment]; };
-	Moments operator[](std::initializer_list<int> whichMoments){
+	double& operator[](const int& whichMoment){ return moments[whichMoment]; };
+	Moments operator[](const std::initializer_list<int>& whichMoments){
 		Moments selectedMoments;
 		for(int i: whichMoments)
 			selectedMoments[i] = moments.at(i);
@@ -29,6 +29,33 @@ public:
 	};
 private:
 	std::map<int, double> moments;
+};
+
+class MomentsEstimators {
+public:
+	MomentsEstimators(){};
+	DataSample at(const int& whichMoment){
+		if(momentsEstimators.find(whichMoment) == momentsEstimators.end())
+				throw std::out_of_range("MomentsEstimators::[] accessed an invalid moment! Aborting...");
+			else
+				return momentsEstimators[whichMoment];
+	};
+	DataSample& operator[](const int& whichMoment){ return momentsEstimators[whichMoment]; };
+	MomentsEstimators operator[](const std::initializer_list<int>& whichMoments){
+		MomentsEstimators selectedMoments;
+		for(int i: whichMoments)
+			selectedMoments[i] = momentsEstimators.at(i);
+		return selectedMoments;
+	};
+	std::vector<DataSample> operator()(const std::initializer_list<int>& whichMoments){
+		std::vector<DataSample> selectedMoments;
+		for(int i: whichMoments)
+			selectedMoments.push_back(momentsEstimators.at(i));
+		return selectedMoments;
+	};
+
+private:
+	std::map<int, DataSample > momentsEstimators;
 };
 
 /*
@@ -47,31 +74,31 @@ private:
  *       Think whether put it as private member and in case do it.
  */
 
-typedef DataSample (*functionSignature)(std::vector<DataSample>);
+typedef DataSample (*functionForEstimators)(std::vector<DataSample>);
+typedef double (*functionForObservable)(Moments);
 
 class ObservableAbstract {
 public:
 	ObservableAbstract(std::string obsName, bool isMeanKnownToBeZero);
-	virtual ~ObservableAbstract();
+	virtual ~ObservableAbstract(){};
 	std::string getObservableName();
 	EstimateAndError getValueAndError();
-
 protected:
 	//Calculation from raw data
 	void calculateAndSetValueAndError(DataSample& dataSample, Parameters parameters);
 	//Calculation for Reweighting
-	void calculateAndSetValueAndError(Moments moments, std::vector<std::valarray<double> > estimators, ErrorCalculationMethod errorMethod);
+	void calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod);
 	std::string observableName;
 	bool isMeanZero;
 private:
 	std::vector<DataSample> getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const Parameters& parameters);
+	std::vector<DataSample> calculateNeededMomentsPerDataPoint(DataSample& dataSample);
 	//Virtual method that must be provided by children classes
-	virtual std::vector<DataSample> getNeededMomentsPerDataPoint(DataSample& dataSample) = 0;
 	virtual Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters) = 0;
 	virtual void printCorrectBinningInformation(const Parameters& parameters) = 0;
-	virtual functionSignature getFunctionToEvaluateObservable() = 0;
-	virtual double calculateValueFromMoments(Moments moments) = 0;
-	virtual double calculateErrorFromEstimators(std::vector<std::valarray<double> > estimators, ErrorCalculationMethod errorMethod) = 0;
+	virtual functionForEstimators getFunctionToBeAppliedToEstimators() = 0;
+	virtual functionForObservable getFunctionToCalculateObservable() = 0;
+	virtual std::initializer_list<int> getNeededMoments() = 0;
 	EstimateAndError observableEstimateAndError;
 };
 
@@ -79,22 +106,61 @@ private:
 class Mean : public ObservableAbstract {
 public:
 	Mean(DataSample& dataSample, Parameters parameters);
-	Mean(Moments moments, std::vector<std::valarray<double> > estimators, bool isMeanZero, ErrorCalculationMethod errorMethod);
-	const std::array<int, 1> neededMoments{ {1} };
+	Mean(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod);
+	static constexpr std::initializer_list<int> neededMoments = { {1} };
+	static constexpr std::initializer_list<int> neededMomentsWithZeroMean = {};
 private:
-	std::vector<DataSample> getNeededMomentsPerDataPoint(DataSample& dataSample);
 	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
 	void printCorrectBinningInformation(const Parameters& parameters);
-	functionSignature getFunctionToEvaluateObservable();
-	double calculateValueFromMoments(Moments moments);
-	double calculateErrorFromEstimators(std::vector<std::valarray<double> > estimators, ErrorCalculationMethod errorMethod);
+	functionForEstimators getFunctionToBeAppliedToEstimators();
+	functionForObservable getFunctionToCalculateObservable();
+	std::initializer_list<int> getNeededMoments();
 };
 
 
+class Variance : public ObservableAbstract {
+public:
+	Variance(DataSample& dataSample, Parameters parameters);
+	Variance(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod);
+	static constexpr std::initializer_list<int> neededMoments = {1, 2};
+	static constexpr std::initializer_list<int> neededMomentsWithZeroMean = { {2} };
+private:
+	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
+	void printCorrectBinningInformation(const Parameters& parameters);
+	functionForEstimators getFunctionToBeAppliedToEstimators();
+	functionForObservable getFunctionToCalculateObservable();
+	std::initializer_list<int> getNeededMoments();
+};
 
 
+class Skewness : public ObservableAbstract {
+public:
+	Skewness(DataSample& dataSample, Parameters parameters);
+	Skewness(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod);
+	static constexpr std::initializer_list<int> neededMoments = {1, 2, 3};
+	static constexpr std::initializer_list<int> neededMomentsWithZeroMean = {2, 3};
+private:
+	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
+	void printCorrectBinningInformation(const Parameters& parameters);
+	functionForEstimators getFunctionToBeAppliedToEstimators();
+	functionForObservable getFunctionToCalculateObservable();
+	std::initializer_list<int> getNeededMoments();
+};
 
 
+class BinderCumulant : public ObservableAbstract {
+public:
+	BinderCumulant(DataSample& dataSample, Parameters parameters);
+	BinderCumulant(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod);
+	static constexpr std::initializer_list<int> neededMoments = {1, 2, 3, 4};
+	static constexpr std::initializer_list<int> neededMomentsWithZeroMean = {2, 4};
+private:
+	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
+	void printCorrectBinningInformation(const Parameters& parameters);
+	functionForEstimators getFunctionToBeAppliedToEstimators();
+	functionForObservable getFunctionToCalculateObservable();
+	std::initializer_list<int> getNeededMoments();
+};
 
 
 class Observables

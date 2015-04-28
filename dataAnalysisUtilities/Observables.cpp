@@ -1,11 +1,15 @@
 #include "Observables.hpp"
 #include "binning.hpp"
 #include "jackknifeAnalysis.hpp"
+#include "bootstrapAnalysis.hpp"
 
-static std::vector<DataSample> getMomentsPerDataPoint(DataSample&, std::vector<int>, bool);
+static std::vector<DataSample> getMomentsPerDataPoint(DataSample&, std::initializer_list<int>, bool);
 static Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters&, std::string);
 static void printBinningInformation(const Parameters&, std::string);
-static double calculateValueFromMomentsAndObsName(Moments, bool, std::string);
+//static double calculateValueFromMomentsAndObsName(Moments, bool, functionForObservable, std::string);
+//static double calculateErrorFromEstimatorsAndObsName(MomentsEstimators, bool, functionForEstimators, ErrorCalculationMethod, std::string);
+//static std::initializer_list<int> getNeededMomentsUsingObservableName(bool, std::string);
+static double evaluateErrorBasedOnMethod(DataSample, ErrorCalculationMethod);
 
 /*****************************************************************************************/
 
@@ -28,20 +32,27 @@ EstimateAndError ObservableAbstract::getValueAndError()
 
 void ObservableAbstract::calculateAndSetValueAndError(DataSample& dataSample, Parameters parameters)
 {
-	std::vector<DataSample> neededMomentsPerDataPoint = getNeededMomentsPerDataPoint(dataSample);
+	std::vector<DataSample> neededMomentsPerDataPoint = calculateNeededMomentsPerDataPoint(dataSample);
 	Parameters binningParameters = getLocalParametersWithCorrectBinningInformation(parameters);
 	printCorrectBinningInformation(binningParameters);
 	std::vector<DataSample> binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, binningParameters);
-	observableEstimateAndError = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToEvaluateObservable());
+	observableEstimateAndError = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimators());
 }
 
-void ObservableAbstract::calculateAndSetValueAndError(Moments moments, std::vector<std::valarray<double> > estimators, ErrorCalculationMethod errorMethod)
+void ObservableAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod)
 {
-	observableEstimateAndError.estimate = calculateValueFromMoments(moments);
-	observableEstimateAndError.error = calculateErrorFromEstimators(estimators, errorMethod);
+	observableEstimateAndError.estimate = getFunctionToCalculateObservable()(moments);
+	std::initializer_list<int> selectedMoments = getNeededMoments();
+	DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators()(estimators(selectedMoments));
+	observableEstimateAndError.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 }
 
 //================================================ PRIVATE MEMBERS ================================================//
+
+std::vector<DataSample> ObservableAbstract::calculateNeededMomentsPerDataPoint(DataSample& dataSample)
+{
+	return getMomentsPerDataPoint(dataSample, getNeededMoments(), isMeanZero);
+}
 
 std::vector<DataSample> ObservableAbstract::getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const Parameters& parameters){
 	std::vector<DataSample> returnData;
@@ -55,19 +66,18 @@ std::vector<DataSample> ObservableAbstract::getBinnedNeededMoments(std::vector<D
 /************************************************************* MEAN ****************************************************************/
 /***********************************************************************************************************************************/
 
+//Definition of the static member for the linker
+constexpr std::initializer_list<int> Mean::neededMoments;
+constexpr std::initializer_list<int> Mean::neededMomentsWithZeroMean;
+
 Mean::Mean(DataSample& dataSample, Parameters parameters) : ObservableAbstract("MEAN", parameters.isMeanKnownToBeZero)
 {
 	calculateAndSetValueAndError(dataSample, parameters);
 }
 
-Mean::Mean(Moments moments, std::vector<std::valarray<double> > estimators, bool isMeanZero, ErrorCalculationMethod errorMethod) : ObservableAbstract("MEAN", isMeanZero)
+Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod) : ObservableAbstract("MEAN", isMeanZero)
 {
 	calculateAndSetValueAndError(moments, estimators, errorMethod);
-}
-
-std::vector<DataSample> Mean::getNeededMomentsPerDataPoint(DataSample& dataSample)
-{
-	return getMomentsPerDataPoint(dataSample, std::vector<int>(1,1), isMeanZero);
 }
 
 Parameters Mean::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
@@ -80,33 +90,220 @@ void Mean::printCorrectBinningInformation(const Parameters& parameters)
 	printBinningInformation(parameters, observableName);
 }
 
-functionSignature Mean::getFunctionToEvaluateObservable()
+functionForEstimators Mean::getFunctionToBeAppliedToEstimators()
 {
-	auto identicalFunction = [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 1) throw std::invalid_argument("Invalid call to Mean function!");
-																			 return in[0]; };
-	return identicalFunction;
+	if(isMeanZero)
+		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 0) throw std::invalid_argument("Invalid call to Mean function with zero mean for estimators!");
+															   return DataSample(std::valarray<double>(0.0, in[0].getNumberOfElements())); };
+	else
+		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 1) throw std::invalid_argument("Invalid call to Mean function for estimators!"); return in[0]; };
 }
 
-double Mean::calculateValueFromMoments(Moments moments)
+functionForObservable Mean::getFunctionToCalculateObservable()
 {
-	return calculateValueFromMomentsAndObsName(moments, isMeanZero, observableName);
+	if(isMeanZero)
+		return [] (Moments in) -> double { return 0.0; };
+	else
+		return [] (Moments in) -> double { return in.at(1); };
+}
+
+std::initializer_list<int> Mean::getNeededMoments()
+{
+	return isMeanZero ? Mean::neededMomentsWithZeroMean : Mean::neededMoments;
+}
+
+
+/***********************************************************************************************************************************/
+/************************************************************* VARIANCE ************************************************************/
+/***********************************************************************************************************************************/
+
+//Definition of the static member for the linker
+constexpr std::initializer_list<int> Variance::neededMoments;
+constexpr std::initializer_list<int> Variance::neededMomentsWithZeroMean;
+
+Variance::Variance(DataSample& dataSample, Parameters parameters) : ObservableAbstract("VARIANCE", parameters.isMeanKnownToBeZero)
+{
+	calculateAndSetValueAndError(dataSample, parameters);
+}
+
+Variance::Variance(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod) : ObservableAbstract("VARIANCE", isMeanZero)
+{
+	calculateAndSetValueAndError(moments, estimators, errorMethod);
+}
+
+Parameters Variance::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
+{
+	return buildLocalParametersWithCorrectBinningInformation(parameters, observableName);
+}
+
+void Variance::printCorrectBinningInformation(const Parameters& parameters)
+{
+	printBinningInformation(parameters, observableName);
+}
+
+functionForEstimators Variance::getFunctionToBeAppliedToEstimators()
+{
+	if(isMeanZero)
+		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 1) throw std::invalid_argument("Invalid call to Variance function with zero mean for estimators!");
+															   return in[1]; };
+	else
+		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 2) throw std::invalid_argument("Invalid call to Variance function for estimators!");
+															   DataSample ex1 = in[0]; //estimator first moment
+															   DataSample ex2 = in[1]; //estimator second moment
+															   return ex2 - (ex1 ^ 2); };
+
+}
+
+functionForObservable Variance::getFunctionToCalculateObservable()
+{
+	if(isMeanZero)
+		return [] (Moments in) -> double { return in.at(2); };
+	else
+		return [] (Moments in) -> double { return in.at(2) - in.at(1) * in.at(1); };
+}
+
+std::initializer_list<int> Variance::getNeededMoments()
+{
+	return isMeanZero ? Variance::neededMomentsWithZeroMean : Variance::neededMoments;
+}
+
+
+/***********************************************************************************************************************************/
+/************************************************************* SKEWNESS ************************************************************/
+/***********************************************************************************************************************************/
+
+//Definition of the static member for the linker
+constexpr std::initializer_list<int> Skewness::neededMoments;
+constexpr std::initializer_list<int> Skewness::neededMomentsWithZeroMean;
+
+Skewness::Skewness(DataSample& dataSample, Parameters parameters) : ObservableAbstract("SKEWNESS", parameters.isMeanKnownToBeZero)
+{
+	calculateAndSetValueAndError(dataSample, parameters);
+}
+
+Skewness::Skewness(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod) : ObservableAbstract("SKEWNESS", isMeanZero)
+{
+	calculateAndSetValueAndError(moments, estimators, errorMethod);
+}
+
+Parameters Skewness::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
+{
+	return buildLocalParametersWithCorrectBinningInformation(parameters, observableName);
+}
+
+void Skewness::printCorrectBinningInformation(const Parameters& parameters)
+{
+	printBinningInformation(parameters, observableName);
+}
+
+functionForEstimators Skewness::getFunctionToBeAppliedToEstimators()
+{
+	if(isMeanZero)
+		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 2) throw std::invalid_argument("Invalid call to Skewness function with zero mean for estimators!");
+															   DataSample ex2 = in[0]; //estimator second moment
+															   DataSample ex3 = in[1]; //estimator third moment
+															   return ex3 / (ex2 ^ 1.5); };
+	else
+		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 3) throw std::invalid_argument("Invalid call to Skewness function for estimators!");
+															   DataSample ex1 = in[0]; //estimator first moment
+															   DataSample ex2 = in[1]; //estimator second moment
+															   DataSample ex3 = in[2]; //estimator third moment
+															   return (ex3 - ((3 * ex2) * ex1) + (2 * (ex1 ^ 3)))/((ex2 - (ex1 ^ 2)) ^ 1.5); };
+}
+
+functionForObservable Skewness::getFunctionToCalculateObservable()
+{
+	if(isMeanZero)
+		return [] (Moments in) -> double { return in.at(3) / pow(in.at(2), 1.5); };
+	else
+		return [] (Moments in) -> double { double x1 = in.at(1); double x2 = in.at(2); double x3 = in.at(3);
+										   return (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5)); };
+}
+
+std::initializer_list<int> Skewness::getNeededMoments()
+{
+	return isMeanZero ? Skewness::neededMomentsWithZeroMean : Skewness::neededMoments;
+}
+
+
+/***********************************************************************************************************************************/
+/******************************************************** BINDER CUMULANT **********************************************************/
+/***********************************************************************************************************************************/
+
+//Definition of the static member for the linker
+constexpr std::initializer_list<int> BinderCumulant::neededMoments;
+constexpr std::initializer_list<int> BinderCumulant::neededMomentsWithZeroMean;
+
+BinderCumulant::BinderCumulant(DataSample& dataSample, Parameters parameters) : ObservableAbstract("BINDER CUMULANT", parameters.isMeanKnownToBeZero)
+{
+	calculateAndSetValueAndError(dataSample, parameters);
+}
+
+BinderCumulant::BinderCumulant(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod) : ObservableAbstract("BINDER CUMULANT", isMeanZero)
+{
+	calculateAndSetValueAndError(moments, estimators, errorMethod);
+}
+
+Parameters BinderCumulant::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
+{
+	return buildLocalParametersWithCorrectBinningInformation(parameters, observableName);
+}
+
+void BinderCumulant::printCorrectBinningInformation(const Parameters& parameters)
+{
+	printBinningInformation(parameters, observableName);
+}
+
+functionForEstimators BinderCumulant::getFunctionToBeAppliedToEstimators()
+{
+	if(isMeanZero)
+		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 2) throw std::invalid_argument("Invalid call to BinderCumulant function with zero mean for estimators!");
+															   DataSample ex2 = in[0]; //estimator second moment
+															   DataSample ex4 = in[1]; //estimator third moment
+															   return ex4 / (ex2 ^ 2.0); };
+	else
+		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 4) throw std::invalid_argument("Invalid call to BinderCumulant function for estimators!");
+															   DataSample ex1 = in[0]; //estimator first moment
+															   DataSample ex2 = in[1]; //estimator second moment
+															   DataSample ex3 = in[2]; //estimator third moment
+															   DataSample ex4 = in[3]; //estimator fourth moment
+															   return (ex4 - ((4 * ex3) * ex1) + (6 * ex2) * (ex1 ^ 2) - (3 * (ex1 ^ 4)))/((ex2 - (ex1 ^ 2)) ^ 2); };
+}
+
+functionForObservable BinderCumulant::getFunctionToCalculateObservable()
+{
+	if(isMeanZero)
+		return [] (Moments in) -> double { return in.at(4) / pow(in.at(2), 2.0); };
+	else
+		return [] (Moments in) -> double { double x1 = in.at(1); double x2 = in.at(2); double x3 = in.at(3); double x4 = in.at(4);
+										   return (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0)); };
+}
+
+std::initializer_list<int> BinderCumulant::getNeededMoments()
+{
+	return isMeanZero ? BinderCumulant::neededMomentsWithZeroMean : BinderCumulant::neededMoments;
 }
 
 
 
 
+//===============================================================================================================================================//
 
-
-
-
-
-
-static std::vector<DataSample> getMomentsPerDataPoint(DataSample& sampleIn, std::vector<int> whichMoments, bool isMeanZero)
+static std::vector<DataSample> getMomentsPerDataPoint(DataSample& sampleIn, std::initializer_list<int> whichMoments, bool isMeanZero)
 {
 	std::vector<DataSample> returnVec;
 	for(auto i: whichMoments)
 		returnVec.push_back(isMeanZero ? sampleIn.getNthMomentPerDataPoint(i) : sampleIn.getNthCentralMomentPerDataPoint(i));
 	return returnVec;
+}
+
+static double evaluateErrorBasedOnMethod(DataSample dataSample, ErrorCalculationMethod errorMethod){
+	if(errorMethod == jackknife)
+		return calculateJacknifeError(dataSample);
+	else if (errorMethod == bootstrap)
+		return calculateBootstrapError(dataSample);
+	else
+		throw std::logic_error("Unknown error method in \"evaluateErrorBasedOnMethod\"! Aborting...");
 }
 
 static Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable){
@@ -136,56 +333,5 @@ static void printBinningInformation(const Parameters& parameters, std::string ob
 	else
 		std::cout << parameters.binsize << " as binsize!\n";
 }
-
-/*
- * In the following two functions it is understood that the moments and the estimators
- * are given ONLY for the needed moments and they are considered to be given in order.
- * For example in the Binder Cumulant, the moments vector will contain the second moment
- * as first entry and the fourth moment as second entry.
- */
-static double calculateValueFromMomentsAndObsName(Moments moments, bool isMeanZero, std::string observable)
-{
-	if(observable == "MEAN"){
-		double x1 = moments.at(1);
-		return isMeanZero ? 0.0 : x1;
-	}else if(observable == "VARIANCE"){
-		if(isMeanZero){
-			return moments.at(2);
-		}else{
-			double x1 = moments.at(1);
-			double x2 = moments.at(2);
-			return  x2-x1*x1;
-		}
-	}else if(observable == "SKEWNESS"){
-		if(isMeanZero){
-			double x2 = moments.at(2);
-			double x3 = moments.at(3);
-			return x3/(pow(x2, 1.5));
-		}else{
-			double x1 = moments.at(1);
-			double x2 = moments.at(2);
-			double x3 = moments.at(3);
-			return (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5));
-		}
-	}else if(observable == "BINDER CUMULANT"){
-		if(isMeanZero){
-			double x2 = moments.at(2);
-			double x4 = moments.at(4);
-			return x4/(pow(x2, 2.0));
-		}else{
-			double x1 = moments.at(1);
-			double x2 = moments.at(2);
-			double x3 = moments.at(3);
-			double x4 = moments.at(4);
-			return (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0));
-		}
-	}else{
-		throw std::invalid_argument("Unknown observable in buildLocalParametersWithCorrectBinningInformation function!");
-	}
-}
-
-
-
-
 
 
