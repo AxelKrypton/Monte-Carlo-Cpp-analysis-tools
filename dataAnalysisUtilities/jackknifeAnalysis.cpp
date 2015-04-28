@@ -36,3 +36,19 @@ EstimateAndError jackknifeAnalysis(DataSample sampleWithUncorrelatedData, DataSa
 
     return EstimateAndError(estimate, error);
 }
+
+EstimateAndError jackknifeAnalysis(std::vector<DataSample> samplesWithUncorrelatedData, DataSample (*function)(std::vector<DataSample>) )
+{
+    std::vector<DataSample> jackknifeEstimators;
+	for(size_t i=0; i<samplesWithUncorrelatedData.size(); i++){
+		//Here we implicitly cast JackknifeEstimators to DataSample, but it should be fine!
+		jackknifeEstimators.push_back(JackknifeEstimators(samplesWithUncorrelatedData[i]));
+	}
+
+    DataSample functionAppliedToEstimators = function(jackknifeEstimators);
+
+    double estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
+    double error = calculateJacknifeError(functionAppliedToEstimators);
+
+    return EstimateAndError(estimate, error);
+}

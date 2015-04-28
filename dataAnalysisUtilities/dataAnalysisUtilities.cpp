@@ -161,9 +161,14 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 	DataSample binnedSample1 = performBinning(thirdCentralMomentSample, binningParameters);
 	DataSample binnedSample2 = performBinning(secondCentralMomentSample, binningParameters);
 	
-	auto calcSkewness = [] (DataSample & in1, DataSample & in2) -> DataSample { return in1 / (in2 ^ (3. / 2)); };
+//	auto calcSkewness = [] (DataSample & in1, DataSample & in2) -> DataSample { return in1 / (in2 ^ (3. / 2)); };
+	auto calcSkewness = [] (std::vector<DataSample> in) -> DataSample { return in[0] / (in[1] ^ (3. / 2)); };
+	std::vector<DataSample> sampleForJack;
+	sampleForJack.push_back(binnedSample1);
+	sampleForJack.push_back(binnedSample2);
 	
-	return jackknifeAnalysis(binnedSample1, binnedSample2, calcSkewness);
+//	return jackknifeAnalysis(binnedSample1, binnedSample2, calcSkewness);
+	return jackknifeAnalysis(sampleForJack, calcSkewness);
 }
 
 EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
