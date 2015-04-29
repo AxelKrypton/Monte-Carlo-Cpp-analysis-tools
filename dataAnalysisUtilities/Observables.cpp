@@ -43,6 +43,8 @@ void ObservableAbstract::calculateAndSetValueAndError(Moments moments, MomentsEs
 {
 	observableEstimateAndError.estimate = getFunctionToCalculateObservable()(moments);
 	std::initializer_list<int> selectedMoments = getNeededMoments();
+	if(selectedMoments.size() == 0)
+		throw std::logic_error("Non sense call to \"calculateAndSetValueAndError\" function, since non moments are needed to evaluate the error! Aborting...");
 	DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators()(estimators(selectedMoments));
 	observableEstimateAndError.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 }
@@ -77,7 +79,10 @@ Mean::Mean(DataSample& dataSample, Parameters parameters) : ObservableAbstract("
 
 Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod) : ObservableAbstract("MEAN", isMeanZero)
 {
-	calculateAndSetValueAndError(moments, estimators, errorMethod);
+	if(isMeanZero)
+		observableEstimateAndError = EstimateAndError(0.0, 0.0);
+	else
+		calculateAndSetValueAndError(moments, estimators, errorMethod);
 }
 
 Parameters Mean::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
@@ -102,7 +107,7 @@ functionForEstimators Mean::getFunctionToBeAppliedToEstimators()
 functionForObservable Mean::getFunctionToCalculateObservable()
 {
 	if(isMeanZero)
-		return [] (Moments in) -> double { return 0.0; };
+		return [] (Moments in) -> double { return in[0]*0.0; }; //in[0]*0.0 just to use the in parameter
 	else
 		return [] (Moments in) -> double { return in.at(1); };
 }
@@ -145,7 +150,7 @@ functionForEstimators Variance::getFunctionToBeAppliedToEstimators()
 {
 	if(isMeanZero)
 		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 1) throw std::invalid_argument("Invalid call to Variance function with zero mean for estimators!");
-															   return in[1]; };
+															   return in[0]; };
 	else
 		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 2) throw std::invalid_argument("Invalid call to Variance function for estimators!");
 															   DataSample ex1 = in[0]; //estimator first moment
@@ -267,7 +272,7 @@ functionForEstimators BinderCumulant::getFunctionToBeAppliedToEstimators()
 															   DataSample ex2 = in[1]; //estimator second moment
 															   DataSample ex3 = in[2]; //estimator third moment
 															   DataSample ex4 = in[3]; //estimator fourth moment
-															   return (ex4 - ((4 * ex3) * ex1) + (6 * ex2) * (ex1 ^ 2) - (3 * (ex1 ^ 4)))/((ex2 - (ex1 ^ 2)) ^ 2); };
+															   return (ex4 - (4 * ex3 * ex1) + (6 * ex2 * ex1 * ex1) - (3 * ex1 * ex1 * ex1 * ex1))/((ex2 - (ex1 ^ 2)) ^ 2); };
 }
 
 functionForObservable BinderCumulant::getFunctionToCalculateObservable()

@@ -59,7 +59,7 @@ private:
 };
 
 /*
- * NOTE: In order to make a function return a pointer to function one must use and horrible syntax.
+ * NOTE: In order to make a function return a pointer to function one must use an horrible syntax.
  *       For example, if you want that a function taking a double return a pointer to a function that
  *       takes one int and one char and returns a bool, you should write
  *
@@ -90,6 +90,7 @@ protected:
 	void calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod);
 	std::string observableName;
 	bool isMeanZero;
+	EstimateAndError observableEstimateAndError;
 private:
 	std::vector<DataSample> getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const Parameters& parameters);
 	std::vector<DataSample> calculateNeededMomentsPerDataPoint(DataSample& dataSample);
@@ -99,12 +100,12 @@ private:
 	virtual functionForEstimators getFunctionToBeAppliedToEstimators() = 0;
 	virtual functionForObservable getFunctionToCalculateObservable() = 0;
 	virtual std::initializer_list<int> getNeededMoments() = 0;
-	EstimateAndError observableEstimateAndError;
 };
 
 
 class Mean : public ObservableAbstract {
 public:
+	Mean() = delete;
 	Mean(DataSample& dataSample, Parameters parameters);
 	Mean(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod);
 	static constexpr std::initializer_list<int> neededMoments = { {1} };
@@ -120,6 +121,7 @@ private:
 
 class Variance : public ObservableAbstract {
 public:
+	Variance() = delete;
 	Variance(DataSample& dataSample, Parameters parameters);
 	Variance(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod);
 	static constexpr std::initializer_list<int> neededMoments = {1, 2};
@@ -135,6 +137,7 @@ private:
 
 class Skewness : public ObservableAbstract {
 public:
+	Skewness() = delete;
 	Skewness(DataSample& dataSample, Parameters parameters);
 	Skewness(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod);
 	static constexpr std::initializer_list<int> neededMoments = {1, 2, 3};
@@ -150,6 +153,7 @@ private:
 
 class BinderCumulant : public ObservableAbstract {
 public:
+	BinderCumulant() = delete;
 	BinderCumulant(DataSample& dataSample, Parameters parameters);
 	BinderCumulant(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod);
 	static constexpr std::initializer_list<int> neededMoments = {1, 2, 3, 4};
