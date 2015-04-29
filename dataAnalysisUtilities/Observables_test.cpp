@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Observables.hpp"
+#include "dataSampleTestUtilities.hpp" // for doublePrecisionInPercent
 
 BOOST_AUTO_TEST_SUITE(moments)
 
@@ -106,4 +107,199 @@ BOOST_AUTO_TEST_SUITE(momentsEstimators)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-//TODO: Develop tests for Mean, Variance, Skewness, BinderCumulant classes
+static Moments buildMomentsForTest(){
+	Moments moments;
+	moments[1] = 5.120788163699608e-01;
+	moments[2] = 2.622374015645983e-01;
+	moments[3] = 1.342992378238976e-01;
+	moments[4] = 6.878181572513453e-02;
+	return moments;
+	/*
+	 *     mean = 0.5120788163699608		-> zero mean: 0.0
+	 * variance = 1.268738973830841e-05		-> zero mean: 0.2622374015645983
+	 * skewness = 0.5694793357428045		-> zero mean: 1.000072760979389
+	 *   binder = 3.7478114121524830		-> zero mean: 1.000194288875983
+	 */
+}
+
+static MomentsEstimators buildMomentsEstimatorsForTest(){
+	MomentsEstimators momentsEst;
+	momentsEst[1] = DataSample(std::valarray<double>({5.1235601107091922e-01, 5.1150824489887503e-01, 5.1172734937075659e-01, 5.1178725503695854e-01,
+													  5.0979370987783490e-01, 5.1255624637967778e-01, 5.1202230784545366e-01, 5.1171955370408695e-01,
+													  5.1187488596000053e-01, 5.0979885326724550e-01, 5.1346010441702183e-01, 5.0972776041563195e-01,
+													  5.1024877919415301e-01, 5.1106580352847342e-01, 5.1195532496227270e-01, 5.1390447355869662e-01,
+													  5.1202183781458366e-01, 5.1326137707280928e-01, 5.1267731347761258e-01, 5.1142797137376972e-01}));
+	momentsEst[2] = DataSample(std::valarray<double>({2.6252465475720638e-01, 2.6165170089094386e-01, 2.6187569175770908e-01, 2.6193691234537581e-01,
+													  2.5990842550370130e-01, 2.6272340690594786e-01, 2.6217662123277541e-01, 2.6186580343559934e-01,
+													  2.6202834168518563e-01, 2.5990976236280711e-01, 2.6365306166921659e-01, 2.5983595391311276e-01,
+													  2.6037344532842710e-01, 2.6120041302190311e-01, 2.6210894186848277e-01, 2.6410567248106614e-01,
+													  2.6217766022621947e-01, 2.6344694349572489e-01, 2.6284970759104292e-01, 2.6156899778943893e-01}));
+	momentsEst[3] = DataSample(std::valarray<double>({1.3452246987538111e-01, 1.3384830173963591e-01, 1.3402005031388509e-01, 1.3406698527826047e-01,
+													  1.3251889318442522e-01, 1.3467028782742235e-01, 1.3425032974734333e-01, 1.3401099022082003e-01,
+													  1.3413850486189055e-01, 1.3251691344901928e-01, 1.3538744578451081e-01, 1.3245946231125300e-01,
+													  1.3287530606686845e-01, 1.3350305989651526e-01, 1.3419903990843887e-01, 1.3573319225558023e-01,
+													  1.3425229075709791e-01, 1.3522713133192771e-01, 1.3476908916630512e-01, 1.3378440751335702e-01}));
+	momentsEst[4] = DataSample(std::valarray<double>({6.8936002646886763e-02, 6.8473202726632348e-02, 6.8590267467890556e-02, 6.8622260196942120e-02,
+													  6.7572025855569748e-02, 6.9033623934637786e-02, 6.8746913222247338e-02, 6.8583080004194330e-02,
+													  6.8671972940326412e-02, 6.7568629641372460e-02, 6.9525398204902958e-02, 6.7528892599278342e-02,
+													  6.7814859824966087e-02, 6.8238427978485269e-02, 6.8712360871493086e-02, 6.9760160621270675e-02,
+													  6.8749042841277780e-02, 6.9414579186828071e-02, 6.9102312901675886e-02, 6.8429331538084379e-02}));
+	return momentsEst;
+	/*
+	 * bootstrap     mean = 1.1520239122276158e-03
+	 * bootstrap variance = 3.0259317682406541e-06
+	 * bootstrap skewness = not present in the reference code
+	 * bootstrap   binder = 7.2132403917648602e-01
+	 */
+}
+
+static MomentsEstimators buildMomentsEstimatorsSameEntryForTest(){
+	MomentsEstimators momentsEst;
+	momentsEst[1] = DataSample(std::valarray<double>(5.126236900933244e-01, 100));
+	momentsEst[2] = DataSample(std::valarray<double>(2.627932923896761e-01, 100));
+	momentsEst[3] = DataSample(std::valarray<double>(1.347245894580630e-01, 100));
+	momentsEst[4] = DataSample(std::valarray<double>(6.907112186983248e-02, 100));
+	return momentsEst;
+}
+
+
+BOOST_AUTO_TEST_SUITE(MeanTest)
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)
+	{
+		EstimateAndError referenceValue(0.0, 0.0);
+		Mean mean(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
+		BOOST_CHECK_CLOSE(mean.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(mean.getValueAndError().error, 1.e-7);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
+	{
+		EstimateAndError referenceValue(0.5120788163699608, 0.0);
+		Mean mean(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
+		BOOST_CHECK_CLOSE(mean.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(mean.getValueAndError().error, 1.e-7);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
+	{
+		EstimateAndError referenceValue(0.5120788163699608, 1.1520239122276158e-03);
+		Mean mean(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
+		BOOST_CHECK_CLOSE(mean.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(mean.getValueAndError().error, referenceValue.error, doublePrecisionInPercent);
+	}
+
+	//TODO: Test for Mean mean(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(VarianceTest)
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)
+	{
+		EstimateAndError referenceValue(0.2622374015645983, 0.0);
+		Variance variance(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
+		BOOST_CHECK_CLOSE(variance.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(variance.getValueAndError().error, 1.e-7);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
+	{
+		EstimateAndError referenceValue(1.268738973830841e-05, 0.0);
+		Variance variance(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
+		BOOST_CHECK_CLOSE(variance.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(variance.getValueAndError().error, 1.e-7);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
+	{
+		EstimateAndError referenceValue(1.268738973830841e-05, 3.0259317682406541e-06);
+		Variance variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
+		BOOST_CHECK_CLOSE(variance.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(variance.getValueAndError().error, referenceValue.error, doublePrecisionInPercent);
+	}
+
+	//TODO: Test for Variance variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(SkewnessTest)
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)
+	{
+		EstimateAndError referenceValue(1.000072760979389, 0.0);
+		Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
+		BOOST_CHECK_CLOSE(skewness.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(skewness.getValueAndError().error, 1.e-7);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
+	{
+		EstimateAndError referenceValue(0.5694793357428045, 0.0);
+		Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
+		BOOST_CHECK_CLOSE(skewness.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(skewness.getValueAndError().error, 1.e-7);
+	}
+
+	//TODO: Test for Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
+	//TODO: Test for Skewness variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(BinderCumulantTest)
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)
+	{
+		EstimateAndError referenceValue(1.000194288875983, 0.0);
+		BinderCumulant binder(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
+		BOOST_CHECK_CLOSE(binder.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(binder.getValueAndError().error, 1.e-7);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
+	{
+		EstimateAndError referenceValue(3.7478114121524830, 0.0);
+		BinderCumulant binder(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
+		BOOST_CHECK_CLOSE(binder.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(binder.getValueAndError().error, 3.e-7);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
+	{
+		EstimateAndError referenceValue(3.7478114121524830, 7.2132403917648602e-01);
+		BinderCumulant binder(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
+		BOOST_CHECK_CLOSE(binder.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(binder.getValueAndError().error, referenceValue.error, doublePrecisionInPercent);
+	}
+
+	//TODO: Test for BinderCumulant binder(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
+
+BOOST_AUTO_TEST_SUITE_END()
+
+//TODO: Develop tests for Mean, Variance, Skewness, BinderCumulant classes with Jackknife from estimators!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
