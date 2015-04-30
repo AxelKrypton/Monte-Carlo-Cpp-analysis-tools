@@ -7,11 +7,11 @@
 #include "../dataAnalysisUtilities/Observables.hpp"
 
 /*
- * The idea underlying the implementation of the Reweighter class is that the user construct a
- * Reweighter object, sets the values of new parameters (ranges and number of points) either in
+ * The idea underlying the implementation of the MomentsReweighter class is that the user construct a
+ * MomentsReweighter object, sets the values of new parameters (ranges and number of points) either in
  * the constructor or using the setter setNewParameters, and then uses methods such as
  * getLogZAtNewPoints to get the result of the calculation. This means that the user has not
- * to invoque a method to start the calculation itself.
+ * to invoke a method to start the calculation itself.
  *
  * Given what written above, one has to consider that to calculate the logZ at the new points
  * the value of logZ at the simulated points is needed and, of course, one must have the values
@@ -24,28 +24,28 @@
  *
  * NOTE: Actually there are three kind of setters: one to set only the ranges, one to set only
  *       the number of new points, and one to set both. The first two are thought to be used
- *       only to re-set the values: one cannot instatiate an object without giving the new parameters
+ *       only to re-set the values: one cannot instantiate an object without giving the new parameters
  *       and then call first on single setter and then the other. For this case, the complete
- *       setter shoud be used. However, all these three setters will calculate again the values
+ *       setter should be used. However, all these three setters will calculate again the values
  *       of logZ at the new points.
  *
  * Now, it should be clear that, to make this class more user-friendly, some functionalities in
  * principle different have been grouped in single methods (like the setting operation and the
- * calculation). The problem is that in the tests the single functonality shoud be tested. Hence
+ * calculation). The problem is that in the tests the single functionality should be tested. Hence
  * one would like to test the setter itself, without carrying out any calculation in it. The calculation
  * should to be tested in a separate test case. This is the reason why we proceed implementing a
- * ReweighterAbstract class that has the setters as pure virtual functions. In the derived classes
- * Reweighter and ReweighterTest these setters will be properly defined, i.e. in the Reweighter the
+ * MomentsReweighterAbstract class that has the setters as pure virtual functions. In the derived classes
+ * MomentsReweighter and MomentsReweighterTest these setters will be properly defined, i.e. in the MomentsReweighter the
  * calculation of logZ at new points will be done and in ReweighterTest not. About the calculation
  * in the constructor, one would like to do something similar, but we know it is not possible to have
  * a virtual constructor. Thus we will not put this calculation in the ReweighterAbstract class
- * constructor, but only in the real Reweighter class.
+ * constructor, but only in the real MomentsReweighter class.
  *
  * NOTE: Since abstract classes cannot be used to instantiate objects, it could be misleading to
  *       have a public constructor. Actually, it seems to make no difference to have a public or
  *       a private constructor in an abstract class, we will make them protected (read this reference
  *       http://stackoverflow.com/questions/1363147/is-a-public-constructor-in-an-abstract-class-a-codesmell
- *       for more detials).
+ *       for more details).
  *
  * REMARK: For each pure virtual method, the base class can still have an implementation of such a method
  *         that can be explicitly called in the children with the scope resolution operator. In this way,
@@ -59,11 +59,10 @@
  * each given configuration. So it is not sufficient to know the value of the logZ at the simulated points
  * and the value of each observable at each simulated points (i.e. only the mean over the Monte Carlo history)
  * in order to calculate the values of the observables at the new points. This slightly complicates the
- * implementation, since it makes then less sense to have a completely new object to get the new values of the
- * observables. It is indeed rather natural to make the Reweighter class responsible also for calculating
- * the values of the new observables, though in this way the "Single responsability" principle is partially
- * violated (even if actually one could think as responsability the observables reweighting).
- * The reason why it is quite easy to include here the observable reweight procedure is that one can
+ * implementation. It is indeed rather natural to make the MomentsReweighter class responsible also for calculating
+ * the values of the moments of the observables, though in this way the "Single responsability" principle is partially
+ * violated (even if actually one could think as responsability the momentss reweighting).
+ * The reason why it is quite easy to include here the observable moments reweighting procedure is that one can
  * easily give the observables data to the class, without changing almost anything. It is enough to give
  * them as columns after the conjugated quantities in each simulation data file. Since the number of conjugated
  * quantities is known, being it equal to the number of reweighting parameters, one can easily deduce the
