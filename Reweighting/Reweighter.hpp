@@ -74,10 +74,10 @@
  */
 
 
-class ReweighterAbstract {
+class MomentsReweighterAbstract {
     friend class ReweightingDataHandler;
 public:
-    virtual ~ReweighterAbstract() {}
+    virtual ~MomentsReweighterAbstract() {}
 	//Getters
 	std::vector<std::vector<double> > getValuesOfSimulationParameters();
 	std::vector<std::vector<double> > getValuesOfNewParameters();
@@ -95,13 +95,13 @@ public:
     std::vector<std::vector<Observables> > calculateAndGetReweightedObservables();
 
 protected:
-    ReweighterAbstract();
-    ReweighterAbstract(std::string configurationFileIn,
+    MomentsReweighterAbstract();
+    MomentsReweighterAbstract(std::string configurationFileIn,
                        std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                        std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
                        std::string errorMethodIn = "bootstrap",
                        double precisionToCalculateLogZ = 1.e-7);
-    ReweighterAbstract(std::string configurationFileIn,
+    MomentsReweighterAbstract(std::string configurationFileIn,
                        std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                        std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
                        std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
@@ -195,24 +195,24 @@ private:
 };
 
 
-class Reweighter : public ReweighterAbstract{
+class MomentsReweighter : public MomentsReweighterAbstract{
 public:
-    Reweighter() : ReweighterAbstract() {}
-    explicit Reweighter(std::string configurationFileIn,
+    MomentsReweighter() : MomentsReweighterAbstract() {}
+    explicit MomentsReweighter(std::string configurationFileIn,
                         std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                         std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
                         std::string errorMethodIn = "bootstrap", double precisionToCalculateLogZ = 1.e-7)
-     : ReweighterAbstract(configurationFileIn, colToBeRewUsingMultipleColumns,
+     : MomentsReweighterAbstract(configurationFileIn, colToBeRewUsingMultipleColumns,
     		              colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {
         calculateAndSetLogZAtSimulatedPoints();
     }
-    Reweighter(std::string configurationFileIn,
+    MomentsReweighter(std::string configurationFileIn,
                std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
                std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
                std::string errorMethodIn = "bootstrap", double precisionToCalculateLogZ = 1.e-7)
-     : ReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
+     : MomentsReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
                           newNumberOfPointsOfParametersIn, colToBeRewUsingMultipleColumns,
                           colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {
         calculateAndSetLogZAtSimulatedPoints();
@@ -221,18 +221,18 @@ public:
 
     //Setters
     void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
-        ReweighterAbstract::setNewRangesOfParameters(newRangesOfParametersIn);
+        MomentsReweighterAbstract::setNewRangesOfParameters(newRangesOfParametersIn);
         calculateAndSetLogZAtNewPoints();
     }
 
     void setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn){
-        ReweighterAbstract::setNewNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn);
+        MomentsReweighterAbstract::setNewNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn);
         calculateAndSetLogZAtNewPoints();
     }
 
     void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                           std::vector<unsigned int> newNumberOfPointsOfParametersIn){
-        ReweighterAbstract::setNewParameters(newRangesOfParametersIn, newNumberOfPointsOfParametersIn);
+        MomentsReweighterAbstract::setNewParameters(newRangesOfParametersIn, newNumberOfPointsOfParametersIn);
         calculateAndSetLogZAtNewPoints();
     }
 };

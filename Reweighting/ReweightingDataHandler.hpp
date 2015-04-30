@@ -27,11 +27,11 @@
  *       exception will be thrown!
  */
 
-class ReweighterAbstract;
-class Reweighter;
+class MomentsReweighterAbstract;
+class MomentsReweighter;
 
 class ReweightingDataHandler {
-    friend class ReweighterAbstract;
+    friend class MomentsReweighterAbstract;
 public:
     ReweightingDataHandler();
     ReweightingDataHandler(std::string configurationFileIn,
@@ -45,8 +45,8 @@ public:
     std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters();
     void extractAndSetProvidedValuesOfLogZAtSimulatedPoints(std::vector<double>& logZ);
     //Output to file
-    void writeNewConfigurationFileWithMetaparameters(Reweighter reweighter, std::string newConfigFileName = "");
-    void writeNewPointsToFileWithLogZ(Reweighter reweighter, std::string outputFileName = "logZAtNewPoints");
+    void writeNewConfigurationFileWithMetaparameters(MomentsReweighter reweighter, std::string newConfigFileName = "");
+    void writeNewPointsToFileWithLogZ(MomentsReweighter reweighter, std::string outputFileName = "logZAtNewPoints");
 
 protected:
     std::vector<int> numberOfBinsToBeUsed;

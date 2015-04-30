@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_SUITE(functionalities)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
         ReweightingDataHandler reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
-        reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(Reweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack"));
+        reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(MomentsReweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack"));
         std::string outputFileName = "configFileWithLogZ";
         BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
         if(boost::filesystem::exists(outputFileName))
@@ -188,13 +188,13 @@ BOOST_AUTO_TEST_SUITE(functionalities)
         std::vector<std::pair<double, double> > newRanges;
         std::vector< unsigned int> newNumPoints(1, 30);
         newRanges.push_back(std::make_pair(5.348, 5.3509));
-        Reweighter* reweighter = new Reweighter(fileThatDoesExist, newRanges, newNumPoints);
+        MomentsReweighter* reweighter = new MomentsReweighter(fileThatDoesExist, newRanges, newNumPoints);
         std::vector<double> simulatedLogZ = reweighter->getLogZAtSimulatedPoints();
         std::string outputFileName = "testWritingConfigFile";
         reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(*reweighter, outputFileName);
         BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
         delete reweighter;
-        reweighter = new Reweighter(outputFileName);
+        reweighter = new MomentsReweighter(outputFileName);
         for(size_t i=0; i<simulatedLogZ.size(); i++)
             BOOST_REQUIRE_CLOSE(reweighter->getLogZAtSimulatedPoints()[i], simulatedLogZ[i], doublePrecisionInPercent);
         if(boost::filesystem::exists(outputFileName))
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_SUITE(functionalities)
         std::vector<std::pair<double, double> > newRanges;
         std::vector< unsigned int> newNumPoints(1, 30);
         newRanges.push_back(std::make_pair(5.348, 5.3509));
-        Reweighter reweighter(fileThatDoesExist, newRanges, newNumPoints);
+        MomentsReweighter reweighter(fileThatDoesExist, newRanges, newNumPoints);
         std::string outputFileName = "testWritingNewPoints";
         std::ofstream outputFile;
         outputFile.open(outputFileName.c_str());

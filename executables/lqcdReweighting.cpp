@@ -24,7 +24,7 @@ int main(int argc, const char ** argv)
         else
         	throw std::runtime_error("Error method unknown! This exception should never be thrown! Bug...");
 		
-        Reweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints, colOfObsMultipleColumns, colOfObsWithZeroMean, errorMethod);
+        MomentsReweighter reweighter(parameters.getInputfile(), newRanges, newNumPoints, colOfObsMultipleColumns, colOfObsWithZeroMean, errorMethod);
 		
 		std::vector<std::vector<Observables> > reweightedObservables = reweighter.calculateAndGetReweightedObservables();
 		std::vector<std::vector<double> > newBetaValues = reweighter.getValuesOfNewParameters();

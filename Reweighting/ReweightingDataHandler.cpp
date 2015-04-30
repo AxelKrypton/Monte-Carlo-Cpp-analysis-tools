@@ -169,7 +169,7 @@ void ReweightingDataHandler::extractAndSetProvidedValuesOfLogZAtSimulatedPoints(
 }
 
 
-void ReweightingDataHandler::writeNewConfigurationFileWithMetaparameters(Reweighter reweighter, std::string newConfigFileName){
+void ReweightingDataHandler::writeNewConfigurationFileWithMetaparameters(MomentsReweighter reweighter, std::string newConfigFileName){
     if(newConfigFileName == "")
         newConfigFileName = "configFileWithLogZ";
     std::ofstream outputFile;
@@ -199,7 +199,7 @@ void ReweightingDataHandler::writeNewConfigurationFileWithMetaparameters(Reweigh
     outputFile.close();
 }
 
-void ReweightingDataHandler::writeNewPointsToFileWithLogZ(Reweighter reweighter, std::string outputFileName){
+void ReweightingDataHandler::writeNewPointsToFileWithLogZ(MomentsReweighter reweighter, std::string outputFileName){
     if(boost::filesystem::exists(outputFileName))
         throw std::invalid_argument("The file \"outputFileName\" already exists! It will not be overwritten, aborting...");
     std::ofstream outputFile;

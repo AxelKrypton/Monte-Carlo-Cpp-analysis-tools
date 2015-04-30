@@ -22,12 +22,12 @@ static void evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(Observab
  * the default constructor of the SimulationDataContainer class that throws an std::invalid_argument
  * exception.
  */
-ReweighterAbstract::ReweighterAbstract() {
+MomentsReweighterAbstract::MomentsReweighterAbstract() {
     throw std::invalid_argument("Reweighter needs SimulationDataContainer object for construction!");
 }
 
 
-ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
+MomentsReweighterAbstract::MomentsReweighterAbstract(std::string configurationFileIn,
                                        std::vector<unsigned int> colToBeRewUsingMultipleColumns,
                                        std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
                                        std::string errorMethodIn, double precisionToCalculateLogZ)
@@ -38,7 +38,7 @@ ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
 }
 
 
-ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
+MomentsReweighterAbstract::MomentsReweighterAbstract(std::string configurationFileIn,
                                        std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                                        std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
                                        std::vector<unsigned int> colToBeRewUsingMultipleColumns,
@@ -53,51 +53,51 @@ ReweighterAbstract::ReweighterAbstract(std::string configurationFileIn,
 }
 
 
-std::vector<std::vector<double> > ReweighterAbstract::getValuesOfSimulationParameters(){
+std::vector<std::vector<double> > MomentsReweighterAbstract::getValuesOfSimulationParameters(){
 	return valuesOfSimulationParameters;
 }
 
 
-std::vector<std::vector<double> > ReweighterAbstract::getValuesOfNewParameters(){
+std::vector<std::vector<double> > MomentsReweighterAbstract::getValuesOfNewParameters(){
 	return valuesOfNewParameters;
 }
 
 
-int ReweighterAbstract::getNumberOfNewPoints(){
+int MomentsReweighterAbstract::getNumberOfNewPoints(){
 	return valuesOfNewParameters.size();
 }
 
 
-std::vector<double> ReweighterAbstract::getLogZAtSimulatedPoints(){
+std::vector<double> MomentsReweighterAbstract::getLogZAtSimulatedPoints(){
 	return logZAtSimulatedPoints;
 }
 
 
-std::vector<double> ReweighterAbstract::getLogZAtNewPoints(){
+std::vector<double> MomentsReweighterAbstract::getLogZAtNewPoints(){
     if(newRangesOfParameters.size() == 0 || newNumberOfPointsOfParameters.size() == 0)
         throw std::logic_error("Values of logZ at new points cannot be retrieved without setting before the new points!");
 	return logZAtNewPoints;
 }
 
 
-double ReweighterAbstract::getPrecisionToCalculateLogZ(){
+double MomentsReweighterAbstract::getPrecisionToCalculateLogZ(){
 	return precisionOfIterativeProcedureToCalculateLogZ;
 }
 
 
-void ReweighterAbstract::setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
+void MomentsReweighterAbstract::setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
 	newRangesOfParameters = newRangesOfParametersIn;
 	calculateNewPoints();
 }
 
 
-void ReweighterAbstract::setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn){
+void MomentsReweighterAbstract::setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn){
 	newNumberOfPointsOfParameters = newNumberOfPointsOfParametersIn;
 	calculateNewPoints();
 }
 
 
-void ReweighterAbstract::setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+void MomentsReweighterAbstract::setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
 		                               std::vector<unsigned int> newNumberOfPointsOfParametersIn)
 {
 	newRangesOfParameters = newRangesOfParametersIn;
@@ -105,7 +105,7 @@ void ReweighterAbstract::setNewParameters(std::vector<std::pair<double, double> 
 	calculateNewPoints();
 }
 
-void ReweighterAbstract::setPrecisionToCalculateLogZ(double precisionToCalculateLogZ){
+void MomentsReweighterAbstract::setPrecisionToCalculateLogZ(double precisionToCalculateLogZ){
 	if(precisionToCalculateLogZ <= 0.0)
 		throw std::range_error("Precision smaller than or equal to zero is nonsense!");
 	precisionOfIterativeProcedureToCalculateLogZ = precisionToCalculateLogZ;
@@ -121,7 +121,7 @@ void ReweighterAbstract::setPrecisionToCalculateLogZ(double precisionToCalculate
  *       be sure that each observable is positive before taking the logarithm. This is achieved
  *       shifting them by twice the minimum, if some negative value occurs.
  */
-std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweightedObservables(){
+std::vector<std::vector<Observables> > MomentsReweighterAbstract::calculateAndGetReweightedObservables(){
     std::cout << "==========================================================\n";
     std::cout << " Starting reweighting of observables...\n";
     size_t numberOfNewPoints = valuesOfNewParameters.size();
@@ -189,7 +189,7 @@ std::vector<std::vector<Observables> > ReweighterAbstract::calculateAndGetReweig
 /************************** PROTECTED OR PRIVATE METHODS *********************************/
 /*****************************************************************************************/
 
-void ReweighterAbstract::generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero)
+void MomentsReweighterAbstract::generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero)
 {
 	reweightingParameterNames = reweightingDataHandler.getNamesOfParametersIgnoringMetaParameters();
     valuesOfSimulationParameters = reweightingDataHandler.getValuesOfSimulationParametersIgnoringMetaParameters();
@@ -211,7 +211,7 @@ void ReweighterAbstract::generalInitialization(std::vector<unsigned int> colWhos
     reweightingDataHandler.extractAndSetProvidedValuesOfLogZAtSimulatedPoints(logZAtSimulatedPoints);
 }
 
-void ReweighterAbstract::calculateNewPoints(){
+void MomentsReweighterAbstract::calculateNewPoints(){
 	//todo: improve! Here the easiest implementation -> new point values determined as (upper_bound-lower_bound)/num_points
 	if(newRangesOfParameters.size() != newNumberOfPointsOfParameters.size() ||
        newRangesOfParameters.size() != reweightingParameterNames.size())
@@ -249,7 +249,7 @@ void ReweighterAbstract::calculateNewPoints(){
  *       instance, logZAtSimulatedPoints must have the right amount of memory reserved
  *       before calling this function.
  */
-std::vector<double> ReweighterAbstract::calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated,
+std::vector<double> MomentsReweighterAbstract::calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated,
                                                                  bool useUncorrData, const int entryToBeLeftOut,
                                                                  std::vector<double>* logZAtSimulationPointToBeUsed){
 
@@ -311,7 +311,7 @@ std::vector<double> ReweighterAbstract::calculateLogZAtNewPoints(std::vector<std
  *       instance, logZAtSimulatedPoints must have the right amount of memory reserved
  *       before calling this function.
  */
-std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPoints(bool useUncorrData, const int entryToBeLeftOut,
+std::vector<double> MomentsReweighterAbstract::calculateLogZAtSimulatedPoints(bool useUncorrData, const int entryToBeLeftOut,
         															   std::vector<double>* logZAtSimulationPointToStartFrom, bool printUserInfo){
     /*
      * Here we MUST initialize the values of the logZ to zero. Namely one should do something like
@@ -398,11 +398,11 @@ std::vector<double> ReweighterAbstract::calculateLogZAtSimulatedPoints(bool useU
     }
 }
 
-void ReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
+void MomentsReweighterAbstract::calculateAndSetLogZAtSimulatedPoints(){
 	logZAtSimulatedPoints = calculateLogZAtSimulatedPoints(false, -1, &logZAtSimulatedPoints, true);
 }
 
-void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
+void MomentsReweighterAbstract::calculateAndSetLogZAtNewPoints(){
     logZAtNewPoints = calculateLogZAtNewPoints(valuesOfNewParameters);
 }
 
@@ -431,7 +431,7 @@ void ReweighterAbstract::calculateAndSetLogZAtNewPoints(){
  *         it is done on the purpose to keep the calculation of logZ and the observables separated.
  * TODO: Refactor calculation of logarithmOfDenominator in an own function.
  */
-std::vector<std::vector<double> > ReweighterAbstract::calculateReweightedObservableValues(bool useUncorrData,
+std::vector<std::vector<double> > MomentsReweighterAbstract::calculateReweightedObservableValues(bool useUncorrData,
                                                                                           const int entryToBeLeftOut,
                                                                                           std::vector<double> *logZAtSimulationPointToBeUsed,
                                                                                           std::vector<double> *logZAtNewPointsToBeUsed){
@@ -489,7 +489,7 @@ std::vector<std::vector<double> > ReweighterAbstract::calculateReweightedObserva
  * The preparation of the observables, as well as their restoration, has to be done also on
  * the uncorrelated data, since they are used to estimate the error (with the Jackknife method).
  */
-void ReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<double>& minimumOfEachObservable){
+void MomentsReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<double>& minimumOfEachObservable){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
     //Estimate of minimum of each observable through all files
     for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
@@ -522,7 +522,7 @@ void ReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<double>
     }
 }
 
-void ReweighterAbstract::restoreObservablesAfterReweighting(std::vector<double> minimumOfEachObservable,
+void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<double> minimumOfEachObservable,
                                      std::vector<std::vector<double> > *reweightedObservablesFromRawData,
                                      std::valarray<std::vector<std::vector<double> > > *estimatorsForErrorCalculation){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
@@ -560,13 +560,13 @@ void ReweighterAbstract::restoreObservablesAfterReweighting(std::vector<double> 
 }
 
 
-SimulationDataContainer ReweighterAbstract::getSimulationDataContainer(bool raw){
+SimulationDataContainer MomentsReweighterAbstract::getSimulationDataContainer(bool raw){
     return (raw == true) ? reweightingDataHandler.simulationRawDataContainer
                          : reweightingDataHandler.simulationUncorrDataContainer;
 }
 
 
-void ReweighterAbstract::calculateAndSetReweightedObservablesAndErrorsValuesFromMomentsAndEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
+void MomentsReweighterAbstract::calculateAndSetReweightedObservablesAndErrorsValuesFromMomentsAndEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
 																									 const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation,
 																									 ErrorCalculationMethod errorMethod)
 {
