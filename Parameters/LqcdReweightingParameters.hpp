@@ -6,9 +6,22 @@
 #include <boost/algorithm/string.hpp>
 namespace po = boost::program_options;
 
-
 //TODO: Merge with other Parameters class
-class LqcdReweightingParameters
+
+class ReweightingParameters{
+	/*
+	 * TODO: implement! Here the methods for a general reweighting in N par should be put.
+	 *       Then the LqcdReweightingParameters should be a particular case of this class.
+	 *       One idea is to make some getters here be overwritten by those of the child class.
+	 *       For example here getNewBetaRange_low should return a std::vector<double> and
+	 *       in LqcdReweightingParameters just one double. Actually I do not know if this can
+	 *       be done overwriting methods, maybe a class template would be better. For the moment
+	 *       leave like that since we can use polymorphism in the Reweighter class constructor!
+	 */
+};
+
+
+class LqcdReweightingParameters : ReweightingParameters
 {
 public:
 	LqcdReweightingParameters(int argc, const char ** argv);
