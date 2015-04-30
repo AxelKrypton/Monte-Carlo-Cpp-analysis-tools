@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE Reweighter_objects
+#define BOOST_TEST_MODULE MomentsReweighter_objects
 #include <boost/test/unit_test.hpp>
 #include <valarray>
 

@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE ReweightingDataHandler
+#define BOOST_TEST_MODULE MomentsReweightingDataHandler
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 #include <fstream>
@@ -8,10 +8,10 @@
 #include "MomentsReweighter.hpp"
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePrecisionInPercent
 
-class ReweightingDataHandlerTest : public MomentsReweightingDataHandler{
+class MomentsReweightingDataHandlerTest : public MomentsReweightingDataHandler{
 public:
-    ReweightingDataHandlerTest() : MomentsReweightingDataHandler(){}
-    ReweightingDataHandlerTest(std::string configurationFileIn,
+    MomentsReweightingDataHandlerTest() : MomentsReweightingDataHandler(){}
+    MomentsReweightingDataHandlerTest(std::string configurationFileIn,
                                std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                                std::string errorMethodIn = "bootstrap")
       : MomentsReweightingDataHandler(configurationFileIn, obsToBeRewUsingMultipleColumns, errorMethodIn){}
@@ -37,11 +37,11 @@ BOOST_AUTO_TEST_SUITE(build)
         std::string fileThatDoesExistButWrong2 = "GeneralTestFiles/wrong_configfile_4"; //correct structure but with two identical set of parameters
         std::string fileThatDoesExistButWrong3 = "GeneralTestFiles/wrong_configfile_5"; //correct structure but with two identical filenames
         std::string fileThatDoesExistButWrong4 = "GeneralTestFiles/wrong_configfile_6"; //correct structure but with not existing file inside
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesNotExist), std::exception);
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong1), std::exception);
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong2), std::exception);
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong3), std::exception);
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong4), std::exception);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesNotExist), std::exception);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong1), std::exception);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong2), std::exception);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong3), std::exception);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong4), std::exception);
     }
 
     BOOST_AUTO_TEST_CASE(build3)
@@ -54,35 +54,35 @@ BOOST_AUTO_TEST_SUITE(build)
         std::string fileThatDoesExistButWrong5 = "GeneralTestFiles/wrong_configfile_11"; //correct structure but without binsize at least on one line
         std::string fileThatDoesExistButWrong6 = "GeneralTestFiles/wrong_configfile_12"; //correct structure but with negative binsize
         std::string fileThatDoesExistButWrong7 = "GeneralTestFiles/wrong_configfile_13"; //correct structure but with different number of observables in two files
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong1), std::logic_error);
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong2), std::invalid_argument);
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong3), std::logic_error);
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong4), std::logic_error);
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong5), std::runtime_error);
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong6), std::invalid_argument);
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong7), std::logic_error);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong1), std::logic_error);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong2), std::invalid_argument);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong3), std::logic_error);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong4), std::logic_error);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong5), std::runtime_error);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong6), std::invalid_argument);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExistButWrong7), std::logic_error);
     }
 
     BOOST_AUTO_TEST_CASE(build4)
 	{
 		std::string fileThatDoesExist = "RealTestData/configfile_3";
-		BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "unknown"), std::invalid_argument);
-		BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), ""), std::invalid_argument);
-		BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "Jack_100"), std::invalid_argument);
-		BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot_100_200"), std::invalid_argument);
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jackknife"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "JaCk"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jAcKKniFe"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "bootstrap"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "bOOt"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "BooTSTRap"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot 200"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot_300"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot-400"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot,500"));
-		BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "bootstrap.1000"));
+		BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "unknown"), std::invalid_argument);
+		BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), ""), std::invalid_argument);
+		BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "Jack_100"), std::invalid_argument);
+		BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot_100_200"), std::invalid_argument);
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jackknife"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "JaCk"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jAcKKniFe"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "bootstrap"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "bOOt"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "BooTSTRap"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot 200"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot_300"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot-400"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "boot,500"));
+		BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "bootstrap.1000"));
 	}
 
     BOOST_AUTO_TEST_CASE(build5)
@@ -90,15 +90,15 @@ BOOST_AUTO_TEST_SUITE(build)
         std::string fileThatDoesExist1 = "GeneralTestFiles/simulationDataContainer.configfile_1";
         std::string fileThatDoesExist2 = "GeneralTestFiles/simulationDataContainer.configfile_2";
         std::string fileThatDoesExist3 = "GeneralTestFiles/simulationDataContainer.configfile_3";
-        BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist1, std::vector<unsigned int>(), "jack"));
-        BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist2, std::vector<unsigned int>(), "jack"));
-        BOOST_REQUIRE_NO_THROW(ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist3, std::vector<unsigned int>(), "jack"));
+        BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist1, std::vector<unsigned int>(), "jack"));
+        BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist2, std::vector<unsigned int>(), "jack"));
+        BOOST_REQUIRE_NO_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist3, std::vector<unsigned int>(), "jack"));
     }
 
     BOOST_AUTO_TEST_CASE(build6)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_3";
-        ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
+        MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
         const int referenceNumberOfBins = 16;
         BOOST_REQUIRE_EQUAL(reweightingDataHandler.getNumberOfBinsToBeUsed()[0], referenceNumberOfBins);
     }
@@ -107,13 +107,13 @@ BOOST_AUTO_TEST_SUITE(build)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_6";
         std::vector<unsigned int> multipleColumns(1,1);
-        ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, multipleColumns);
+        MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, multipleColumns);
         const int referenceNumberObsGiven = 4;
         const int referenceNumberObsRew = 16;
         BOOST_REQUIRE_EQUAL(reweightingDataHandler.getNumberOfObsGivenAsInput(), referenceNumberObsGiven);
         BOOST_REQUIRE_EQUAL(reweightingDataHandler.getNumberOfObsToBeRew(), referenceNumberObsRew);
         multipleColumns.push_back(3);
-        BOOST_REQUIRE_THROW(ReweightingDataHandlerTest reweightingDataHandler2(fileThatDoesExist, multipleColumns), std::invalid_argument);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandlerTest reweightingDataHandler2(fileThatDoesExist, multipleColumns), std::invalid_argument);
     }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_SUITE(getters)
     BOOST_AUTO_TEST_CASE(getters1)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
-        ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
+        MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
         std::vector<std::string> referenceParams;
         referenceParams.push_back("beta");
         referenceParams.push_back("chem_pot_im");
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_SUITE(getters)
     BOOST_AUTO_TEST_CASE(getters2)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
-        ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
+        MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
         std::vector<std::vector<double> > referenceValues(3, std::vector<double>(2));
         referenceValues[0][0] = 4.0;
         referenceValues[1][0] = 4.5;
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_SUITE(getters)
     BOOST_AUTO_TEST_CASE(getters3)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
-        ReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
+        MomentsReweightingDataHandlerTest reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
         std::vector<double> referenceLogZ(3, 0.0);
         referenceLogZ[1] = 3.14;
         std::vector<double> setLogZ(3, 0.0);
