@@ -116,6 +116,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfBootstrapResample() );
 	}
 
+	BOOST_AUTO_TEST_CASE(bootstrapPrecision)
+	{
+		double defaultValue = 1.e-7;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getWeightPrecision() );
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(setArguments)
@@ -142,7 +148,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_CHECK(filename == parameters.getInputfile());
 	}
 
-	static LqcdReweightingParameters createParametersForArgumentSettingCheck_longOption(std::string argumentName, int newValue)
+	static LqcdReweightingParameters createParametersForArgumentSettingCheck_longOption(std::string argumentName, double newValue)
 	{
 		std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
 		int numberOfArguments = 4;
@@ -159,14 +165,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 	
 	BOOST_AUTO_TEST_CASE(newRange_high)
 	{
-		double newValue = 65.;
+		double newValue = 65.123;
 		std::string argumentName = "--newBetaRange_high";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_high() );
 	}
 	
 	BOOST_AUTO_TEST_CASE(newRange_low)
 	{
-		double newValue = 14.;
+		double newValue = 14.563;
 		std::string argumentName = "--newBetaRange_low";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_low() );
 	}
@@ -315,6 +321,13 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		std::vector<unsigned int> refValues;
 		refValues.push_back(5);
 		BOOST_REQUIRE(refValues == createParametersForArgumentSettingCheck_string(argumentName, newValues).getColumnsWhoseMeanIsKnownToBeZero() );
+	}
+
+	BOOST_AUTO_TEST_CASE(weightPrecision)
+	{
+		double newValue = 1.e-08;
+		std::string argumentName = "--weightPrecision";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getWeightPrecision() );
 	}
 	
 BOOST_AUTO_TEST_SUITE_END()

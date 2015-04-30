@@ -29,6 +29,7 @@ public:
 	bool getUseJackknifeAsErrorMethod();
 	bool getUseBootstrapAsErrorMethod();
 	int getNumberOfBootstrapResample();
+	double getWeightPrecision();
 
 	struct parse_aborted {};
 	
@@ -46,6 +47,7 @@ private:
 	bool deactivateReweightingForBinder;
 	bool useJackknifeAsErrorMethod;
 	bool useBootstrapAsErrorMethod;
+	double weightPrecision;
 	int numberOfBootstrapResample;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
     std::vector<unsigned int> columnsWhoseMeanIsKnownToBeZero;
