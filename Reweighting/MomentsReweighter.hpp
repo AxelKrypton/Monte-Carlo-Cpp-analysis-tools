@@ -2,7 +2,7 @@
 #define REWEIGHTER_H_
 
 #include "SimulationDataContainer.hpp"
-#include "ReweightingDataHandler.hpp"
+#include "MomentsReweightingDataHandler.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 #include "../dataAnalysisUtilities/Observables.hpp"
 
@@ -75,7 +75,7 @@
 
 
 class MomentsReweighterAbstract {
-    friend class ReweightingDataHandler;
+    friend class MomentsReweightingDataHandler;
 public:
     virtual ~MomentsReweighterAbstract() {}
 	//Getters
@@ -144,7 +144,7 @@ private:
 
 
     //Members
-    ReweightingDataHandler reweightingDataHandler;
+    MomentsReweightingDataHandler reweightingDataHandler;
     std::vector<std::string> reweightingParameterNames;
 
 	/*

@@ -4,17 +4,17 @@
 #include <boost/filesystem.hpp>
 #include <fstream>
 
-#include "ReweightingDataHandler.hpp"
-#include "Reweighter.hpp"
+#include "MomentsReweightingDataHandler.hpp"
+#include "MomentsReweighter.hpp"
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePrecisionInPercent
 
-class ReweightingDataHandlerTest : public ReweightingDataHandler{
+class ReweightingDataHandlerTest : public MomentsReweightingDataHandler{
 public:
-    ReweightingDataHandlerTest() : ReweightingDataHandler(){}
+    ReweightingDataHandlerTest() : MomentsReweightingDataHandler(){}
     ReweightingDataHandlerTest(std::string configurationFileIn,
                                std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                                std::string errorMethodIn = "bootstrap")
-      : ReweightingDataHandler(configurationFileIn, obsToBeRewUsingMultipleColumns, errorMethodIn){}
+      : MomentsReweightingDataHandler(configurationFileIn, obsToBeRewUsingMultipleColumns, errorMethodIn){}
     std::vector<int> getNumberOfBinsToBeUsed(){ return numberOfBinsToBeUsed;}
     int getNumberOfObsGivenAsInput(){ return numberOfObservablesGivenAsInput;}
     int getNumberOfObsToBeRew(){ return numberOfObservablesToBeReweighted;}
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_SUITE(build)
 
     BOOST_AUTO_TEST_CASE(build1)
     {
-        BOOST_REQUIRE_THROW(ReweightingDataHandler reweightingDataHandler, std::invalid_argument);
+        BOOST_REQUIRE_THROW(MomentsReweightingDataHandler reweightingDataHandler, std::invalid_argument);
     }
 
     BOOST_AUTO_TEST_CASE(build2)
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_SUITE(functionalities)
     BOOST_AUTO_TEST_CASE(writeNewConfigFile1)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
-        ReweightingDataHandler reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
+        MomentsReweightingDataHandler reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
         reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(MomentsReweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack"));
         std::string outputFileName = "configFileWithLogZ";
         BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_SUITE(functionalities)
     BOOST_AUTO_TEST_CASE(writeNewConfigFile2)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_1";
-        ReweightingDataHandler reweightingDataHandler(fileThatDoesExist);
+        MomentsReweightingDataHandler reweightingDataHandler(fileThatDoesExist);
         std::vector<std::pair<double, double> > newRanges;
         std::vector< unsigned int> newNumPoints(1, 30);
         newRanges.push_back(std::make_pair(5.348, 5.3509));
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_SUITE(functionalities)
     BOOST_AUTO_TEST_CASE(writeNewPointsToFile)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_1";
-        ReweightingDataHandler reweightingDataHandler(fileThatDoesExist);
+        MomentsReweightingDataHandler reweightingDataHandler(fileThatDoesExist);
         std::vector<std::pair<double, double> > newRanges;
         std::vector< unsigned int> newNumPoints(1, 30);
         newRanges.push_back(std::make_pair(5.348, 5.3509));

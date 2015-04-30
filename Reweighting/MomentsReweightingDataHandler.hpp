@@ -30,16 +30,16 @@
 class MomentsReweighterAbstract;
 class MomentsReweighter;
 
-class ReweightingDataHandler {
+class MomentsReweightingDataHandler {
     friend class MomentsReweighterAbstract;
 public:
-    ReweightingDataHandler();
-    ReweightingDataHandler(std::string configurationFileIn,
+    MomentsReweightingDataHandler();
+    MomentsReweightingDataHandler(std::string configurationFileIn,
                            std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
                            std::string errorMethodIn = "bootstrap");
-    ReweightingDataHandler(const ReweightingDataHandler&);
-    ReweightingDataHandler& operator=(const ReweightingDataHandler&);
-    ~ReweightingDataHandler() { if(bootstrapNumber != NULL) delete bootstrapNumber; }
+    MomentsReweightingDataHandler(const MomentsReweightingDataHandler&);
+    MomentsReweightingDataHandler& operator=(const MomentsReweightingDataHandler&);
+    ~MomentsReweightingDataHandler() { if(bootstrapNumber != NULL) delete bootstrapNumber; }
     //Getters
     std::vector<std::string> getNamesOfParametersIgnoringMetaParameters();
     std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters();

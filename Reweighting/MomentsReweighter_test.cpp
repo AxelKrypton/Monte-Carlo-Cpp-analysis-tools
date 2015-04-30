@@ -3,8 +3,8 @@
 #include <boost/test/unit_test.hpp>
 #include <valarray>
 
-#include "Reweighter.hpp"
-#include "ReweightingDataHandler.hpp"
+#include "MomentsReweighter.hpp"
+#include "MomentsReweightingDataHandler.hpp"
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePrecisionInPercent
 
 class MomentsReweighterTest : public MomentsReweighterAbstract{

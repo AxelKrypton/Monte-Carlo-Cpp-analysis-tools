@@ -1,7 +1,7 @@
 #include "exceptions.hpp"
 #include "exitCodes.hpp"
 #include "../Parameters/LqcdReweightingParameters.hpp"
-#include "../Reweighting/Reweighter.hpp"
+#include "../Reweighting/MomentsReweighter.hpp"
 #include "../IO/io_utilities.hpp"
 
 int main(int argc, const char ** argv)

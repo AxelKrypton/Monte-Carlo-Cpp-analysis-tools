@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 #include <chrono>
-#include "Reweighter.hpp"
+#include "MomentsReweighter.hpp"
 #include "SimulationData.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 #include "../dataAnalysisUtilities/jackknifeAnalysis.hpp"

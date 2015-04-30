@@ -1,7 +1,7 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
-#include "ReweightingDataHandler.hpp"
-#include "Reweighter.hpp"
+#include "MomentsReweightingDataHandler.hpp"
+#include "MomentsReweighter.hpp"
 #include "SimulationData.hpp"
 #include "../dataAnalysisUtilities/binnedDataSample.hpp"
 
@@ -20,10 +20,10 @@ static std::pair<ErrorCalculationMethod, std::string> getErrorCalculationMethod(
  * Initialization of the const static member of ReweighterAbstract class.
  */
 std::string tmp[2] = {"logZ", "binsize"};
-const std::vector<std::string> ReweightingDataHandler::metaParameters(tmp, tmp+2);
+const std::vector<std::string> MomentsReweightingDataHandler::metaParameters(tmp, tmp+2);
 
 
-ReweightingDataHandler::ReweightingDataHandler() {
+MomentsReweightingDataHandler::MomentsReweightingDataHandler() {
     throw std::invalid_argument("ReweightingDataHandler needs input file for construction!");
 }
 
@@ -37,7 +37,7 @@ ReweightingDataHandler::ReweightingDataHandler() {
  *
  * TODO: Refactor this constructor extracting functions!!
  */
-ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
+MomentsReweightingDataHandler::MomentsReweightingDataHandler(std::string configurationFileIn,
                                                std::vector<unsigned int> obsToBeRewUsingMultipleColumns,
                                                std::string errorMethodIn)
     : configurationFile(configurationFileIn), simulationRawDataContainer(configurationFileIn),
@@ -50,10 +50,10 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
 		*bootstrapNumber = std::stoi( temporaryPair.second );
 	}
 	numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - getNamesOfParametersIgnoringMetaParameters().size();
-    checkCorrectnessOfConfigurationFileForReweighting(simulationRawDataContainer, ReweightingDataHandler::metaParameters, numberOfObservablesGivenAsInput);
+    checkCorrectnessOfConfigurationFileForReweighting(simulationRawDataContainer, MomentsReweightingDataHandler::metaParameters, numberOfObservablesGivenAsInput);
 
     std::vector<int> entriesToBeCutFromRawData;
-    numberOfBinsToBeUsed = getNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, ReweightingDataHandler::metaParameters, errorMethod, entriesToBeCutFromRawData);
+    numberOfBinsToBeUsed = getNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, MomentsReweightingDataHandler::metaParameters, errorMethod, entriesToBeCutFromRawData);
     //Evaluate central moments per data and append them to the raw data container
     //TODO: So far this is hard-coded, make it general and settable by user
     std::vector<unsigned int> columnsForWhichMomentsMustBeInserted;
@@ -100,7 +100,7 @@ ReweightingDataHandler::ReweightingDataHandler(std::string configurationFileIn,
 }
 
 //Copy constructor needed since we have a raw pointer as member!
-ReweightingDataHandler::ReweightingDataHandler(const ReweightingDataHandler& objectIn)
+MomentsReweightingDataHandler::MomentsReweightingDataHandler(const MomentsReweightingDataHandler& objectIn)
    : numberOfBinsToBeUsed(objectIn.numberOfBinsToBeUsed),
      numberOfObservablesGivenAsInput(objectIn.numberOfObservablesGivenAsInput),
      numberOfObservablesToBeReweighted(objectIn.numberOfObservablesToBeReweighted),
@@ -116,7 +116,7 @@ ReweightingDataHandler::ReweightingDataHandler(const ReweightingDataHandler& obj
 }
 
 //Equal operator needed since we have a raw pointer as member!
-ReweightingDataHandler& ReweightingDataHandler::operator=(const ReweightingDataHandler& rhs){
+MomentsReweightingDataHandler& MomentsReweightingDataHandler::operator=(const MomentsReweightingDataHandler& rhs){
 	// check for "self assignment" and do nothing in that case
 	if (this == &rhs) return *this;
 	else{
@@ -136,22 +136,22 @@ ReweightingDataHandler& ReweightingDataHandler::operator=(const ReweightingDataH
 	return *this;
 }
 
-std::vector<std::string> ReweightingDataHandler::getNamesOfParametersIgnoringMetaParameters(){
+std::vector<std::string> MomentsReweightingDataHandler::getNamesOfParametersIgnoringMetaParameters(){
     std::vector<std::string> result;
     extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(simulationRawDataContainer[0], result,
-                                                                     ReweightingDataHandler::metaParameters);
+                                                                     MomentsReweightingDataHandler::metaParameters);
     return result;
 }
 
-std::vector<std::vector<double> > ReweightingDataHandler::getValuesOfSimulationParametersIgnoringMetaParameters(){
+std::vector<std::vector<double> > MomentsReweightingDataHandler::getValuesOfSimulationParametersIgnoringMetaParameters(){
     std::vector<std::vector<double> > result;
     extractValuesOfSimulationParametersIgnoringMetaParameters(simulationRawDataContainer, result,
-                                                              ReweightingDataHandler::metaParameters);
+                                                              MomentsReweightingDataHandler::metaParameters);
     return result;
 }
 
 //Here we do not return a vector but we give it as argument because it is supposed to be prepared!
-void ReweightingDataHandler::extractAndSetProvidedValuesOfLogZAtSimulatedPoints(std::vector<double>& logZ){
+void MomentsReweightingDataHandler::extractAndSetProvidedValuesOfLogZAtSimulatedPoints(std::vector<double>& logZ){
     if(logZ.size() == 0)
         throw std::invalid_argument("logZ asked to be set but not allocated!");
     for(size_t i=0; i<logZ.size(); i++){
@@ -169,7 +169,7 @@ void ReweightingDataHandler::extractAndSetProvidedValuesOfLogZAtSimulatedPoints(
 }
 
 
-void ReweightingDataHandler::writeNewConfigurationFileWithMetaparameters(MomentsReweighter reweighter, std::string newConfigFileName){
+void MomentsReweightingDataHandler::writeNewConfigurationFileWithMetaparameters(MomentsReweighter reweighter, std::string newConfigFileName){
     if(newConfigFileName == "")
         newConfigFileName = "configFileWithLogZ";
     std::ofstream outputFile;
@@ -183,11 +183,11 @@ void ReweightingDataHandler::writeNewConfigurationFileWithMetaparameters(Moments
         for(size_t j=0; j<reweighter.reweightingParameterNames.size(); j++){
             outputFile << reweighter.reweightingParameterNames[j] << " " << reweighter.valuesOfSimulationParameters[i][j] << "\t";
         }
-        for(size_t j=0; j<ReweightingDataHandler::metaParameters.size(); j++){
-            outputFile << ReweightingDataHandler::metaParameters[j] << " ";
-            if(ReweightingDataHandler::metaParameters[j] == "logZ")
+        for(size_t j=0; j<MomentsReweightingDataHandler::metaParameters.size(); j++){
+            outputFile << MomentsReweightingDataHandler::metaParameters[j] << " ";
+            if(MomentsReweightingDataHandler::metaParameters[j] == "logZ")
                 outputFile << reweighter.logZAtSimulatedPoints[i];
-            else if(ReweightingDataHandler::metaParameters[j] == "binsize")
+            else if(MomentsReweightingDataHandler::metaParameters[j] == "binsize")
                 outputFile << reweighter.reweightingDataHandler.simulationRawDataContainer[i][0].getNumberOfElements()/numberOfBinsToBeUsed[i];
             else
                 throw std::runtime_error("Encountered unknown metaparameter writing new configuration file!");
@@ -199,7 +199,7 @@ void ReweightingDataHandler::writeNewConfigurationFileWithMetaparameters(Moments
     outputFile.close();
 }
 
-void ReweightingDataHandler::writeNewPointsToFileWithLogZ(MomentsReweighter reweighter, std::string outputFileName){
+void MomentsReweightingDataHandler::writeNewPointsToFileWithLogZ(MomentsReweighter reweighter, std::string outputFileName){
     if(boost::filesystem::exists(outputFileName))
         throw std::invalid_argument("The file \"outputFileName\" already exists! It will not be overwritten, aborting...");
     std::ofstream outputFile;
