@@ -3,6 +3,7 @@ add_library(Reweighting
 	SimulationDataContainer.cpp
     MomentsReweightingDataHandler.cpp
 	MomentsReweighter.cpp
+	Reweighter.cpp
 )
 target_link_libraries(Reweighting dataAnalysisUtilities)
 
@@ -17,3 +18,4 @@ add_unit_test(SimulationData SimulationData_test Reweighting dataAnalysisUtiliti
 add_unit_test(SimulationDataContainer SimulationDataContainer_test Reweighting dataAnalysisUtilities)
 add_unit_test(MomentsReweightingDataHandler MomentsReweightingDataHandler_test Reweighting dataAnalysisUtilities)
 add_unit_test(MomentsReweighter MomentsReweighter_test Reweighting dataAnalysisUtilities)
+add_unit_test(Reweighter Reweighter_test Reweighting dataAnalysisUtilities Parameters)
