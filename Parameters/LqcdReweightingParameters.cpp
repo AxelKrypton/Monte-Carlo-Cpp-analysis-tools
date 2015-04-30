@@ -17,11 +17,12 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
 		("deactivateReweightingForVariance", po::value<bool>(&deactivateReweightingForVariance)->default_value(false)->implicit_value(true), "Do not perform reweighting for the variance of the data.")
 		("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false)->implicit_value(true), "Do not perform reweighting for the skewness of the data.")
         ("deactivateReweightingForBinder", po::value<bool>(&deactivateReweightingForBinder)->default_value(false)->implicit_value(true), "Do not perform reweighting for the binder cumulant of the data.")
-        ("obsMultipleColumns", po::value<std::vector<unsigned int> >(&columnsToBeReweightedUsingMultipleColumns)->multitoken(), "Number of FIRST column containing observable to be reweighted using several columns for higher moments. ATTENTION: Columns ranges from ZERO!")
-        ("obsWithZeroMean", po::value<std::vector<unsigned int> >(&columnsWhoseMeanIsKnownToBeZero)->multitoken(), "Number of COLUMNS containing observable whose mean is known a priori to be zero. ATTENTION: Columns ranges from ZERO!!")
-        ("useJackknifeAsErrorMethod", po::value<bool>(&useJackknifeAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Jackknife. ATTENTION: Unless the statistics is such that one has the same number of uncorrelated data points in ALL simulations, this method will make in general overestimate the errors!!!")
+        ("obsMultipleColumns", po::value<std::vector<unsigned int> >(&columnsToBeReweightedUsingMultipleColumns)->multitoken(), "Number of FIRST column containing observable to be reweighted using several columns for higher moments. ATTENTION: Column ranges start from ZERO!")
+        ("obsWithZeroMean", po::value<std::vector<unsigned int> >(&columnsWhoseMeanIsKnownToBeZero)->multitoken(), "Number of COLUMNS containing observables whose mean is known a priori to be zero. ATTENTION: Column ranges start from ZERO!!")
+        ("useJackknifeAsErrorMethod", po::value<bool>(&useJackknifeAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Jackknife. ATTENTION: This method implies to use the biggest binsize for all raw data points. Unless the statistics is such that the number of uncorrelated data points is not affected, this method will in general overestimate the errors!!!")
         ("useBootstrapAsErrorMethod", po::value<bool>(&useBootstrapAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Bootstrap.")
-        ("numberOfBootstrapResample", po::value<int>(&numberOfBootstrapResample)->default_value(100), "Number of resample to be done in the bootstrap.");
+        ("numberOfBootstrapResample", po::value<int>(&numberOfBootstrapResample)->default_value(100), "Number of resamples to be done in the bootstrap.")
+        ("weightPrecision", po::value<double>(&weightPrecision)->default_value(1.e-7), "Precision for iterative finding of optimal weights.");
 		
 	//option "file" can be given without option description
 	positionalOptions.add("file", 1);
@@ -80,6 +81,7 @@ void LqcdReweightingParameters::printParameters()
 	for(size_t i=0; i<columnsWhoseMeanIsKnownToBeZero.size(); i++)
 		std::cout << columnsWhoseMeanIsKnownToBeZero[i] << " ";
 	std::cout << std::endl;
+	std::cout << "#   Precision to determine reweighting weights:\t" << weightPrecision << std::endl;
 	std::cout << "#   Error method used:  ";
 	if(useJackknifeAsErrorMethod) std::cout << "Jackknife\n";
 	if(useBootstrapAsErrorMethod) std::cout << "Bootstrap (" << numberOfBootstrapResample << " resample)\n";
@@ -187,3 +189,9 @@ int LqcdReweightingParameters::getNumberOfBootstrapResample()
 {
 	return numberOfBootstrapResample;
 }
+
+double LqcdReweightingParameters::getWeightPrecision()
+{
+	return weightPrecision;
+}
+
