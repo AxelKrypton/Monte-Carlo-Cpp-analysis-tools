@@ -12,9 +12,7 @@
 static void writeNewPoints(std::vector<std::vector<double> >&, std::vector<std::vector<double> >, std::vector<double>, int=0, int=0);
 static void findIflogZHasToBeCalculated(std::vector<double>, std::vector<int>&);
 static double logarithmic_sum(double, double);
-static void evaluateEstimateOfObservablesPerPointFromMoments(Observables&, const bool, std::vector<double>);
-static void evaluateErrorOfObservablesPerPointFromEstimators(Observables&, const bool, std::vector<std::valarray<double> >, ErrorCalculationMethod);
-static double evaluateErrorBasedOnMethod(DataSample&, ErrorCalculationMethod);
+static void evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(Observables&, const Moments&, const MomentsEstimators&, const bool, ErrorCalculationMethod);
 
 /*****************************************************************************************/
 
@@ -575,95 +573,35 @@ void ReweighterAbstract::calculateAndSetReweightedObservablesAndErrorsValuesFrom
 	size_t numberOfObservablesGivenAsInput = reweightingDataHandler.numberOfObservablesGivenAsInput;
 	for(size_t i=0; i<valuesOfNewParameters.size(); i++){
 		for(size_t j=0; j<numberOfObservablesGivenAsInput; j++){ //The size here below is set to 4 manually for the moment!
-			std::vector<std::valarray<double> > errorEstimatorsPerPointAndObs(4, std::valarray<double>(estimatorsForErrorsCalculation.size()));
-			std::vector<double> momentsPerPointAndObs(4, 0.0);
-			momentsPerPointAndObs[0] = reweightedObservablesFromRawData[i][j];
+			Moments momentsPerPointAndObs;
+			MomentsEstimators errorEstimatorsPerPointAndObs;
+			momentsPerPointAndObs[1] = reweightedObservablesFromRawData[i][j]; //reweighted observables are the first moment!
+			std::valarray<double> auxiliaryArray(estimatorsForErrorsCalculation.size());
 			for(size_t k=0; k<estimatorsForErrorsCalculation.size(); k++)
-					errorEstimatorsPerPointAndObs[0][k] = estimatorsForErrorsCalculation[k][i][j];
+					auxiliaryArray[k] = estimatorsForErrorsCalculation[k][i][j];
+			errorEstimatorsPerPointAndObs[1] = DataSample(auxiliaryArray);
 			for(size_t m=0; m<3; m++){ //loop on the number of moments inserted, for the moment manually set
-				momentsPerPointAndObs[m+1] = reweightedObservablesFromRawData[i][numberOfObservablesGivenAsInput+j*3+m];
+				momentsPerPointAndObs[m+2] = reweightedObservablesFromRawData[i][numberOfObservablesGivenAsInput+j*3+m]; //second, third and fourth moments
 				for(size_t k=0; k<estimatorsForErrorsCalculation.size(); k++)
-					errorEstimatorsPerPointAndObs[m+1][k] = estimatorsForErrorsCalculation[k][i][numberOfObservablesGivenAsInput+j*3+m];
-
+					auxiliaryArray[k] = estimatorsForErrorsCalculation[k][i][numberOfObservablesGivenAsInput+j*3+m];
+				errorEstimatorsPerPointAndObs[m+2] = DataSample(auxiliaryArray);
 			}
-			evaluateEstimateOfObservablesPerPointFromMoments(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], momentsPerPointAndObs);
-			evaluateErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], meanOfObservableIsKnownToBeZero[j], errorEstimatorsPerPointAndObs, errorMethod);
+			evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], momentsPerPointAndObs, errorEstimatorsPerPointAndObs,
+																		meanOfObservableIsKnownToBeZero[j], errorMethod);
 		}
 	}
-
 }
 
 /*****************************************************************************************/
 /******************************* STATIC FUNCTIONS ****************************************/
 /*****************************************************************************************/
 
-/*
- * In the following functions we use the jackknife method to estimate the observable
- * error. ATTENTION: it is understood that the first valarray in the vector "est"
- * contains the estimators of the observable given as input and the following contain
- * the central moments that have been asked to be calculated (so far manually set to 2,3,4).
- */
-static void evaluateEstimateOfObservablesPerPointFromMoments(Observables& obs, const bool meanIsZero, std::vector<double> moments){
-    double x1 = moments[0];
-    double x2 = moments[1];
-    double x3 = moments[2];
-    double x4 = moments[3];
-    if(meanIsZero){
-    	obs.mean.estimate = 0.0;
-		obs.susceptibility.estimate = x2;
-		obs.skewness.estimate = x3/(pow(x2, 1.5));
-		obs.binderCumulant.estimate = x4/(pow(x2, 2.0));
-    }else{
-		obs.mean.estimate = x1;
-		obs.susceptibility.estimate = x2-x1*x1;
-		obs.skewness.estimate = (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5));
-		obs.binderCumulant.estimate = (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0));
-    }
-}
-
-static void evaluateErrorOfObservablesPerPointFromEstimators(Observables& obs, const bool meanIsZero, std::vector<std::valarray<double> > est, ErrorCalculationMethod errorMethod){
-    DataSample estimatorData(est[0]);
-    DataSample estimatorSecondMomentPerData(est[1]);
-    DataSample estimatorThirdMomentPerData(est[2]);
-    DataSample estimatorFourthMomentPerData(est[3]);
-
-    if(meanIsZero){
-    	//Mean error
-		obs.mean.error = 0.0;
-		//Susceptibility error
-		DataSample functionAppliedToEstimators = estimatorSecondMomentPerData;
-		obs.susceptibility.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
-		//Skewness error
-		functionAppliedToEstimators = (estimatorThirdMomentPerData) / (estimatorSecondMomentPerData ^ 1.5);
-		obs.skewness.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
-		//Binder cumulant error
-		functionAppliedToEstimators = (estimatorFourthMomentPerData) / (estimatorSecondMomentPerData ^ 2);
-		obs.binderCumulant.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
-    }else{
-		//Mean error
-		obs.mean.error = evaluateErrorBasedOnMethod(estimatorData, errorMethod);
-		//Susceptibility error
-		DataSample functionAppliedToEstimators = estimatorSecondMomentPerData - (estimatorData ^ 2);
-		obs.susceptibility.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
-		//Skewness error
-		functionAppliedToEstimators = (estimatorThirdMomentPerData - ((3*estimatorSecondMomentPerData ) * estimatorData)
-									   + (2*(estimatorData ^ 3))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 1.5);
-		obs.skewness.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
-		//Binder cumulant error
-		functionAppliedToEstimators = (estimatorFourthMomentPerData -((4*estimatorThirdMomentPerData) * estimatorData)
-									   + (6*estimatorSecondMomentPerData) * (estimatorData ^ 2)
-									   - (3*(estimatorData ^ 4))) / ((estimatorSecondMomentPerData -(estimatorData ^ 2)) ^ 2);
-		obs.binderCumulant.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
-    }
-}
-
-static double evaluateErrorBasedOnMethod(DataSample& dataSample, ErrorCalculationMethod errorMethod){
-	if(errorMethod == jackknife)
-		return calculateJacknifeError(dataSample);
-	else if (errorMethod == bootstrap)
-		return calculateBootstrapError(dataSample);
-	else
-		throw std::logic_error("Unknown error method in \"evaluateErrorBasedOnMethod\"! Aborting...");
+static void evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(Observables& obs, const Moments& moments, const MomentsEstimators& momentsEstimators,
+																		const bool meanIsZero, ErrorCalculationMethod errorMethod){
+	obs.mean = Mean(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
+	obs.susceptibility = Variance(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
+	obs.skewness = Skewness(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
+	obs.binderCumulant = BinderCumulant(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
 }
 
 /*
