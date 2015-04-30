@@ -48,6 +48,15 @@ public:
     void writeNewConfigurationFileWithMetaparameters(MomentsReweighter reweighter, std::string newConfigFileName = "");
     void writeNewPointsToFileWithLogZ(MomentsReweighter reweighter, std::string outputFileName = "logZAtNewPoints");
 
+    //This is public temporarily for compilation!  metaParameters must be moved to ReweighterIO
+    /*
+     * These are metaparameters that must NOT be interpreted as reweighting parameters,
+     * though they can be given in the configurationFile and then be stored in the
+     * SimulationData parameters. Note that they are static in order to be accessible
+     * from outside without an object.
+     */
+    static const std::vector<std::string> metaParameters;
+
 protected:
     std::vector<int> numberOfBinsToBeUsed;
     int numberOfObservablesGivenAsInput;
@@ -60,13 +69,7 @@ private:
 	ErrorCalculationMethod errorMethod;
 	int* bootstrapNumber;
 
-    /*
-     * These are metaparameters that must NOT be interpreted as reweighting parameters,
-     * though they can be given in the configurationFile and then be stored in the
-     * SimulationData parameters. Note that they are static in order to be accessible
-     * from outside without an object.
-     */
-    static const std::vector<std::string> metaParameters;
+
 };
 
 
