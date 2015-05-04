@@ -4,9 +4,29 @@
 #include "SimulationDataContainer.hpp"
 #include "../Parameters/LqcdReweightingParameters.hpp"
 
+class Binsizes{
+public:
+	Binsizes(): binsizes(std::map<int, int>()) {};
+	int& operator[](const unsigned int& whichMoment){ return binsizes[whichMoment]; };
+	int at(const unsigned int& whichMoment){return binsizes.at(whichMoment); };
+	bool empty(){ return binsizes.empty(); };
+	int getDefaultValue(){ try{ binsizes.at(-1);}
+						   catch(std::out_of_range& exceptionThrown){ throw std::invalid_argument("Default value UNSET for Binsizes object!"); }
+						   return binsizes[-1]; };
+	void setDefaultValue(const int& valueIn){ binsizes[-1] = valueIn; };
+	void print(){for(auto elem : binsizes) std::cout << "Binsize[" << elem.first << "] = " << elem.second << "\n"; };
+	//TODO: Implement operator == between Binsizes object and remove this method that has been created only for testing purposes!
+	std::map<int, int> getMap(){ return binsizes; };
+private:
+	std::map<int, int> binsizes;
+};
+
+
+
 
 class ReweighterIO {
 	friend class Reweighter;
+	friend class ReweighterIOTester;
 public:
 	ReweighterIO() = delete;
 	/*
@@ -16,8 +36,11 @@ public:
 	ReweighterIO(LqcdReweightingParameters parameters);
 private:
 	SimulationDataContainer readFromFileDataContainer;
-	std::vector<std::string> namesOfParametersIgnoringMetaParameters;
+	std::vector<std::string> namesOfParametersIgnoringMetaParameters; //just vector of string because sim. par. are the same for ALL data files!
 	std::vector<std::vector<double> > valuesOfSimulationParametersIgnoringMetaParameters;
+	//Specific member for each meta parameter
+	std::vector<Binsizes> valuesOfSpecifiedBinsizes;
+//	std::vector<double> valuesOfSpecifiedLogZ; //TODO: Implement!
 	ErrorCalculationMethod errorMethod;
 	std::unique_ptr<int> bootstrapNumber;
 

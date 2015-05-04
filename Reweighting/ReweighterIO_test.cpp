@@ -4,10 +4,208 @@
 
 #include "ReweighterIO.hpp"
 
-static LqcdReweightingParameters createLqcdParameters(std::string filename)
+static ReweighterIO createLqcdParameters(std::string filename, bool useJackknife = false)
 {
-	int numberOfArguments = 4;
+	int numberOfArguments = 3;
 	filename = std::string("-f" + filename);
-	const char * arguments[] = {"foo", filename.c_str(), "--useBootstrapAsErrorMethod", "--deactivateReweightingForSkewness"};
-	return LqcdReweightingParameters(numberOfArguments, arguments);
+	std::string whichError;
+	if(useJackknife)
+		whichError = "--useJackknifeAsErrorMethod";
+	else
+		whichError = "--useBootstrapAsErrorMethod";
+	const char * arguments[] = {"foo", filename.c_str(), whichError.c_str()};
+	return ReweighterIO(LqcdReweightingParameters(numberOfArguments, arguments));
 }
+
+class ReweighterIOTester{
+public:
+	ReweighterIOTester(std::string filename, bool useJackknife = false) : reweighterIO(createLqcdParameters(filename, useJackknife)){};
+	std::vector<std::string> getNamesOfParametersIgnoringMetaParameters(){ return reweighterIO.namesOfParametersIgnoringMetaParameters; };
+	std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters(){ return reweighterIO.valuesOfSimulationParametersIgnoringMetaParameters; };
+	std::vector<Binsizes> getValuesOfSpecifiedBinsizes(){ return reweighterIO.valuesOfSpecifiedBinsizes; };
+	ErrorCalculationMethod getErrorMethod(){ return reweighterIO.errorMethod; };
+	int getBootstrapNumber(){ return *(reweighterIO.bootstrapNumber); };
+private:
+	ReweighterIO reweighterIO;
+};
+
+
+BOOST_AUTO_TEST_SUITE(build)
+
+    BOOST_AUTO_TEST_CASE(build1)
+    {
+        //These tests use configfile without mandatory binsize label since the exception must be thrown before
+        std::string fileThatDoesNotExist = "fileThatShouldNotBe";
+        std::string fileThatDoesExistButWrong1 = "GeneralTestFiles/wrong_configfile_3"; //wrong structure
+        std::string fileThatDoesExistButWrong2 = "GeneralTestFiles/wrong_configfile_4"; //correct structure but with two identical set of parameters
+        std::string fileThatDoesExistButWrong3 = "GeneralTestFiles/wrong_configfile_5"; //correct structure but with two identical filenames
+        std::string fileThatDoesExistButWrong4 = "GeneralTestFiles/wrong_configfile_6"; //correct structure but with not existing file inside
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesNotExist), std::exception);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong1), std::exception);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong2), std::exception);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong3), std::exception);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong4), std::exception);
+    }
+
+    BOOST_AUTO_TEST_CASE(build2)
+    {
+        //Here we use configfile with mandatory binsize label even if sometimes the exception is thrown before
+        std::string fileThatDoesExistButWrong1 = "GeneralTestFiles/wrong_configfile_7"; //correct structure but with datafile with wrong number of columns
+        std::string fileThatDoesExistButWrong2 = "GeneralTestFiles/wrong_configfile_8"; //correct structure but with different parameters name in two lines
+        std::string fileThatDoesExistButWrong3 = "GeneralTestFiles/wrong_configfile_9"; //correct structure but with different number of observables in one file
+        std::string fileThatDoesExistButWrong4 = "GeneralTestFiles/wrong_configfile_10"; //correct structure but with two identical set of reweigthing parameters
+        std::string fileThatDoesExistButWrong5 = "GeneralTestFiles/wrong_configfile_11"; //correct structure but without binsize at least on one line
+        std::string fileThatDoesExistButWrong6 = "GeneralTestFiles/wrong_configfile_12"; //correct structure but with negative binsize
+        std::string fileThatDoesExistButWrong7 = "GeneralTestFiles/wrong_configfile_13"; //correct structure but with different number of observables in two files
+        std::string fileThatDoesExistButWrong8 = "GeneralTestFiles/wrong_configfile_14"; //correct structure but with chars in moment binsize
+        std::string fileThatDoesExistButWrong9 = "GeneralTestFiles/wrong_configfile_15"; //correct structure but with negative moment in binsize
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong1), std::logic_error);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong2), std::invalid_argument);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong3), std::logic_error);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong4), std::logic_error);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong5), std::runtime_error);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong6), std::invalid_argument);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong7), std::logic_error);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong8), std::invalid_argument);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong9), std::invalid_argument);
+    }
+
+    BOOST_AUTO_TEST_CASE(build3)
+    {
+        std::string fileThatDoesExist1 = "GeneralTestFiles/simulationDataContainer.configfile_1";
+        std::string fileThatDoesExist2 = "GeneralTestFiles/simulationDataContainer.configfile_2";
+        std::string fileThatDoesExist3 = "GeneralTestFiles/simulationDataContainer.configfile_3";
+        std::string fileThatDoesExist4 = "RealTestData/configfile_3";
+        BOOST_REQUIRE_NO_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExist1, true));
+        BOOST_REQUIRE_NO_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExist2, false));
+        BOOST_REQUIRE_NO_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExist3, true));
+        BOOST_REQUIRE_NO_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExist4, false));
+    }
+
+    BOOST_AUTO_TEST_CASE(build4)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_6";
+        ReweighterIOTester reweighterIOTester(fileThatDoesExist);
+        std::string referenceParName = "beta";
+        std::vector<std::vector<double> > referenceParValue(3, std::vector<double>(1));
+        referenceParValue[0][0] = 5.355;
+        referenceParValue[1][0] = 5.357;
+        referenceParValue[2][0] = 5.360;
+        BOOST_REQUIRE_EQUAL(reweighterIOTester.getNamesOfParametersIgnoringMetaParameters()[0], referenceParName);
+        BOOST_REQUIRE(reweighterIOTester.getValuesOfSimulationParametersIgnoringMetaParameters() == referenceParValue);
+    }
+
+    BOOST_AUTO_TEST_CASE(build5)
+	{
+		std::string fileThatDoesExist = "RealTestData/configfile_6";
+		ReweighterIOTester reweighterIOTester(fileThatDoesExist, true);
+		const ErrorCalculationMethod referenceErrorMethod = jackknife;
+		BOOST_REQUIRE_EQUAL(reweighterIOTester.getErrorMethod(), referenceErrorMethod);
+	}
+
+    BOOST_AUTO_TEST_CASE(build6)
+	{
+		std::string fileThatDoesExist = "RealTestData/configfile_6";
+		ReweighterIOTester reweighterIOTester(fileThatDoesExist);
+		const ErrorCalculationMethod referenceErrorMethod = bootstrap;
+		const int referenceBootstrapResample = 100;
+		BOOST_REQUIRE_EQUAL(reweighterIOTester.getErrorMethod(), referenceErrorMethod);
+		BOOST_REQUIRE_EQUAL(reweighterIOTester.getBootstrapNumber(), referenceBootstrapResample);
+	}
+
+    BOOST_AUTO_TEST_CASE(build7)
+    {
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_6";
+        ReweighterIOTester reweighterIOTester(fileThatDoesExist);
+        Binsizes binsizesFile1, binsizesFile2, binsizesFile3;
+        binsizesFile1.setDefaultValue(1);
+        binsizesFile2[1] = 1;
+        binsizesFile2[4] = 5;
+        binsizesFile3[1] = 2;
+        binsizesFile3[2] = 8;
+        std::vector<Binsizes> gottenBinsizes = reweighterIOTester.getValuesOfSpecifiedBinsizes();
+        gottenBinsizes[0].print();
+        std::cout << "---\n";
+        gottenBinsizes[1].print();
+        std::cout << "---\n";
+        gottenBinsizes[2].print();
+
+        BOOST_REQUIRE_EQUAL(gottenBinsizes.size(), 3);
+        BOOST_REQUIRE(gottenBinsizes[0].getMap() == binsizesFile1.getMap());
+        BOOST_REQUIRE(gottenBinsizes[1].getMap() == binsizesFile2.getMap());
+        BOOST_REQUIRE(gottenBinsizes[2].getMap() == binsizesFile3.getMap());
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+
+
+
+
+//TODO: Adapt the following tests to ReweighterIO.
+
+//BOOST_AUTO_TEST_SUITE(functionalities)
+//
+////TODO: Write a ReweighterMockup object to be used inside these tests!
+//
+//    BOOST_AUTO_TEST_CASE(writeNewConfigFile1)
+//    {
+//        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
+//        MomentsReweightingDataHandler reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
+//        reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(MomentsReweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack"));
+//        std::string outputFileName = "configFileWithLogZ";
+//        BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
+//        if(boost::filesystem::exists(outputFileName))
+//            boost::filesystem::remove(outputFileName);
+//    }
+//
+//    BOOST_AUTO_TEST_CASE(writeNewConfigFile2)
+//    {
+//        std::string fileThatDoesExist = "RealTestData/configfile_1";
+//        MomentsReweightingDataHandler reweightingDataHandler(fileThatDoesExist);
+//        std::vector<std::pair<double, double> > newRanges;
+//        std::vector< unsigned int> newNumPoints(1, 30);
+//        newRanges.push_back(std::make_pair(5.348, 5.3509));
+//        MomentsReweighter* reweighter = new MomentsReweighter(fileThatDoesExist, newRanges, newNumPoints);
+//        std::vector<double> simulatedLogZ = reweighter->getLogZAtSimulatedPoints();
+//        std::string outputFileName = "testWritingConfigFile";
+//        reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(*reweighter, outputFileName);
+//        BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
+//        delete reweighter;
+//        reweighter = new MomentsReweighter(outputFileName);
+//        for(size_t i=0; i<simulatedLogZ.size(); i++)
+//            BOOST_REQUIRE_CLOSE(reweighter->getLogZAtSimulatedPoints()[i], simulatedLogZ[i], doublePrecisionInPercent);
+//        if(boost::filesystem::exists(outputFileName))
+//            boost::filesystem::remove(outputFileName);
+//        delete reweighter;
+//    }
+//
+//    BOOST_AUTO_TEST_CASE(writeNewPointsToFile)
+//    {
+//        std::string fileThatDoesExist = "RealTestData/configfile_1";
+//        MomentsReweightingDataHandler reweightingDataHandler(fileThatDoesExist);
+//        std::vector<std::pair<double, double> > newRanges;
+//        std::vector< unsigned int> newNumPoints(1, 30);
+//        newRanges.push_back(std::make_pair(5.348, 5.3509));
+//        MomentsReweighter reweighter(fileThatDoesExist, newRanges, newNumPoints);
+//        std::string outputFileName = "testWritingNewPoints";
+//        std::ofstream outputFile;
+//        outputFile.open(outputFileName.c_str());
+//        outputFile << "Hello!";
+//        outputFile.close();
+//        BOOST_REQUIRE_MESSAGE(boost::filesystem::exists( outputFileName ) == true, "Something bad happened creating a file!");
+//        BOOST_REQUIRE_THROW(reweightingDataHandler.writeNewPointsToFileWithLogZ(reweighter, outputFileName), std::invalid_argument);
+//        boost::filesystem::remove(outputFileName);
+//        std::vector<double> newLogZ = reweighter.getLogZAtNewPoints();
+//        reweightingDataHandler.writeNewPointsToFileWithLogZ(reweighter, outputFileName);
+//        BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
+//        if(boost::filesystem::exists(outputFileName))
+//            boost::filesystem::remove(outputFileName);
+//    }
+//
+//BOOST_AUTO_TEST_SUITE_END()
+
+
+
+
