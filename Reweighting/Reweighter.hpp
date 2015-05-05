@@ -10,16 +10,24 @@
 
 
 
-class RawDataForReweightingAndMetainformation {
-public:
+struct RawDataForReweightingAndMetainformation {
 	SimulationDataContainer rawData;
 	std::vector<std::string> namesOfParametersIgnoringMetaParameters;
     std::vector<std::vector<double> > valuesOfSimulationParametersIgnoringMetaParameters;
     std::vector<int> numberOfBinsToBeUsed;
+    std::vector<double> valuesOfSpecifiedLogZ;
+    bool isMeanKnownToBeZero;
+};
+
+struct ReweightingProcedure {
+	std::vector<unsigned int> momentsToBeReweighted;
+	std::vector<int> binsizesToBeUsed;
+	std::vector<std::string> quantitiesConsidered;
 };
 
 
 class Reweighter {
+	friend class ReweighterTester;
 public:
 	Reweighter() = delete;
 	/*
@@ -28,11 +36,13 @@ public:
 	 */
 	Reweighter(LqcdReweightingParameters parameters);
 	std::vector<std::vector<Observables> > getReweightedObservables();
-	//void writeReweightingResultsToFile();
 private:
 	ReweighterIO reweighterIO;
 	std::vector<std::string> quantitiesToBeReweighted;
 	std::vector<std::vector<Observables> > observablesAtNewPoints;
+	//The following methods are here in order to be tested one by one (in principle they could be static function in the .cpp file)
+	Reweighter(std::initializer_list<std::string>);
+	std::vector<ReweightingProcedure> getReweightingProceduresToBePerformed();
 };
 
 
