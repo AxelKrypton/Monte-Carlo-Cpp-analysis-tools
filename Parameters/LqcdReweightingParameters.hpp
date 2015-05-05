@@ -43,6 +43,7 @@ public:
 	bool getUseBootstrapAsErrorMethod();
 	int getNumberOfBootstrapResample();
 	double getWeightPrecision();
+	bool getIsMeanKnownToBeZero();
 
 	struct parse_aborted {};
 	
@@ -63,7 +64,8 @@ private:
 	double weightPrecision;
 	int numberOfBootstrapResample;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
-    std::vector<unsigned int> columnsWhoseMeanIsKnownToBeZero;
+    std::vector<unsigned int> columnsWhoseMeanIsKnownToBeZero; //TODO: delete this option, either mean is zero for all columns or for none!
+    bool isMeanKnownToBeZero;
 };
 
 #endif

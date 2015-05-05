@@ -89,6 +89,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForBinder() );
 	}
 	
+	BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero)
+	{
+		bool defaultValue = false;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getIsMeanKnownToBeZero() );
+	}
+
 	BOOST_AUTO_TEST_CASE(outputfilePrefix)
 	{
 		std::string defaultValue = "reweightedData";
@@ -241,6 +247,20 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForBinder() );
 	}
 	
+	BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero_implicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--isMeanKnownToBeZero";
+		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getIsMeanKnownToBeZero() );
+	}
+
+	BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero_explicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--isMeanKnownToBeZero";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getIsMeanKnownToBeZero() );
+	}
+
 	BOOST_AUTO_TEST_CASE(useJackknife_implicit)
 	{
 		bool newValue = true;
