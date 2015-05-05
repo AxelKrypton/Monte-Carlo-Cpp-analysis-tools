@@ -5,10 +5,11 @@
 static std::vector<std::string> getNamesOfParametersIgnoringMetaParameters(SimulationData);
 static std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer);
 static std::vector<Binsizes> getValuesOfSpecifiedBinsizes(SimulationDataContainer);
-//static std::vector<double> getValuesOfSpecifiedLogZ(SimulationDataContainer);
+static std::vector<double> getValuesOfSpecifiedLogZ(SimulationDataContainer);
 static void extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(SimulationData, std::vector<std::string>&, const std::vector<std::string>&);
 static void extractValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer, std::vector<std::vector<double> >& , const std::vector<std::string>&);
 static void extractValuesOfSpecifiedBinsizes(SimulationDataContainer, std::vector<Binsizes>& , const std::string&);
+static void extractValuesOfSpecifiedLogZ(SimulationDataContainer, std::vector<double>& , const std::string&);
 static bool isLastEntryPresentMoreThanOnce(std::vector<std::vector<double> >);
 static void checkCorrectnessOfConfigurationFileForReweighting(SimulationDataContainer, const std::vector<std::string>, int);
 static bool isLabelMatchingAnyMetaParameter(const std::string&, const std::vector<std::string>&);
@@ -19,10 +20,11 @@ static bool isLabelMatchingAnyMetaParameter(const std::string&, const std::vecto
 
 ReweighterIO::ReweighterIO(LqcdReweightingParameters parameters) : readFromFileDataContainer(parameters.getInputfile()), bootstrapNumber(nullptr)
 {
+	isMeanKnownToBeZero = parameters.getIsMeanKnownToBeZero();
 	namesOfParametersIgnoringMetaParameters = getNamesOfParametersIgnoringMetaParameters(readFromFileDataContainer[0]);
 	valuesOfSimulationParametersIgnoringMetaParameters = getValuesOfSimulationParametersIgnoringMetaParameters(readFromFileDataContainer);
 	valuesOfSpecifiedBinsizes = getValuesOfSpecifiedBinsizes(readFromFileDataContainer);
-	//valuesOfSpecifiedLogZ = getValuesOfSpecifiedLogZ(readFromFileDataContainer);
+	valuesOfSpecifiedLogZ = getValuesOfSpecifiedLogZ(readFromFileDataContainer);
 	int numberOfObservablesGivenAsInput = readFromFileDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
 	checkCorrectnessOfConfigurationFileForReweighting(readFromFileDataContainer, MomentsReweightingDataHandler::metaParameters, numberOfObservablesGivenAsInput);
 	//Set error information
@@ -56,6 +58,12 @@ static std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoring
 static std::vector<Binsizes> getValuesOfSpecifiedBinsizes(SimulationDataContainer simDataCont){
 	std::vector<Binsizes> result;
 	extractValuesOfSpecifiedBinsizes(simDataCont, result, MomentsReweightingDataHandler::metaParameters[1]);
+	return result;
+}
+
+static std::vector<double> getValuesOfSpecifiedLogZ(SimulationDataContainer simDataCont){
+	std::vector<double> result;
+	extractValuesOfSpecifiedLogZ(simDataCont, result, MomentsReweightingDataHandler::metaParameters[0]);
 	return result;
 }
 
@@ -130,6 +138,22 @@ static void extractValuesOfSpecifiedBinsizes(SimulationDataContainer simDataCont
 		areAllBinsizesEmpty &= valuesOfBinsizes[i].empty();
 	if(areAllBinsizesEmpty)
 		throw std::runtime_error("In the configuration file at least one binsize must be provided!");
+}
+
+/*
+ * Again we have to take trace for the logZ not provided. Since logZ
+ * can take any real values, when not provided we set it to 'nan'.
+ */
+static void extractValuesOfSpecifiedLogZ(SimulationDataContainer simDataCont, std::vector<double>& valuesOfLogZ, const std::string& logZLabel){
+	std::map<std::string, double> auxMap;
+	valuesOfLogZ = std::vector<double>(simDataCont.getNumberOfDatafiles(), NAN);
+	for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
+		auxMap = simDataCont[i].getSimulationParameters();
+		for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
+			if((it->first) == logZLabel)
+				valuesOfLogZ[i] = it->second;
+		}
+	}
 }
 
 

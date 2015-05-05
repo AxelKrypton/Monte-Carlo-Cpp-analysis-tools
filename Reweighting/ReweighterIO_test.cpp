@@ -23,6 +23,7 @@ public:
 	std::vector<std::string> getNamesOfParametersIgnoringMetaParameters(){ return reweighterIO.namesOfParametersIgnoringMetaParameters; };
 	std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters(){ return reweighterIO.valuesOfSimulationParametersIgnoringMetaParameters; };
 	std::vector<Binsizes> getValuesOfSpecifiedBinsizes(){ return reweighterIO.valuesOfSpecifiedBinsizes; };
+	std::vector<double> getValuesOfSpecifiedLogZ(){ return reweighterIO.valuesOfSpecifiedLogZ; };
 	ErrorCalculationMethod getErrorMethod(){ return reweighterIO.errorMethod; };
 	int getBootstrapNumber(){ return *(reweighterIO.bootstrapNumber); };
 private:
@@ -124,16 +125,22 @@ BOOST_AUTO_TEST_SUITE(build)
         binsizesFile3[1] = 2;
         binsizesFile3[2] = 8;
         std::vector<Binsizes> gottenBinsizes = reweighterIOTester.getValuesOfSpecifiedBinsizes();
-        gottenBinsizes[0].print();
-        std::cout << "---\n";
-        gottenBinsizes[1].print();
-        std::cout << "---\n";
-        gottenBinsizes[2].print();
-
         BOOST_REQUIRE_EQUAL(gottenBinsizes.size(), 3);
         BOOST_REQUIRE(gottenBinsizes[0].getMap() == binsizesFile1.getMap());
         BOOST_REQUIRE(gottenBinsizes[1].getMap() == binsizesFile2.getMap());
         BOOST_REQUIRE(gottenBinsizes[2].getMap() == binsizesFile3.getMap());
+	}
+
+    BOOST_AUTO_TEST_CASE(build8)
+	{
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
+		ReweighterIOTester reweighterIOTester(fileThatDoesExist);
+		std::vector<double> referenceLogZ({NAN, 3.14, NAN});
+		std::vector<double> gottenLogZ = reweighterIOTester.getValuesOfSpecifiedLogZ();
+		BOOST_REQUIRE_EQUAL(gottenLogZ.size(), 3);
+		BOOST_REQUIRE(isnan(gottenLogZ[0]));
+		BOOST_REQUIRE_EQUAL(gottenLogZ[1], referenceLogZ[1]);
+		BOOST_REQUIRE(isnan(gottenLogZ[2]));
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -8,7 +8,11 @@ class Binsizes{
 public:
 	Binsizes(): binsizes(std::map<int, int>()) {};
 	int& operator[](const unsigned int& whichMoment){ return binsizes[whichMoment]; };
-	int at(const unsigned int& whichMoment){return binsizes.at(whichMoment); };
+	int at(const unsigned int& whichMoment){ try{ return binsizes.at(whichMoment); }
+											 catch(std::out_of_range& exceptionThrown){ return getDefaultValue(); } };
+	std::vector<int> at(const std::initializer_list<unsigned int>& whichMoments){ std::vector<int> result;
+																				  for(auto i : whichMoments) result.push_back(this->at(i));
+																				  return result; };
 	bool empty(){ return binsizes.empty(); };
 	int getDefaultValue(){ try{ binsizes.at(-1);}
 						   catch(std::out_of_range& exceptionThrown){ throw std::invalid_argument("Default value UNSET for Binsizes object!"); }
@@ -36,14 +40,14 @@ public:
 	ReweighterIO(LqcdReweightingParameters parameters);
 private:
 	SimulationDataContainer readFromFileDataContainer;
+	bool isMeanKnownToBeZero;
 	std::vector<std::string> namesOfParametersIgnoringMetaParameters; //just vector of string because sim. par. are the same for ALL data files!
 	std::vector<std::vector<double> > valuesOfSimulationParametersIgnoringMetaParameters;
 	//Specific member for each meta parameter
 	std::vector<Binsizes> valuesOfSpecifiedBinsizes;
-//	std::vector<double> valuesOfSpecifiedLogZ; //TODO: Implement!
+	std::vector<double> valuesOfSpecifiedLogZ;
 	ErrorCalculationMethod errorMethod;
 	std::unique_ptr<int> bootstrapNumber;
-
 };
 
 
