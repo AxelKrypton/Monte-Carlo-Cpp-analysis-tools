@@ -18,7 +18,6 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
 		("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false)->implicit_value(true), "Do not perform reweighting for the skewness of the data.")
         ("deactivateReweightingForBinder", po::value<bool>(&deactivateReweightingForBinder)->default_value(false)->implicit_value(true), "Do not perform reweighting for the binder cumulant of the data.")
         ("obsMultipleColumns", po::value<std::vector<unsigned int> >(&columnsToBeReweightedUsingMultipleColumns)->multitoken(), "Number of FIRST column containing observable to be reweighted using several columns for higher moments. ATTENTION: Column ranges start from ZERO!")
-        ("obsWithZeroMean", po::value<std::vector<unsigned int> >(&columnsWhoseMeanIsKnownToBeZero)->multitoken(), "Number of COLUMNS containing observables whose mean is known a priori to be zero. ATTENTION: Column ranges start from ZERO!!")
         ("isMeanKnownToBeZero", po::value<bool>(&isMeanKnownToBeZero)->default_value(false)->implicit_value(true), "ALL observables are known a priori to have zero mean.")
         ("useJackknifeAsErrorMethod", po::value<bool>(&useJackknifeAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Jackknife. ATTENTION: This method implies to use the biggest binsize for all raw data points. Unless the statistics is such that the number of uncorrelated data points is not affected, this method will in general overestimate the errors!!!")
         ("useBootstrapAsErrorMethod", po::value<bool>(&useBootstrapAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Bootstrap.")
@@ -76,17 +75,10 @@ void LqcdReweightingParameters::printParameters()
     std::cout << "#   New beta points:\t  " << numberOfNewBetaPoints << std::endl;
     if(isMeanKnownToBeZero)
     	std::cout << "#   Mean of the observables known to be ZERO" << std::endl;
-    //Lines to be deleted:
     std::cout << "#   Columns of obs. to be rew. with multiple columns:  ";
     for(size_t i=0; i<columnsToBeReweightedUsingMultipleColumns.size(); i++)
         std::cout << columnsToBeReweightedUsingMultipleColumns[i] << " ";
     std::cout << std::endl;
-
-
-    std::cout << "#   Columns of obs. whose mean is known to be zero:  ";
-	for(size_t i=0; i<columnsWhoseMeanIsKnownToBeZero.size(); i++)
-		std::cout << columnsWhoseMeanIsKnownToBeZero[i] << " ";
-	std::cout << std::endl;
 	std::cout << "#   Precision to determine reweighting weights:\t" << weightPrecision << std::endl;
 	std::cout << "#   Error method used:  ";
 	if(useJackknifeAsErrorMethod) std::cout << "Jackknife\n";
@@ -175,10 +167,6 @@ bool LqcdReweightingParameters::getDeactivateReweightingForBinder()
 
 std::vector<unsigned int> LqcdReweightingParameters::getColumnsToBeReweightedUsingMultipleColumns(){
     return columnsToBeReweightedUsingMultipleColumns;
-}
-
-std::vector<unsigned int> LqcdReweightingParameters::getColumnsWhoseMeanIsKnownToBeZero(){
-	return columnsWhoseMeanIsKnownToBeZero;
 }
 
 bool LqcdReweightingParameters::getUseJackknifeAsErrorMethod()

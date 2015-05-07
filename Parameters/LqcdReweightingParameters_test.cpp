@@ -334,15 +334,6 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         BOOST_REQUIRE(refValues == createParametersForArgumentSettingCheck_string(argumentName, newValues).getColumnsToBeReweightedUsingMultipleColumns() );
     }
 
-    BOOST_AUTO_TEST_CASE(observablesZeroMean)
-	{
-		std::string newValues = "5";
-		std::string argumentName = "--obsWithZeroMean";
-		std::vector<unsigned int> refValues;
-		refValues.push_back(5);
-		BOOST_REQUIRE(refValues == createParametersForArgumentSettingCheck_string(argumentName, newValues).getColumnsWhoseMeanIsKnownToBeZero() );
-	}
-
 	BOOST_AUTO_TEST_CASE(weightPrecision)
 	{
 		double newValue = 1.e-08;

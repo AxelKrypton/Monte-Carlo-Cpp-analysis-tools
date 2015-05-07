@@ -38,7 +38,6 @@ public:
 	bool getDeactivateReweightingForSkewness();
 	bool getDeactivateReweightingForBinder();
     std::vector<unsigned int> getColumnsToBeReweightedUsingMultipleColumns();
-	std::vector<unsigned int> getColumnsWhoseMeanIsKnownToBeZero();
 	bool getUseJackknifeAsErrorMethod();
 	bool getUseBootstrapAsErrorMethod();
 	int getNumberOfBootstrapResample();
@@ -64,7 +63,6 @@ private:
 	double weightPrecision;
 	int numberOfBootstrapResample;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
-    std::vector<unsigned int> columnsWhoseMeanIsKnownToBeZero; //TODO: delete this option, either mean is zero for all columns or for none!
     bool isMeanKnownToBeZero;
 };
 
