@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_SUITE(build)
 	{
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         const int numberOfSimulationParametersGivenInInputFileOnFirstLine = 4;
-        const int numberOfSimulationParametersGivenInInputFileOnOtherLines = 3;
+        const int numberOfSimulationParametersGivenInInputFileOnOtherLines = 4;
 		SimulationDataContainer simDataCont(fileThatDoesExist);
         BOOST_REQUIRE_EQUAL(simDataCont.getNumberOfSimulationParameters(0),
                             numberOfSimulationParametersGivenInInputFileOnFirstLine);
@@ -223,60 +223,125 @@ BOOST_AUTO_TEST_SUITE(InsertCentralMoments)
 
     BOOST_AUTO_TEST_CASE(InsertCentralMoments1)
     {
-        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_2";
         SimulationDataContainer simDataCont(fileThatDoesExist);
-        std::vector<unsigned int> columns;
-        std::vector<unsigned int> moments;
-        std::vector<bool> useMultipleColumns(3, false);
-        columns.push_back(0);
-        columns.push_back(1);
-        columns.push_back(2);
-        moments.push_back(0);
-        moments.push_back(1);
-        simDataCont = simDataCont.insertMomentsPerData(columns, moments, useMultipleColumns);
-        const int newNumberOfColumns = 9;
-        const double columnsFirstMomentFirstFile[3][3] = {1.1, 1.4, 1.7, 1.2, 1.5, 1.8, 1.3, 1.6, -1.9};
+        std::vector<unsigned int> moments{0,1};
+        simDataCont = simDataCont.buildAndGetMomentsPerData(moments, 0);
+        const int newNumberOfColumns = 6;
+        const double FilesAfter[3][6][3] = {{{1.0, 1.0, 1.0}, {1.1, 1.4, 1.7}, {1.0, 1.0, 1.0}, {1.2, 1.5, 1.8}, {1.0, 1.0, 1.0}, {1.3, 1.6, -1.9}},
+        									{{1.0, 1.0, 1.0}, {2.1, 2.4, 2.7}, {1.0, 1.0, 1.0}, {2.2, 2.5, 2.8}, {1.0, 1.0, 1.0}, {2.3, -2.6, 2.9}},
+        									{{1.0, 1.0, 1.0}, {3.1, 3.4, 3.7}, {1.0, 1.0, 1.0}, {3.2, 3.5, 3.8}, {1.0, 1.0, 1.0}, {-3.3, 3.6, -3.9}}};
+
         for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++)
             BOOST_REQUIRE_EQUAL(simDataCont[i].getNumberOfDataSample(), newNumberOfColumns);
-        for(int i=0; i<3; i++){
-            BOOST_REQUIRE_CLOSE(simDataCont[0][4][i], columnsFirstMomentFirstFile[0][i], doublePrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(simDataCont[0][6][i], columnsFirstMomentFirstFile[1][i], doublePrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(simDataCont[0][8][i], columnsFirstMomentFirstFile[2][i], doublePrecisionInPercent);
-        }
+
         for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
-            for(int j=0; j<3; j++){
-                BOOST_REQUIRE_EQUAL(simDataCont[i][3][j], 1.0);
-                BOOST_REQUIRE_EQUAL(simDataCont[i][5][j], 1.0);
-                BOOST_REQUIRE_EQUAL(simDataCont[i][7][j], 1.0);
+            for(int j=0; j<newNumberOfColumns; j++){
+            	for(int k=0; k<simDataCont[i][j].getNumberOfElements(); k++){
+            		BOOST_REQUIRE_EQUAL(simDataCont[i][j][k], FilesAfter[i][j][k]);
+            	}
             }
         }
     }
 
-    BOOST_AUTO_TEST_CASE(InsertCentralMoments2)
+	BOOST_AUTO_TEST_CASE(InsertCentralMoments2)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_4";
         SimulationDataContainer simDataCont(fileThatDoesExist);
-        std::vector<unsigned int> columns;
-        std::vector<unsigned int> moments;
-        std::vector<bool> useMultipleColumns(1, true);
-        columns.push_back(0);
-        moments.push_back(2);
-        moments.push_back(3);
-        moments.push_back(4);
-        simDataCont = simDataCont.insertMomentsPerData(columns, moments, useMultipleColumns);
-        const int newNumberOfColumns = 4;
-        const double FirstMoment[3] = {2, 2.1, 2.2};
+        std::vector<unsigned int> moments{2,3,4};
+        std::vector<unsigned int> useMultipleColumns{0};
+        simDataCont = simDataCont.buildAndGetMomentsPerData(moments, 0, useMultipleColumns);
+        const int newNumberOfColumns = 3;
         const double SecondMoment[3] = {0.688333333333333, 0.648333333333333, 0.588333333333333,};
         const double ThirdMoment[3] = {-21.7715, -27.2085, -33.4555};
         const double FourthMoment[3] = {-163.68, -218.484, -285.1368};
         BOOST_REQUIRE_EQUAL(simDataCont[0].getNumberOfDataSample(), newNumberOfColumns);
         for(int i=0; i<3; i++){
-            BOOST_REQUIRE_CLOSE(simDataCont[0][0][i], FirstMoment[i], doublePrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(simDataCont[0][1][i], SecondMoment[i], doublePrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(simDataCont[0][2][i], ThirdMoment[i], doublePrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(simDataCont[0][3][i], FourthMoment[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][0][i], SecondMoment[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][1][i], ThirdMoment[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][2][i], FourthMoment[i], doublePrecisionInPercent);
         }
     }
+
+	BOOST_AUTO_TEST_CASE(InsertCentralMoments3)
+    {
+        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_4";
+        SimulationDataContainer simDataCont(fileThatDoesExist);
+        std::vector<unsigned int> moments{2, 1, 4};
+        std::vector<unsigned int> useMultipleColumns{0};
+        simDataCont = simDataCont.buildAndGetMomentsPerData(moments, 0, useMultipleColumns);
+        const int newNumberOfColumns = 6;
+        const double FirstMoment1[3] = {3.1, 3.4, 3.7};
+        const double FirstMoment2[3] = {3.2, 3.5, 3.8};
+        const double FirstMoment3[3] = {-3.3, -3.6, -3.9};
+        const double FirstMoment4[3] = {5.0, 5.1, 5.2};
+        const double SecondMoment[3] = {0.688333333333333, 0.648333333333333, 0.588333333333333,};
+        const double FourthMoment[3] = {-163.68, -218.484, -285.1368};
+        BOOST_REQUIRE_EQUAL(simDataCont[0].getNumberOfDataSample(), newNumberOfColumns);
+        for(int i=0; i<3; i++){
+            BOOST_REQUIRE_CLOSE(simDataCont[0][0][i], SecondMoment[i], doublePrecisionInPercent);
+        	BOOST_REQUIRE_CLOSE(simDataCont[0][1][i], FirstMoment1[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][2][i], FirstMoment2[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][3][i], FirstMoment3[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][4][i], FirstMoment4[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][5][i], FourthMoment[i], doublePrecisionInPercent);
+        }
+    }
+
+	BOOST_AUTO_TEST_CASE(InsertCentralMoments4)
+	{
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_2";
+		SimulationDataContainer simDataCont(fileThatDoesExist);
+		std::vector<unsigned int> moments{0,1};
+		simDataCont = simDataCont.buildAndGetMomentsPerData(moments, 1);
+		const int newNumberOfColumns = 5;
+		const double FilesAfter[3][5][3] = {{{1.1, 1.4, 1.7}, {1.0, 1.0, 1.0}, {1.2, 1.5, 1.8}, {1.0, 1.0, 1.0}, {1.3, 1.6, -1.9}},
+											{{2.1, 2.4, 2.7}, {1.0, 1.0, 1.0}, {2.2, 2.5, 2.8}, {1.0, 1.0, 1.0}, {2.3, -2.6, 2.9}},
+											{{3.1, 3.4, 3.7}, {1.0, 1.0, 1.0}, {3.2, 3.5, 3.8}, {1.0, 1.0, 1.0}, {-3.3, 3.6, -3.9}}};
+
+		for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++)
+			BOOST_REQUIRE_EQUAL(simDataCont[i].getNumberOfDataSample(), newNumberOfColumns);
+
+		for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
+			for(int j=0; j<newNumberOfColumns; j++){
+				for(int k=0; k<simDataCont[i][j].getNumberOfElements(); k++){
+					BOOST_REQUIRE_EQUAL(simDataCont[i][j][k], FilesAfter[i][j][k]);
+				}
+			}
+		}
+	}
+
+	BOOST_AUTO_TEST_CASE(InsertCentralMoments5)
+	{
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_2";
+		SimulationDataContainer simDataCont(fileThatDoesExist);
+		std::vector<unsigned int> moments{0,1};
+		simDataCont = simDataCont.buildAndGetMomentsPerData(moments, 2);
+		const int newNumberOfColumns = 4;
+		const double FilesAfter[3][4][3] = {{{1.1, 1.4, 1.7}, {1.2, 1.5, 1.8}, {1.0, 1.0, 1.0}, {1.3, 1.6, -1.9}},
+											{{2.1, 2.4, 2.7}, {2.2, 2.5, 2.8}, {1.0, 1.0, 1.0}, {2.3, -2.6, 2.9}},
+											{{3.1, 3.4, 3.7}, {3.2, 3.5, 3.8}, {1.0, 1.0, 1.0}, {-3.3, 3.6, -3.9}}};
+
+		for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++)
+			BOOST_REQUIRE_EQUAL(simDataCont[i].getNumberOfDataSample(), newNumberOfColumns);
+
+		for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
+			for(int j=0; j<newNumberOfColumns; j++){
+				for(int k=0; k<simDataCont[i][j].getNumberOfElements(); k++){
+					BOOST_REQUIRE_EQUAL(simDataCont[i][j][k], FilesAfter[i][j][k]);
+				}
+			}
+		}
+	}
+
+	BOOST_AUTO_TEST_CASE(InsertCentralMoments6)
+	{
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_2";
+		SimulationDataContainer simDataCont(fileThatDoesExist);
+		std::vector<unsigned int> moments{0,1};
+		BOOST_REQUIRE_THROW(simDataCont.buildAndGetMomentsPerData(moments, 3), std::logic_error);
+		BOOST_REQUIRE_THROW(simDataCont.buildAndGetMomentsPerData(moments, 4), std::logic_error);
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 

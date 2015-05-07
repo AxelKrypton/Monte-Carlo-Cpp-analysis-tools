@@ -14,9 +14,8 @@ public:
     SimulationDataContainer getUncorrelatedSimulationDataSet(std::vector<int> numberOfBinsToBeUsed, ErrorCalculationMethod errorMethod, std::default_random_engine *generator = NULL);
     std::vector<int> getNumberOfEntriesLeftOut(std::vector<int> parameterToBeUsed);
     SimulationData& operator[](int index);
-    SimulationDataContainer insertMomentsPerData(std::vector<unsigned int> whichColumns,
-                                                 std::vector<unsigned int> whichMoments,
-                                                 std::vector<bool> useMultipleColumnsForMoments = std::vector<bool>(5, false));
+    SimulationDataContainer buildAndGetMomentsPerData(std::vector<unsigned int> whichMoments, unsigned int ignoreFirstNColumns,
+    												  std::vector<unsigned int> columnsForWhichMultipleColumnsForMomentsAreUsed = std::vector<unsigned int>());
 
 private:
 	std::vector<SimulationData> simulationDataSet;
@@ -30,7 +29,7 @@ private:
  * the 3rd moment per data of the second column, then, per each SimulationData object in
  * the SimulationDataContainer, one column (i.e. a DataSampleBasic object) containing
  * (O2)^3 will be appended (where O2 is each entry of the second column).
- * The argument useMultipleColumnsForCentralMoments is to decide how to build the higher moments.
+ * The argument useMultipleColumnsForMoments is to decide how to build the higher moments.
  * Its size must be equal to that of whichColumns and its entries are referred in the obvious way
  * to the columns. If any entry is false then the central moments are build in the standard way,
  * otherwise the columns starting from that specified are used to build the higher moments; as
