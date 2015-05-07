@@ -169,12 +169,19 @@ private:
 	std::initializer_list<unsigned int> getNeededMoments();
 };
 
+/*
+ * TODO: The following class should be a container for the quantities above and it should allow the possibility to set only some.
+ *       One idea could be to use the access operator with the observable name as argument to recover values and do something
+ *       when it is asked for an unset quantity (implement operator[] and function at or something like that)
+ */
 
 class Observables
 {
 public:
-    Observables() : mean(0.0, 0.0), susceptibility(0.0, 0.0),
-                    skewness(0.0, 0.0), binderCumulant(0.0, 0.0) 
+//    Observables() : mean(0.0, 0.0), susceptibility(0.0, 0.0),
+//                    skewness(0.0, 0.0), binderCumulant(0.0, 0.0)
+	Observables() : mean(NAN, NAN), susceptibility(NAN, NAN),
+                    skewness(NAN, NAN), binderCumulant(NAN, NAN)
 										{
 												observableNames.push_back("mean" );
 												observableNames.push_back("susc");
