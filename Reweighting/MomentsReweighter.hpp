@@ -74,7 +74,7 @@
 
 
 class MomentsReweighterAbstract {
-    friend class MomentsReweightingDataHandler;
+    friend class MomentsReweighterHelper;
 public:
     virtual ~MomentsReweighterAbstract() {}
 	//Getters
@@ -84,33 +84,34 @@ public:
 	std::vector<double> getLogZAtSimulatedPoints();
 	std::vector<double> getLogZAtNewPoints();
 	double getPrecisionToCalculateLogZ();
+	std::vector<std::vector<Moments> > getMomentsAtNewPoints();
+	std::vector<std::vector<MomentsEstimators> > getMomentsEstimatorsAtNewPoints();
 	//Setters
-    void setPrecisionToCalculateLogZ(double precisionToCalculateLogZ);
+    virtual void setPrecisionToCalculateLogZ(double precisionToCalculateLogZ) = 0;
     virtual void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn) = 0;
     virtual void setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn) = 0;
     virtual void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                                   std::vector<unsigned int> newNumberOfPointsOfParametersIn) = 0;
-    //Other functionalities
-    std::vector<std::vector<Observables> > calculateAndGetReweightedObservables();
-
 protected:
-    MomentsReweighterAbstract();
-    MomentsReweighterAbstract(std::string configurationFileIn,
-                       std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
-                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
-                       std::string errorMethodIn = "bootstrap",
-                       double precisionToCalculateLogZ = 1.e-7);
-    MomentsReweighterAbstract(std::string configurationFileIn,
-                       std::vector<std::pair<double, double> >  newRangesOfParametersIn,
-                       std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
-                       std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
-                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
-                       std::string errorMethodIn = "bootstrap",
-                       double precisionToCalculateLogZ = 1.e-7);
+    MomentsReweighterAbstract() = delete;
+    MomentsReweighterAbstract(RawDataForReweightingAndMetainformation rawDataForReweightingAndMetainformationIn);
+//    MomentsReweighterAbstract(std::string configurationFileIn,
+//                       std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+//                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
+//                       std::string errorMethodIn = "bootstrap",
+//                       double precisionToCalculateLogZ = 1.e-7);
+//    MomentsReweighterAbstract(std::string configurationFileIn,
+//                       std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+//                       std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
+//                       std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+//                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
+//                       std::string errorMethodIn = "bootstrap",
+//                       double precisionToCalculateLogZ = 1.e-7);
 
     //Some of the following method could be static functions in the .cpp file but are here for testing purposes
     void calculateAndSetLogZAtSimulatedPoints();
     void calculateAndSetLogZAtNewPoints();
+    void calculateAndSetReweightedMomentsAndMomentsEstimators();
     void prepareObservablesBeforeReweighting(std::vector<double> &);
     void restoreObservablesAfterReweighting(std::vector<double> minimumOfEachObservable,
                                             std::vector<std::vector<double> > *reweightedObservablesFromRawData,
@@ -130,21 +131,22 @@ protected:
 private:
     /*
 	 * Note: The following function is basically the second constructor above. We put it here because it is also the first part
-	 *       of the third constructor. In C one constructor cannot call another constructor (in c++11 one would use delegating constructors).
+	 *       of the third constructor. In c++03 one constructor cannot call another constructor (in c++11 one would use delegating constructors).
 	 */
-	void generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero);
+//	void generalInitialization();
+//	void generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero);
 
     //Method in which "valuesOfNewParameters" is filled and some checks are done
     void calculateNewPoints();
     //Method used in calculateAndGetReweightedObservables to select data to calculate observables and errors and to set them
-    void calculateAndSetReweightedObservablesAndErrorsValuesFromMomentsAndEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
-    		 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation,
-    		 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 ErrorCalculationMethod errorMethod);
+    void extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
+    		 	 	 	 	 	 	 	 	 	 	 	 	const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation);
 
 
     //Members
-    MomentsReweightingDataHandler reweightingDataHandler;
+    MomentsReweighterHelper momentsReweighterHelper;
     std::vector<std::string> reweightingParameterNames;
+    std::vector<unsigned int> momentsToBeReweighted;
 
 	/*
 	 * Here in the following objects the order depending on which parameters are
@@ -176,63 +178,84 @@ private:
 	std::vector<std::vector<double> >  valuesOfNewParameters;
 	std::vector<double> logZAtSimulatedPoints;
 	std::vector<double> logZAtNewPoints;
-    std::vector<std::vector<Observables> > observablesAtNewPoints;
+//    std::vector<std::vector<Observables> > observablesAtNewPoints;
+	std::vector<std::vector<Moments> > momentsAtNewPoints;
+	std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints;
 
-	//Todo: think whether keep these two objects as members or not
-	//Note: the following two elements could be unified in c++11 with std::tuple
 	/*
 	 * The new points are so far WITHIN the given range without counting the boundaries.
 	 * They are at the same distance one from each other.
+	 *
+	 * NOTE: the following two elements could be unified in c++11 with std::tuple
 	 */
 	std::vector<std::pair<double, double> >  newRangesOfParameters;
 	std::vector<unsigned int>  newNumberOfPointsOfParameters;
 
 	//Additional parameters
-	std::vector<bool> meanOfObservableIsKnownToBeZero;  //here the indices of the vector are the
-														//number of observable, NOT of the column!
+//	std::vector<bool> meanOfObservableIsKnownToBeZero;  //here the indices of the vector are the
+//														//number of observable, NOT of the column!
 	double precisionOfIterativeProcedureToCalculateLogZ;
 };
 
 
 class MomentsReweighter : public MomentsReweighterAbstract{
 public:
-    MomentsReweighter() : MomentsReweighterAbstract() {}
-    explicit MomentsReweighter(std::string configurationFileIn,
-                        std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
-                        std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
-                        std::string errorMethodIn = "bootstrap", double precisionToCalculateLogZ = 1.e-7)
-     : MomentsReweighterAbstract(configurationFileIn, colToBeRewUsingMultipleColumns,
-    		              colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {
-        calculateAndSetLogZAtSimulatedPoints();
+    MomentsReweighter() = delete;
+
+    explicit MomentsReweighter(RawDataForReweightingAndMetainformation rawDataForReweightingAndMetainformationIn)
+    	: MomentsReweighterAbstract(rawDataForReweightingAndMetainformationIn)
+    {
+		calculateAndSetLogZAtSimulatedPoints();
+		calculateAndSetLogZAtNewPoints();
+		calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
-    MomentsReweighter(std::string configurationFileIn,
-               std::vector<std::pair<double, double> >  newRangesOfParametersIn,
-               std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
-               std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
-               std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
-               std::string errorMethodIn = "bootstrap", double precisionToCalculateLogZ = 1.e-7)
-     : MomentsReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
-                          newNumberOfPointsOfParametersIn, colToBeRewUsingMultipleColumns,
-                          colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {
-        calculateAndSetLogZAtSimulatedPoints();
-        calculateAndSetLogZAtNewPoints();
-    }
+
+//    explicit MomentsReweighter(std::string configurationFileIn,
+//                        std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+//                        std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
+//                        std::string errorMethodIn = "bootstrap", double precisionToCalculateLogZ = 1.e-7)
+//     : MomentsReweighterAbstract(configurationFileIn, colToBeRewUsingMultipleColumns,
+//    		              colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {
+//        calculateAndSetLogZAtSimulatedPoints();
+//    }
+//    MomentsReweighter(std::string configurationFileIn,
+//               std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+//               std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
+//               std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+//               std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
+//               std::string errorMethodIn = "bootstrap", double precisionToCalculateLogZ = 1.e-7)
+//     : MomentsReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
+//                          newNumberOfPointsOfParametersIn, colToBeRewUsingMultipleColumns,
+//                          colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {
+//        calculateAndSetLogZAtSimulatedPoints();
+//        calculateAndSetLogZAtNewPoints();
+//    }
 
     //Setters
     void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
         MomentsReweighterAbstract::setNewRangesOfParameters(newRangesOfParametersIn);
         calculateAndSetLogZAtNewPoints();
+        calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
 
     void setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn){
         MomentsReweighterAbstract::setNewNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn);
         calculateAndSetLogZAtNewPoints();
+        calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
 
     void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
                           std::vector<unsigned int> newNumberOfPointsOfParametersIn){
         MomentsReweighterAbstract::setNewParameters(newRangesOfParametersIn, newNumberOfPointsOfParametersIn);
         calculateAndSetLogZAtNewPoints();
+        calculateAndSetReweightedMomentsAndMomentsEstimators();
+    }
+
+    void setPrecisionToCalculateLogZ(double precisionToCalculateLogZ){
+    	MomentsReweighterAbstract::setPrecisionToCalculateLogZ(precisionToCalculateLogZ);
+		calculateAndSetLogZAtSimulatedPoints();
+		calculateAndSetLogZAtNewPoints();
+		calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
 };
 

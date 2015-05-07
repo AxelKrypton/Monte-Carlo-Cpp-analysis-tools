@@ -12,45 +12,64 @@
 static void writeNewPoints(std::vector<std::vector<double> >&, std::vector<std::vector<double> >, std::vector<double>, int=0, int=0);
 static void findIflogZHasToBeCalculated(std::vector<double>, std::vector<int>&);
 static double logarithmic_sum(double, double);
-static void evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(Observables&, const Moments&, const MomentsEstimators&, const bool, ErrorCalculationMethod);
+//static void evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(Observables&, const Moments&, const MomentsEstimators&, const bool, ErrorCalculationMethod);
 
 /*****************************************************************************************/
 
-/*
- * The following exception in the default constructor is never thrown because in the
- * initialization list (that is not explicitly given) there is an implicit call to
- * the default constructor of the SimulationDataContainer class that throws an std::invalid_argument
- * exception.
- */
-MomentsReweighterAbstract::MomentsReweighterAbstract() {
-    throw std::invalid_argument("Reweighter needs SimulationDataContainer object for construction!");
-}
+///*
+// * The following exception in the default constructor is never thrown because in the
+// * initialization list (that is not explicitly given) there is an implicit call to
+// * the default constructor of the SimulationDataContainer class that throws an std::invalid_argument
+// * exception.
+// */
+//MomentsReweighterAbstract::MomentsReweighterAbstract() {
+//    throw std::invalid_argument("Reweighter needs SimulationDataContainer object for construction!");
+//}
 
-
-MomentsReweighterAbstract::MomentsReweighterAbstract(std::string configurationFileIn,
-                                       std::vector<unsigned int> colToBeRewUsingMultipleColumns,
-                                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
-                                       std::string errorMethodIn, double precisionToCalculateLogZ)
- : reweightingDataHandler(configurationFileIn, colToBeRewUsingMultipleColumns, errorMethodIn), observablesAtNewPoints(),
-   precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
+MomentsReweighterAbstract::MomentsReweighterAbstract(RawDataForReweightingAndMetainformation rawDataForReweightingAndMetainformationIn)
+	: momentsReweighterHelper(rawDataForReweightingAndMetainformationIn)
 {
-	generalInitialization(colWhoseMeanIsKnownToBeZero);
-}
-
-
-MomentsReweighterAbstract::MomentsReweighterAbstract(std::string configurationFileIn,
-                                       std::vector<std::pair<double, double> >  newRangesOfParametersIn,
-                                       std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
-                                       std::vector<unsigned int> colToBeRewUsingMultipleColumns,
-                                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
-                                       std::string errorMethodIn, double precisionToCalculateLogZ)
- : reweightingDataHandler(configurationFileIn, colToBeRewUsingMultipleColumns, errorMethodIn), observablesAtNewPoints(),
-   newRangesOfParameters(newRangesOfParametersIn), newNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn),
-   precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
-{
-	generalInitialization(colWhoseMeanIsKnownToBeZero);
+	reweightingParameterNames = momentsReweighterHelper.namesOfParametersIgnoringMetaParameters;
+	valuesOfSimulationParameters = momentsReweighterHelper.valuesOfSimulationParametersIgnoringMetaParameters;
+	momentsToBeReweighted = rawDataForReweightingAndMetainformationIn.momentsToBeReweighted;
+	newRangesOfParameters = rawDataForReweightingAndMetainformationIn.newRangesOfParameters;
+	newNumberOfPointsOfParameters = rawDataForReweightingAndMetainformationIn.newNumberOfPointsOfParameters;
+	precisionOfIterativeProcedureToCalculateLogZ = rawDataForReweightingAndMetainformationIn.precisionToCalculateLogZ;
+	if(precisionOfIterativeProcedureToCalculateLogZ <= 0.0)
+		throw std::range_error("Precision smaller than or equal to zero is nonsense!");
+	logZAtSimulatedPoints = rawDataForReweightingAndMetainformationIn.valuesOfSpecifiedLogZ;
+	//Set to zero not given value of logZ. TODO: This should be done in calculateLogZAtSimulatedPoints
+	for(size_t i=0; i<logZAtSimulatedPoints.size(); i++){
+		if(isnan(logZAtSimulatedPoints[i]))
+			logZAtSimulatedPoints[i] = 0.0;
+	}
 	calculateNewPoints();
 }
+
+//MomentsReweighterAbstract::MomentsReweighterAbstract(std::string configurationFileIn,
+//                                       std::vector<unsigned int> colToBeRewUsingMultipleColumns,
+//                                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
+//                                       std::string errorMethodIn, double precisionToCalculateLogZ)
+// : momentsReweighterHelper(configurationFileIn, colToBeRewUsingMultipleColumns, errorMethodIn), observablesAtNewPoints(),
+//   precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
+//{
+//	generalInitialization(colWhoseMeanIsKnownToBeZero);
+//}
+//
+//
+//MomentsReweighterAbstract::MomentsReweighterAbstract(std::string configurationFileIn,
+//                                       std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+//                                       std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
+//                                       std::vector<unsigned int> colToBeRewUsingMultipleColumns,
+//                                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
+//                                       std::string errorMethodIn, double precisionToCalculateLogZ)
+// : momentsReweighterHelper(configurationFileIn, colToBeRewUsingMultipleColumns, errorMethodIn), observablesAtNewPoints(),
+//   newRangesOfParameters(newRangesOfParametersIn), newNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn),
+//   precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
+//{
+//	generalInitialization(colWhoseMeanIsKnownToBeZero);
+//	calculateNewPoints();
+//}
 
 
 std::vector<std::vector<double> > MomentsReweighterAbstract::getValuesOfSimulationParameters(){
@@ -85,6 +104,16 @@ double MomentsReweighterAbstract::getPrecisionToCalculateLogZ(){
 }
 
 
+std::vector<std::vector<Moments> > MomentsReweighterAbstract::getMomentsAtNewPoints(){
+	return momentsAtNewPoints;
+}
+
+
+std::vector<std::vector<MomentsEstimators> > MomentsReweighterAbstract::getMomentsEstimatorsAtNewPoints(){
+	return momentsEstimatorsAtNewPoints;
+}
+
+
 void MomentsReweighterAbstract::setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
 	newRangesOfParameters = newRangesOfParametersIn;
 	calculateNewPoints();
@@ -111,6 +140,12 @@ void MomentsReweighterAbstract::setPrecisionToCalculateLogZ(double precisionToCa
 	precisionOfIterativeProcedureToCalculateLogZ = precisionToCalculateLogZ;
 }
 
+
+/*****************************************************************************************/
+/************************** PROTECTED OR PRIVATE METHODS *********************************/
+/*****************************************************************************************/
+
+
 /*
  * In the following function the reweighting of the observables is performed. The error on the
  * reweighted quantities is estimated using the Jackknife approach, i.e. calculating here
@@ -120,12 +155,14 @@ void MomentsReweighterAbstract::setPrecisionToCalculateLogZ(double precisionToCa
  * NOTE: In order to reweight, the use of logarithms is highly encouraged. Hence we have to
  *       be sure that each observable is positive before taking the logarithm. This is achieved
  *       shifting them by twice the minimum, if some negative value occurs.
+ *
+ * TODO: Some operations are in common to bootstrap and jackknife: extract them from if else!
  */
-std::vector<std::vector<Observables> > MomentsReweighterAbstract::calculateAndGetReweightedObservables(){
+void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstimators(){
     std::cout << "==========================================================\n";
     std::cout << " Starting reweighting of observables...\n";
     size_t numberOfNewPoints = valuesOfNewParameters.size();
-    size_t numberOfObservablesToBeReweighted = reweightingDataHandler.numberOfObservablesToBeReweighted;
+    size_t numberOfObservablesToBeReweighted = momentsReweighterHelper.numberOfObservablesToBeReweighted;
     std::vector<double> minimumOfEachObservable(numberOfObservablesToBeReweighted, std::numeric_limits<double>::max());
     prepareObservablesBeforeReweighting(minimumOfEachObservable);
     std::cout << "   Calculating the moments of observables at new points... \n";
@@ -134,9 +171,9 @@ std::vector<std::vector<Observables> > MomentsReweighterAbstract::calculateAndGe
     std::vector<double> smartGuessForLogZ = logZAtSimulatedPoints;
 
     //Switch between different error calculation methods
-    if(reweightingDataHandler.errorMethod == jackknife){
-    	//reweightingDataHandler.simulationUncorrDataContainer already set for jackknife
-    	size_t numberOfBinsUsedToBinData = reweightingDataHandler.numberOfBinsToBeUsed[0];
+    if(momentsReweighterHelper.errorMethod == jackknife){
+    	//momentsReweighterHelper.simulationUncorrDataContainer already set for jackknife
+    	size_t numberOfBinsUsedToBinData = momentsReweighterHelper.numberOfBinsToBeUsed[0];
     	std::valarray<std::vector<std::vector<double> > >
     	            jackknifeEstimators(std::vector<std::vector<double> >(numberOfNewPoints,
     	                                                                  std::vector<double>(numberOfObservablesToBeReweighted)),
@@ -153,21 +190,21 @@ std::vector<std::vector<Observables> > MomentsReweighterAbstract::calculateAndGe
 		}
 		std::cout << "   ...done!\n";
 		restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &jackknifeEstimators);
-		calculateAndSetReweightedObservablesAndErrorsValuesFromMomentsAndEstimators(reweightedObservablesFromRawData, jackknifeEstimators, jackknife);
-    }else if(reweightingDataHandler.errorMethod == bootstrap){
-    	if(reweightingDataHandler.bootstrapNumber == NULL)
+		extractAndSetReweightedMomentsAndMomentsEstimators(reweightedObservablesFromRawData, jackknifeEstimators);
+    }else if(momentsReweighterHelper.errorMethod == bootstrap){
+    	if(momentsReweighterHelper.bootstrapNumber == NULL)
     		throw std::logic_error("In \"calculateAndGetReweightedObservables\" bootstrapNumber unset in the bootstrap case!! Aborting...");
     	std::valarray<std::vector<std::vector<double> > >
     	        	            bootstrapEstimators(std::vector<std::vector<double> >(numberOfNewPoints,
     	        	                                                                  std::vector<double>(numberOfObservablesToBeReweighted)),
-    	        	            				    *(reweightingDataHandler.bootstrapNumber));
+    	        	            				    *(momentsReweighterHelper.bootstrapNumber));
     	std::cout << "   Calculating the Bootstrap estimators... \n";
 		// construct a trivial random generator engine from a time-based seed:
 		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 		std::default_random_engine generator(seed);
-    	for(int iBoot=0; iBoot<(*(reweightingDataHandler.bootstrapNumber)); iBoot++){
-    		reweightingDataHandler.simulationUncorrDataContainer =
-    				reweightingDataHandler.simulationRawDataContainer.getUncorrelatedSimulationDataSet(reweightingDataHandler.numberOfBinsToBeUsed, bootstrap, &generator);
+    	for(int iBoot=0; iBoot<(*(momentsReweighterHelper.bootstrapNumber)); iBoot++){
+    		momentsReweighterHelper.simulationUncorrDataContainer =
+    				momentsReweighterHelper.simulationRawDataContainer.getUncorrelatedSimulationDataSet(momentsReweighterHelper.numberOfBinsToBeUsed, bootstrap, &generator);
     		std::vector<double> logZAtSimulatedPointsUsingUncorrData = calculateLogZAtSimulatedPoints(true, -1, &smartGuessForLogZ);
     		std::vector<double> logZAtNewPointsUsingUncorrData = calculateLogZAtNewPoints(valuesOfNewParameters, true, -1, &logZAtSimulatedPointsUsingUncorrData);
     		bootstrapEstimators[iBoot] = calculateReweightedObservableValues(true, -1, &logZAtSimulatedPointsUsingUncorrData, &logZAtNewPointsUsingUncorrData);
@@ -175,41 +212,37 @@ std::vector<std::vector<Observables> > MomentsReweighterAbstract::calculateAndGe
     	}
     	std::cout << "   ...done!\n";
     	restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &bootstrapEstimators);
-    	calculateAndSetReweightedObservablesAndErrorsValuesFromMomentsAndEstimators(reweightedObservablesFromRawData, bootstrapEstimators, bootstrap);
+    	extractAndSetReweightedMomentsAndMomentsEstimators(reweightedObservablesFromRawData, bootstrapEstimators);
     }else{
     	throw std::invalid_argument("Error method for some reason unknown! Aborting...");
     }
 
     std::cout << " ...reweighting of observables done!\n";
     std::cout << "==========================================================\n\n";
-    return observablesAtNewPoints;
 }
 
-/*****************************************************************************************/
-/************************** PROTECTED OR PRIVATE METHODS *********************************/
-/*****************************************************************************************/
 
-void MomentsReweighterAbstract::generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero)
-{
-	reweightingParameterNames = reweightingDataHandler.getNamesOfParametersIgnoringMetaParameters();
-    valuesOfSimulationParameters = reweightingDataHandler.getValuesOfSimulationParametersIgnoringMetaParameters();
-    meanOfObservableIsKnownToBeZero=std::vector<bool>(reweightingDataHandler.numberOfObservablesGivenAsInput, false);
-    for(size_t i=0; i<colWhoseMeanIsKnownToBeZero.size(); i++){
-    	if(colWhoseMeanIsKnownToBeZero[i]<reweightingParameterNames.size())
-    		throw std::invalid_argument("Number of column for obs. whose mean should be known to be zero referring to a column of conjugated quantity!");
-    	else if(colWhoseMeanIsKnownToBeZero[i]>=reweightingParameterNames.size()+reweightingDataHandler.numberOfObservablesGivenAsInput)
-    		throw std::invalid_argument("Invalid specified observable whose mean should be known to be zero!");
-    	meanOfObservableIsKnownToBeZero[colWhoseMeanIsKnownToBeZero[i]-reweightingParameterNames.size()]=true;
-    }
-    std::cout << "meanOfObservableIsKnownToBeZero=( ";
-    for(int i=0; i<reweightingDataHandler.numberOfObservablesGivenAsInput; i++)
-    	std::cout << meanOfObservableIsKnownToBeZero[i] << " ";
-    std::cout << ")\n\n";
-    if(precisionOfIterativeProcedureToCalculateLogZ <= 0.0)
-        throw std::range_error("Precision smaller than or equal to zero is nonsense!");
-    logZAtSimulatedPoints.resize(valuesOfSimulationParameters.size(), 0.0);
-    reweightingDataHandler.extractAndSetProvidedValuesOfLogZAtSimulatedPoints(logZAtSimulatedPoints);
-}
+//void MomentsReweighterAbstract::generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero)
+//{
+//	reweightingParameterNames = momentsReweighterHelper.getNamesOfParametersIgnoringMetaParameters();
+//    valuesOfSimulationParameters = momentsReweighterHelper.getValuesOfSimulationParametersIgnoringMetaParameters();
+//    meanOfObservableIsKnownToBeZero=std::vector<bool>(momentsReweighterHelper.numberOfObservablesGivenAsInput, false);
+//    for(size_t i=0; i<colWhoseMeanIsKnownToBeZero.size(); i++){
+//    	if(colWhoseMeanIsKnownToBeZero[i]<reweightingParameterNames.size())
+//    		throw std::invalid_argument("Number of column for obs. whose mean should be known to be zero referring to a column of conjugated quantity!");
+//    	else if(colWhoseMeanIsKnownToBeZero[i]>=reweightingParameterNames.size()+momentsReweighterHelper.numberOfObservablesGivenAsInput)
+//    		throw std::invalid_argument("Invalid specified observable whose mean should be known to be zero!");
+//    	meanOfObservableIsKnownToBeZero[colWhoseMeanIsKnownToBeZero[i]-reweightingParameterNames.size()]=true;
+//    }
+//    std::cout << "meanOfObservableIsKnownToBeZero=( ";
+//    for(int i=0; i<momentsReweighterHelper.numberOfObservablesGivenAsInput; i++)
+//    	std::cout << meanOfObservableIsKnownToBeZero[i] << " ";
+//    std::cout << ")\n\n";
+//    if(precisionOfIterativeProcedureToCalculateLogZ <= 0.0)
+//        throw std::range_error("Precision smaller than or equal to zero is nonsense!");
+//    logZAtSimulatedPoints.resize(valuesOfSimulationParameters.size(), 0.0);
+//    reweightingDataHandler.extractAndSetProvidedValuesOfLogZAtSimulatedPoints(logZAtSimulatedPoints);
+//}
 
 void MomentsReweighterAbstract::calculateNewPoints(){
 	//todo: improve! Here the easiest implementation -> new point values determined as (upper_bound-lower_bound)/num_points
@@ -228,8 +261,9 @@ void MomentsReweighterAbstract::calculateNewPoints(){
 	valuesOfNewParameters.clear();
 	writeNewPoints(valuesOfNewParameters, newPointValuesForSingleParameter, auxiliaryVector);
 	logZAtNewPoints.reserve(valuesOfNewParameters.size());
-    observablesAtNewPoints = std::vector<std::vector<Observables> >(valuesOfNewParameters.size(),
-                             std::vector<Observables>(reweightingDataHandler.numberOfObservablesGivenAsInput, Observables()));
+    momentsAtNewPoints = std::vector<std::vector<Moments> >(valuesOfNewParameters.size(), std::vector<Moments>(momentsReweighterHelper.numberOfObservablesGivenAsInput, Moments()));
+    momentsEstimatorsAtNewPoints = std::vector<std::vector<MomentsEstimators> >(valuesOfNewParameters.size(),
+    																			std::vector<MomentsEstimators>(momentsReweighterHelper.numberOfObservablesGivenAsInput, MomentsEstimators()));
 }
 
 
@@ -253,8 +287,8 @@ std::vector<double> MomentsReweighterAbstract::calculateLogZAtNewPoints(std::vec
                                                                  bool useUncorrData, const int entryToBeLeftOut,
                                                                  std::vector<double>* logZAtSimulationPointToBeUsed){
 
-    SimulationDataContainer& simDataCont = (useUncorrData) ? reweightingDataHandler.simulationUncorrDataContainer
-                                                           : reweightingDataHandler.simulationRawDataContainer;
+    SimulationDataContainer& simDataCont = (useUncorrData) ? momentsReweighterHelper.simulationUncorrDataContainer
+                                                           : momentsReweighterHelper.simulationRawDataContainer;
     if(entryToBeLeftOut >= simDataCont[0][0].getNumberOfElements())
         throw std::logic_error("A not existing data entry has been asked to be excluded calculating logZ!");
     if(logZAtSimulationPointToBeUsed == NULL)
@@ -326,7 +360,7 @@ std::vector<double> MomentsReweighterAbstract::calculateLogZAtSimulatedPoints(bo
      * TODO: Benchmark in real life if these two blocks can be merged, i.e. how long takes the
      *       indices set up in the else here below.
      */
-	if(entryToBeLeftOut >= reweightingDataHandler.numberOfBinsToBeUsed[0]) //Here negative values mean do not leave out entry, so no check is done!
+	if(entryToBeLeftOut >= momentsReweighterHelper.numberOfBinsToBeUsed[0]) //Here negative values mean do not leave out entry, so no check is done!
 		throw std::out_of_range("Invalid entry to be left out in \"calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry\" function.");
 
 	std::vector<double> resultLogZ(valuesOfSimulationParameters.size(), 0.0);
@@ -349,14 +383,14 @@ std::vector<double> MomentsReweighterAbstract::calculateLogZAtSimulatedPoints(bo
                            *expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations]);
                 //here one should put eq.(8.34)
             }
-            if(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ)
-            	resultLogZ = newLogZ;
-            else
-            	break;
 			if(printUserInfo && residuum < valueResiduumForOutput){
 			  std::cout << "   Residuum = " << sqrt(residuum) << std::endl;
 			  valueResiduumForOutput/=10.;
 			}
+            if(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ)
+            	resultLogZ = newLogZ;
+            else
+            	break;
 	    }
         if (printUserInfo){
         	std::cout << " ...done!" << std::endl;
@@ -436,8 +470,8 @@ std::vector<std::vector<double> > MomentsReweighterAbstract::calculateReweighted
                                                                                           std::vector<double> *logZAtSimulationPointToBeUsed,
                                                                                           std::vector<double> *logZAtNewPointsToBeUsed){
 
-    SimulationDataContainer& simDataCont = (useUncorrData) ? reweightingDataHandler.simulationUncorrDataContainer
-                                                           : reweightingDataHandler.simulationRawDataContainer;
+    SimulationDataContainer& simDataCont = (useUncorrData) ? momentsReweighterHelper.simulationUncorrDataContainer
+                                                           : momentsReweighterHelper.simulationRawDataContainer;
     if(entryToBeLeftOut >= simDataCont[0][0].getNumberOfElements())
         throw std::logic_error("A not existing data entry has been asked to be excluded reweighting observables!");
     if(logZAtSimulationPointToBeUsed == NULL)
@@ -448,7 +482,7 @@ std::vector<std::vector<double> > MomentsReweighterAbstract::calculateReweighted
     size_t numberOfReweightingParameters = reweightingParameterNames.size();
     size_t numberOfSimulationsDone = valuesOfSimulationParameters.size();
     size_t numberOfNewPoints = valuesOfNewParameters.size();
-    std::vector<std::vector<double> > outputValuesOfObservables(numberOfNewPoints, std::vector<double>(reweightingDataHandler.numberOfObservablesToBeReweighted));
+    std::vector<std::vector<double> > outputValuesOfObservables(numberOfNewPoints, std::vector<double>(momentsReweighterHelper.numberOfObservablesToBeReweighted));
     double logarithmOfDenominator;
     for(size_t indexNewPoint = 0; indexNewPoint < numberOfNewPoints; indexNewPoint++){
         bool firstValue = true;
@@ -469,7 +503,7 @@ std::vector<std::vector<double> > MomentsReweighterAbstract::calculateReweighted
                     double newTerm = log((double)numberConfigurations2) - (*logZAtSimulationPointToBeUsed)[indexSimulation2] + exponent;
                     logarithmOfDenominator = (indexSimulation2 == 0) ? newTerm : logarithmic_sum(logarithmOfDenominator, newTerm);
                 }
-                for(int indexObservable=0; indexObservable<reweightingDataHandler.numberOfObservablesToBeReweighted; indexObservable++){
+                for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++){
                     double newTerm = simDataCont[indexSimulation1][indexObservable+numberOfReweightingParameters][indexConfiguration] - logarithmOfDenominator;
                     outputValuesOfObservables[indexNewPoint][indexObservable] =
                             (indexSimulation1 == 0 && (indexConfiguration == 0 || firstValue)) ? newTerm :
@@ -478,7 +512,7 @@ std::vector<std::vector<double> > MomentsReweighterAbstract::calculateReweighted
                 firstValue = false;
             }
         }
-        for(int indexObservable=0; indexObservable<reweightingDataHandler.numberOfObservablesToBeReweighted; indexObservable++)
+        for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++)
             outputValuesOfObservables[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
     }
 
@@ -492,23 +526,23 @@ std::vector<std::vector<double> > MomentsReweighterAbstract::calculateReweighted
 void MomentsReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<double>& minimumOfEachObservable){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
     //Estimate of minimum of each observable through all files
-    for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
-        for(int indexObservable=numberOfReweightingParameters; indexObservable<reweightingDataHandler.simulationRawDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++){
-            if(reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].min() < minimumOfEachObservable[indexObservable-numberOfReweightingParameters])
-                minimumOfEachObservable[indexObservable-numberOfReweightingParameters] = reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].min();
+    for(int indexSimulation=0; indexSimulation<momentsReweighterHelper.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
+        for(int indexObservable=numberOfReweightingParameters; indexObservable<momentsReweighterHelper.simulationRawDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++){
+            if(momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable].min() < minimumOfEachObservable[indexObservable-numberOfReweightingParameters])
+                minimumOfEachObservable[indexObservable-numberOfReweightingParameters] = momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable].min();
         }
     }
     //Shift, if necessary, and logarithm
-    for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
-        for(int indexObservable=numberOfReweightingParameters; indexObservable<reweightingDataHandler.simulationRawDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++){
+    for(int indexSimulation=0; indexSimulation<momentsReweighterHelper.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
+        for(int indexObservable=numberOfReweightingParameters; indexObservable<momentsReweighterHelper.simulationRawDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++){
             if(minimumOfEachObservable[indexObservable-numberOfReweightingParameters] < 0){
                 if(indexSimulation == 0)
                     std::cout << "  Observable number " << indexObservable-numberOfReweightingParameters << " shifted due to negative values!\n";
-                reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable] -= 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
-                reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][indexObservable] -= 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
+                momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable] -= 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
+                momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][indexObservable] -= 2*minimumOfEachObservable[indexObservable-numberOfReweightingParameters];
             }
-            for(int indexData=0; indexData<reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].getNumberOfElements(); indexData++){
-                if(reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable][indexData] == 0.0){
+            for(int indexData=0; indexData<momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable].getNumberOfElements(); indexData++){
+                if(momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable][indexData] == 0.0){
                     std::ostringstream exceptionString;
                     exceptionString << "Zero-value for observable ";
                     exceptionString << indexObservable << " found in datafile " << indexSimulation;
@@ -516,8 +550,8 @@ void MomentsReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<
                     throw std::runtime_error(exceptionString.str());
                 }
             }
-            reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationRawDataContainer[indexSimulation][indexObservable].applyFunction(log);
-            reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][indexObservable] = reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][indexObservable].applyFunction(log);
+            momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable] = momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable].applyFunction(log);
+            momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][indexObservable] = momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][indexObservable].applyFunction(log);
         }
     }
 }
@@ -527,12 +561,12 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<d
                                      std::valarray<std::vector<std::vector<double> > > *estimatorsForErrorCalculation){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
     //Exponential and shift, if necessary, BOTH on raw/uncorr data AND on values at new points (Jackknife partial predicitions)
-    for(int indexObservable=0; indexObservable<reweightingDataHandler.numberOfObservablesToBeReweighted; indexObservable++){
-        for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
-            reweightingDataHandler.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] =
-                    reweightingDataHandler.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
-            reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] =
-                    reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
+    for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++){
+        for(int indexSimulation=0; indexSimulation<momentsReweighterHelper.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
+            momentsReweighterHelper.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] =
+                    momentsReweighterHelper.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
+            momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] =
+                    momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
         }
         for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
             if(estimatorsForErrorCalculation != NULL){
@@ -550,9 +584,9 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<d
          }
          if(minimumOfEachObservable[indexObservable] < 0){
              std::cout << "  Observable number " << indexObservable << " restored!\n";
-             for(int indexSimulation=0; indexSimulation<reweightingDataHandler.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
-                reweightingDataHandler.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] += 2*minimumOfEachObservable[indexObservable];
-                reweightingDataHandler.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] += 2*minimumOfEachObservable[indexObservable];
+             for(int indexSimulation=0; indexSimulation<momentsReweighterHelper.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
+                momentsReweighterHelper.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] += 2*minimumOfEachObservable[indexObservable];
+                momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] += 2*minimumOfEachObservable[indexObservable];
              }
          }
      }
@@ -561,48 +595,58 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<d
 
 
 SimulationDataContainer MomentsReweighterAbstract::getSimulationDataContainer(bool raw){
-    return (raw == true) ? reweightingDataHandler.simulationRawDataContainer
-                         : reweightingDataHandler.simulationUncorrDataContainer;
+    return (raw == true) ? momentsReweighterHelper.simulationRawDataContainer
+                         : momentsReweighterHelper.simulationUncorrDataContainer;
 }
 
 
-void MomentsReweighterAbstract::calculateAndSetReweightedObservablesAndErrorsValuesFromMomentsAndEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
-																									 const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation,
-																									 ErrorCalculationMethod errorMethod)
+void MomentsReweighterAbstract::extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
+																				   const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation)
 {
-	size_t numberOfObservablesGivenAsInput = reweightingDataHandler.numberOfObservablesGivenAsInput;
+	size_t numberOfObservablesGivenAsInput = momentsReweighterHelper.numberOfObservablesGivenAsInput;
 	for(size_t i=0; i<valuesOfNewParameters.size(); i++){
-		for(size_t j=0; j<numberOfObservablesGivenAsInput; j++){ //The size here below is set to 4 manually for the moment!
-			Moments momentsPerPointAndObs;
-			MomentsEstimators errorEstimatorsPerPointAndObs;
-			momentsPerPointAndObs[1] = reweightedObservablesFromRawData[i][j]; //reweighted observables are the first moment!
-			std::valarray<double> auxiliaryArray(estimatorsForErrorsCalculation.size());
-			for(size_t k=0; k<estimatorsForErrorsCalculation.size(); k++)
-					auxiliaryArray[k] = estimatorsForErrorsCalculation[k][i][j];
-			errorEstimatorsPerPointAndObs[1] = DataSample(auxiliaryArray);
-			for(size_t m=0; m<3; m++){ //loop on the number of moments inserted, for the moment manually set
-				momentsPerPointAndObs[m+2] = reweightedObservablesFromRawData[i][numberOfObservablesGivenAsInput+j*3+m]; //second, third and fourth moments
-				for(size_t k=0; k<estimatorsForErrorsCalculation.size(); k++)
-					auxiliaryArray[k] = estimatorsForErrorsCalculation[k][i][numberOfObservablesGivenAsInput+j*3+m];
-				errorEstimatorsPerPointAndObs[m+2] = DataSample(auxiliaryArray);
+		for(size_t j=0; j<numberOfObservablesGivenAsInput; j++){
+			for(size_t k=0; k<momentsToBeReweighted.size(); k++){ //TODO: Implement here the case of multiple columns, now it cannot work!!
+				momentsAtNewPoints[i][j][momentsToBeReweighted[k]] = reweightedObservablesFromRawData[i][j*momentsToBeReweighted.size()+k];
+				//The estimators are in the valarray in estimatorsForErrorsCalculation, that is the outermost index => temporary object needed
+				std::valarray<double> auxiliaryArray(estimatorsForErrorsCalculation.size());
+				for(size_t h=0; h<estimatorsForErrorsCalculation.size(); h++)
+					auxiliaryArray[h] = estimatorsForErrorsCalculation[h][i][j*momentsToBeReweighted.size()+k];
+				momentsEstimatorsAtNewPoints[i][j][momentsToBeReweighted[k]] =  DataSample(auxiliaryArray);
 			}
-			evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], momentsPerPointAndObs, errorEstimatorsPerPointAndObs,
-																		meanOfObservableIsKnownToBeZero[j], errorMethod);
 		}
 	}
+
+//			Moments momentsPerPointAndObs;
+//			MomentsEstimators errorEstimatorsPerPointAndObs;
+//			momentsPerPointAndObs[1] = reweightedObservablesFromRawData[i][j]; //reweighted observables are the first moment!
+//			std::valarray<double> auxiliaryArray(estimatorsForErrorsCalculation.size());
+//			for(size_t k=0; k<estimatorsForErrorsCalculation.size(); k++)
+//					auxiliaryArray[k] = estimatorsForErrorsCalculation[k][i][j];
+//			errorEstimatorsPerPointAndObs[1] = DataSample(auxiliaryArray);
+//			for(size_t m=0; m<3; m++){ //loop on the number of moments inserted, for the moment manually set
+//				momentsPerPointAndObs[m+2] = reweightedObservablesFromRawData[i][numberOfObservablesGivenAsInput+j*3+m]; //second, third and fourth moments
+//				for(size_t k=0; k<estimatorsForErrorsCalculation.size(); k++)
+//					auxiliaryArray[k] = estimatorsForErrorsCalculation[k][i][numberOfObservablesGivenAsInput+j*3+m];
+//				errorEstimatorsPerPointAndObs[m+2] = DataSample(auxiliaryArray);
+//			}
+//			evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], momentsPerPointAndObs, errorEstimatorsPerPointAndObs,
+//																		meanOfObservableIsKnownToBeZero[j], errorMethod);
+//		}
+//	}
 }
 
 /*****************************************************************************************/
 /******************************* STATIC FUNCTIONS ****************************************/
 /*****************************************************************************************/
 
-static void evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(Observables& obs, const Moments& moments, const MomentsEstimators& momentsEstimators,
-																		const bool meanIsZero, ErrorCalculationMethod errorMethod){
-	obs.mean = Mean(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
-	obs.susceptibility = Variance(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
-	obs.skewness = Skewness(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
-	obs.binderCumulant = BinderCumulant(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
-}
+//static void evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(Observables& obs, const Moments& moments, const MomentsEstimators& momentsEstimators,
+//																		const bool meanIsZero, ErrorCalculationMethod errorMethod){
+//	obs.mean = Mean(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
+//	obs.susceptibility = Variance(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
+//	obs.skewness = Skewness(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
+//	obs.binderCumulant = BinderCumulant(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
+//}
 
 /*
  * In the following function, we decide to calculate logZ at those simulated points for which in

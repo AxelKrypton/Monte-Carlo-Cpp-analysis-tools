@@ -1,7 +1,8 @@
 #ifndef REWEIGHTINGDATAHANDLER_H_
 #define REWEIGHTINGDATAHANDLER_H_
 
-#include "SimulationDataContainer.hpp"
+#include "Reweighter.hpp"
+#include <memory>
 
 /*
  * The following object is supposed to deal with all the I/O operations and to prepare a
@@ -29,24 +30,27 @@
 
 class MomentsReweighterAbstract;
 class MomentsReweighter;
+class MomentsReweighterHelperTest;
 
-class MomentsReweightingDataHandler {
+class MomentsReweighterHelper {
     friend class MomentsReweighterAbstract;
+    friend class MomentsReweighterHelperTest;
 public:
-    MomentsReweightingDataHandler();
-    MomentsReweightingDataHandler(std::string configurationFileIn,
-                           std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
-                           std::string errorMethodIn = "bootstrap");
-    MomentsReweightingDataHandler(const MomentsReweightingDataHandler&);
-    MomentsReweightingDataHandler& operator=(const MomentsReweightingDataHandler&);
-    ~MomentsReweightingDataHandler() { if(bootstrapNumber != NULL) delete bootstrapNumber; }
+    MomentsReweighterHelper() = delete;
+    MomentsReweighterHelper(RawDataForReweightingAndMetainformation rawDataForReweightingAndMetainformation);
+//    MomentsReweighterHelper(std::string configurationFileIn,
+//                           std::vector<unsigned int> obsToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
+//                           std::string errorMethodIn = "bootstrap");
+//    MomentsReweighterHelper(const MomentsReweighterHelper&);
+//    MomentsReweighterHelper& operator=(const MomentsReweighterHelper&);
+//    ~MomentsReweighterHelper() { if(bootstrapNumber != NULL) delete bootstrapNumber; }
     //Getters
-    std::vector<std::string> getNamesOfParametersIgnoringMetaParameters();
-    std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters();
-    void extractAndSetProvidedValuesOfLogZAtSimulatedPoints(std::vector<double>& logZ);
-    //Output to file
-    void writeNewConfigurationFileWithMetaparameters(MomentsReweighter reweighter, std::string newConfigFileName = "");
-    void writeNewPointsToFileWithLogZ(MomentsReweighter reweighter, std::string outputFileName = "logZAtNewPoints");
+//    std::vector<std::string> getNamesOfParametersIgnoringMetaParameters();
+//    std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters();
+//    void extractAndSetProvidedValuesOfLogZAtSimulatedPoints(std::vector<double>& logZ);
+//    //Output to file
+//    void writeNewConfigurationFileWithMetaparameters(MomentsReweighter reweighter, std::string newConfigFileName = "");
+//    void writeNewPointsToFileWithLogZ(MomentsReweighter reweighter, std::string outputFileName = "logZAtNewPoints");
 
     //This is public temporarily for compilation!  metaParameters must be moved to ReweighterIO
     /*
@@ -63,11 +67,13 @@ protected:
     int numberOfObservablesToBeReweighted;
 
 private:
-    std::string configurationFile;
+//    std::string configurationFile;
     SimulationDataContainer simulationRawDataContainer;
     SimulationDataContainer simulationUncorrDataContainer;
+    std::vector<std::string> namesOfParametersIgnoringMetaParameters;
+    std::vector<std::vector<double> > valuesOfSimulationParametersIgnoringMetaParameters;
 	ErrorCalculationMethod errorMethod;
-	int* bootstrapNumber;
+	std::shared_ptr<int> bootstrapNumber;
 
 
 };
