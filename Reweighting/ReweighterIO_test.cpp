@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_SUITE(build)
         BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong2), std::invalid_argument);
         BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong3), std::logic_error);
         BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong4), std::logic_error);
-        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong5), std::runtime_error);
+        BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong5), std::invalid_argument);
         BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong6), std::invalid_argument);
         BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong7), std::logic_error);
         BOOST_REQUIRE_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExistButWrong8), std::invalid_argument);
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_SUITE(build)
 
     BOOST_AUTO_TEST_CASE(build3)
     {
-        std::string fileThatDoesExist1 = "GeneralTestFiles/simulationDataContainer.configfile_1";
+        std::string fileThatDoesExist1 = "GeneralTestFiles/simulationDataContainer.configfile_1"; //This test should fail since on some line there is no binsize given!
         std::string fileThatDoesExist2 = "GeneralTestFiles/simulationDataContainer.configfile_2";
         std::string fileThatDoesExist3 = "GeneralTestFiles/simulationDataContainer.configfile_3";
         std::string fileThatDoesExist4 = "RealTestData/configfile_3";
@@ -146,11 +146,9 @@ BOOST_AUTO_TEST_SUITE(build)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-
-
-
-
-//TODO: Adapt the following tests to ReweighterIO.
+/*
+ * See comment in ReweighterIO.cpp file regarding these functions to know why they are commented out.
+ */
 
 //BOOST_AUTO_TEST_SUITE(functionalities)
 //
@@ -159,8 +157,16 @@ BOOST_AUTO_TEST_SUITE_END()
 //    BOOST_AUTO_TEST_CASE(writeNewConfigFile1)
 //    {
 //        std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
-//        MomentsReweightingDataHandler reweightingDataHandler(fileThatDoesExist, std::vector<unsigned int>(), "jack");
-//        reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(MomentsReweighter(fileThatDoesExist, std::vector<unsigned int>(), std::vector<unsigned int>(), "jack"));
+//		std::initializer_list<std::string> options = {("-f" + fileThatDoesExist), "--useJackknifeAsErrorMethod"};
+//        std::vector<unsigned int> momentsToBeReweighted{1, 2, 3, 4};
+//        std::vector<int> binsizesToBeUsed{2, 2, 2};
+//        RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed);
+//        std::vector<std::pair<double, double> > newRanges = {std::make_pair(4.2, 4.6), std::make_pair(0.8, 1.2)};
+//		std::vector< unsigned int> newNumPoints(2, 3);
+//		rawDataAndMetaInfo.newRangesOfParameters = newRanges;
+//		rawDataAndMetaInfo.newNumberOfPointsOfParameters = newNumPoints;
+//        MomentsReweighterHelper reweightingDataHandler(rawDataAndMetaInfo);
+//        reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(MomentsReweighter(rawDataAndMetaInfo));
 //        std::string outputFileName = "configFileWithLogZ";
 //        BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
 //        if(boost::filesystem::exists(outputFileName))
@@ -170,17 +176,21 @@ BOOST_AUTO_TEST_SUITE_END()
 //    BOOST_AUTO_TEST_CASE(writeNewConfigFile2)
 //    {
 //        std::string fileThatDoesExist = "RealTestData/configfile_1";
-//        MomentsReweightingDataHandler reweightingDataHandler(fileThatDoesExist);
-//        std::vector<std::pair<double, double> > newRanges;
-//        std::vector< unsigned int> newNumPoints(1, 30);
-//        newRanges.push_back(std::make_pair(5.348, 5.3509));
-//        MomentsReweighter* reweighter = new MomentsReweighter(fileThatDoesExist, newRanges, newNumPoints);
+//		std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+//													  "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30"};
+//        std::vector<unsigned int> momentsToBeReweighted{1, 2, 3, 4};
+//		std::vector<int> binsizesToBeUsed{100, 100, 100};
+//		RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed);
+//        MomentsReweighterHelper reweightingDataHandler(rawDataAndMetaInfo);
+//        MomentsReweighter* reweighter = new MomentsReweighter(rawDataAndMetaInfo);
 //        std::vector<double> simulatedLogZ = reweighter->getLogZAtSimulatedPoints();
 //        std::string outputFileName = "testWritingConfigFile";
 //        reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(*reweighter, outputFileName);
 //        BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
 //        delete reweighter;
-//        reweighter = new MomentsReweighter(outputFileName);
+//		std::initializer_list<std::string> options2 = {"-f" + outputFileName, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+//													   "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30"};
+//        reweighter = new MomentsReweighter(ReweighterTester(options2).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed));
 //        for(size_t i=0; i<simulatedLogZ.size(); i++)
 //            BOOST_REQUIRE_CLOSE(reweighter->getLogZAtSimulatedPoints()[i], simulatedLogZ[i], doublePrecisionInPercent);
 //        if(boost::filesystem::exists(outputFileName))
@@ -191,11 +201,13 @@ BOOST_AUTO_TEST_SUITE_END()
 //    BOOST_AUTO_TEST_CASE(writeNewPointsToFile)
 //    {
 //        std::string fileThatDoesExist = "RealTestData/configfile_1";
-//        MomentsReweightingDataHandler reweightingDataHandler(fileThatDoesExist);
-//        std::vector<std::pair<double, double> > newRanges;
-//        std::vector< unsigned int> newNumPoints(1, 30);
-//        newRanges.push_back(std::make_pair(5.348, 5.3509));
-//        MomentsReweighter reweighter(fileThatDoesExist, newRanges, newNumPoints);
+//		std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+//													  "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30"};
+//		std::vector<unsigned int> momentsToBeReweighted{1, 2, 3, 4};
+//		std::vector<int> binsizesToBeUsed{100, 100, 100};
+//		RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed);
+//		MomentsReweighterHelper reweightingDataHandler(rawDataAndMetaInfo);
+//        MomentsReweighter reweighter(rawDataAndMetaInfo);
 //        std::string outputFileName = "testWritingNewPoints";
 //        std::ofstream outputFile;
 //        outputFile.open(outputFileName.c_str());
@@ -212,7 +224,6 @@ BOOST_AUTO_TEST_SUITE_END()
 //    }
 //
 //BOOST_AUTO_TEST_SUITE_END()
-
 
 
 
