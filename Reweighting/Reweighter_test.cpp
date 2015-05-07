@@ -362,6 +362,23 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
         }
     }
 
+    /*
+     * Trivial test where mean is set by hand to zero
+     */
+    BOOST_AUTO_TEST_CASE(meanReweighting5)
+	{
+		std::string fileThatDoesExist = "RealTestData/configfile_5";
+		std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useBootstrapAsErrorMethod", "--newBetaRange_low=5.348",
+													  "--newBetaRange_high=5.363", "--numberOfNewBetaPoints=51", "--deactivateReweightingForVariance",
+													  "--deactivateReweightingForSkewness", "--deactivateReweightingForBinder", "--isMeanKnownToBeZero"};
+		ReweighterTester reweighter(options, true);
+		std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.getReweightedObservables();
+		for(size_t i=0; i < valuesObsNewPoints.size(); i++){
+			BOOST_REQUIRE_EQUAL(valuesObsNewPoints[i][0].mean.estimate, 0.0);
+			BOOST_REQUIRE_EQUAL(valuesObsNewPoints[i][0].mean.error, 0.0);
+		}
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

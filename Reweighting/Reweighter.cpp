@@ -11,6 +11,7 @@ static void printInformationAboutReweightingProcedure(const ReweightingProcedure
 static void checkSizesOfMomentsAndMomentsEstimators(std::vector<std::vector<Moments> >, std::vector<std::vector<MomentsEstimators> >, size_t, size_t);
 static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<std::vector<Observables> >&, bool, ErrorCalculationMethod, std::vector<std::vector<Moments> >,
 																	std::vector<std::vector<MomentsEstimators> >, std::vector<std::string>);
+static void setMeanToZeroAtNewPoints(std::vector<std::vector<Observables> >&);
 
 /*****************************************************************************************/
 
@@ -61,6 +62,10 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 		setObservablesAtNewPointsFromMomentsAndMomentEstimators(observablesAtNewPoints, reweighterIO.isMeanKnownToBeZero, reweighterIO.errorMethod,
 																momentsAtNewPoints, momentsEstimatorsAtNewPoints, rewProc.quantitiesConsidered);
 	}
+
+	//Set manually mean to zero if mean is known to be zero and MEAN is asked
+	if(reweighterIO.isMeanKnownToBeZero && find(quantitiesToBeReweighted.begin(), quantitiesToBeReweighted.end(), Mean::observableName) != quantitiesToBeReweighted.end())
+		setMeanToZeroAtNewPoints(observablesAtNewPoints);
 }
 
 std::vector<std::vector<Observables> > Reweighter::getReweightedObservables(){
@@ -255,6 +260,20 @@ static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<
 }
 
 
+static void setMeanToZeroAtNewPoints(std::vector<std::vector<Observables> >& observables){
+	for(size_t newPoint=0; newPoint<observables.size(); newPoint++){
+		for(size_t obsInFile=0; obsInFile<observables[newPoint].size(); obsInFile++){
+			if(std::isnan(observables[newPoint][obsInFile].mean.estimate))
+				observables[newPoint][obsInFile].mean.estimate = 0.0;
+			else
+				throw std::logic_error("Error setting mean.estimate to 0.0 since it should be NAN but it isn't!");
+			if(std::isnan(observables[newPoint][obsInFile].mean.error))
+				observables[newPoint][obsInFile].mean.error = 0.0;
+			else
+				throw std::logic_error("Error setting mean.error to 0.0 since it should be NAN but it isn't!");
+		}
+	}
+}
 
 
 
