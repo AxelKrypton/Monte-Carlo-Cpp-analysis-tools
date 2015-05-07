@@ -21,12 +21,13 @@ static bool isLabelMatchingAnyMetaParameter(const std::string&, const std::vecto
 ReweighterIO::ReweighterIO(LqcdReweightingParameters parameters) : readFromFileDataContainer(parameters.getInputfile()), bootstrapNumber(nullptr)
 {
 	isMeanKnownToBeZero = parameters.getIsMeanKnownToBeZero();
+	columnsToBeReweightedUsingMultipleColumns = parameters.getColumnsToBeReweightedUsingMultipleColumns();
 	namesOfParametersIgnoringMetaParameters = getNamesOfParametersIgnoringMetaParameters(readFromFileDataContainer[0]);
 	valuesOfSimulationParametersIgnoringMetaParameters = getValuesOfSimulationParametersIgnoringMetaParameters(readFromFileDataContainer);
 	valuesOfSpecifiedBinsizes = getValuesOfSpecifiedBinsizes(readFromFileDataContainer);
 	valuesOfSpecifiedLogZ = getValuesOfSpecifiedLogZ(readFromFileDataContainer);
 	int numberOfObservablesGivenAsInput = readFromFileDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
-	checkCorrectnessOfConfigurationFileForReweighting(readFromFileDataContainer, MomentsReweightingDataHandler::metaParameters, numberOfObservablesGivenAsInput);
+	checkCorrectnessOfConfigurationFileForReweighting(readFromFileDataContainer, MomentsReweighterHelper::metaParameters, numberOfObservablesGivenAsInput);
 	//Set error information
 	if(parameters.getUseJackknifeAsErrorMethod())
 		errorMethod = jackknife;
@@ -37,33 +38,87 @@ ReweighterIO::ReweighterIO(LqcdReweightingParameters parameters) : readFromFileD
 		throw std::runtime_error("Error method unknown! This exception should never be thrown! Please investigate...");
 }
 
+/*
+ * The two functions below have been for the moment commented out and not adapted to the new code. The main reason
+ * is that if several reweighting procedures are needed for the different quantities (because of the binsizes), then
+ * logZ and the binsizes themselves will change and there is not only one file that should be produced.
+ *
+ * TODO: Think what should be done depending on the user needs.
+ */
 
-
+//void ReweighterIO::writeNewConfigurationFileWithMetaparameters(MomentsReweighter reweighter, std::string newConfigFileName){
+//    if(newConfigFileName == "")
+//        newConfigFileName = "configFileWithLogZ";
+//    std::ofstream outputFile;
+//    outputFile.open(newConfigFileName.c_str(), std::ofstream::app);
+//    if(!outputFile)
+//        throw std::runtime_error("Something went wrong opening the file \"" + newConfigFileName + "\"!");
+//    outputFile.precision(16);
+//    outputFile << "\n\n#===================================================================================\n\n";
+//    for(int i=0; i<reweighter.momentsReweighterHelper.simulationRawDataContainer.getNumberOfDatafiles(); i++){
+//        outputFile << reweighter.momentsReweighterHelper.simulationRawDataContainer[i].getDatafileName() << "\t";
+//        for(size_t j=0; j<reweighter.reweightingParameterNames.size(); j++){
+//            outputFile << reweighter.reweightingParameterNames[j] << " " << reweighter.valuesOfSimulationParameters[i][j] << "\t";
+//        }
+//        for(size_t j=0; j<MomentsReweighterHelper::metaParameters.size(); j++){
+//            outputFile << MomentsReweighterHelper::metaParameters[j] << " ";
+//            if(MomentsReweighterHelper::metaParameters[j] == "logZ")
+//                outputFile << reweighter.logZAtSimulatedPoints[i];
+//            else if(MomentsReweighterHelper::metaParameters[j] == "binsize")
+//                outputFile << reweighter.momentsReweighterHelper.simulationRawDataContainer[i][0].getNumberOfElements()/numberOfBinsToBeUsed[i];
+//            else
+//                throw std::runtime_error("Encountered unknown metaparameter writing new configuration file!");
+//            outputFile << "\t";
+//        }
+//            outputFile << "\n";
+//    }
+//    outputFile << "\n#===================================================================================\n\n";
+//    outputFile.close();
+//}
+//
+//void MomentsReweighterHelper::writeNewPointsToFileWithLogZ(MomentsReweighter reweighter, std::string outputFileName){
+//    if(boost::filesystem::exists(outputFileName))
+//        throw std::invalid_argument("The file \"outputFileName\" already exists! It will not be overwritten, aborting...");
+//    std::ofstream outputFile;
+//    outputFile.open(outputFileName.c_str());
+//    if(!outputFile)
+//        throw std::runtime_error("Something went wrong opening the file \"" + outputFileName + "\"!");
+//    outputFile.precision(16);
+//    for(size_t i=0; i<reweighter.reweightingParameterNames.size(); i++)
+//        outputFile << "# " << reweighter.reweightingParameterNames[i] << "\t";
+//    outputFile << "logZ\n";
+//    for(size_t i=0; i<reweighter.valuesOfNewParameters.size(); i++){
+//        for(size_t j=0; j<reweighter.valuesOfNewParameters[i].size(); j++)
+//            outputFile << reweighter.valuesOfNewParameters[i][j] << "\t";
+//        outputFile << reweighter.logZAtNewPoints[i] << std::endl;
+//    }
+//    outputFile.close();
+//}
 
 /******************************************** STATIC FUNCTIONS *************************************************/
 
 
 static std::vector<std::string> getNamesOfParametersIgnoringMetaParameters(SimulationData simData){
     std::vector<std::string> result;
-    extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(simData, result, MomentsReweightingDataHandler::metaParameters);
+    extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(simData, result, MomentsReweighterHelper::metaParameters);
     return result;
 }
 
 static std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer simDataCont){
     std::vector<std::vector<double> > result;
-    extractValuesOfSimulationParametersIgnoringMetaParameters(simDataCont, result, MomentsReweightingDataHandler::metaParameters);
+    extractValuesOfSimulationParametersIgnoringMetaParameters(simDataCont, result, MomentsReweighterHelper::metaParameters);
     return result;
 }
 
 static std::vector<Binsizes> getValuesOfSpecifiedBinsizes(SimulationDataContainer simDataCont){
 	std::vector<Binsizes> result;
-	extractValuesOfSpecifiedBinsizes(simDataCont, result, MomentsReweightingDataHandler::metaParameters[1]);
+	extractValuesOfSpecifiedBinsizes(simDataCont, result, MomentsReweighterHelper::metaParameters[1]);
 	return result;
 }
 
 static std::vector<double> getValuesOfSpecifiedLogZ(SimulationDataContainer simDataCont){
 	std::vector<double> result;
-	extractValuesOfSpecifiedLogZ(simDataCont, result, MomentsReweightingDataHandler::metaParameters[0]);
+	extractValuesOfSpecifiedLogZ(simDataCont, result, MomentsReweighterHelper::metaParameters[0]);
 	return result;
 }
 
@@ -106,21 +161,24 @@ static void extractValuesOfSimulationParametersIgnoringMetaParameters(Simulation
 
 /*
  * In the following function, we go through the configuration file and we check on each line
- * whether binsize is provided. If it is given  we check that its value makes sense and we store it,
- * otherwise we manually store zero to take trace that for such a file the binsize was not given.
+ * whether binsize is provided. If it is given we check that its value makes sense and we store it,
+ * otherwise we throw an exception, since at least one binsize is required!
  */
 static void extractValuesOfSpecifiedBinsizes(SimulationDataContainer simDataCont, std::vector<Binsizes>& valuesOfBinsizes, const std::string& binsizeLabel){
 	std::map<std::string, double> auxMap;
 	valuesOfBinsizes = std::vector<Binsizes>(simDataCont.getNumberOfDatafiles(), Binsizes());
 	for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
 		auxMap = simDataCont[i].getSimulationParameters();
+		bool found = false;
 		for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
 			if((it->first) == binsizeLabel){
+				found = true;
 				if(it->second <= 0)
 					throw std::invalid_argument("At least one non positive binsize has been provided!");
 				else
 					valuesOfBinsizes[i].setDefaultValue((int)it->second);
 			}else if((it->first).find(binsizeLabel) != std::string::npos){ //This means that  binsizeLabel is contained in it->first
+				found = true;
 				if(it->second <= 0)
 					throw std::invalid_argument("At least one non positive binsize has been provided!");
 				else{
@@ -131,6 +189,8 @@ static void extractValuesOfSpecifiedBinsizes(SimulationDataContainer simDataCont
 				}
 			}
 		}
+		if(!found)
+			throw std::invalid_argument("In the configuration file at least for one file NO binsize was provided! Aborting...");
 	}
 	//If no binsize was provided throw an exception!
 	bool areAllBinsizesEmpty = true;
@@ -141,7 +201,7 @@ static void extractValuesOfSpecifiedBinsizes(SimulationDataContainer simDataCont
 }
 
 /*
- * Again we have to take trace for the logZ not provided. Since logZ
+ * We have to take trace for the logZ not provided. Since logZ
  * can take any real values, when not provided we set it to 'nan'.
  */
 static void extractValuesOfSpecifiedLogZ(SimulationDataContainer simDataCont, std::vector<double>& valuesOfLogZ, const std::string& logZLabel){

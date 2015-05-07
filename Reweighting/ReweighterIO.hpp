@@ -15,7 +15,9 @@ public:
 																				  return result; };
 	bool empty(){ return binsizes.empty(); };
 	int getDefaultValue(){ try{ binsizes.at(-1);}
-						   catch(std::out_of_range& exceptionThrown){ throw std::invalid_argument("Default value UNSET for Binsizes object!"); }
+						   catch(std::out_of_range& exceptionThrown){
+							   throw std::invalid_argument("Default value UNSET for Binsizes object! Hint: if performing Reweighting, is the configuration file correct?");
+						   }
 						   return binsizes[-1]; };
 	void setDefaultValue(const int& valueIn){ binsizes[-1] = valueIn; };
 	void print(){for(auto elem : binsizes) std::cout << "Binsize[" << elem.first << "] = " << elem.second << "\n"; };
@@ -24,8 +26,6 @@ public:
 private:
 	std::map<int, int> binsizes;
 };
-
-
 
 
 class ReweighterIO {
@@ -38,16 +38,20 @@ public:
 	 *            case LqcdReweightingParameters. It is temporary in order to make everything work!
 	 */
 	ReweighterIO(LqcdReweightingParameters parameters);
+    //Output to file
+	//void writeNewConfigurationFileWithMetaparameters(MomentsReweighter reweighter, std::string newConfigFileName = "");
+    //void writeNewPointsToFileWithLogZ(MomentsReweighter reweighter, std::string outputFileName = "logZAtNewPoints");
 private:
 	SimulationDataContainer readFromFileDataContainer;
 	bool isMeanKnownToBeZero;
-	std::vector<std::string> namesOfParametersIgnoringMetaParameters; //just vector of string because sim. par. are the same for ALL data files!
+	std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
+	std::vector<std::string> namesOfParametersIgnoringMetaParameters; //just vector of string because the simulation parameters are the same for ALL data files!
 	std::vector<std::vector<double> > valuesOfSimulationParametersIgnoringMetaParameters;
 	//Specific member for each meta parameter
 	std::vector<Binsizes> valuesOfSpecifiedBinsizes;
 	std::vector<double> valuesOfSpecifiedLogZ;
 	ErrorCalculationMethod errorMethod;
-	std::unique_ptr<int> bootstrapNumber;
+	std::shared_ptr<int> bootstrapNumber;
 };
 
 

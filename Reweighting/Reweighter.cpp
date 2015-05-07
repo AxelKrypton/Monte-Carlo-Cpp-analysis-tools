@@ -1,27 +1,66 @@
 #include "Reweighter.hpp"
+#include "MomentsReweighter.hpp"
 
 static std::vector<std::string> getQuantitiesToBeReweighted(LqcdReweightingParameters);
 static std::vector<int> getBinsizesToBeUsedBasedOnObservable(std::string, bool, std::vector<Binsizes>);
 static std::initializer_list<unsigned int> getNeededMomentsBasedOnObservableName(std::string, bool);
 static std::vector<ReweightingProcedure> getReweightingProceduresToBePerformedBasedOnBinsizesPerQuantity(std::map<std::string, std::vector<int> >, bool);
 static std::vector<unsigned int> getUnionOfVectors(std::vector<unsigned int>, std::vector<unsigned int>);
-static LqcdReweightingParameters createLqcdParameters(std::initializer_list<std::string>);
+static unsigned int getMaximumMomentToBeReweighted(const std::vector<ReweightingProcedure>&);
+static void printInformationAboutReweightingProcedure(const ReweightingProcedure&);
+static void checkSizesOfMomentsAndMomentsEstimators(std::vector<std::vector<Moments> >, std::vector<std::vector<MomentsEstimators> >, size_t, size_t);
+static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<std::vector<Observables> >&, bool, ErrorCalculationMethod, std::vector<std::vector<Moments> >,
+																	std::vector<std::vector<MomentsEstimators> >, std::vector<std::string>);
 
 /*****************************************************************************************/
 
 Reweighter::Reweighter(std::initializer_list<std::string> options) : reweighterIO(createLqcdParameters(options))
 {
-	quantitiesToBeReweighted = getQuantitiesToBeReweighted(createLqcdParameters(options));
+	LqcdReweightingParameters parameters = createLqcdParameters(options);
+	quantitiesToBeReweighted = getQuantitiesToBeReweighted(parameters);
+	precisionOfIterativeProcedureToCalculateLogZ = parameters.getWeightPrecision();
+	newNumberOfPointsOfParameters = {parameters.getNumberOfNewBetaPoints()}; //TODO: Use method of class ReweightingParameters to be implemented!!
+	newRangesOfParameters = {std::make_pair(parameters.getNewBetaRange_low(), parameters.getNewBetaRange_high())}; //TODO: Use method of class ReweightingParameters to be implemented!!
 	std::cout << "quantitiesToBeReweighted.size() = " << quantitiesToBeReweighted.size() << "  - ";
 	for(auto i: quantitiesToBeReweighted)
 		std::cout << i << " - ";
 	std::cout << "\n";
+	std::cout << "reweighterIO.valuesOfSpecifiedLogZ.size() = " << reweighterIO.valuesOfSpecifiedLogZ.size() << "  -> ";
+	for(auto i: reweighterIO.valuesOfSpecifiedLogZ)
+		std::cout << i << " ";
+	std::cout << "\n";
 }
 
-Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(parameters)
+Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(parameters), quantitiesToBeReweighted(getQuantitiesToBeReweighted(parameters)),
+															   precisionOfIterativeProcedureToCalculateLogZ(parameters.getWeightPrecision())
 {
-	quantitiesToBeReweighted = getQuantitiesToBeReweighted(parameters);
-	//...
+	newNumberOfPointsOfParameters = {parameters.getNumberOfNewBetaPoints()}; //TODO: Use method of class ReweightingParameters to be implemented!!
+	newRangesOfParameters = {std::make_pair(parameters.getNewBetaRange_low(), parameters.getNewBetaRange_high())}; //TODO: Use method of class ReweightingParameters to be implemented!!
+	std::vector<ReweightingProcedure> reweightingProceduresToBePerformed = getReweightingProceduresToBePerformed();
+	maximumMomentNeededOverall = getMaximumMomentToBeReweighted(reweightingProceduresToBePerformed);
+	//Before setting the observables, we have to reserve the correct amount of memory
+	const size_t numberOfNewPoints = std::accumulate(newNumberOfPointsOfParameters.begin(), newNumberOfPointsOfParameters.end(), 1, std::multiplies<unsigned int>());
+	const size_t numberOfObservablesInFiles = reweighterIO.readFromFileDataContainer[0].getNumberOfDataSample() - reweighterIO.namesOfParametersIgnoringMetaParameters.size()
+											- reweighterIO.columnsToBeReweightedUsingMultipleColumns.size()*(maximumMomentNeededOverall-1); //neglect multiple columns (count one column only)
+	observablesAtNewPoints = std::vector<std::vector<Observables>>(numberOfNewPoints, std::vector<Observables>(numberOfObservablesInFiles, Observables()));
+
+	std::cout << "maximumMomentNeededOverall = " << maximumMomentNeededOverall << "\n";
+	std::cout << "numberOfNewPoints = " << numberOfNewPoints << "\n";
+	std::cout << "numberOfObservablesInFiles = " << numberOfObservablesInFiles << "\n";
+	std::cout << "quantitiesToBeReweighted.size() = " << quantitiesToBeReweighted.size() << "  - ";
+	for(auto i: quantitiesToBeReweighted)
+		std::cout << i << " - ";
+	std::cout << "\n";
+
+	for(auto rewProc: reweightingProceduresToBePerformed){
+		printInformationAboutReweightingProcedure(rewProc);
+		MomentsReweighter momentsReweighter(getRawDataForReweightingAndMetainformation(rewProc.momentsToBeReweighted, rewProc.binsizesToBeUsed));
+		std::vector<std::vector<Moments> > momentsAtNewPoints = momentsReweighter.getMomentsAtNewPoints();
+		std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints = momentsReweighter.getMomentsEstimatorsAtNewPoints();
+		checkSizesOfMomentsAndMomentsEstimators(momentsAtNewPoints, momentsEstimatorsAtNewPoints, numberOfNewPoints, numberOfObservablesInFiles);
+		setObservablesAtNewPointsFromMomentsAndMomentEstimators(observablesAtNewPoints, reweighterIO.isMeanKnownToBeZero, reweighterIO.errorMethod,
+																momentsAtNewPoints, momentsEstimatorsAtNewPoints, rewProc.quantitiesConsidered);
+	}
 }
 
 std::vector<std::vector<Observables> > Reweighter::getReweightedObservables(){
@@ -29,20 +68,8 @@ std::vector<std::vector<Observables> > Reweighter::getReweightedObservables(){
 }
 
 
-
-
-
-
-
 /******************************************** PRIVATE METHODS *************************************************/
 
-/*
- * The return type of this function looks complicate. It is intended to work as follows.
- *   - The outermost vector takes trace of the reweighting procedures to be done
- *   - For each reweighting procedure we have a pair:
- *       - The first entry are the moments to be reweighted using the MomentsReweighter
- *       - The second entry is the binsizes to be used in the reweighting procedure
- */
 std::vector<ReweightingProcedure> Reweighter::getReweightingProceduresToBePerformed(){
 	std::map<std::string, std::vector<int> > binsizesToBeUsedPerQuantityToBeReweighted;
 	for(auto quantity : quantitiesToBeReweighted){
@@ -53,8 +80,25 @@ std::vector<ReweightingProcedure> Reweighter::getReweightingProceduresToBePerfor
 	return getReweightingProceduresToBePerformedBasedOnBinsizesPerQuantity(binsizesToBeUsedPerQuantityToBeReweighted, reweighterIO.isMeanKnownToBeZero);
 }
 
+RawDataForReweightingAndMetainformation Reweighter::getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed){
+	return {reweighterIO.readFromFileDataContainer, reweighterIO.namesOfParametersIgnoringMetaParameters,
+			reweighterIO.valuesOfSimulationParametersIgnoringMetaParameters, reweighterIO.valuesOfSpecifiedLogZ,
+			newRangesOfParameters, newNumberOfPointsOfParameters,
+			reweighterIO.isMeanKnownToBeZero, precisionOfIterativeProcedureToCalculateLogZ,
+			reweighterIO.columnsToBeReweightedUsingMultipleColumns, reweighterIO.errorMethod,
+			reweighterIO.bootstrapNumber, maximumMomentNeededOverall, momentsToBeReweighted, binsizesToBeUsed};
+}
 
-
+LqcdReweightingParameters Reweighter::createLqcdParameters(std::initializer_list<std::string> options)
+{
+	std::vector<const char*> tmp;
+	tmp.push_back(std::string("foo").c_str());
+	for(auto i: options)
+		tmp.push_back(i.c_str());
+	int numberOfArguments = (int)tmp.size();
+	LqcdReweightingParameters parameters(numberOfArguments, tmp.data());
+	return parameters;
+}
 
 /******************************************** STATIC FUNCTIONS *************************************************/
 
@@ -133,13 +177,84 @@ static std::vector<unsigned int> getUnionOfVectors(std::vector<unsigned int> fir
 }
 
 
-static LqcdReweightingParameters createLqcdParameters(std::initializer_list<std::string> options)
-{
-	std::vector<const char*> tmp;
-	tmp.push_back(std::string("foo").c_str());
-	for(auto i: options)
-		tmp.push_back(i.c_str());
-	int numberOfArguments = (int)tmp.size();
-	LqcdReweightingParameters parameters(numberOfArguments, tmp.data());
-	return parameters;
+static unsigned int getMaximumMomentToBeReweighted(const std::vector<ReweightingProcedure>& rewProcedures){
+	unsigned int result = 0;
+	for(auto rewProc: rewProcedures){
+		unsigned int localMax = *std::max_element(rewProc.momentsToBeReweighted.begin(), rewProc.momentsToBeReweighted.end());
+		if( localMax > result)
+			result = localMax;
+	}
+	return result;
 }
+
+
+static void printInformationAboutReweightingProcedure(const ReweightingProcedure& rewProc){
+	std::string info = "   Reweighting moments ";
+	for(auto i: rewProc.momentsToBeReweighted)
+		info += std::to_string(i) + " ";
+	info += "for ";
+	for(auto i: rewProc.quantitiesConsidered)
+		info += i + " ";
+	info += "  ";
+    std::cout << "\n";
+    for(size_t i=0; i<info.length()+4; i++)
+        std::cout << "*";
+    std::cout << "\n**";
+    for(size_t i=0; i<info.length(); i++)
+		std::cout << " ";
+	std::cout << "**\n";
+    std::cout << "**" << info << "**\n**";
+    for(size_t i=0; i<info.length(); i++)
+		std::cout << " ";
+    std::cout << "**\n";
+	for(size_t i=0; i<info.length()+4; i++)
+		std::cout << "*";
+	std::cout << "\n\n";
+}
+
+
+static void checkSizesOfMomentsAndMomentsEstimators(std::vector<std::vector<Moments> > moments, std::vector<std::vector<MomentsEstimators> > momentsEstimators,
+													size_t numberOfPoints, size_t numberOfObservablesInFiles)
+{
+	if(moments.size() != numberOfPoints)
+		throw std::runtime_error("Resulting size of moments after Reweighting is different from the expected one (wrong numberOfPoints)!");
+	for(size_t i=0; i<moments.size(); i++){
+		if(moments[i].size() != numberOfObservablesInFiles)
+			throw std::runtime_error("Resulting size of moments after Reweighting is different from the expected one (wrong numberOfObservablesInFiles)!");
+	}
+
+	if(momentsEstimators.size() != numberOfPoints)
+		throw std::runtime_error("Resulting size of momentsEstimators after Reweighting is different from the expected one (wrong numberOfPoints)!");
+	for(size_t i=0; i<momentsEstimators.size(); i++){
+		if(momentsEstimators[i].size() != numberOfObservablesInFiles)
+			throw std::runtime_error("Resulting size of momentsEstimators after Reweighting is different from the expected one (wrong numberOfObservablesInFiles)!");
+	}
+}
+
+static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<std::vector<Observables> >& observables, bool isMeanZero,
+																	ErrorCalculationMethod errorMethod, std::vector<std::vector<Moments> > moments,
+																	std::vector<std::vector<MomentsEstimators> > momentsEstimators,
+																	std::vector<std::string> quantitiesToBeSet)
+{
+	for(size_t newPoint=0; newPoint<observables.size(); newPoint++){
+		for(size_t obsInFile=0; obsInFile<observables[newPoint].size(); obsInFile++){
+			for(auto quantity: quantitiesToBeSet){
+				if(quantity == Mean::observableName)
+					observables[newPoint][obsInFile].mean = Mean(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod).getValueAndError();
+				else if(quantity == Variance::observableName)
+					observables[newPoint][obsInFile].susceptibility = Variance(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod).getValueAndError();
+				else if(quantity == Skewness::observableName)
+					observables[newPoint][obsInFile].skewness = Skewness(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod).getValueAndError();
+				else if(quantity == BinderCumulant::observableName)
+					observables[newPoint][obsInFile].binderCumulant = BinderCumulant(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod).getValueAndError();
+				else
+					throw std::invalid_argument("Unknown observable in \"setObservablesAtNewPointsFromMomentsAndMomentEstimators\" function!");
+			}
+		}
+	}
+}
+
+
+
+
+
