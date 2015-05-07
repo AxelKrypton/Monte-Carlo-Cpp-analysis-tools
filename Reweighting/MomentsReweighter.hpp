@@ -1,8 +1,8 @@
-#ifndef REWEIGHTER_H_
-#define REWEIGHTER_H_
+#ifndef MOMENTSREWEIGHTER_H_
+#define MOMENTSREWEIGHTER_H_
 
 #include "SimulationDataContainer.hpp"
-#include "MomentsReweightingDataHandler.hpp"
+#include "MomentsReweighterHelper.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 #include "../dataAnalysisUtilities/Observables.hpp"
 
@@ -261,4 +261,4 @@ public:
 
 
 
-#endif /* REWEIGHTER_H_ */
+#endif /* MOMENTSREWEIGHTER_H_ */

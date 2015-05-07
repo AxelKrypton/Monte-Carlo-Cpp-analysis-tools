@@ -1,6 +1,6 @@
 #include <regex>
 #include "ReweighterIO.hpp"
-#include "MomentsReweightingDataHandler.hpp"
+#include "MomentsReweighterHelper.hpp"
 
 static std::vector<std::string> getNamesOfParametersIgnoringMetaParameters(SimulationData);
 static std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer);

@@ -4,7 +4,7 @@
 #include <boost/filesystem.hpp>
 #include <fstream>
 
-#include "MomentsReweightingDataHandler.hpp"
+#include "MomentsReweighterHelper.hpp"
 #include "MomentsReweighter.hpp"
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePrecisionInPercent
 

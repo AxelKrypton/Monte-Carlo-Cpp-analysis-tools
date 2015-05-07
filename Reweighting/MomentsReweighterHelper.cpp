@@ -1,6 +1,6 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
-#include "MomentsReweightingDataHandler.hpp"
+#include "MomentsReweighterHelper.hpp"
 #include "MomentsReweighter.hpp"
 #include "SimulationData.hpp"
 #include "../dataAnalysisUtilities/binnedDataSample.hpp"

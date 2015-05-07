@@ -5,7 +5,7 @@
 
 #include "Reweighter.hpp"
 #include "MomentsReweighter.hpp"
-#include "MomentsReweightingDataHandler.hpp"
+#include "MomentsReweighterHelper.hpp"
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePrecisionInPercent
 
 //TODO: Once implemented the general class ReweightingParameters, then one should use this here without going through ReweighterTester (like in build2)

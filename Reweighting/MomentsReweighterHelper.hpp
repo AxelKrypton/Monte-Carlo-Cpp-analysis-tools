@@ -1,5 +1,5 @@
-#ifndef REWEIGHTINGDATAHANDLER_H_
-#define REWEIGHTINGDATAHANDLER_H_
+#ifndef MOMENTSREWEIGHTERHELPER_H_
+#define MOMENTSREWEIGHTERHELPER_H_
 
 #include "Reweighter.hpp"
 #include <memory>
@@ -87,4 +87,4 @@ private:
 
 
 
-#endif /* REWEIGHTINGDATAHANDLER_H_ */
+#endif /* MOMENTSREWEIGHTERHELPER_H_ */
