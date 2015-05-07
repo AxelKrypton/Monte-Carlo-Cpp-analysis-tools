@@ -38,6 +38,7 @@ class Reweighter {
 public:
 	Reweighter() = delete;
 	/*
+	 * TODO:
 	 * ATTENTION: The ctor MUST take an argument of type ReweightingParameters not the particular
 	 *            case LqcdReweightingParameters. It is temporary in order to make everything work!
 	 */

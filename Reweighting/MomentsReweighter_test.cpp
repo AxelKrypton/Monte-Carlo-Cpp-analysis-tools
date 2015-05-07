@@ -17,21 +17,6 @@ public:
     	: MomentsReweighterAbstract(ReweighterTester(options).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed)){};
     MomentsReweighterTest(RawDataForReweightingAndMetainformation in) : MomentsReweighterAbstract(in) {};
 
-//    MomentsReweighterTest(std::string configurationFileIn,
-//                   std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
-//                   std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
-//                   std::string errorMethodIn = "jackknife", double precisionToCalculateLogZ = 1.e-7)
-//     : MomentsReweighterAbstract(configurationFileIn, colToBeRewUsingMultipleColumns,
-//    		              colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {}
-//    MomentsReweighterTest(std::string configurationFileIn, std::vector<std::pair<double, double> >  newRangesOfParametersIn,
-//                   std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
-//                   std::vector<unsigned int> colToBeRewUsingMultipleColumns = std::vector<unsigned int>(),
-//                   std::vector<unsigned int> colWhoseMeanIsKnownToBeZero = std::vector<unsigned int>(),
-//                   std::string errorMethodIn = "jackknife", double precisionToCalculateLogZ = 1.e-7)
-//     : MomentsReweighterAbstract(configurationFileIn, newRangesOfParametersIn,
-//                          newNumberOfPointsOfParametersIn, colToBeRewUsingMultipleColumns,
-//                          colWhoseMeanIsKnownToBeZero, errorMethodIn, precisionToCalculateLogZ) {}
-
     //Setters
     void setPrecisionToCalculateLogZ(double precisionToCalculateLogZ){
 		MomentsReweighterAbstract::setPrecisionToCalculateLogZ(precisionToCalculateLogZ);
@@ -502,9 +487,6 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
 
 
  //TODO: Implement tests for testCalculateAndSetReweightedMomentsAndMomentsEstimators function!
-
-
-
 
 
 /****************************************************************************************************/

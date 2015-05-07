@@ -101,7 +101,6 @@ SimulationDataContainer SimulationDataContainer::buildAndGetMomentsPerData(std::
 																		   std::vector<unsigned int> columnsForWhichMultipleColumnsForMomentsAreUsed)
 {
     SimulationDataContainer newSimDataCont(*this);
-
     for(size_t i=0; i<columnsForWhichMultipleColumnsForMomentsAreUsed.size(); i++){
     	if(columnsForWhichMultipleColumnsForMomentsAreUsed[i] < ignoreFirstNColumns)
     		throw std::logic_error("In \"buildAndGetMomentsPerData\" asked to use multiple columns in building moments of an ignored column!");
@@ -133,18 +132,9 @@ SimulationDataContainer SimulationDataContainer::buildAndGetMomentsPerData(std::
                 		newSimDataCont.simulationDataSet[i].appendNewColumnOfData(getMomentUsingMultipleColumns(whichMoments[k], temporarySamples));
                 }
                 j+=maxMoment;
-//                //Replace the column j by the mean of the given columns
-//                newSimDataCont.simulationDataSet[i][j] = getMomentUsingMultipleColumns(1, temporarySamples);
             }
         }
     }
-
-//    for(int i=0; i<newSimDataCont[0].getNumberOfDataSample(); i++){
-//        for(int j=0; j<newSimDataCont[0][i].getNumberOfElements(); j++)
-//            std::cout << "s[0][" << i << "][" << j << "] = " << newSimDataCont[0][i][j] << "\n";
-//    }
-//    std::cout << "\n\n";
-
     //Delete all original columns (use this object to recover original number of columns)
     for(size_t i=0; i<simulationDataSet.size(); i++){
         for(int j=ignoreFirstNColumns; j<simulationDataSet[i].getNumberOfDataSample(); j++){
@@ -153,25 +143,6 @@ SimulationDataContainer SimulationDataContainer::buildAndGetMomentsPerData(std::
         	newSimDataCont.simulationDataSet[i].deleteColumnOfData(ignoreFirstNColumns);
         }
     }
-
-//    //Delete columns used to get higher moments (leaving the first)
-//    for(int i=0; i<newSimDataCont.getNumberOfDatafiles(); i++){
-//        for(size_t j=0; j<whichColumns.size(); j++){
-//            if(useMultipleColumnsForMoments[j]==true){
-//                unsigned int maxMoment = *max_element(whichMoments.begin(), whichMoments.end());
-//                for(size_t k=1; k<maxMoment; k++)
-//                    //Here it seems that I delete always the same columns but indeed
-//                    //it is ok because when deleting the other are shifted to the left
-//                    newSimDataCont.simulationDataSet[i].deleteColumnOfData(whichColumns[j]+1);
-//            }
-//        }
-//    }
-
-//    for(int i=0; i<newSimDataCont[0].getNumberOfDataSample(); i++){
-//        for(int j=0; j<newSimDataCont[0][i].getNumberOfElements(); j++)
-//            std::cout << "s[0][" << i << "][" << j << "] = " << newSimDataCont[0][i][j] << "\n";
-//    }
-
     return newSimDataCont;
 }
 

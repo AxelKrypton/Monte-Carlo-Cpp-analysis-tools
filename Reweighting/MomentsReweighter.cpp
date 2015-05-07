@@ -12,19 +12,8 @@
 static void writeNewPoints(std::vector<std::vector<double> >&, std::vector<std::vector<double> >, std::vector<double>, int=0, int=0);
 static void findIflogZHasToBeCalculated(std::vector<double>, std::vector<int>&);
 static double logarithmic_sum(double, double);
-//static void evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(Observables&, const Moments&, const MomentsEstimators&, const bool, ErrorCalculationMethod);
 
 /*****************************************************************************************/
-
-///*
-// * The following exception in the default constructor is never thrown because in the
-// * initialization list (that is not explicitly given) there is an implicit call to
-// * the default constructor of the SimulationDataContainer class that throws an std::invalid_argument
-// * exception.
-// */
-//MomentsReweighterAbstract::MomentsReweighterAbstract() {
-//    throw std::invalid_argument("Reweighter needs SimulationDataContainer object for construction!");
-//}
 
 MomentsReweighterAbstract::MomentsReweighterAbstract(RawDataForReweightingAndMetainformation rawDataForReweightingAndMetainformationIn)
 	: momentsReweighterHelper(rawDataForReweightingAndMetainformationIn)
@@ -45,31 +34,6 @@ MomentsReweighterAbstract::MomentsReweighterAbstract(RawDataForReweightingAndMet
 	}
 	calculateNewPoints();
 }
-
-//MomentsReweighterAbstract::MomentsReweighterAbstract(std::string configurationFileIn,
-//                                       std::vector<unsigned int> colToBeRewUsingMultipleColumns,
-//                                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
-//                                       std::string errorMethodIn, double precisionToCalculateLogZ)
-// : momentsReweighterHelper(configurationFileIn, colToBeRewUsingMultipleColumns, errorMethodIn), observablesAtNewPoints(),
-//   precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
-//{
-//	generalInitialization(colWhoseMeanIsKnownToBeZero);
-//}
-//
-//
-//MomentsReweighterAbstract::MomentsReweighterAbstract(std::string configurationFileIn,
-//                                       std::vector<std::pair<double, double> >  newRangesOfParametersIn,
-//                                       std::vector<unsigned int>  newNumberOfPointsOfParametersIn,
-//                                       std::vector<unsigned int> colToBeRewUsingMultipleColumns,
-//                                       std::vector<unsigned int> colWhoseMeanIsKnownToBeZero,
-//                                       std::string errorMethodIn, double precisionToCalculateLogZ)
-// : momentsReweighterHelper(configurationFileIn, colToBeRewUsingMultipleColumns, errorMethodIn), observablesAtNewPoints(),
-//   newRangesOfParameters(newRangesOfParametersIn), newNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn),
-//   precisionOfIterativeProcedureToCalculateLogZ(precisionToCalculateLogZ)
-//{
-//	generalInitialization(colWhoseMeanIsKnownToBeZero);
-//	calculateNewPoints();
-//}
 
 
 std::vector<std::vector<double> > MomentsReweighterAbstract::getValuesOfSimulationParameters(){
@@ -221,28 +185,6 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
     std::cout << "==========================================================\n\n";
 }
 
-
-//void MomentsReweighterAbstract::generalInitialization(std::vector<unsigned int> colWhoseMeanIsKnownToBeZero)
-//{
-//	reweightingParameterNames = momentsReweighterHelper.getNamesOfParametersIgnoringMetaParameters();
-//    valuesOfSimulationParameters = momentsReweighterHelper.getValuesOfSimulationParametersIgnoringMetaParameters();
-//    meanOfObservableIsKnownToBeZero=std::vector<bool>(momentsReweighterHelper.numberOfObservablesGivenAsInput, false);
-//    for(size_t i=0; i<colWhoseMeanIsKnownToBeZero.size(); i++){
-//    	if(colWhoseMeanIsKnownToBeZero[i]<reweightingParameterNames.size())
-//    		throw std::invalid_argument("Number of column for obs. whose mean should be known to be zero referring to a column of conjugated quantity!");
-//    	else if(colWhoseMeanIsKnownToBeZero[i]>=reweightingParameterNames.size()+momentsReweighterHelper.numberOfObservablesGivenAsInput)
-//    		throw std::invalid_argument("Invalid specified observable whose mean should be known to be zero!");
-//    	meanOfObservableIsKnownToBeZero[colWhoseMeanIsKnownToBeZero[i]-reweightingParameterNames.size()]=true;
-//    }
-//    std::cout << "meanOfObservableIsKnownToBeZero=( ";
-//    for(int i=0; i<momentsReweighterHelper.numberOfObservablesGivenAsInput; i++)
-//    	std::cout << meanOfObservableIsKnownToBeZero[i] << " ";
-//    std::cout << ")\n\n";
-//    if(precisionOfIterativeProcedureToCalculateLogZ <= 0.0)
-//        throw std::range_error("Precision smaller than or equal to zero is nonsense!");
-//    logZAtSimulatedPoints.resize(valuesOfSimulationParameters.size(), 0.0);
-//    reweightingDataHandler.extractAndSetProvidedValuesOfLogZAtSimulatedPoints(logZAtSimulatedPoints);
-//}
 
 void MomentsReweighterAbstract::calculateNewPoints(){
 	//todo: improve! Here the easiest implementation -> new point values determined as (upper_bound-lower_bound)/num_points
@@ -616,37 +558,11 @@ void MomentsReweighterAbstract::extractAndSetReweightedMomentsAndMomentsEstimato
 			}
 		}
 	}
-
-//			Moments momentsPerPointAndObs;
-//			MomentsEstimators errorEstimatorsPerPointAndObs;
-//			momentsPerPointAndObs[1] = reweightedObservablesFromRawData[i][j]; //reweighted observables are the first moment!
-//			std::valarray<double> auxiliaryArray(estimatorsForErrorsCalculation.size());
-//			for(size_t k=0; k<estimatorsForErrorsCalculation.size(); k++)
-//					auxiliaryArray[k] = estimatorsForErrorsCalculation[k][i][j];
-//			errorEstimatorsPerPointAndObs[1] = DataSample(auxiliaryArray);
-//			for(size_t m=0; m<3; m++){ //loop on the number of moments inserted, for the moment manually set
-//				momentsPerPointAndObs[m+2] = reweightedObservablesFromRawData[i][numberOfObservablesGivenAsInput+j*3+m]; //second, third and fourth moments
-//				for(size_t k=0; k<estimatorsForErrorsCalculation.size(); k++)
-//					auxiliaryArray[k] = estimatorsForErrorsCalculation[k][i][numberOfObservablesGivenAsInput+j*3+m];
-//				errorEstimatorsPerPointAndObs[m+2] = DataSample(auxiliaryArray);
-//			}
-//			evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(observablesAtNewPoints[i][j], momentsPerPointAndObs, errorEstimatorsPerPointAndObs,
-//																		meanOfObservableIsKnownToBeZero[j], errorMethod);
-//		}
-//	}
 }
 
 /*****************************************************************************************/
 /******************************* STATIC FUNCTIONS ****************************************/
 /*****************************************************************************************/
-
-//static void evaluateEstimateAndErrorOfObservablesPerPointFromEstimators(Observables& obs, const Moments& moments, const MomentsEstimators& momentsEstimators,
-//																		const bool meanIsZero, ErrorCalculationMethod errorMethod){
-//	obs.mean = Mean(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
-//	obs.susceptibility = Variance(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
-//	obs.skewness = Skewness(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
-//	obs.binderCumulant = BinderCumulant(moments, momentsEstimators, meanIsZero, errorMethod).getValueAndError();
-//}
 
 /*
  * In the following function, we decide to calculate logZ at those simulated points for which in

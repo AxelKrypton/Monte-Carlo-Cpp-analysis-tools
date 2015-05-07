@@ -29,14 +29,6 @@ BOOST_AUTO_TEST_SUITE(build)
 		BOOST_REQUIRE_NO_THROW(ReweighterTester reweighterTester(options));
 	}
 
-//	BOOST_AUTO_TEST_CASE(build2)
-//	{
-//		std::string fileThatDoesExist = "RealTestData/configfile_3";
-//		ReweighterIOTester reweighterIOTester(fileThatDoesExist, std::vector<unsigned int>(), "jack");
-//		const int referenceNumberOfBins = 16;
-//		BOOST_REQUIRE_EQUAL(reweighterIOTester.getNumberOfBinsToBeUsed()[0], referenceNumberOfBins);
-//	}
-
 BOOST_AUTO_TEST_SUITE_END()
 
 
