@@ -39,8 +39,8 @@ void ObservableAbstract::calculateAndSetValueAndError(Moments moments, MomentsEs
 	observableEstimateAndError.estimate = getFunctionToCalculateObservable()(moments);
 	std::initializer_list<unsigned int> selectedMoments = getNeededMoments();
 	if(selectedMoments.size() == 0)
-		throw std::logic_error("Non sense call to \"calculateAndSetValueAndError\" function, since non moments are needed to evaluate the error! Aborting...");
-	DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators()(estimators(selectedMoments));
+		throw std::logic_error("Non sense call to \"calculateAndSetValueAndError\" function, since no moments are needed to evaluate the error! Aborting...");
+	DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators()(estimators[selectedMoments]);
 	observableEstimateAndError.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 }
 
@@ -103,9 +103,10 @@ functionForEstimators Mean::getFunctionToBeAppliedToEstimators()
 functionForObservable Mean::getFunctionToCalculateObservable()
 {
 	if(isMeanZero)
-		return [] (Moments in) -> double { return in[0]*0.0; }; //in[0]*0.0 just to use the in parameter
+		throw std::logic_error("The Mean::getFunctionToCalculateObservable method should not be called with isMeanZero==true!! Aborting...");
+//		return [] (Moments in) -> double { return in[0]*0.0; }; //in[0]*0.0 just to use the in parameter
 	else
-		return [] (Moments in) -> double { return in.at(1); };
+		return [] (Moments in) -> double { return in[1]; };
 }
 
 std::initializer_list<unsigned int> Mean::getNeededMoments()
@@ -159,9 +160,9 @@ functionForEstimators Variance::getFunctionToBeAppliedToEstimators()
 functionForObservable Variance::getFunctionToCalculateObservable()
 {
 	if(isMeanZero)
-		return [] (Moments in) -> double { return in.at(2); };
+		return [] (Moments in) -> double { return in[2]; };
 	else
-		return [] (Moments in) -> double { return in.at(2) - in.at(1) * in.at(1); };
+		return [] (Moments in) -> double { return in[2] - in[1] * in[1]; };
 }
 
 std::initializer_list<unsigned int> Variance::getNeededMoments()
@@ -217,9 +218,9 @@ functionForEstimators Skewness::getFunctionToBeAppliedToEstimators()
 functionForObservable Skewness::getFunctionToCalculateObservable()
 {
 	if(isMeanZero)
-		return [] (Moments in) -> double { return in.at(3) / pow(in.at(2), 1.5); };
+		return [] (Moments in) -> double { return in[3] / pow(in[2], 1.5); };
 	else
-		return [] (Moments in) -> double { double x1 = in.at(1); double x2 = in.at(2); double x3 = in.at(3);
+		return [] (Moments in) -> double { double x1 = in[1]; double x2 = in[2]; double x3 = in[3];
 										   return (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5)); };
 }
 
@@ -277,9 +278,9 @@ functionForEstimators BinderCumulant::getFunctionToBeAppliedToEstimators()
 functionForObservable BinderCumulant::getFunctionToCalculateObservable()
 {
 	if(isMeanZero)
-		return [] (Moments in) -> double { return in.at(4) / pow(in.at(2), 2.0); };
+		return [] (Moments in) -> double { return in[4] / pow(in[2], 2.0); };
 	else
-		return [] (Moments in) -> double { double x1 = in.at(1); double x2 = in.at(2); double x3 = in.at(3); double x4 = in.at(4);
+		return [] (Moments in) -> double { double x1 = in[1]; double x2 = in[2]; double x3 = in[3]; double x4 = in[4];
 										   return (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0)); };
 }
 

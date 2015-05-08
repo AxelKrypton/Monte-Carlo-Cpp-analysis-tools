@@ -548,13 +548,13 @@ void MomentsReweighterAbstract::extractAndSetReweightedMomentsAndMomentsEstimato
 	size_t numberOfObservablesGivenAsInput = momentsReweighterHelper.numberOfObservablesGivenAsInput;
 	for(size_t i=0; i<valuesOfNewParameters.size(); i++){
 		for(size_t j=0; j<numberOfObservablesGivenAsInput; j++){
-			for(size_t k=0; k<momentsToBeReweighted.size(); k++){ //TODO: Implement here the case of multiple columns, now it cannot work!!
-				momentsAtNewPoints[i][j][momentsToBeReweighted[k]] = reweightedObservablesFromRawData[i][j*momentsToBeReweighted.size()+k];
+			for(size_t k=0; k<momentsToBeReweighted.size(); k++){
+				momentsAtNewPoints[i][j].insert(momentsToBeReweighted[k], reweightedObservablesFromRawData[i][j*momentsToBeReweighted.size()+k]);
 				//The estimators are in the valarray in estimatorsForErrorsCalculation, that is the outermost index => temporary object needed
 				std::valarray<double> auxiliaryArray(estimatorsForErrorsCalculation.size());
 				for(size_t h=0; h<estimatorsForErrorsCalculation.size(); h++)
 					auxiliaryArray[h] = estimatorsForErrorsCalculation[h][i][j*momentsToBeReweighted.size()+k];
-				momentsEstimatorsAtNewPoints[i][j][momentsToBeReweighted[k]] =  DataSample(auxiliaryArray);
+				momentsEstimatorsAtNewPoints[i][j].insert(momentsToBeReweighted[k], DataSample(auxiliaryArray));
 			}
 		}
 	}

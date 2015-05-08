@@ -11,51 +11,105 @@ class Parameters;
 
 enum ErrorCalculationMethod { bootstrap = 1, jackknife };
 
+/*
+ * NOTE: In order to handle the possibility to have several estimates per moment in the Moment class
+ *       and several sets of estimators per moment in the MomentsEstimators class, we use a std::multimap
+ *       member. Then we cannot use the access operator[] in the standard way, i.e. both to get and to set
+ *       an entry. This is related to the fact that multimap has no operator[] defined. Another thing it
+ *       would be cool to have is a method that get the number of the moment and returns either a single
+ *       object or a set of object (in the case several were set). Nevertheless overload based on return
+ *       value is not allowed in c++. So we decided to do in this way. We have an insert method to set
+ *       elements. Then we use the operator[] to get a single value (checking for this case) and we use
+ *       the operator() to get a set of values (checking for this case).
+ */
 class Moments {
 public:
 	Moments(){};
-	double at(const unsigned int& whichMoment){
-		if(moments.find(whichMoment) == moments.end())
-				throw std::out_of_range("Moments::[] accessed an invalid moment! Aborting...");
-			else
-				return moments[whichMoment];
-	};
-	double& operator[](const unsigned int& whichMoment){ return moments[whichMoment]; };
-	Moments operator[](const std::initializer_list<unsigned int>& whichMoments){
-		Moments selectedMoments;
-		for(int i: whichMoments)
-			selectedMoments[i] = moments.at(i);
-		return selectedMoments;
-	};
+	void insert(const unsigned int& whichMoment, const double& momentValue){
+		moments.insert(std::pair<unsigned int, double>(whichMoment, momentValue));
+	}
+	double operator[](const unsigned int& whichMoment){
+		std::multimap<unsigned int, double>::iterator itWhichMoment = moments.find(whichMoment);
+		if(itWhichMoment == moments.end())
+			throw std::out_of_range("Moments::[] accessed an invalid moment! Aborting...");
+		else if(moments.count(itWhichMoment->first) > 1)
+			throw std::invalid_argument("Moments::[] accessed a moment for which several values are set, NOT ALLOWED! Aborting...");
+		else
+			return itWhichMoment->second;
+	}
+	std::vector<double> operator()(const unsigned int& whichMoment){
+		std::multimap<unsigned int, double>::iterator itWhichMoment = moments.find(whichMoment);
+		if(itWhichMoment == moments.end())
+			throw std::out_of_range("Moments::() accessed an invalid moment! Aborting...");
+		else if(moments.count(itWhichMoment->first) == 1)
+			throw std::invalid_argument("Moments::() accessed a moment for which only on value is set, NOT ALLOWED! Aborting...");
+		else{
+			std::vector<double> returnVec;
+			std::multimap<unsigned int, double>::iterator itRangeWhichMoment;
+			for (itRangeWhichMoment=moments.equal_range(itWhichMoment->first).first; itRangeWhichMoment!=moments.equal_range(itWhichMoment->first).second; ++itRangeWhichMoment)
+				returnVec.push_back(itRangeWhichMoment->second);
+			return returnVec;
+		}
+	}
 private:
-	std::map<unsigned int, double> moments;
+	std::multimap<unsigned int, double> moments;
 };
 
 class MomentsEstimators {
 public:
 	MomentsEstimators(){};
-	DataSample at(const unsigned int& whichMoment){
-		if(momentsEstimators.find(whichMoment) == momentsEstimators.end())
-				throw std::out_of_range("MomentsEstimators::[] accessed an invalid moment! Aborting...");
-			else
-				return momentsEstimators[whichMoment];
-	};
-	DataSample& operator[](const unsigned int& whichMoment){ return momentsEstimators[whichMoment]; };
-	MomentsEstimators operator[](const std::initializer_list<unsigned int>& whichMoments){
-		MomentsEstimators selectedMoments;
-		for(unsigned int i: whichMoments)
-			selectedMoments[i] = momentsEstimators.at(i);
-		return selectedMoments;
-	};
-	std::vector<DataSample> operator()(const std::initializer_list<unsigned int>& whichMoments){
+	void insert(const unsigned int& whichMoment, const DataSample& momentEstValues){
+		momentsEstimators.insert(std::pair<unsigned int, DataSample>(whichMoment, momentEstValues));
+	}
+	DataSample operator[](const unsigned int& whichMoment){
+		std::multimap<unsigned int, DataSample>::iterator itWhichMoment = momentsEstimators.find(whichMoment);
+		if(itWhichMoment == momentsEstimators.end())
+			throw std::out_of_range("MomentsEstimators::[] accessed an invalid moment! Aborting...");
+		else if(momentsEstimators.count(itWhichMoment->first) > 1)
+			throw std::invalid_argument("MomentsEstimators::[] accessed a moment for which several values are set, NOT ALLOWED! Aborting...");
+		else
+			return itWhichMoment->second;
+	}
+	std::vector<DataSample> operator[](const std::initializer_list<unsigned int>& whichMoments){
 		std::vector<DataSample> selectedMoments;
-		for(unsigned int i: whichMoments)
-			selectedMoments.push_back(momentsEstimators.at(i));
+		for(unsigned int i: whichMoments){
+			DataSample tmp = (*this)[i];
+			selectedMoments.push_back(tmp);
+		}
 		return selectedMoments;
-	};
+	}
+
+	std::vector<DataSample> operator()(const unsigned int& whichMoment){
+		std::multimap<unsigned int, DataSample>::iterator itWhichMoment = momentsEstimators.find(whichMoment);
+		if(itWhichMoment == momentsEstimators.end())
+			throw std::out_of_range("MomentsEstimators::() accessed an invalid moment! Aborting...");
+		else if(momentsEstimators.count(itWhichMoment->first) == 1)
+			throw std::invalid_argument("MomentsEstimators::() accessed a moment for which only on value is set, NOT ALLOWED! Aborting...");
+		else{
+			std::vector<DataSample> returnVec;
+			std::multimap<unsigned int, DataSample>::iterator itRangeWhichMoment;
+			for (itRangeWhichMoment=momentsEstimators.equal_range(itWhichMoment->first).first; itRangeWhichMoment!=momentsEstimators.equal_range(itWhichMoment->first).second; ++itRangeWhichMoment)
+				returnVec.push_back(itRangeWhichMoment->second);
+			return returnVec;
+		}
+	}
+
+//	DataSample& operator[](const unsigned int& whichMoment){ return momentsEstimators[whichMoment]; };
+//	MomentsEstimators operator[](const std::initializer_list<unsigned int>& whichMoments){
+//		MomentsEstimators selectedMoments;
+//		for(unsigned int i: whichMoments)
+//			selectedMoments[i] = momentsEstimators.at(i);
+//		return selectedMoments;
+//	};
+//	std::vector<DataSample> operator()(const std::initializer_list<unsigned int>& whichMoments){
+//		std::vector<DataSample> selectedMoments;
+//		for(unsigned int i: whichMoments)
+//			selectedMoments.push_back(momentsEstimators.at(i));
+//		return selectedMoments;
+//	};
 
 private:
-	std::map<unsigned int, DataSample > momentsEstimators;
+	std::multimap<unsigned int, DataSample> momentsEstimators;
 };
 
 /*

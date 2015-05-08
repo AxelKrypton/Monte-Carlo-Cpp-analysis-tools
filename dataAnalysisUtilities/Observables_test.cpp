@@ -17,30 +17,22 @@ BOOST_AUTO_TEST_SUITE(moments)
 		unsigned int referenceIndex=12;
 		double referenceMoment = 3.14;
 		Moments moment;
-		moment[referenceIndex] = referenceMoment;
+		moment.insert(referenceIndex, referenceMoment);
+		BOOST_REQUIRE_THROW(moment[3], std::out_of_range);
+		BOOST_REQUIRE_THROW(moment(referenceIndex), std::invalid_argument);
 		BOOST_REQUIRE_EQUAL(referenceMoment, moment[referenceIndex]);
 	}
 
 	BOOST_AUTO_TEST_CASE(setter_getter2)
 	{
-		std::vector<unsigned int> referenceIndex{12, 7, 2};
+		unsigned int referenceIndex=3;
 		std::vector<double> referenceMoment{3.14, 6.28, 9.42};
 		Moments moment;
-		for(size_t i=0; i<referenceIndex.size(); i++){
-			moment[referenceIndex[i]] = referenceMoment[i];
-		}
-		Moments moment2 = moment[ {12, 2} ];
-		std::initializer_list<unsigned int> tmp = {12, 7, 2, 1};
-		BOOST_REQUIRE_THROW(Moments moment3 = moment[tmp], std::out_of_range);
-		BOOST_REQUIRE_EQUAL(referenceMoment[0], moment2[referenceIndex[0]]);
-		BOOST_REQUIRE_EQUAL(referenceMoment[2], moment2[referenceIndex[2]]);
-	}
-
-	BOOST_AUTO_TEST_CASE(at)
-	{
-		Moments moment;
-		moment[0] = 123.456;
-		BOOST_REQUIRE_THROW(moment.at(3), std::out_of_range);
+		for(size_t i=0; i<referenceMoment.size(); i++)
+			moment.insert(referenceIndex, referenceMoment[i]);
+		BOOST_REQUIRE_THROW(moment(4), std::out_of_range);
+		BOOST_REQUIRE_THROW(moment[3], std::invalid_argument);
+		BOOST_REQUIRE(moment(3) == referenceMoment);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -58,50 +50,42 @@ BOOST_AUTO_TEST_SUITE(momentsEstimators)
 		unsigned int referenceIndex=12;
 		DataSample referenceMomentEst(std::valarray<double>(3.14, 100));
 		MomentsEstimators momentsEst;
-		momentsEst[referenceIndex] = referenceMomentEst;
+		momentsEst.insert(referenceIndex, referenceMomentEst);
+		BOOST_REQUIRE_THROW(momentsEst[3], std::out_of_range);
+		BOOST_REQUIRE_THROW(momentsEst(referenceIndex), std::invalid_argument);
 		for(int i=0; i<referenceMomentEst.getNumberOfElements(); i++)
 			BOOST_REQUIRE_EQUAL(referenceMomentEst[i], momentsEst[referenceIndex][i]);
 	}
 
 	BOOST_AUTO_TEST_CASE(setter_getter2)
 	{
-		std::vector<unsigned int> referenceIndex{12, 7, 2};
-		std::vector<DataSample> referenceMomentEst(3, DataSample(std::valarray<double>(6.28, 100)));
-		MomentsEstimators momentsEst;
-		for(size_t i=0; i<referenceIndex.size(); i++){
-			momentsEst[referenceIndex[i]] = referenceMomentEst[i];
-		}
-		MomentsEstimators momentsEst2 = momentsEst[ {12, 2} ];
-		std::initializer_list<unsigned int> tmp = {12, 7, 2, 1};
-		BOOST_REQUIRE_THROW(MomentsEstimators moment3 = momentsEst[tmp], std::out_of_range);
-		for(int i=0; i<referenceMomentEst[0].getNumberOfElements(); i++){
-			BOOST_REQUIRE_EQUAL(referenceMomentEst[0][i], momentsEst2[referenceIndex[0]][i]);
-			BOOST_REQUIRE_EQUAL(referenceMomentEst[2][i], momentsEst2[referenceIndex[2]][i]);
-		}
-	}
-
-	BOOST_AUTO_TEST_CASE(setter_getter3)
-	{
 		std::vector<int> referenceIndex{12, 7, 2};
 		std::vector<DataSample> referenceMomentEst(3, DataSample(std::valarray<double>(6.28, 100)));
 		MomentsEstimators momentsEst;
-		for(size_t i=0; i<referenceIndex.size(); i++){
-			momentsEst[referenceIndex[i]] = referenceMomentEst[i];
-		}
-		std::vector<DataSample> momentsEstSelected = momentsEst( {12, 2} );
+		for(size_t i=0; i<referenceIndex.size(); i++)
+			momentsEst.insert(referenceIndex[i], referenceMomentEst[i]);
+		std::vector<DataSample> momentsEstSelected = momentsEst[ {12, 2} ];
 		std::initializer_list<unsigned int> tmp = {12, 7, 2, 1};
-		BOOST_REQUIRE_THROW(MomentsEstimators moment3 = momentsEst[tmp], std::out_of_range);
+		BOOST_REQUIRE_THROW(std::vector<DataSample> momentsEstSelectedWrong = momentsEst[tmp], std::out_of_range);
 		for(int i=0; i<referenceMomentEst[0].getNumberOfElements(); i++){
 			BOOST_REQUIRE_EQUAL(referenceMomentEst[0][i], momentsEstSelected[0][i]);
 			BOOST_REQUIRE_EQUAL(referenceMomentEst[2][i], momentsEstSelected[1][i]);
 		}
 	}
 
-	BOOST_AUTO_TEST_CASE(at)
+	BOOST_AUTO_TEST_CASE(setter_getter3)
 	{
+		unsigned int referenceIndex=3;
+		std::vector<DataSample> referenceMomentEst{DataSample(std::valarray<double>(3.14, 100)), DataSample(std::valarray<double>(6.28, 100))};
 		MomentsEstimators momentsEst;
-		momentsEst[0] = DataSample(std::valarray<double>(9.42, 100));
-		BOOST_REQUIRE_THROW(momentsEst.at(3), std::out_of_range);
+		for(size_t i=0; i<referenceMomentEst.size(); i++)
+			momentsEst.insert(referenceIndex, referenceMomentEst[i]);
+		BOOST_REQUIRE_THROW(momentsEst(4), std::out_of_range);
+		BOOST_REQUIRE_THROW(momentsEst[3], std::invalid_argument);
+		for(size_t i=0; i<referenceMomentEst.size(); i++){
+			for(int j=0; j<referenceMomentEst[i].getNumberOfElements(); j++)
+				BOOST_REQUIRE_EQUAL(momentsEst(referenceIndex)[i][j], referenceMomentEst[i][j]);
+		}
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -109,10 +93,10 @@ BOOST_AUTO_TEST_SUITE_END()
 
 static Moments buildMomentsForTest(){
 	Moments moments;
-	moments[1] = 5.120788163699608e-01;
-	moments[2] = 2.622374015645983e-01;
-	moments[3] = 1.342992378238976e-01;
-	moments[4] = 6.878181572513453e-02;
+	moments.insert(1, 5.120788163699608e-01);
+	moments.insert(2, 2.622374015645983e-01);
+	moments.insert(3, 1.342992378238976e-01);
+	moments.insert(4, 6.878181572513453e-02);
 	return moments;
 	/*
 	 *     mean = 0.5120788163699608		-> zero mean: 0.0
@@ -124,26 +108,26 @@ static Moments buildMomentsForTest(){
 
 static MomentsEstimators buildMomentsEstimatorsForTest(){
 	MomentsEstimators momentsEst;
-	momentsEst[1] = DataSample(std::valarray<double>({5.1235601107091922e-01, 5.1150824489887503e-01, 5.1172734937075659e-01, 5.1178725503695854e-01,
-													  5.0979370987783490e-01, 5.1255624637967778e-01, 5.1202230784545366e-01, 5.1171955370408695e-01,
-													  5.1187488596000053e-01, 5.0979885326724550e-01, 5.1346010441702183e-01, 5.0972776041563195e-01,
-													  5.1024877919415301e-01, 5.1106580352847342e-01, 5.1195532496227270e-01, 5.1390447355869662e-01,
-													  5.1202183781458366e-01, 5.1326137707280928e-01, 5.1267731347761258e-01, 5.1142797137376972e-01}));
-	momentsEst[2] = DataSample(std::valarray<double>({2.6252465475720638e-01, 2.6165170089094386e-01, 2.6187569175770908e-01, 2.6193691234537581e-01,
-													  2.5990842550370130e-01, 2.6272340690594786e-01, 2.6217662123277541e-01, 2.6186580343559934e-01,
-													  2.6202834168518563e-01, 2.5990976236280711e-01, 2.6365306166921659e-01, 2.5983595391311276e-01,
-													  2.6037344532842710e-01, 2.6120041302190311e-01, 2.6210894186848277e-01, 2.6410567248106614e-01,
-													  2.6217766022621947e-01, 2.6344694349572489e-01, 2.6284970759104292e-01, 2.6156899778943893e-01}));
-	momentsEst[3] = DataSample(std::valarray<double>({1.3452246987538111e-01, 1.3384830173963591e-01, 1.3402005031388509e-01, 1.3406698527826047e-01,
-													  1.3251889318442522e-01, 1.3467028782742235e-01, 1.3425032974734333e-01, 1.3401099022082003e-01,
-													  1.3413850486189055e-01, 1.3251691344901928e-01, 1.3538744578451081e-01, 1.3245946231125300e-01,
-													  1.3287530606686845e-01, 1.3350305989651526e-01, 1.3419903990843887e-01, 1.3573319225558023e-01,
-													  1.3425229075709791e-01, 1.3522713133192771e-01, 1.3476908916630512e-01, 1.3378440751335702e-01}));
-	momentsEst[4] = DataSample(std::valarray<double>({6.8936002646886763e-02, 6.8473202726632348e-02, 6.8590267467890556e-02, 6.8622260196942120e-02,
-													  6.7572025855569748e-02, 6.9033623934637786e-02, 6.8746913222247338e-02, 6.8583080004194330e-02,
-													  6.8671972940326412e-02, 6.7568629641372460e-02, 6.9525398204902958e-02, 6.7528892599278342e-02,
-													  6.7814859824966087e-02, 6.8238427978485269e-02, 6.8712360871493086e-02, 6.9760160621270675e-02,
-													  6.8749042841277780e-02, 6.9414579186828071e-02, 6.9102312901675886e-02, 6.8429331538084379e-02}));
+	momentsEst.insert(1, DataSample(std::valarray<double>({5.1235601107091922e-01, 5.1150824489887503e-01, 5.1172734937075659e-01, 5.1178725503695854e-01,
+														   5.0979370987783490e-01, 5.1255624637967778e-01, 5.1202230784545366e-01, 5.1171955370408695e-01,
+														   5.1187488596000053e-01, 5.0979885326724550e-01, 5.1346010441702183e-01, 5.0972776041563195e-01,
+														   5.1024877919415301e-01, 5.1106580352847342e-01, 5.1195532496227270e-01, 5.1390447355869662e-01,
+														   5.1202183781458366e-01, 5.1326137707280928e-01, 5.1267731347761258e-01, 5.1142797137376972e-01})));
+	momentsEst.insert(2, DataSample(std::valarray<double>({2.6252465475720638e-01, 2.6165170089094386e-01, 2.6187569175770908e-01, 2.6193691234537581e-01,
+														   2.5990842550370130e-01, 2.6272340690594786e-01, 2.6217662123277541e-01, 2.6186580343559934e-01,
+														   2.6202834168518563e-01, 2.5990976236280711e-01, 2.6365306166921659e-01, 2.5983595391311276e-01,
+														   2.6037344532842710e-01, 2.6120041302190311e-01, 2.6210894186848277e-01, 2.6410567248106614e-01,
+														   2.6217766022621947e-01, 2.6344694349572489e-01, 2.6284970759104292e-01, 2.6156899778943893e-01})));
+	momentsEst.insert(3, DataSample(std::valarray<double>({1.3452246987538111e-01, 1.3384830173963591e-01, 1.3402005031388509e-01, 1.3406698527826047e-01,
+														   1.3251889318442522e-01, 1.3467028782742235e-01, 1.3425032974734333e-01, 1.3401099022082003e-01,
+														   1.3413850486189055e-01, 1.3251691344901928e-01, 1.3538744578451081e-01, 1.3245946231125300e-01,
+														   1.3287530606686845e-01, 1.3350305989651526e-01, 1.3419903990843887e-01, 1.3573319225558023e-01,
+														   1.3425229075709791e-01, 1.3522713133192771e-01, 1.3476908916630512e-01, 1.3378440751335702e-01})));
+	momentsEst.insert(4, DataSample(std::valarray<double>({6.8936002646886763e-02, 6.8473202726632348e-02, 6.8590267467890556e-02, 6.8622260196942120e-02,
+														   6.7572025855569748e-02, 6.9033623934637786e-02, 6.8746913222247338e-02, 6.8583080004194330e-02,
+														   6.8671972940326412e-02, 6.7568629641372460e-02, 6.9525398204902958e-02, 6.7528892599278342e-02,
+														   6.7814859824966087e-02, 6.8238427978485269e-02, 6.8712360871493086e-02, 6.9760160621270675e-02,
+														   6.8749042841277780e-02, 6.9414579186828071e-02, 6.9102312901675886e-02, 6.8429331538084379e-02})));
 	return momentsEst;
 	/*
 	 * bootstrap     mean = 1.1520239122276158e-03
@@ -155,10 +139,10 @@ static MomentsEstimators buildMomentsEstimatorsForTest(){
 
 static MomentsEstimators buildMomentsEstimatorsSameEntryForTest(){
 	MomentsEstimators momentsEst;
-	momentsEst[1] = DataSample(std::valarray<double>(5.126236900933244e-01, 100));
-	momentsEst[2] = DataSample(std::valarray<double>(2.627932923896761e-01, 100));
-	momentsEst[3] = DataSample(std::valarray<double>(1.347245894580630e-01, 100));
-	momentsEst[4] = DataSample(std::valarray<double>(6.907112186983248e-02, 100));
+	momentsEst.insert(1, DataSample(std::valarray<double>(5.126236900933244e-01, 100)));
+	momentsEst.insert(2, DataSample(std::valarray<double>(2.627932923896761e-01, 100)));
+	momentsEst.insert(3, DataSample(std::valarray<double>(1.347245894580630e-01, 100)));
+	momentsEst.insert(4, DataSample(std::valarray<double>(6.907112186983248e-02, 100)));
 	return momentsEst;
 }
 
