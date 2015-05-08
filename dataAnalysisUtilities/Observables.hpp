@@ -93,43 +93,23 @@ public:
 			return returnVec;
 		}
 	}
-
-//	DataSample& operator[](const unsigned int& whichMoment){ return momentsEstimators[whichMoment]; };
-//	MomentsEstimators operator[](const std::initializer_list<unsigned int>& whichMoments){
-//		MomentsEstimators selectedMoments;
-//		for(unsigned int i: whichMoments)
-//			selectedMoments[i] = momentsEstimators.at(i);
-//		return selectedMoments;
-//	};
-//	std::vector<DataSample> operator()(const std::initializer_list<unsigned int>& whichMoments){
-//		std::vector<DataSample> selectedMoments;
-//		for(unsigned int i: whichMoments)
-//			selectedMoments.push_back(momentsEstimators.at(i));
-//		return selectedMoments;
-//	};
-
 private:
 	std::multimap<unsigned int, DataSample> momentsEstimators;
 };
 
 /*
- * NOTE: In order to make a function return a pointer to function one must use an horrible syntax.
- *       For example, if you want that a function taking a double return a pointer to a function that
- *       takes one int and one char and returns a bool, you should write
- *
- *          bool (*getFunction(double a))(int, char);
- *
- *       and this is quite not readable. That's why one defines a new type and uses it like
- *
- *          typedef bool (*functionSignature)(int, char);
- *          functionSignature GetFunction(double a);
- *
  * TODO: So far the error method is not a private member of the class, since for the raw data only Jackknife is used!
  *       Think whether put it as private member and in case do it.
  */
 
-typedef DataSample (*functionForEstimators)(std::vector<DataSample>);
-typedef double (*functionForObservable)(Moments);
+typedef std::function<double(Moments)> functionForObservable;
+typedef std::function<DataSample(MomentsEstimators)> functionForEstimators;
+typedef DataSample (*functionForEstimatorsForJackknife)(std::vector<DataSample>);
+/*
+ * TODO: Change the last line above with the following:
+ *           typedef std::function<DataSample(std::vector<DataSample>)> functionForEstimatorsForJackknife;
+ */
+
 
 class ObservableAbstract {
 public:
@@ -150,6 +130,7 @@ private:
 	//Virtual method that must be provided by children classes
 	virtual Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters) = 0;
 	virtual void printCorrectBinningInformation(const Parameters& parameters) = 0;
+	virtual functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() = 0;
 	virtual functionForEstimators getFunctionToBeAppliedToEstimators() = 0;
 	virtual functionForObservable getFunctionToCalculateObservable() = 0;
 	virtual std::initializer_list<unsigned int> getNeededMoments() = 0;
@@ -167,6 +148,7 @@ public:
 private:
 	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
 	void printCorrectBinningInformation(const Parameters& parameters);
+	functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
 	functionForEstimators getFunctionToBeAppliedToEstimators();
 	functionForObservable getFunctionToCalculateObservable();
 	std::initializer_list<unsigned int> getNeededMoments();
@@ -184,6 +166,7 @@ public:
 private:
 	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
 	void printCorrectBinningInformation(const Parameters& parameters);
+	functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
 	functionForEstimators getFunctionToBeAppliedToEstimators();
 	functionForObservable getFunctionToCalculateObservable();
 	std::initializer_list<unsigned int> getNeededMoments();
@@ -201,6 +184,7 @@ public:
 private:
 	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
 	void printCorrectBinningInformation(const Parameters& parameters);
+	functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
 	functionForEstimators getFunctionToBeAppliedToEstimators();
 	functionForObservable getFunctionToCalculateObservable();
 	std::initializer_list<unsigned int> getNeededMoments();
@@ -218,6 +202,7 @@ public:
 private:
 	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
 	void printCorrectBinningInformation(const Parameters& parameters);
+	functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
 	functionForEstimators getFunctionToBeAppliedToEstimators();
 	functionForObservable getFunctionToCalculateObservable();
 	std::initializer_list<unsigned int> getNeededMoments();

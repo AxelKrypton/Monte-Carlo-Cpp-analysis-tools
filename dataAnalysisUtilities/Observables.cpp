@@ -31,16 +31,13 @@ void ObservableAbstract::calculateAndSetValueAndError(DataSample& dataSample, Pa
 	Parameters binningParameters = getLocalParametersWithCorrectBinningInformation(parameters);
 	printCorrectBinningInformation(binningParameters);
 	std::vector<DataSample> binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, binningParameters);
-	observableEstimateAndError = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimators());
+	observableEstimateAndError = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
 }
 
 void ObservableAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod)
 {
 	observableEstimateAndError.estimate = getFunctionToCalculateObservable()(moments);
-	std::initializer_list<unsigned int> selectedMoments = getNeededMoments();
-	if(selectedMoments.size() == 0)
-		throw std::logic_error("Non sense call to \"calculateAndSetValueAndError\" function, since no moments are needed to evaluate the error! Aborting...");
-	DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators()(estimators[selectedMoments]);
+	DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators()(estimators);
 	observableEstimateAndError.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 }
 
@@ -91,13 +88,21 @@ void Mean::printCorrectBinningInformation(const Parameters& parameters)
 	printBinningInformation(parameters, Mean::observableName);
 }
 
-functionForEstimators Mean::getFunctionToBeAppliedToEstimators()
+functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToEstimatorsForJackknife()
 {
 	if(isMeanZero)
 		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 0) throw std::invalid_argument("Invalid call to Mean function with zero mean for estimators!");
 															   return DataSample(std::valarray<double>(0.0, in[0].getNumberOfElements())); };
 	else
 		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 1) throw std::invalid_argument("Invalid call to Mean function for estimators!"); return in[0]; };
+}
+
+functionForEstimators Mean::getFunctionToBeAppliedToEstimators()
+{
+	if(isMeanZero)
+		throw std::logic_error("The Mean::getFunctionToBeAppliedToEstimators method should not be called with isMeanZero==true!! Aborting...");
+	else
+		return [] (MomentsEstimators in) -> DataSample { return in[1]; };
 }
 
 functionForObservable Mean::getFunctionToCalculateObservable()
@@ -144,7 +149,7 @@ void Variance::printCorrectBinningInformation(const Parameters& parameters)
 	printBinningInformation(parameters, Variance::observableName);
 }
 
-functionForEstimators Variance::getFunctionToBeAppliedToEstimators()
+functionForEstimatorsForJackknife Variance::getFunctionToBeAppliedToEstimatorsForJackknife()
 {
 	if(isMeanZero)
 		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 1) throw std::invalid_argument("Invalid call to Variance function with zero mean for estimators!");
@@ -155,6 +160,14 @@ functionForEstimators Variance::getFunctionToBeAppliedToEstimators()
 															   DataSample ex2 = in[1]; //estimator second moment
 															   return ex2 - (ex1 ^ 2); };
 
+}
+
+functionForEstimators Variance::getFunctionToBeAppliedToEstimators()
+{
+	if(isMeanZero)
+		return [] (MomentsEstimators in) -> DataSample { return in[2]; };
+	else
+		return [] (MomentsEstimators in) -> DataSample { return in[2] - (in[1] ^ 2); };
 }
 
 functionForObservable Variance::getFunctionToCalculateObservable()
@@ -200,7 +213,7 @@ void Skewness::printCorrectBinningInformation(const Parameters& parameters)
 	printBinningInformation(parameters, Skewness::observableName);
 }
 
-functionForEstimators Skewness::getFunctionToBeAppliedToEstimators()
+functionForEstimatorsForJackknife Skewness::getFunctionToBeAppliedToEstimatorsForJackknife()
 {
 	if(isMeanZero)
 		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 2) throw std::invalid_argument("Invalid call to Skewness function with zero mean for estimators!");
@@ -213,6 +226,14 @@ functionForEstimators Skewness::getFunctionToBeAppliedToEstimators()
 															   DataSample ex2 = in[1]; //estimator second moment
 															   DataSample ex3 = in[2]; //estimator third moment
 															   return (ex3 - ((3 * ex2) * ex1) + (2 * (ex1 ^ 3)))/((ex2 - (ex1 ^ 2)) ^ 1.5); };
+}
+
+functionForEstimators Skewness::getFunctionToBeAppliedToEstimators()
+{
+	if(isMeanZero)
+		return [] (MomentsEstimators in) -> DataSample { return in[3] / (in[2] ^ 1.5); };
+	else
+		return [] (MomentsEstimators in) -> DataSample { return (in[3] - ((3 * in[2]) * in[1]) + (2 * (in[1] ^ 3)))/((in[2] - (in[1] ^ 2)) ^ 1.5); };
 }
 
 functionForObservable Skewness::getFunctionToCalculateObservable()
@@ -259,7 +280,7 @@ void BinderCumulant::printCorrectBinningInformation(const Parameters& parameters
 	printBinningInformation(parameters, BinderCumulant::observableName);
 }
 
-functionForEstimators BinderCumulant::getFunctionToBeAppliedToEstimators()
+functionForEstimatorsForJackknife BinderCumulant::getFunctionToBeAppliedToEstimatorsForJackknife()
 {
 	if(isMeanZero)
 		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 2) throw std::invalid_argument("Invalid call to BinderCumulant function with zero mean for estimators!");
@@ -273,6 +294,14 @@ functionForEstimators BinderCumulant::getFunctionToBeAppliedToEstimators()
 															   DataSample ex3 = in[2]; //estimator third moment
 															   DataSample ex4 = in[3]; //estimator fourth moment
 															   return (ex4 - (4 * ex3 * ex1) + (6 * ex2 * ex1 * ex1) - (3 * ex1 * ex1 * ex1 * ex1))/((ex2 - (ex1 ^ 2)) ^ 2); };
+}
+
+functionForEstimators BinderCumulant::getFunctionToBeAppliedToEstimators()
+{
+	if(isMeanZero)
+		return [] (MomentsEstimators in) -> DataSample { return in[4] / (in[2] ^ 2.0); };
+	else
+		return [] (MomentsEstimators in) -> DataSample { return (in[4] - (4 * in[3] * in[1]) + (6 * in[2] * in[1] * in[1]) - (3 * in[1] * in[1] * in[1] * in[1]))/((in[2] - (in[1] ^ 2)) ^ 2); };
 }
 
 functionForObservable BinderCumulant::getFunctionToCalculateObservable()
