@@ -58,6 +58,9 @@ private:
     SimulationDataContainer simulationUncorrDataContainer;
     std::vector<std::string> namesOfParametersIgnoringMetaParameters;
     std::vector<std::vector<double> > valuesOfSimulationParametersIgnoringMetaParameters;
+    std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
+    std::vector<unsigned int> momentsToBeReweighted;
+    unsigned int maximumMomentNeededOverall;
 	ErrorCalculationMethod errorMethod;
 	std::shared_ptr<int> bootstrapNumber;
 

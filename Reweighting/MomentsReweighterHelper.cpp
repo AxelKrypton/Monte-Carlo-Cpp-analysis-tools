@@ -31,27 +31,34 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
 	: simulationRawDataContainer(rawDataForReweightingAndMetainformation.rawData), simulationUncorrDataContainer(rawDataForReweightingAndMetainformation.rawData),
 	  namesOfParametersIgnoringMetaParameters(rawDataForReweightingAndMetainformation.namesOfParametersIgnoringMetaParameters),
 	  valuesOfSimulationParametersIgnoringMetaParameters(rawDataForReweightingAndMetainformation.valuesOfSimulationParametersIgnoringMetaParameters),
+	  columnsToBeReweightedUsingMultipleColumns(rawDataForReweightingAndMetainformation.columnsToBeReweightedUsingMultipleColumns),
+	  momentsToBeReweighted(rawDataForReweightingAndMetainformation.momentsToBeReweighted),
+	  maximumMomentNeededOverall(rawDataForReweightingAndMetainformation.maximumMomentNeededOverall),
 	  errorMethod(rawDataForReweightingAndMetainformation.errorMethod), bootstrapNumber(rawDataForReweightingAndMetainformation.bootstrapNumber)
 {
 	std::vector<int> entriesToBeCutFromRawData;
 	setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, rawDataForReweightingAndMetainformation.binsizesToBeUsed, errorMethod,
 												 numberOfBinsToBeUsed, entriesToBeCutFromRawData);
 	//Evaluate central moments per data and append them to the raw data container
-	std::vector<unsigned int> obsToBeRewUsingMultipleColumns = rawDataForReweightingAndMetainformation.columnsToBeReweightedUsingMultipleColumns;
-	std::vector<unsigned int> momentsNeeded = rawDataForReweightingAndMetainformation.momentsToBeReweighted;
-	unsigned int maxMomentNeeded = rawDataForReweightingAndMetainformation.maximumMomentNeededOverall;
-	if(momentsNeeded.empty())
+	if(momentsToBeReweighted.empty())
 		throw std::logic_error("MomentsReweighterHelper asked to be built without any moment to be reweighted! Aborting...");
-	std::sort(obsToBeRewUsingMultipleColumns.begin(), obsToBeRewUsingMultipleColumns.end());
-	for(size_t i=1; i<obsToBeRewUsingMultipleColumns.size(); i++){
-		if(obsToBeRewUsingMultipleColumns[i]-obsToBeRewUsingMultipleColumns[i-1] < maxMomentNeeded)
-			throw std::invalid_argument("obsToBeRewUsingMultipleColumns contains columns too close (distance<" + std::to_string(maxMomentNeeded) + ")!");
+	std::sort(columnsToBeReweightedUsingMultipleColumns.begin(), columnsToBeReweightedUsingMultipleColumns.end());
+	for(size_t i=1; i<columnsToBeReweightedUsingMultipleColumns.size(); i++){
+		if(columnsToBeReweightedUsingMultipleColumns[i]-columnsToBeReweightedUsingMultipleColumns[i-1] < maximumMomentNeededOverall)
+			throw std::invalid_argument("obsToBeRewUsingMultipleColumns contains columns too close (distance<" + std::to_string(maximumMomentNeededOverall) + ")!");
 	}
 
 	//Here I set the number of "real" observables given as input (neglecting the multiple columns)
 	numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
-	numberOfObservablesGivenAsInput -= obsToBeRewUsingMultipleColumns.size()*(maxMomentNeeded-1); //neglect multiple columns (count one column only)
-	simulationRawDataContainer = simulationRawDataContainer.buildAndGetMomentsPerData(momentsNeeded, namesOfParametersIgnoringMetaParameters.size(), obsToBeRewUsingMultipleColumns);
+
+	std::cout << "Obs. given as input counting multiple = " << numberOfObservablesGivenAsInput << "\n";
+
+	numberOfObservablesGivenAsInput -= columnsToBeReweightedUsingMultipleColumns.size()*(maximumMomentNeededOverall-1); //neglect multiple columns (count one column only)
+
+	std::cout << "Obs. given as input NOT counting multiple = " << numberOfObservablesGivenAsInput << "\n";
+
+	simulationRawDataContainer = simulationRawDataContainer.buildAndGetMomentsPerData(momentsToBeReweighted, namesOfParametersIgnoringMetaParameters.size(),
+																					  columnsToBeReweightedUsingMultipleColumns);
 	numberOfObservablesToBeReweighted = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
 
 	std::cout << "numberOfObservablesGivenAsInput = " << numberOfObservablesGivenAsInput << "\n";
