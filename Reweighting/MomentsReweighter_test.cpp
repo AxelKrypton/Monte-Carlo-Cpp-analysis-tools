@@ -88,6 +88,11 @@ public:
     void testCalculateAndSetReweightedMomentsAndMomentsEstimators(){
     	calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
+
+    void testExtractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
+	 	 	 	 												const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation){
+    	extractAndSetReweightedMomentsAndMomentsEstimators(reweightedObservablesFromRawData, estimatorsForErrorsCalculation);
+	}
 };
 
 
@@ -483,7 +488,85 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
             BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], exp(valuesObsNewPoints[i][0]), 1.e-8);
     }
 
- BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(extractionColumns)
+
+	BOOST_AUTO_TEST_CASE(extractionColumns1)
+	{
+		std::string fileThatDoesExist = "RealTestData/configfile_1";
+		std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+													  "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30"};
+		MomentsReweighterTest reweighter(options, {2}, {1,1,1});
+		std::vector<std::vector<double> > reweightedObservablesFromRawData(reweighter.getNumberOfNewPoints());
+		std::valarray<std::vector<std::vector<double> > > estimatorsForErrorsCalculation(reweighter.getNumberOfNewPoints());
+		for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
+			reweightedObservablesFromRawData[i] = {1.0}; //Of course fake numbers, just for testing
+		for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
+			estimatorsForErrorsCalculation[i] = reweightedObservablesFromRawData;
+		reweighter.testExtractAndSetReweightedMomentsAndMomentsEstimators(reweightedObservablesFromRawData, estimatorsForErrorsCalculation);
+		std::vector<std::vector<Moments> > momentsAtNewPoints = reweighter.getMomentsAtNewPoints();
+		std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints = reweighter.getMomentsEstimatorsAtNewPoints();
+		for(size_t i=0; i<momentsAtNewPoints.size(); i++)
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0][2], 1.0);
+	}
+
+	BOOST_AUTO_TEST_CASE(extractionColumns2)
+	{
+		std::string fileThatDoesExist = "RealTestData/configfile_6";
+		std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+													  "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--obsMultipleColumns=1"};
+		MomentsReweighterTest reweighter(options, {1}, {1,1,1});
+		std::vector<std::vector<double> > reweightedObservablesFromRawData(reweighter.getNumberOfNewPoints());
+		std::valarray<std::vector<std::vector<double> > > estimatorsForErrorsCalculation(reweighter.getNumberOfNewPoints());
+		for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
+			reweightedObservablesFromRawData[i] = {1,1,1,1,2,3,4}; //Of course fake numbers, just for testing
+		for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
+			estimatorsForErrorsCalculation[i] = reweightedObservablesFromRawData;
+		reweighter.testExtractAndSetReweightedMomentsAndMomentsEstimators(reweightedObservablesFromRawData, estimatorsForErrorsCalculation);
+		std::vector<std::vector<Moments> > momentsAtNewPoints = reweighter.getMomentsAtNewPoints();
+		std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints = reweighter.getMomentsEstimatorsAtNewPoints();
+		for(size_t i=0; i<momentsAtNewPoints.size(); i++){
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0](1)[0], 1.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0](1)[1], 1.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0](1)[2], 1.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0](1)[3], 1.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][1][1], 2.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][2][1], 3.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][3][1], 4.0);
+		}
+	}
+
+	BOOST_AUTO_TEST_CASE(extractionColumns3)
+	{
+		std::string fileThatDoesExist = "RealTestData/configfile_6";
+		std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+													  "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--obsMultipleColumns=1"};
+		MomentsReweighterTest reweighter(options, {2,3,1,4}, {1,1,1});
+		std::vector<std::vector<double> > reweightedObservablesFromRawData(reweighter.getNumberOfNewPoints());
+		std::valarray<std::vector<std::vector<double> > > estimatorsForErrorsCalculation(reweighter.getNumberOfNewPoints());
+		for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
+			reweightedObservablesFromRawData[i] = {2,3,1,1,1,1,4}; //Of course fake numbers, just for testing
+		for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
+			estimatorsForErrorsCalculation[i] = reweightedObservablesFromRawData;
+		reweighter.testExtractAndSetReweightedMomentsAndMomentsEstimators(reweightedObservablesFromRawData, estimatorsForErrorsCalculation);
+		std::vector<std::vector<Moments> > momentsAtNewPoints = reweighter.getMomentsAtNewPoints();
+		std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints = reweighter.getMomentsEstimatorsAtNewPoints();
+		for(size_t i=0; i<momentsAtNewPoints.size(); i++){
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0](1)[0], 1.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0](1)[1], 1.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0](1)[2], 1.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0](1)[3], 1.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0][2], 2.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0][3], 3.0);
+			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0][4], 4.0);
+		}
+	}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
 
 
  //TODO: Implement tests for testCalculateAndSetReweightedMomentsAndMomentsEstimators function!

@@ -115,19 +115,17 @@ protected:
                                                  std::vector<double> *logZAtSimulationPointToBeUsed = NULL);
     //This getter again only for testing reason
     SimulationDataContainer getSimulationDataContainer(bool raw = true);
+    //Method used in calculateAndGetReweightedObservables to select data to calculate observables and errors and to set them
+	void extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
+															const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation);
 
 private:
-
     //Method in which "valuesOfNewParameters" is filled and some checks are done
     void calculateNewPoints();
-    //Method used in calculateAndGetReweightedObservables to select data to calculate observables and errors and to set them
-    void extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
-    		 	 	 	 	 	 	 	 	 	 	 	 	const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation);
 
     //Members
     MomentsReweighterHelper momentsReweighterHelper;
     std::vector<std::string> reweightingParameterNames;
-    std::vector<unsigned int> momentsToBeReweighted;
 
 	/*
 	 * Here in the following objects the order depending on which parameters are

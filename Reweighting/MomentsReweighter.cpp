@@ -20,7 +20,6 @@ MomentsReweighterAbstract::MomentsReweighterAbstract(RawDataForReweightingAndMet
 {
 	reweightingParameterNames = momentsReweighterHelper.namesOfParametersIgnoringMetaParameters;
 	valuesOfSimulationParameters = momentsReweighterHelper.valuesOfSimulationParametersIgnoringMetaParameters;
-	momentsToBeReweighted = rawDataForReweightingAndMetainformationIn.momentsToBeReweighted;
 	newRangesOfParameters = rawDataForReweightingAndMetainformationIn.newRangesOfParameters;
 	newNumberOfPointsOfParameters = rawDataForReweightingAndMetainformationIn.newNumberOfPointsOfParameters;
 	precisionOfIterativeProcedureToCalculateLogZ = rawDataForReweightingAndMetainformationIn.precisionToCalculateLogZ;
@@ -545,16 +544,36 @@ SimulationDataContainer MomentsReweighterAbstract::getSimulationDataContainer(bo
 void MomentsReweighterAbstract::extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
 																				   const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation)
 {
-	size_t numberOfObservablesGivenAsInput = momentsReweighterHelper.numberOfObservablesGivenAsInput;
+	const size_t numberOfObservablesGivenAsInput = momentsReweighterHelper.numberOfObservablesGivenAsInput;
+	const size_t numberOfNeededMoments = momentsReweighterHelper.momentsToBeReweighted.size();
 	for(size_t i=0; i<valuesOfNewParameters.size(); i++){
+		int numberOfLastColumnThatHasBeenExtracted = 0;
 		for(size_t j=0; j<numberOfObservablesGivenAsInput; j++){
-			for(size_t k=0; k<momentsToBeReweighted.size(); k++){
-				momentsAtNewPoints[i][j].insert(momentsToBeReweighted[k], reweightedObservablesFromRawData[i][j*momentsToBeReweighted.size()+k]);
-				//The estimators are in the valarray in estimatorsForErrorsCalculation, that is the outermost index => temporary object needed
-				std::valarray<double> auxiliaryArray(estimatorsForErrorsCalculation.size());
-				for(size_t h=0; h<estimatorsForErrorsCalculation.size(); h++)
-					auxiliaryArray[h] = estimatorsForErrorsCalculation[h][i][j*momentsToBeReweighted.size()+k];
-				momentsEstimatorsAtNewPoints[i][j].insert(momentsToBeReweighted[k], DataSample(auxiliaryArray));
+			for(size_t k=0; k<numberOfNeededMoments; k++){
+				if(momentsReweighterHelper.momentsToBeReweighted[k] == 1
+				   && find(momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns.begin(),
+						   momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns.end(), j+reweightingParameterNames.size())
+						!= momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns.end()){
+
+					//if momentsToBeReweighted[k]==1 insert as many columns as the maximum moment needed says!
+					for(unsigned int h=0; h<momentsReweighterHelper.maximumMomentNeededOverall; h++)
+						momentsAtNewPoints[i][j].insert(1, reweightedObservablesFromRawData[i][numberOfLastColumnThatHasBeenExtracted+h]);
+					//The estimators are in the valarray in estimatorsForErrorsCalculation, that is the outermost index => temporary object needed
+					std::valarray<double> auxiliaryArray(estimatorsForErrorsCalculation.size());
+					for(unsigned int h=0; h<momentsReweighterHelper.maximumMomentNeededOverall; h++){
+						for(size_t l=0; l<estimatorsForErrorsCalculation.size(); l++)
+							auxiliaryArray[l] = estimatorsForErrorsCalculation[l][i][numberOfLastColumnThatHasBeenExtracted+h];
+						momentsEstimatorsAtNewPoints[i][j].insert(momentsReweighterHelper.momentsToBeReweighted[k], DataSample(auxiliaryArray));
+					}
+					numberOfLastColumnThatHasBeenExtracted += momentsReweighterHelper.maximumMomentNeededOverall;
+				}else{
+					momentsAtNewPoints[i][j].insert(momentsReweighterHelper.momentsToBeReweighted[k], reweightedObservablesFromRawData[i][numberOfLastColumnThatHasBeenExtracted]);
+					std::valarray<double> auxiliaryArray(estimatorsForErrorsCalculation.size());
+					for(size_t h=0; h<estimatorsForErrorsCalculation.size(); h++)
+						auxiliaryArray[h] = estimatorsForErrorsCalculation[h][i][numberOfLastColumnThatHasBeenExtracted];
+					momentsEstimatorsAtNewPoints[i][j].insert(momentsReweighterHelper.momentsToBeReweighted[k], DataSample(auxiliaryArray));
+					numberOfLastColumnThatHasBeenExtracted++;
+				}
 			}
 		}
 	}
