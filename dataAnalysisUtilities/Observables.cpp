@@ -6,10 +6,8 @@
 static std::vector<DataSample> getMomentsPerDataPoint(DataSample&, std::initializer_list<unsigned int>, bool);
 static Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters&, std::string);
 static void printBinningInformation(const Parameters&, std::string);
-//static double calculateValueFromMomentsAndObsName(Moments, bool, functionForObservable, std::string);
-//static double calculateErrorFromEstimatorsAndObsName(MomentsEstimators, bool, functionForEstimators, ErrorCalculationMethod, std::string);
-//static std::initializer_list<int> getNeededMomentsUsingObservableName(bool, std::string);
 static double evaluateErrorBasedOnMethod(DataSample, ErrorCalculationMethod);
+template<typename T> static T getPowerOfFirstMomentUsingSeveralEstimate(const std::vector<T>&, const int);
 
 /*****************************************************************************************/
 
@@ -34,10 +32,10 @@ void ObservableAbstract::calculateAndSetValueAndError(DataSample& dataSample, Pa
 	observableEstimateAndError = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
 }
 
-void ObservableAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod)
+void ObservableAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
 {
-	observableEstimateAndError.estimate = getFunctionToCalculateObservable()(moments);
-	DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators()(estimators);
+	observableEstimateAndError.estimate = getFunctionToCalculateObservable(useMultipleEstimate)(moments);
+	DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators(useMultipleEstimate)(estimators);
 	observableEstimateAndError.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 }
 
@@ -70,12 +68,12 @@ Mean::Mean(DataSample& dataSample, Parameters parameters) : ObservableAbstract(p
 	calculateAndSetValueAndError(dataSample, parameters);
 }
 
-Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod) : ObservableAbstract(isMeanZero)
+Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate) : ObservableAbstract(isMeanZero)
 {
 	if(isMeanZero)
 		observableEstimateAndError = EstimateAndError(0.0, 0.0);
 	else
-		calculateAndSetValueAndError(moments, estimators, errorMethod);
+		calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }
 
 Parameters Mean::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
@@ -97,21 +95,30 @@ functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToEstimatorsForJac
 		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 1) throw std::invalid_argument("Invalid call to Mean function for estimators!"); return in[0]; };
 }
 
-functionForEstimators Mean::getFunctionToBeAppliedToEstimators()
+//TODO: Unify the following two function with a static template
+functionForEstimators Mean::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
 {
 	if(isMeanZero)
 		throw std::logic_error("The Mean::getFunctionToBeAppliedToEstimators method should not be called with isMeanZero==true!! Aborting...");
-	else
-		return [] (MomentsEstimators in) -> DataSample { return in[1]; };
+	else{
+		if(useMultipleEstimate)
+			return [] (MomentsEstimators in) -> DataSample { return getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1); };
+		else
+			return [] (MomentsEstimators in) -> DataSample { return in[1]; };
+	}
+
 }
 
-functionForObservable Mean::getFunctionToCalculateObservable()
+functionForObservable Mean::getFunctionToCalculateObservable(bool useMultipleEstimate)
 {
 	if(isMeanZero)
 		throw std::logic_error("The Mean::getFunctionToCalculateObservable method should not be called with isMeanZero==true!! Aborting...");
-//		return [] (Moments in) -> double { return in[0]*0.0; }; //in[0]*0.0 just to use the in parameter
-	else
-		return [] (Moments in) -> double { return in[1]; };
+	else{
+		if(useMultipleEstimate){
+			return [] (Moments in) -> double { return getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 1); };
+		}else
+			return [] (Moments in) -> double { return in[1]; };
+	}
 }
 
 std::initializer_list<unsigned int> Mean::getNeededMoments()
@@ -134,9 +141,9 @@ Variance::Variance(DataSample& dataSample, Parameters parameters) : ObservableAb
 	calculateAndSetValueAndError(dataSample, parameters);
 }
 
-Variance::Variance(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod) : ObservableAbstract(isMeanZero)
+Variance::Variance(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate) : ObservableAbstract(isMeanZero)
 {
-	calculateAndSetValueAndError(moments, estimators, errorMethod);
+	calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }
 
 Parameters Variance::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
@@ -162,20 +169,29 @@ functionForEstimatorsForJackknife Variance::getFunctionToBeAppliedToEstimatorsFo
 
 }
 
-functionForEstimators Variance::getFunctionToBeAppliedToEstimators()
+//TODO: Unify the following two function with a static template
+functionForEstimators Variance::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
 {
 	if(isMeanZero)
 		return [] (MomentsEstimators in) -> DataSample { return in[2]; };
-	else
-		return [] (MomentsEstimators in) -> DataSample { return in[2] - (in[1] ^ 2); };
+	else{
+		if(useMultipleEstimate)
+			return [] (MomentsEstimators in) -> DataSample { return in[2] - getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2); };
+		else
+			return [] (MomentsEstimators in) -> DataSample { return in[2] - (in[1] ^ 2); };
+	}
 }
 
-functionForObservable Variance::getFunctionToCalculateObservable()
+functionForObservable Variance::getFunctionToCalculateObservable(bool useMultipleEstimate)
 {
 	if(isMeanZero)
 		return [] (Moments in) -> double { return in[2]; };
-	else
-		return [] (Moments in) -> double { return in[2] - in[1] * in[1]; };
+	else{
+		if(useMultipleEstimate)
+			return [] (Moments in) -> double { return in[2] - getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2); };
+		else
+			return [] (Moments in) -> double { return in[2] - in[1] * in[1]; };
+	}
 }
 
 std::initializer_list<unsigned int> Variance::getNeededMoments()
@@ -198,9 +214,9 @@ Skewness::Skewness(DataSample& dataSample, Parameters parameters) : ObservableAb
 	calculateAndSetValueAndError(dataSample, parameters);
 }
 
-Skewness::Skewness(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod) : ObservableAbstract(isMeanZero)
+Skewness::Skewness(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate) : ObservableAbstract(isMeanZero)
 {
-	calculateAndSetValueAndError(moments, estimators, errorMethod);
+	calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }
 
 Parameters Skewness::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
@@ -228,21 +244,44 @@ functionForEstimatorsForJackknife Skewness::getFunctionToBeAppliedToEstimatorsFo
 															   return (ex3 - ((3 * ex2) * ex1) + (2 * (ex1 ^ 3)))/((ex2 - (ex1 ^ 2)) ^ 1.5); };
 }
 
-functionForEstimators Skewness::getFunctionToBeAppliedToEstimators()
+//TODO: Unify the following two function with a static template
+functionForEstimators Skewness::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
 {
 	if(isMeanZero)
 		return [] (MomentsEstimators in) -> DataSample { return in[3] / (in[2] ^ 1.5); };
-	else
-		return [] (MomentsEstimators in) -> DataSample { return (in[3] - ((3 * in[2]) * in[1]) + (2 * (in[1] ^ 3)))/((in[2] - (in[1] ^ 2)) ^ 1.5); };
+	else{
+		if(useMultipleEstimate){
+			return [] (MomentsEstimators in) -> DataSample {
+				DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
+				DataSample firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2);
+				DataSample firstMomentCubic = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 3);
+				return (in[3] - ((3 * in[2]) * firstMoment) + (2 * firstMomentCubic))/((in[2] - firstMomentSquared) ^ 1.5);
+			};
+		}else
+			return [] (MomentsEstimators in) -> DataSample { return (in[3] - ((3 * in[2]) * in[1]) + (2 * (in[1] ^ 3)))/((in[2] - (in[1] ^ 2)) ^ 1.5); };
+	}
 }
 
-functionForObservable Skewness::getFunctionToCalculateObservable()
+functionForObservable Skewness::getFunctionToCalculateObservable(bool useMultipleEstimate)
 {
 	if(isMeanZero)
 		return [] (Moments in) -> double { return in[3] / pow(in[2], 1.5); };
-	else
-		return [] (Moments in) -> double { double x1 = in[1]; double x2 = in[2]; double x3 = in[3];
-										   return (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5)); };
+	else{
+		if(useMultipleEstimate){
+			return [] (Moments in) -> double {
+				double firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 1);
+				double firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2);
+				double firstMomentCubic = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 3);
+				double x2 = in[2]; double x3 = in[3];
+				return (x3-3*x2*firstMoment+2*firstMomentCubic)/(pow(x2-firstMomentSquared, 1.5));
+			};
+		}else{
+			return [] (Moments in) -> double {
+				double x1 = in[1]; double x2 = in[2]; double x3 = in[3];
+				return (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5));
+			};
+		}
+	}
 }
 
 std::initializer_list<unsigned int> Skewness::getNeededMoments()
@@ -265,9 +304,9 @@ BinderCumulant::BinderCumulant(DataSample& dataSample, Parameters parameters) : 
 	calculateAndSetValueAndError(dataSample, parameters);
 }
 
-BinderCumulant::BinderCumulant(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod) : ObservableAbstract(isMeanZero)
+BinderCumulant::BinderCumulant(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate) : ObservableAbstract(isMeanZero)
 {
-	calculateAndSetValueAndError(moments, estimators, errorMethod);
+	calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }
 
 Parameters BinderCumulant::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
@@ -296,21 +335,47 @@ functionForEstimatorsForJackknife BinderCumulant::getFunctionToBeAppliedToEstima
 															   return (ex4 - (4 * ex3 * ex1) + (6 * ex2 * ex1 * ex1) - (3 * ex1 * ex1 * ex1 * ex1))/((ex2 - (ex1 ^ 2)) ^ 2); };
 }
 
-functionForEstimators BinderCumulant::getFunctionToBeAppliedToEstimators()
+//TODO: Unify the following two function with a static template
+functionForEstimators BinderCumulant::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
 {
 	if(isMeanZero)
 		return [] (MomentsEstimators in) -> DataSample { return in[4] / (in[2] ^ 2.0); };
-	else
-		return [] (MomentsEstimators in) -> DataSample { return (in[4] - (4 * in[3] * in[1]) + (6 * in[2] * in[1] * in[1]) - (3 * in[1] * in[1] * in[1] * in[1]))/((in[2] - (in[1] ^ 2)) ^ 2); };
+	else{
+		if(useMultipleEstimate){
+			return [] (MomentsEstimators in) -> DataSample {
+				DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
+				DataSample firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2);
+				DataSample firstMomentQuartic = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 4);
+				return (in[4] - (4 * in[3] * firstMoment) + (6 * in[2] * firstMomentSquared) - (3 * firstMomentQuartic))/((in[2] - firstMomentSquared) ^ 2);
+			};
+		}else{
+			return [] (MomentsEstimators in) -> DataSample {
+				return (in[4] - (4 * in[3] * in[1]) + (6 * in[2] * in[1] * in[1]) - (3 * in[1] * in[1] * in[1] * in[1]))/((in[2] - (in[1] ^ 2)) ^ 2);
+			};
+		}
+	}
 }
 
-functionForObservable BinderCumulant::getFunctionToCalculateObservable()
+functionForObservable BinderCumulant::getFunctionToCalculateObservable(bool useMultipleEstimate	)
 {
 	if(isMeanZero)
 		return [] (Moments in) -> double { return in[4] / pow(in[2], 2.0); };
-	else
-		return [] (Moments in) -> double { double x1 = in[1]; double x2 = in[2]; double x3 = in[3]; double x4 = in[4];
-										   return (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0)); };
+	else{
+		if(useMultipleEstimate){
+			return [] (Moments in) -> double {
+				double firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 1);
+				double firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2);
+				double firstMomentQuartic = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 4);
+				double x2 = in[2]; double x3 = in[3]; double x4 = in[4];
+				return (x4-4*x3*firstMoment+6*x2*firstMomentSquared-3*firstMomentQuartic)/(pow(x2-firstMomentSquared, 2.0));
+			};
+		}else{
+			return [] (Moments in) -> double {
+				double x1 = in[1]; double x2 = in[2]; double x3 = in[3]; double x4 = in[4];
+				return (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0));
+			};
+		}
+	}
 }
 
 std::initializer_list<unsigned int> BinderCumulant::getNeededMoments()
@@ -367,5 +432,34 @@ static void printBinningInformation(const Parameters& parameters, std::string ob
 	else
 		std::cout << parameters.binsize << " as binsize!\n";
 }
+
+//TODO: Implement the following class in a general way
+
+template<typename T> static T getPowerOfFirstMomentUsingSeveralEstimate(const std::vector<T>& estimates, const int power){
+	if(estimates.size() != 4)
+		throw std::invalid_argument("So far only 4 multiple estimates are allowed in quantities calculations! Aborting...");
+
+	switch(power){
+	case 1:
+		return (estimates[0] + estimates[1] + estimates[2] + estimates[3])/4.0;
+	case 2:
+		return ((estimates[0] * estimates[1]) + (estimates[0] * estimates[2]) + (estimates[0] * estimates[3]) +
+				(estimates[1] * estimates[2]) + (estimates[1] * estimates[3]) + (estimates[2] * estimates[3]))/6.0;
+	case 3:
+		return ((estimates[0] * estimates[1] * estimates[2]) + (estimates[0] * estimates[1] * estimates[3]) +
+				(estimates[0] * estimates[2] * estimates[3]) + (estimates[1] * estimates[2] * estimates[3]))/4.0;
+	case 4:
+		return (estimates[0] * estimates[1] * estimates[2] * estimates[3]);
+	default:
+		throw std::invalid_argument("Asked for a not implemented power in \"getPowerOfFirstMomentUsingSeveralEstimate\" function! Aborting...");
+	}
+
+}
+
+
+
+
+
+
 
 

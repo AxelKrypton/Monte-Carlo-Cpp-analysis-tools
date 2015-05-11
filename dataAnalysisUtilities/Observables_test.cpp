@@ -106,6 +106,16 @@ static Moments buildMomentsForTest(){
 	 */
 }
 
+static Moments buildMomentsSeveralEstimateForTest(){
+	Moments moments;
+	for(int i=0; i<4; i++)
+		moments.insert(1, 5.120788163699608e-01);
+	moments.insert(2, 2.622374015645983e-01);
+	moments.insert(3, 1.342992378238976e-01);
+	moments.insert(4, 6.878181572513453e-02);
+	return moments;
+}
+
 static MomentsEstimators buildMomentsEstimatorsForTest(){
 	MomentsEstimators momentsEst;
 	momentsEst.insert(1, DataSample(std::valarray<double>({5.1235601107091922e-01, 5.1150824489887503e-01, 5.1172734937075659e-01, 5.1178725503695854e-01,
@@ -146,6 +156,16 @@ static MomentsEstimators buildMomentsEstimatorsSameEntryForTest(){
 	return momentsEst;
 }
 
+static MomentsEstimators buildMomentsEstimatorsSameEntrySeveralEstimateForTest(){
+	MomentsEstimators momentsEst;
+	for(int i=0; i<4; i++)
+		momentsEst.insert(1, DataSample(std::valarray<double>(5.126236900933244e-01, 100)));
+	momentsEst.insert(2, DataSample(std::valarray<double>(2.627932923896761e-01, 100)));
+	momentsEst.insert(3, DataSample(std::valarray<double>(1.347245894580630e-01, 100)));
+	momentsEst.insert(4, DataSample(std::valarray<double>(6.907112186983248e-02, 100)));
+	return momentsEst;
+}
+
 
 BOOST_AUTO_TEST_SUITE(MeanTest)
 
@@ -173,7 +193,29 @@ BOOST_AUTO_TEST_SUITE(MeanTest)
 		BOOST_CHECK_CLOSE(mean.getValueAndError().error, referenceValue.error, doublePrecisionInPercent);
 	}
 
-	//TODO: Test for Mean mean(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
+	{
+		EstimateAndError referenceValue(0.0, 0.0);
+		Mean mean(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
+		BOOST_CHECK_CLOSE(mean.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(mean.getValueAndError().error, referenceValue.error, doublePrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
+	{
+		EstimateAndError referenceValue(0.0, 0.0);
+		Mean mean(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
+		BOOST_CHECK_CLOSE(mean.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(mean.getValueAndError().error, 1.e-7);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator6)
+	{
+		EstimateAndError referenceValue(0.5120788163699608, 0.0);
+		Mean mean(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
+		BOOST_CHECK_CLOSE(mean.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(mean.getValueAndError().error, 1.e-7);
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -206,6 +248,22 @@ BOOST_AUTO_TEST_SUITE(VarianceTest)
 
 	//TODO: Test for Variance variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
 
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
+	{
+		EstimateAndError referenceValue(0.2622374015645983, 0.0);
+		Variance variance(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
+		BOOST_CHECK_CLOSE(variance.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(variance.getValueAndError().error, 1.e-7);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
+	{
+		EstimateAndError referenceValue(1.268738973830841e-05, 0.0);
+		Variance variance(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
+		BOOST_CHECK_CLOSE(variance.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(variance	.getValueAndError().error, 1.e-7);
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
@@ -229,6 +287,22 @@ BOOST_AUTO_TEST_SUITE(SkewnessTest)
 
 	//TODO: Test for Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
 	//TODO: Test for Skewness variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
+	{
+		EstimateAndError referenceValue(1.000072760979389, 0.0);
+		Skewness skewness(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
+		BOOST_CHECK_CLOSE(skewness.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(skewness.getValueAndError().error, 1.e-7);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
+	{
+		EstimateAndError referenceValue(0.5694793357428045, 0.0);
+		Skewness skewness(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
+		BOOST_CHECK_CLOSE(skewness.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(skewness.getValueAndError().error, 1.e-7);
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -260,6 +334,22 @@ BOOST_AUTO_TEST_SUITE(BinderCumulantTest)
 	}
 
 	//TODO: Test for BinderCumulant binder(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
+	{
+		EstimateAndError referenceValue(1.000194288875983, 0.0);
+		BinderCumulant binder(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
+		BOOST_CHECK_CLOSE(binder.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(binder.getValueAndError().error, 1.e-7);
+	}
+
+	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
+	{
+		EstimateAndError referenceValue(3.7478114121524830, 0.0);
+		BinderCumulant binder(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
+		BOOST_CHECK_CLOSE(binder.getValueAndError().estimate, referenceValue.estimate, doublePrecisionInPercent);
+		BOOST_CHECK_SMALL(binder.getValueAndError().error, 3.e-7);
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
 
