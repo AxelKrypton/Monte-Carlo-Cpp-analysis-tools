@@ -59,6 +59,7 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 	for(auto rewProc: reweightingProceduresToBePerformed){
 		printInformationAboutReweightingProcedure(rewProc);
 		MomentsReweighter momentsReweighter(getRawDataForReweightingAndMetainformation(rewProc.momentsToBeReweighted, rewProc.binsizesToBeUsed));
+		if(valuesOfNewParameters.empty()) valuesOfNewParameters = momentsReweighter.getValuesOfNewParameters();
 		std::vector<std::vector<Moments> > momentsAtNewPoints = momentsReweighter.getMomentsAtNewPoints();
 		std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints = momentsReweighter.getMomentsEstimatorsAtNewPoints();
 		checkSizesOfMomentsAndMomentsEstimators(momentsAtNewPoints, momentsEstimatorsAtNewPoints, numberOfNewPoints, numberOfObservablesInFiles);
@@ -71,6 +72,11 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 	//Set manually mean to zero if mean is known to be zero and MEAN is asked
 	if(reweighterIO.isMeanKnownToBeZero && find(quantitiesToBeReweighted.begin(), quantitiesToBeReweighted.end(), Mean::observableName) != quantitiesToBeReweighted.end())
 		setMeanToZeroAtNewPoints(observablesAtNewPoints);
+}
+
+
+std::vector<std::vector<double> > Reweighter::getValuesOfNewParameters(){
+	return valuesOfNewParameters;
 }
 
 std::vector<std::vector<Observables> > Reweighter::getReweightedObservables(){

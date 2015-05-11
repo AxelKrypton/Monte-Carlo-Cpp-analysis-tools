@@ -43,6 +43,7 @@ public:
 	 *            case LqcdReweightingParameters. It is temporary in order to make everything work!
 	 */
 	Reweighter(LqcdReweightingParameters parameters);
+	std::vector<std::vector<double> > getValuesOfNewParameters();
 	std::vector<std::vector<Observables> > getReweightedObservables();
 private:
 	ReweighterIO reweighterIO;
@@ -50,6 +51,7 @@ private:
 	unsigned int maximumMomentNeededOverall;
     std::vector<std::pair<double, double> >  newRangesOfParameters;
     std::vector<unsigned int>  newNumberOfPointsOfParameters;
+    std::vector<std::vector<double> > valuesOfNewParameters;
 	double precisionOfIterativeProcedureToCalculateLogZ;
 	std::vector<std::vector<Observables> > observablesAtNewPoints;
 	//The following methods are here in order to be tested one by one (in principle they could be static function in the .cpp file)
