@@ -680,7 +680,7 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
 	/*
 	 * This test is a consistency check for the case in which several reweighting procedures are needed
 	 */
-	BOOST_AUTO_TEST_CASE(bindReweighting4)
+	BOOST_AUTO_TEST_CASE(quantitiesReweighting1)
 	{
 		std::string fileThatDoesExist = "RealTestData/configfile_7";
 		std::initializer_list<std::string> options1 = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
@@ -709,6 +709,43 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
 							    valuesObsNewPoints2[2*i][0].binderCumulant.estimate, doublePrecisionInPercent);
 			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].binderCumulant.error,
 							    valuesObsNewPoints2[2*i][0].binderCumulant.error, doublePrecisionInPercent);
+		}
+	}
+
+	/*
+	 * This test is a consistency check for the case in which several columns are used
+	 */
+	BOOST_AUTO_TEST_CASE(quantitiesReweighting2)
+	{
+		std::string fileThatDoesExist = "RealTestData/configfile_6";
+		std::initializer_list<std::string> options1 = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+													   "--newBetaRange_high=5.363", "--numberOfNewBetaPoints=11", "--obsMultipleColumns=3"};
+		ReweighterTester reweighter(options1, true);
+		std::vector<std::vector<Observables> > valuesObsNewPoints1 = reweighter.getReweightedObservables();
+		std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+													  "--newBetaRange_high=5.363", "--numberOfNewBetaPoints=21", "--obsMultipleColumns=3"};
+		ReweighterTester reweighter2(options2, true);
+		std::vector<std::vector<Observables> > valuesObsNewPoints2 = reweighter2.getReweightedObservables();
+
+		for(size_t i=0; i<valuesObsNewPoints1.size(); i++){
+			for(size_t j=0; j<valuesObsNewPoints1[i].size(); j++){
+				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].mean.estimate,
+									valuesObsNewPoints2[2*i][j].mean.estimate, doublePrecisionInPercent);
+				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].mean.error,
+									valuesObsNewPoints2[2*i][j].mean.error, doublePrecisionInPercent);
+				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].susceptibility.estimate,
+									valuesObsNewPoints2[2*i][j].susceptibility.estimate, doublePrecisionInPercent);
+				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].susceptibility.error,
+									valuesObsNewPoints2[2*i][j].susceptibility.error, doublePrecisionInPercent);
+				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].skewness.estimate,
+									valuesObsNewPoints2[2*i][j].skewness.estimate, doublePrecisionInPercent);
+				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].skewness.error,
+									valuesObsNewPoints2[2*i][j].skewness.error, doublePrecisionInPercent);
+				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].binderCumulant.estimate,
+									valuesObsNewPoints2[2*i][j].binderCumulant.estimate, doublePrecisionInPercent);
+				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].binderCumulant.error,
+									valuesObsNewPoints2[2*i][j].binderCumulant.error, doublePrecisionInPercent);
+			}
 		}
 	}
 
