@@ -45,9 +45,13 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 	std::vector<ReweightingProcedure> reweightingProceduresToBePerformed = getReweightingProceduresToBePerformed();
 	maximumMomentNeededOverall = getMaximumMomentToBeReweighted(reweightingProceduresToBePerformed);
 	//Before setting the observables, we have to reserve the correct amount of memory
-	const size_t numberOfNewPoints = std::accumulate(newNumberOfPointsOfParameters.begin(), newNumberOfPointsOfParameters.end(), 1, std::multiplies<unsigned int>());
-	const size_t numberOfObservablesInFiles = reweighterIO.readFromFileDataContainer[0].getNumberOfDataSample() - reweighterIO.namesOfParametersIgnoringMetaParameters.size()
-											- reweighterIO.columnsToBeReweightedUsingMultipleColumns.size()*(maximumMomentNeededOverall-1); //neglect multiple columns (count one column only)
+	size_t numberOfNewPoints, numberOfObservablesInFiles;
+	if(useSimulatedPointsAsNewPoints)
+		numberOfNewPoints = reweighterIO.valuesOfSimulationParametersIgnoringMetaParameters.size();
+	else
+		numberOfNewPoints = std::accumulate(newNumberOfPointsOfParameters.begin(), newNumberOfPointsOfParameters.end(), 1, std::multiplies<unsigned int>());
+	numberOfObservablesInFiles = reweighterIO.readFromFileDataContainer[0].getNumberOfDataSample() - reweighterIO.namesOfParametersIgnoringMetaParameters.size()
+							   - reweighterIO.columnsToBeReweightedUsingMultipleColumns.size()*(maximumMomentNeededOverall-1); //neglect multiple columns (count one column only)
 	observablesAtNewPoints = std::vector<std::vector<Observables>>(numberOfNewPoints, std::vector<Observables>(numberOfObservablesInFiles, Observables()));
 
 	std::cout << "maximumMomentNeededOverall = " << maximumMomentNeededOverall << "\n";
