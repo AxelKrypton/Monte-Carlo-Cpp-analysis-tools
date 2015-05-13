@@ -22,6 +22,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
         ("useJackknifeAsErrorMethod", po::value<bool>(&useJackknifeAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Jackknife. ATTENTION: This method implies to use the biggest binsize for all raw data points. Unless the statistics is such that the number of uncorrelated data points is not affected, this method will in general overestimate the errors!!!")
         ("useBootstrapAsErrorMethod", po::value<bool>(&useBootstrapAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Bootstrap.")
         ("numberOfBootstrapResample", po::value<int>(&numberOfBootstrapResample)->default_value(100), "Number of resamples to be done in the bootstrap.")
+        ("useSimulatedPointsAsNewPoints", po::value<bool>(&useSimulatedPointsAsNewPoints)->default_value(false)->implicit_value(true), "Perform reweighting evaluating the observables at the simulated points (given in the configuration file).")
         ("weightPrecision", po::value<double>(&weightPrecision)->default_value(1.e-7), "Precision for iterative finding of optimal weights.");
 		
 	//option "file" can be given without option description
@@ -71,8 +72,12 @@ void LqcdReweightingParameters::printParameters()
 	std::cout << "# Inputfile:\t\"" << inputfile << "\"" << std::endl;
 	std::cout << separator << std::endl;
 	std::cout << "# Reweighting parameters:" << std::endl;
-	std::cout << "#   New beta range:\t[" << newBetaRange_low << ":" << newBetaRange_high << "]" << std::endl;
-    std::cout << "#   New beta points:\t  " << numberOfNewBetaPoints << std::endl;
+	if(useSimulatedPointsAsNewPoints)
+		std::cout << "#   Reweight at simulated points" << std::endl;
+	else{
+		std::cout << "#   New beta range:\t[" << newBetaRange_low << ":" << newBetaRange_high << "]" << std::endl;
+		std::cout << "#   New beta points:\t  " << numberOfNewBetaPoints << std::endl;
+	}
     if(isMeanKnownToBeZero)
     	std::cout << "#   Mean of the observables known to be ZERO" << std::endl;
     std::cout << "#   Columns of obs. to be rew. with multiple columns:  ";
@@ -177,6 +182,11 @@ bool LqcdReweightingParameters::getUseJackknifeAsErrorMethod()
 bool LqcdReweightingParameters::getUseBootstrapAsErrorMethod()
 {
 	return useBootstrapAsErrorMethod;
+}
+
+bool LqcdReweightingParameters::getUseSimulatedPointsAsNewPoints()
+{
+	return useSimulatedPointsAsNewPoints;
 }
 
 int LqcdReweightingParameters::getNumberOfBootstrapResample()

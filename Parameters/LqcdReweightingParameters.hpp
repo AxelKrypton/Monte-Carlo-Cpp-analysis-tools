@@ -40,6 +40,7 @@ public:
     std::vector<unsigned int> getColumnsToBeReweightedUsingMultipleColumns();
 	bool getUseJackknifeAsErrorMethod();
 	bool getUseBootstrapAsErrorMethod();
+	bool getUseSimulatedPointsAsNewPoints();
 	int getNumberOfBootstrapResample();
 	double getWeightPrecision();
 	bool getIsMeanKnownToBeZero();
@@ -60,6 +61,7 @@ private:
 	bool deactivateReweightingForBinder;
 	bool useJackknifeAsErrorMethod;
 	bool useBootstrapAsErrorMethod;
+	bool useSimulatedPointsAsNewPoints;
 	double weightPrecision;
 	int numberOfBootstrapResample;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;

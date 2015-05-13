@@ -22,6 +22,7 @@ MomentsReweighterAbstract::MomentsReweighterAbstract(RawDataForReweightingAndMet
 	valuesOfSimulationParameters = momentsReweighterHelper.valuesOfSimulationParametersIgnoringMetaParameters;
 	newRangesOfParameters = rawDataForReweightingAndMetainformationIn.newRangesOfParameters;
 	newNumberOfPointsOfParameters = rawDataForReweightingAndMetainformationIn.newNumberOfPointsOfParameters;
+	useSimulatedPointsAsNewPoints = rawDataForReweightingAndMetainformationIn.useSimulatedPointsAsNewPoints;
 	precisionOfIterativeProcedureToCalculateLogZ = rawDataForReweightingAndMetainformationIn.precisionToCalculateLogZ;
 	if(precisionOfIterativeProcedureToCalculateLogZ <= 0.0)
 		throw std::range_error("Precision smaller than or equal to zero is nonsense!");
@@ -78,12 +79,16 @@ std::vector<std::vector<MomentsEstimators> > MomentsReweighterAbstract::getMomen
 
 
 void MomentsReweighterAbstract::setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
+	if(useSimulatedPointsAsNewPoints)
+		throw std::logic_error("Trying to reset the ranges while useSimulatedPointsAsNewPoints is true, NOT ALLOWED!");
 	newRangesOfParameters = newRangesOfParametersIn;
 	calculateNewPoints();
 }
 
 
 void MomentsReweighterAbstract::setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn){
+	if(useSimulatedPointsAsNewPoints)
+		throw std::logic_error("Trying to reset the number of points while useSimulatedPointsAsNewPoints is true, NOT ALLOWED!");
 	newNumberOfPointsOfParameters = newNumberOfPointsOfParametersIn;
 	calculateNewPoints();
 }
@@ -92,6 +97,7 @@ void MomentsReweighterAbstract::setNewNumberOfPointsOfParameters(std::vector<uns
 void MomentsReweighterAbstract::setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
 		                               std::vector<unsigned int> newNumberOfPointsOfParametersIn)
 {
+	useSimulatedPointsAsNewPoints = false;
 	newRangesOfParameters = newRangesOfParametersIn;
 	newNumberOfPointsOfParameters = newNumberOfPointsOfParametersIn;
 	calculateNewPoints();
@@ -186,21 +192,27 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
 
 
 void MomentsReweighterAbstract::calculateNewPoints(){
-	//todo: improve! Here the easiest implementation -> new point values determined as (upper_bound-lower_bound)/num_points
-	if(newRangesOfParameters.size() != newNumberOfPointsOfParameters.size() ||
-       newRangesOfParameters.size() != reweightingParameterNames.size())
-		throw std::invalid_argument("Size of the vectors of new point parameters incorrect!");
-	std::vector<std::vector<double> > newPointValuesForSingleParameter(newRangesOfParameters.size());
-	for(size_t i=0; i<newRangesOfParameters.size(); i++){
-		if(newNumberOfPointsOfParameters[i] < 2)
-			throw std::invalid_argument("Number of new points must be at least 2, since boundaries are included!");
-		double deltaPar = fabs(newRangesOfParameters[i].first - newRangesOfParameters[i].second)/(newNumberOfPointsOfParameters[i]-1);
-		for(unsigned int j=0; j<newNumberOfPointsOfParameters[i]; j++)
-			newPointValuesForSingleParameter[i].push_back(std::min(newRangesOfParameters[i].first, newRangesOfParameters[i].second) + j*deltaPar);
+
+	//TODO: improve! Here the easiest implementation -> new point values determined as (upper_bound-lower_bound)/num_points
+	if(useSimulatedPointsAsNewPoints){
+		valuesOfNewParameters = valuesOfSimulationParameters;
+	}else{
+		if(newRangesOfParameters.size() != newNumberOfPointsOfParameters.size() ||
+	       newRangesOfParameters.size() != reweightingParameterNames.size())
+			throw std::invalid_argument("Size of the vectors of new point parameters incorrect!");
+		std::vector<std::vector<double> > newPointValuesForSingleParameter(newRangesOfParameters.size());
+		for(size_t i=0; i<newRangesOfParameters.size(); i++){
+			if(newNumberOfPointsOfParameters[i] < 2)
+				throw std::invalid_argument("Number of new points must be at least 2, since boundaries are included!");
+			double deltaPar = fabs(newRangesOfParameters[i].first - newRangesOfParameters[i].second)/(newNumberOfPointsOfParameters[i]-1);
+			for(unsigned int j=0; j<newNumberOfPointsOfParameters[i]; j++)
+				newPointValuesForSingleParameter[i].push_back(std::min(newRangesOfParameters[i].first, newRangesOfParameters[i].second) + j*deltaPar);
+		}
+		std::vector<double> auxiliaryVector;
+		valuesOfNewParameters.clear();
+		writeNewPoints(valuesOfNewParameters, newPointValuesForSingleParameter, auxiliaryVector);
 	}
-	std::vector<double> auxiliaryVector;
-	valuesOfNewParameters.clear();
-	writeNewPoints(valuesOfNewParameters, newPointValuesForSingleParameter, auxiliaryVector);
+
 	logZAtNewPoints.reserve(valuesOfNewParameters.size());
     momentsAtNewPoints = std::vector<std::vector<Moments> >(valuesOfNewParameters.size(), std::vector<Moments>(momentsReweighterHelper.numberOfObservablesGivenAsInput, Moments()));
     momentsEstimatorsAtNewPoints = std::vector<std::vector<MomentsEstimators> >(valuesOfNewParameters.size(),

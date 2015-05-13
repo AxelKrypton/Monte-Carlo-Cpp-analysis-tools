@@ -122,10 +122,16 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfBootstrapResample() );
 	}
 
-	BOOST_AUTO_TEST_CASE(bootstrapPrecision)
+	BOOST_AUTO_TEST_CASE(WeightPrecision)
 	{
 		double defaultValue = 1.e-7;
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getWeightPrecision() );
+	}
+
+	BOOST_AUTO_TEST_CASE(useSimAsNewPoints)
+	{
+		bool defaultValue = false;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getUseSimulatedPointsAsNewPoints() );
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -341,4 +347,18 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getWeightPrecision() );
 	}
 	
+	BOOST_AUTO_TEST_CASE(useSimAsNewPoints_implicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--useSimulatedPointsAsNewPoints";
+		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getUseSimulatedPointsAsNewPoints() );
+	}
+
+	BOOST_AUTO_TEST_CASE(useSimAsNewPoints_explicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--useSimulatedPointsAsNewPoints";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getUseSimulatedPointsAsNewPoints() );
+	}
+
 BOOST_AUTO_TEST_SUITE_END()

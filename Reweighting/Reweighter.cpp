@@ -24,6 +24,7 @@ Reweighter::Reweighter(std::initializer_list<std::string> options) : reweighterI
 	precisionOfIterativeProcedureToCalculateLogZ = parameters.getWeightPrecision();
 	newNumberOfPointsOfParameters = {parameters.getNumberOfNewBetaPoints()}; //TODO: Use method of class ReweightingParameters to be implemented!!
 	newRangesOfParameters = {std::make_pair(parameters.getNewBetaRange_low(), parameters.getNewBetaRange_high())}; //TODO: Use method of class ReweightingParameters to be implemented!!
+	useSimulatedPointsAsNewPoints = parameters.getUseSimulatedPointsAsNewPoints();
 	maximumMomentNeededOverall = 4;//Hard coded for tests, TODO: think a better way
 	std::cout << "quantitiesToBeReweighted.size() = " << quantitiesToBeReweighted.size() << "  - ";
 	for(auto i: quantitiesToBeReweighted)
@@ -40,6 +41,7 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 {
 	newNumberOfPointsOfParameters = {parameters.getNumberOfNewBetaPoints()}; //TODO: Use method of class ReweightingParameters to be implemented!!
 	newRangesOfParameters = {std::make_pair(parameters.getNewBetaRange_low(), parameters.getNewBetaRange_high())}; //TODO: Use method of class ReweightingParameters to be implemented!!
+	useSimulatedPointsAsNewPoints = parameters.getUseSimulatedPointsAsNewPoints();
 	std::vector<ReweightingProcedure> reweightingProceduresToBePerformed = getReweightingProceduresToBePerformed();
 	maximumMomentNeededOverall = getMaximumMomentToBeReweighted(reweightingProceduresToBePerformed);
 	//Before setting the observables, we have to reserve the correct amount of memory
@@ -99,7 +101,7 @@ std::vector<ReweightingProcedure> Reweighter::getReweightingProceduresToBePerfor
 RawDataForReweightingAndMetainformation Reweighter::getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed){
 	return {reweighterIO.readFromFileDataContainer, reweighterIO.namesOfParametersIgnoringMetaParameters,
 			reweighterIO.valuesOfSimulationParametersIgnoringMetaParameters, reweighterIO.valuesOfSpecifiedLogZ,
-			newRangesOfParameters, newNumberOfPointsOfParameters,
+			newRangesOfParameters, newNumberOfPointsOfParameters, useSimulatedPointsAsNewPoints,
 			reweighterIO.isMeanKnownToBeZero, precisionOfIterativeProcedureToCalculateLogZ,
 			reweighterIO.columnsToBeReweightedUsingMultipleColumns, reweighterIO.errorMethod,
 			reweighterIO.bootstrapNumber, maximumMomentNeededOverall, momentsToBeReweighted, binsizesToBeUsed};

@@ -15,6 +15,7 @@ struct RawDataForReweightingAndMetainformation {
     //Information coming from the user
     std::vector<std::pair<double, double> >  newRangesOfParameters;
     std::vector<unsigned int>  newNumberOfPointsOfParameters;
+    bool useSimulatedPointsAsNewPoints;
     bool isMeanKnownToBeZero;
     double precisionToCalculateLogZ;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
@@ -51,6 +52,7 @@ private:
 	unsigned int maximumMomentNeededOverall;
     std::vector<std::pair<double, double> >  newRangesOfParameters;
     std::vector<unsigned int>  newNumberOfPointsOfParameters;
+    bool useSimulatedPointsAsNewPoints;
     std::vector<std::vector<double> > valuesOfNewParameters;
 	double precisionOfIterativeProcedureToCalculateLogZ;
 	std::vector<std::vector<Observables> > observablesAtNewPoints;

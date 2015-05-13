@@ -246,6 +246,18 @@ BOOST_AUTO_TEST_SUITE(setters)
 
 	BOOST_AUTO_TEST_CASE(setters4)
 	{
+		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
+		std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useBootstrapAsErrorMethod", "--useSimulatedPointsAsNewPoints"};
+		MomentsReweighterTest momentsReweighterTest(ReweighterTester(options).getRawDataForReweightingAndMetainformation({1}, {1,1,1}));
+		std::vector<std::pair<double, double> > newRanges = {std::make_pair(4.2, 4.6), std::make_pair(0.7, 1.3), std::make_pair(-1.2e12, -1.6e12)};
+		std::vector< unsigned int> newNumPoints(3, 2);
+		BOOST_REQUIRE_THROW(momentsReweighterTest.setNewRangesOfParameters(newRanges), std::logic_error);
+		BOOST_REQUIRE_THROW(momentsReweighterTest.setNewNumberOfPointsOfParameters(newNumPoints), std::logic_error);
+		BOOST_REQUIRE_NO_THROW(momentsReweighterTest.setNewParameters(newRanges, newNumPoints));
+	}
+
+	BOOST_AUTO_TEST_CASE(setters5)
+	{
         MomentsReweighterTest momentsReweighterTest(createMomentsReweighterTestForGettersAndSettersTests("0.1"));
         BOOST_REQUIRE_THROW(momentsReweighterTest.setPrecisionToCalculateLogZ(-3.e-10), std::range_error);
         BOOST_REQUIRE_NO_THROW(momentsReweighterTest.setPrecisionToCalculateLogZ(1.e-10));

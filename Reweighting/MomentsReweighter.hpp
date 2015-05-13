@@ -168,6 +168,7 @@ private:
 	 */
 	std::vector<std::pair<double, double> >  newRangesOfParameters;
 	std::vector<unsigned int>  newNumberOfPointsOfParameters;
+	bool useSimulatedPointsAsNewPoints;
 
 	double precisionOfIterativeProcedureToCalculateLogZ;
 };
