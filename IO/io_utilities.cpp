@@ -87,6 +87,11 @@ private:
 
 static void checkInputSizes(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
 {
+	if ( reweightedData.size() == 0 )
+	{
+		throw std::exception();
+	}
+
 	uint numberOfNewPoints = reweightedData.size();
 	uint numberOfQuantities = reweightedData[0].size();
 	
@@ -107,7 +112,14 @@ static void checkInputSizes(std::vector<std::vector<double> > & newBetaValues, s
 
 void writeLqcdReweightingResultsToFile(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData, std::string outputfilePrefix)
 {
-	checkInputSizes(newBetaValues, reweightedData);
+	try{
+		checkInputSizes(newBetaValues, reweightedData);
+	}catch(std::invalid_argument& e){
+		throw e;
+	}catch(std::exception& e){
+		std::cout << "\n   No reweighting procedure has been performed, probably because none was asked. No file will be created.\n" << std::endl;
+		return;
+	}
 	
 	std::vector<LqcdReweightedData> ReweightedQuantities;
 	uint numberOfNewPoints = reweightedData.size();
