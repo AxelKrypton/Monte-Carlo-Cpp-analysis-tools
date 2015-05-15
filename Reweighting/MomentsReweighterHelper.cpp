@@ -42,13 +42,16 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
 	//Evaluate central moments per data and append them to the raw data container
 	if(momentsToBeReweighted.empty())
 		throw std::logic_error("MomentsReweighterHelper asked to be built without any moment to be reweighted! Aborting...");
-	std::sort(columnsToBeReweightedUsingMultipleColumns.begin(), columnsToBeReweightedUsingMultipleColumns.end());
-	for(size_t i=1; i<columnsToBeReweightedUsingMultipleColumns.size(); i++){
-		if(columnsToBeReweightedUsingMultipleColumns[i]-columnsToBeReweightedUsingMultipleColumns[i-1] < maximumMomentNeededOverall)
-			throw std::invalid_argument("obsToBeRewUsingMultipleColumns contains columns too close (distance<" + std::to_string(maximumMomentNeededOverall) + ")!");
+	if(!columnsToBeReweightedUsingMultipleColumns.empty()){
+		std::sort(columnsToBeReweightedUsingMultipleColumns.begin(), columnsToBeReweightedUsingMultipleColumns.end());
+		for(size_t i=1; i<columnsToBeReweightedUsingMultipleColumns.size(); i++){
+			if(columnsToBeReweightedUsingMultipleColumns[i]-columnsToBeReweightedUsingMultipleColumns[i-1] < maximumMomentNeededOverall)
+				throw std::invalid_argument("obsToBeRewUsingMultipleColumns contains columns too close (distance<" + std::to_string(maximumMomentNeededOverall) + ")!");
+		}
+		unsigned int numberOfColumnsWithObservables = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
+		if(numberOfColumnsWithObservables - columnsToBeReweightedUsingMultipleColumns.back() + 1 < maximumMomentNeededOverall)
+			throw std::invalid_argument("Not enough columns to be used for single observable (in col. " + std::to_string(columnsToBeReweightedUsingMultipleColumns.back()) + ")!");
 	}
-	if(simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size() - columnsToBeReweightedUsingMultipleColumns.back() + 1 < maximumMomentNeededOverall)
-		throw std::invalid_argument("Not enough columns to be used for single observable (in col. " + std::to_string(columnsToBeReweightedUsingMultipleColumns.back()) + ")!");
 
 	//Here I set the number of "real" observables given as input (neglecting the multiple columns)
 	numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
