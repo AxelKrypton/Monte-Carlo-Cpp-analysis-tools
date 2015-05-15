@@ -47,6 +47,8 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
 		if(columnsToBeReweightedUsingMultipleColumns[i]-columnsToBeReweightedUsingMultipleColumns[i-1] < maximumMomentNeededOverall)
 			throw std::invalid_argument("obsToBeRewUsingMultipleColumns contains columns too close (distance<" + std::to_string(maximumMomentNeededOverall) + ")!");
 	}
+	if(simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size() - columnsToBeReweightedUsingMultipleColumns.back() + 1 < maximumMomentNeededOverall)
+		throw std::invalid_argument("Not enough columns to be used for single observable (in col. " + std::to_string(columnsToBeReweightedUsingMultipleColumns.back()) + ")!");
 
 	//Here I set the number of "real" observables given as input (neglecting the multiple columns)
 	numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
