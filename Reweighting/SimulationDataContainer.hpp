@@ -15,7 +15,8 @@ public:
     std::vector<int> getNumberOfEntriesLeftOut(std::vector<int> parameterToBeUsed);
     SimulationData& operator[](int index);
     SimulationDataContainer buildAndGetMomentsPerData(std::vector<unsigned int> whichMoments, unsigned int ignoreFirstNColumns,
-    												  std::vector<unsigned int> columnsForWhichMultipleColumnsForMomentsAreUsed = std::vector<unsigned int>());
+    												  std::vector<unsigned int> columnsForWhichMultipleColumnsForMomentsAreUsed = std::vector<unsigned int>(),
+    												  unsigned int maximumMomentNeededOverall = 0);
 
 private:
 	std::vector<SimulationData> simulationDataSet;

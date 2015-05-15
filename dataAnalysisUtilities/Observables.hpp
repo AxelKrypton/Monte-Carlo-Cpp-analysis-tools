@@ -21,6 +21,11 @@ enum ErrorCalculationMethod { bootstrap = 1, jackknife };
  *       value is not allowed in c++. So we decided to do in this way. We have an insert method to set
  *       elements. Then we use the operator[] to get a single value (checking for this case) and we use
  *       the operator() to get a set of values (checking for this case).
+ *       TODO: In the functions getFunctionTo[...] we should do a try and catch block when asking the Moments
+ *             or the MomentsEstimators with the operator() in the useMultipleEstimate case. This is because,
+ *             in general, it could happen the (stupid) case in which the reweighting using multiple columns
+ *             is done but there is one only multiple column. Then one only value is set and the operator()
+ *             throws an exception.
  */
 class Moments {
 public:
@@ -42,7 +47,7 @@ public:
 		if(itWhichMoment == moments.end())
 			throw std::out_of_range("Moments::() accessed an invalid moment! Aborting...");
 		else if(moments.count(itWhichMoment->first) == 1)
-			throw std::invalid_argument("Moments::() accessed a moment for which only on value is set, NOT ALLOWED! Aborting...");
+			throw std::invalid_argument("Moments::() accessed a moment for which only one value is set, NOT ALLOWED! Aborting...");
 		else{
 			std::vector<double> returnVec;
 			std::multimap<unsigned int, double>::iterator itRangeWhichMoment;
@@ -84,7 +89,7 @@ public:
 		if(itWhichMoment == momentsEstimators.end())
 			throw std::out_of_range("MomentsEstimators::() accessed an invalid moment! Aborting...");
 		else if(momentsEstimators.count(itWhichMoment->first) == 1)
-			throw std::invalid_argument("MomentsEstimators::() accessed a moment for which only on value is set, NOT ALLOWED! Aborting...");
+			throw std::invalid_argument("MomentsEstimators::() accessed a moment for which only one value is set, NOT ALLOWED! Aborting...");
 		else{
 			std::vector<DataSample> returnVec;
 			std::multimap<unsigned int, DataSample>::iterator itRangeWhichMoment;

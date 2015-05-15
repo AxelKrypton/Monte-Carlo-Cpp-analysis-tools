@@ -43,41 +43,46 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 	newRangesOfParameters = {std::make_pair(parameters.getNewBetaRange_low(), parameters.getNewBetaRange_high())}; //TODO: Use method of class ReweightingParameters to be implemented!!
 	useSimulatedPointsAsNewPoints = parameters.getUseSimulatedPointsAsNewPoints();
 	std::vector<ReweightingProcedure> reweightingProceduresToBePerformed = getReweightingProceduresToBePerformed();
-	maximumMomentNeededOverall = getMaximumMomentToBeReweighted(reweightingProceduresToBePerformed);
-	//Before setting the observables, we have to reserve the correct amount of memory
-	size_t numberOfNewPoints, numberOfObservablesInFiles;
-	if(useSimulatedPointsAsNewPoints)
-		numberOfNewPoints = reweighterIO.valuesOfSimulationParametersIgnoringMetaParameters.size();
-	else
-		numberOfNewPoints = std::accumulate(newNumberOfPointsOfParameters.begin(), newNumberOfPointsOfParameters.end(), 1, std::multiplies<unsigned int>());
-	numberOfObservablesInFiles = reweighterIO.readFromFileDataContainer[0].getNumberOfDataSample() - reweighterIO.namesOfParametersIgnoringMetaParameters.size()
-							   - reweighterIO.columnsToBeReweightedUsingMultipleColumns.size()*(maximumMomentNeededOverall-1); //neglect multiple columns (count one column only)
-	observablesAtNewPoints = std::vector<std::vector<Observables>>(numberOfNewPoints, std::vector<Observables>(numberOfObservablesInFiles, Observables()));
+	if(reweightingProceduresToBePerformed.size() > 0){
+		if(parameters.getNumberOfMultipleColumnsForSingleObservable() == 0)
+			maximumMomentNeededOverall = getMaximumMomentToBeReweighted(reweightingProceduresToBePerformed);
+		else
+			maximumMomentNeededOverall = parameters.getNumberOfMultipleColumnsForSingleObservable();
+		//Before setting the observables, we have to reserve the correct amount of memory
+		size_t numberOfNewPoints, numberOfObservablesInFiles;
+		if(useSimulatedPointsAsNewPoints)
+			numberOfNewPoints = reweighterIO.valuesOfSimulationParametersIgnoringMetaParameters.size();
+		else
+			numberOfNewPoints = std::accumulate(newNumberOfPointsOfParameters.begin(), newNumberOfPointsOfParameters.end(), 1, std::multiplies<unsigned int>());
+		numberOfObservablesInFiles = reweighterIO.readFromFileDataContainer[0].getNumberOfDataSample() - reweighterIO.namesOfParametersIgnoringMetaParameters.size()
+								   - reweighterIO.columnsToBeReweightedUsingMultipleColumns.size()*(maximumMomentNeededOverall-1); //neglect multiple columns (count one column only)
+		observablesAtNewPoints = std::vector<std::vector<Observables>>(numberOfNewPoints, std::vector<Observables>(numberOfObservablesInFiles, Observables()));
 
-	std::cout << "maximumMomentNeededOverall = " << maximumMomentNeededOverall << "\n";
-	std::cout << "numberOfNewPoints = " << numberOfNewPoints << "\n";
-	std::cout << "numberOfObservablesInFiles = " << numberOfObservablesInFiles << "\n";
-	std::cout << "quantitiesToBeReweighted.size() = " << quantitiesToBeReweighted.size() << "  - ";
-	for(auto i: quantitiesToBeReweighted)
-		std::cout << i << " - ";
-	std::cout << "\n";
+		std::cout << "maximumMomentNeededOverall = " << maximumMomentNeededOverall << "\n";
+		std::cout << "numberOfNewPoints = " << numberOfNewPoints << "\n";
+		std::cout << "numberOfObservablesInFiles = " << numberOfObservablesInFiles << "\n";
+		std::cout << "quantitiesToBeReweighted.size() = " << quantitiesToBeReweighted.size() << "  - ";
+		for(auto i: quantitiesToBeReweighted)
+			std::cout << i << " - ";
+		std::cout << "\n";
 
-	for(auto rewProc: reweightingProceduresToBePerformed){
-		printInformationAboutReweightingProcedure(rewProc);
-		MomentsReweighter momentsReweighter(getRawDataForReweightingAndMetainformation(rewProc.momentsToBeReweighted, rewProc.binsizesToBeUsed));
-		if(valuesOfNewParameters.empty()) valuesOfNewParameters = momentsReweighter.getValuesOfNewParameters();
-		std::vector<std::vector<Moments> > momentsAtNewPoints = momentsReweighter.getMomentsAtNewPoints();
-		std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints = momentsReweighter.getMomentsEstimatorsAtNewPoints();
-		checkSizesOfMomentsAndMomentsEstimators(momentsAtNewPoints, momentsEstimatorsAtNewPoints, numberOfNewPoints, numberOfObservablesInFiles);
-		setObservablesAtNewPointsFromMomentsAndMomentEstimators(observablesAtNewPoints, reweighterIO.isMeanKnownToBeZero, reweighterIO.errorMethod,
-																momentsAtNewPoints, momentsEstimatorsAtNewPoints, rewProc.quantitiesConsidered,
-																reweighterIO.columnsToBeReweightedUsingMultipleColumns,
-																reweighterIO.namesOfParametersIgnoringMetaParameters.size(), maximumMomentNeededOverall);
+		for(auto rewProc: reweightingProceduresToBePerformed){
+			printInformationAboutReweightingProcedure(rewProc);
+			MomentsReweighter momentsReweighter(getRawDataForReweightingAndMetainformation(rewProc.momentsToBeReweighted, rewProc.binsizesToBeUsed));
+			if(valuesOfNewParameters.empty()) valuesOfNewParameters = momentsReweighter.getValuesOfNewParameters();
+			std::vector<std::vector<Moments> > momentsAtNewPoints = momentsReweighter.getMomentsAtNewPoints();
+			std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints = momentsReweighter.getMomentsEstimatorsAtNewPoints();
+			checkSizesOfMomentsAndMomentsEstimators(momentsAtNewPoints, momentsEstimatorsAtNewPoints, numberOfNewPoints, numberOfObservablesInFiles);
+			setObservablesAtNewPointsFromMomentsAndMomentEstimators(observablesAtNewPoints, reweighterIO.isMeanKnownToBeZero, reweighterIO.errorMethod,
+																	momentsAtNewPoints, momentsEstimatorsAtNewPoints, rewProc.quantitiesConsidered,
+																	reweighterIO.columnsToBeReweightedUsingMultipleColumns,
+																	reweighterIO.namesOfParametersIgnoringMetaParameters.size(), maximumMomentNeededOverall);
+		}
+
+		//Set manually mean to zero if mean is known to be zero and MEAN is asked
+		if(reweighterIO.isMeanKnownToBeZero && find(quantitiesToBeReweighted.begin(), quantitiesToBeReweighted.end(), Mean::observableName) != quantitiesToBeReweighted.end())
+			setMeanToZeroAtNewPoints(observablesAtNewPoints);
 	}
-
-	//Set manually mean to zero if mean is known to be zero and MEAN is asked
-	if(reweighterIO.isMeanKnownToBeZero && find(quantitiesToBeReweighted.begin(), quantitiesToBeReweighted.end(), Mean::observableName) != quantitiesToBeReweighted.end())
-		setMeanToZeroAtNewPoints(observablesAtNewPoints);
 }
 
 

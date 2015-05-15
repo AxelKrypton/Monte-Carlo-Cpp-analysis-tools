@@ -98,7 +98,8 @@ std::vector<int> SimulationDataContainer::getNumberOfEntriesLeftOut(std::vector<
  * Here the strategy is to insert at the end the moments for all columns and then delete the original columns
  */
 SimulationDataContainer SimulationDataContainer::buildAndGetMomentsPerData(std::vector<unsigned int> whichMoments, unsigned int ignoreFirstNColumns,
-																		   std::vector<unsigned int> columnsForWhichMultipleColumnsForMomentsAreUsed)
+																		   std::vector<unsigned int> columnsForWhichMultipleColumnsForMomentsAreUsed,
+																		   unsigned int maximumMomentNeededOverall)
 {
     SimulationDataContainer newSimDataCont(*this);
     for(size_t i=0; i<columnsForWhichMultipleColumnsForMomentsAreUsed.size(); i++){
@@ -117,7 +118,7 @@ SimulationDataContainer SimulationDataContainer::buildAndGetMomentsPerData(std::
                 }
                 j++;
             }else{
-                unsigned int maxMoment = *max_element(whichMoments.begin(), whichMoments.end());
+                unsigned int maxMoment = (maximumMomentNeededOverall ==0 ) ? *max_element(whichMoments.begin(), whichMoments.end()) : maximumMomentNeededOverall;
                 if(int(j+maxMoment-1) >= simulationDataSet[i].getNumberOfDataSample())
                     throw std::out_of_range("Columns specified not valid to add specified moments using multipleColumns!");
                 std::vector<DataSample> temporarySamples;
