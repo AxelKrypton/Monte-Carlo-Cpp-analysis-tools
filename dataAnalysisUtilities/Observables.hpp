@@ -238,7 +238,7 @@ public:
 			std::string metaInfos = "";
 			for (uint index = 0; index < observableNames.size(); index ++)
 			{
-				metaInfos += observableNames[index] + "\t\terror\t\t";
+				metaInfos += observableNames[index] + "\t\t\terror\t\t\t";
 			}
 			return metaInfos;
 		}
@@ -246,6 +246,7 @@ public:
 		std::string getObservablesAsString()
 		{
 			std::stringstream values;
+			values.precision(12);
 			values << std::scientific;
 			values << mean.estimate << "\t" << mean.error<< "\t" ;
 			values << susceptibility.estimate << "\t" << susceptibility.error << "\t";

@@ -175,9 +175,14 @@ functionForEstimators Variance::getFunctionToBeAppliedToEstimators(bool useMulti
 	if(isMeanZero)
 		return [] (MomentsEstimators in) -> DataSample { return in[2]; };
 	else{
-		if(useMultipleEstimate)
-			return [] (MomentsEstimators in) -> DataSample { return in[2] - getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2); };
-		else
+		if(useMultipleEstimate){
+			return [] (MomentsEstimators in) -> DataSample {
+				DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
+				return in[2] - firstMoment * firstMoment;
+
+//				return in[2] - getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2);
+			};
+		}else
 			return [] (MomentsEstimators in) -> DataSample { return in[2] - (in[1] ^ 2); };
 	}
 }
@@ -187,9 +192,14 @@ functionForObservable Variance::getFunctionToCalculateObservable(bool useMultipl
 	if(isMeanZero)
 		return [] (Moments in) -> double { return in[2]; };
 	else{
-		if(useMultipleEstimate)
-			return [] (Moments in) -> double { return in[2] - getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2); };
-		else
+		if(useMultipleEstimate){
+			return [] (Moments in) -> double {
+				double firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 1);
+				return in[2] - firstMoment * firstMoment;
+
+//				return in[2] - getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2);
+			};
+		}else
 			return [] (Moments in) -> double { return in[2] - in[1] * in[1]; };
 	}
 }
@@ -253,9 +263,11 @@ functionForEstimators Skewness::getFunctionToBeAppliedToEstimators(bool useMulti
 		if(useMultipleEstimate){
 			return [] (MomentsEstimators in) -> DataSample {
 				DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
-				DataSample firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2);
-				DataSample firstMomentCubic = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 3);
-				return (in[3] - ((3 * in[2]) * firstMoment) + (2 * firstMomentCubic))/((in[2] - firstMomentSquared) ^ 1.5);
+				return (in[3] - ((3 * in[2]) * firstMoment) + (2 * firstMoment * firstMoment * firstMoment))/((in[2] - firstMoment * firstMoment) ^ 1.5);
+
+//				DataSample firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2);
+//				DataSample firstMomentCubic = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 3);
+//				return (in[3] - ((3 * in[2]) * firstMoment) + (2 * firstMomentCubic))/((in[2] - firstMomentSquared) ^ 1.5);
 			};
 		}else
 			return [] (MomentsEstimators in) -> DataSample { return (in[3] - ((3 * in[2]) * in[1]) + (2 * (in[1] ^ 3)))/((in[2] - (in[1] ^ 2)) ^ 1.5); };
@@ -270,10 +282,12 @@ functionForObservable Skewness::getFunctionToCalculateObservable(bool useMultipl
 		if(useMultipleEstimate){
 			return [] (Moments in) -> double {
 				double firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 1);
-				double firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2);
-				double firstMomentCubic = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 3);
 				double x2 = in[2]; double x3 = in[3];
-				return (x3-3*x2*firstMoment+2*firstMomentCubic)/(pow(x2-firstMomentSquared, 1.5));
+				return (x3-3*x2*firstMoment+2*firstMoment*firstMoment*firstMoment)/(pow(x2-firstMoment*firstMoment, 1.5));
+
+//				double firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2);
+//				double firstMomentCubic = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 3);
+//				return (x3-3*x2*firstMoment+2*firstMomentCubic)/(pow(x2-firstMomentSquared, 1.5));
 			};
 		}else{
 			return [] (Moments in) -> double {
@@ -344,9 +358,11 @@ functionForEstimators BinderCumulant::getFunctionToBeAppliedToEstimators(bool us
 		if(useMultipleEstimate){
 			return [] (MomentsEstimators in) -> DataSample {
 				DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
-				DataSample firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2);
-				DataSample firstMomentQuartic = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 4);
-				return (in[4] - (4 * in[3] * firstMoment) + (6 * in[2] * firstMomentSquared) - (3 * firstMomentQuartic))/((in[2] - firstMomentSquared) ^ 2);
+				return (in[4] - (4 * in[3] * firstMoment) + (6 * in[2] * firstMoment * firstMoment) - (3 * firstMoment * firstMoment * firstMoment * firstMoment))/((in[2] - (firstMoment ^ 2)) ^ 2);
+
+//				DataSample firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2);
+//				DataSample firstMomentQuartic = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 4);
+//				return (in[4] - (4 * in[3] * firstMoment) + (6 * in[2] * firstMomentSquared) - (3 * firstMomentQuartic))/((in[2] - firstMomentSquared) ^ 2);
 			};
 		}else{
 			return [] (MomentsEstimators in) -> DataSample {
@@ -364,10 +380,12 @@ functionForObservable BinderCumulant::getFunctionToCalculateObservable(bool useM
 		if(useMultipleEstimate){
 			return [] (Moments in) -> double {
 				double firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 1);
-				double firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2);
-				double firstMomentQuartic = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 4);
 				double x2 = in[2]; double x3 = in[3]; double x4 = in[4];
-				return (x4-4*x3*firstMoment+6*x2*firstMomentSquared-3*firstMomentQuartic)/(pow(x2-firstMomentSquared, 2.0));
+				return (x4-4*x3*firstMoment+6*x2*firstMoment*firstMoment-3*firstMoment*firstMoment*firstMoment*firstMoment)/(pow(x2-firstMoment*firstMoment, 2.0));
+
+//				double firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2);
+//				double firstMomentQuartic = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 4);
+//				return (x4-4*x3*firstMoment+6*x2*firstMomentSquared-3*firstMomentQuartic)/(pow(x2-firstMomentSquared, 2.0));
 			};
 		}else{
 			return [] (Moments in) -> double {
