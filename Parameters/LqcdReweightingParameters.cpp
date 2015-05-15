@@ -1,8 +1,18 @@
 #include "LqcdReweightingParameters.hpp"
+#include <sys/ioctl.h>
+#include <stdio.h>
+#include <unistd.h>
+
+static std::string getHelpDescription(std::string);
+static unsigned int getTerminalWidth();
 
 LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** argv) 
 {
-	po::options_description desc("   Options for reweighting data from LQCD simulations.\nNOTE: Reweighting is currently implemented in beta only!\nUsage: \"--<optionName>=<value>\" (or \"-<shortOptionName><value>\")\nNote that boolean options can be changed from their default value implicitly, ie without giving explicitly true or false in the command line.\nFor example, \"--doNotUseBinning\" equals \"--doNotUseBinning true\" (as the default value is false)");
+	po::options_description desc("\nOptions for reweighting data from LQCD simulations.\nNOTE: "
+								 "Reweighting is currently implemented in beta only!\nUsage: \"--<optionName>=<value>\" "
+								 "(or \"-<shortOptionName><value>\")\nNote that boolean options can be changed from their default value implicitly, "
+								 "ie without giving explicitly true or false in the command line.\nFor example, \"--doNotUseBinning\" equals "
+								 "\"--doNotUseBinning true\" (as the default value is false)", getTerminalWidth()/10*9);
 	po::variables_map vm;
 	po::positional_options_description positionalOptions;
 
@@ -17,7 +27,8 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
 		("deactivateReweightingForVariance", po::value<bool>(&deactivateReweightingForVariance)->default_value(false)->implicit_value(true), "Do not perform reweighting for the variance of the data.")
 		("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false)->implicit_value(true), "Do not perform reweighting for the skewness of the data.")
         ("deactivateReweightingForBinder", po::value<bool>(&deactivateReweightingForBinder)->default_value(false)->implicit_value(true), "Do not perform reweighting for the binder cumulant of the data.")
-        ("obsMultipleColumns", po::value<std::vector<unsigned int> >(&columnsToBeReweightedUsingMultipleColumns)->multitoken(), "Number of FIRST column containing observable to be reweighted using several columns for higher moments. ATTENTION: Column ranges start from ZERO!")
+        ("obsMultipleColumns", po::value<std::vector<unsigned int> >(&columnsToBeReweightedUsingMultipleColumns)->multitoken(), getHelpDescription("obsMultipleColumns").c_str())
+        ("numberOfMultipleColumns", po::value<unsigned int>(&numberOfMultipleColumnsForSingleObservable)->default_value(0), "Number of columns to be considered referred to the same observable.")
         ("isMeanKnownToBeZero", po::value<bool>(&isMeanKnownToBeZero)->default_value(false)->implicit_value(true), "ALL observables are known a priori to have zero mean.")
         ("useJackknifeAsErrorMethod", po::value<bool>(&useJackknifeAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Jackknife. ATTENTION: This method implies to use the biggest binsize for all raw data points. Unless the statistics is such that the number of uncorrelated data points is not affected, this method will in general overestimate the errors!!!")
         ("useBootstrapAsErrorMethod", po::value<bool>(&useBootstrapAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Bootstrap.")
@@ -204,3 +215,29 @@ bool LqcdReweightingParameters::getIsMeanKnownToBeZero()
 	return isMeanKnownToBeZero;
 }
 
+unsigned int LqcdReweightingParameters::getNumberOfMultipleColumnsForSingleObservable()
+{
+	return numberOfMultipleColumnsForSingleObservable;
+}
+
+/***************************************************************************/
+
+static std::string getHelpDescription(std::string option){
+	std::string description="";
+	if(option == "obsMultipleColumns"){
+		description += "Number of FIRST column in the file containing observable to be reweighted using several columns for higher moments. ";
+		description += "Do not forget that the first column (column 0) is reserved for the gauge action. In general the expected ";
+		description += "number of columns for the same observable is equal to the maximum moment needed in the reweighting of the ";
+		description += "required quantities (e.g. 3 if only mean and skewness are asked to be reweighted). Use the option ";
+		description += "--numberOfMultipleColumnsForSingleObservable whenever you want to force the program to consider a different ";
+		description += "number of columns for single observable. ATTENTION: Column ranges start from ZERO!";
+	}else
+		throw std::invalid_argument("Unknown option in \"getHelpDescription\" function!");
+	return description;
+}
+
+static unsigned int getTerminalWidth(){
+    struct winsize w; //w.ws_row and w.ws_col
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    return w.ws_col;
+}

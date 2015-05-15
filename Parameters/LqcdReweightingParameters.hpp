@@ -44,6 +44,7 @@ public:
 	int getNumberOfBootstrapResample();
 	double getWeightPrecision();
 	bool getIsMeanKnownToBeZero();
+	unsigned int getNumberOfMultipleColumnsForSingleObservable();
 
 	struct parse_aborted {};
 	
@@ -66,6 +67,7 @@ private:
 	int numberOfBootstrapResample;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
     bool isMeanKnownToBeZero;
+    unsigned int numberOfMultipleColumnsForSingleObservable;
 };
 
 #endif

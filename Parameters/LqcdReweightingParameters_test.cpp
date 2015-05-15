@@ -134,6 +134,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getUseSimulatedPointsAsNewPoints() );
 	}
 
+	BOOST_AUTO_TEST_CASE(numColsForSingleObs)
+	{
+		unsigned int defaultValue = 0;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfMultipleColumnsForSingleObservable() );
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(setArguments)
@@ -339,6 +345,13 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         refValues.push_back(5);
         BOOST_REQUIRE(refValues == createParametersForArgumentSettingCheck_string(argumentName, newValues).getColumnsToBeReweightedUsingMultipleColumns() );
     }
+
+	BOOST_AUTO_TEST_CASE(numColsForSingleObs)
+	{
+		double newValue = 4;
+		std::string argumentName = "--numberOfMultipleColumns";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfMultipleColumnsForSingleObservable() );
+	}
 
 	BOOST_AUTO_TEST_CASE(weightPrecision)
 	{
