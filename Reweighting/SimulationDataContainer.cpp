@@ -10,12 +10,12 @@
 
 static void checkIfDatafileExists(std::string);
 static bool isLastEntryPresentMoreThanOnce(std::vector<std::string>);
-static bool isLastMapPresentMoreThanOnce(std::vector<std::map<std::string, double> >);
-static bool mapCompare(const std::map<std::string, double>&, const std::map<std::string, double>&);
-static bool isAnyMapEmpty(std::vector<std::map<std::string, double> >);
+static bool isLastMapPresentMoreThanOnce(std::vector<std::map<std::string, realFloat> >);
+static bool mapCompare(const std::map<std::string, realFloat>&, const std::map<std::string, realFloat>&);
+static bool isAnyMapEmpty(std::vector<std::map<std::string, realFloat> >);
 static void extractInformationFromFile(std::string fileIn,
                                        std::vector<std::string>& dataFilenames,
-                                       std::vector<std::map<std::string, double> >& dataParameters);
+                                       std::vector<std::map<std::string, realFloat> >& dataParameters);
 static DataSample getMomentUsingMultipleColumns(const int, std::vector<DataSample>);
 static DataSampleBasic getRandomlyOneDataPerBinFromDataSample(DataSampleBasic, const int, bool, std::default_random_engine* = NULL);
 /*****************************************************************************************/
@@ -29,7 +29,7 @@ SimulationDataContainer::SimulationDataContainer(std::string informationFile)
 {
 	checkIfDatafileExists(informationFile);
 	std::vector<std::string> dataFilenames;
-	std::vector<std::map<std::string, double> > dataParameters;
+	std::vector<std::map<std::string, realFloat> > dataParameters;
 	extractInformationFromFile(informationFile, dataFilenames, dataParameters);
 	if(isAnyMapEmpty(dataParameters))
 		throw std::logic_error("In given file \"" + informationFile + "\", no parameters for at least one simulation!");
@@ -152,7 +152,7 @@ SimulationDataContainer SimulationDataContainer::buildAndGetMomentsPerData(std::
 /*****************************************************************************************/
 
 static void extractInformationFromFile(std::string fileIn,
-    std::vector<std::string>& dataFilenames, std::vector<std::map<std::string, double> >& dataParameters)
+    std::vector<std::string>& dataFilenames, std::vector<std::map<std::string, realFloat> >& dataParameters)
 {
 	std::ifstream infile(fileIn.c_str());
 	if(!infile.is_open())
@@ -165,9 +165,9 @@ static void extractInformationFromFile(std::string fileIn,
 			line = line.substr(0, line.find("#", 0)); //remove everything after '#' in each line
 
 			std::stringstream ss(line);
-			double auxForParameterValue;
+			realFloat auxForParameterValue;
 			std::string auxForParameterName, auxForFilename;
-			std::map<std::string, double> auxMap;
+			std::map<std::string, realFloat> auxMap;
 
 			(ss >> auxForFilename) ? dataFilenames.push_back(auxForFilename)
 					               : throw std::runtime_error("Error reading datafile \"" + fileIn + "\"");
@@ -208,7 +208,7 @@ static bool isLastEntryPresentMoreThanOnce(std::vector<std::string> filenames){
 	return (filenames.size() > 1) && (std::find(filenames.begin(), filenames.end()-1, filenames.back()) != filenames.end()-1);
 }
 
-static bool isLastMapPresentMoreThanOnce(std::vector<std::map<std::string, double> > parameters){
+static bool isLastMapPresentMoreThanOnce(std::vector<std::map<std::string, realFloat> > parameters){
 	for(size_t i = 0; i<parameters.size()-1; i++){
 		if(mapCompare(parameters[i], parameters.back()))
 			return true;
@@ -216,11 +216,11 @@ static bool isLastMapPresentMoreThanOnce(std::vector<std::map<std::string, doubl
 	return false;
 }
 
-static bool mapCompare (const std::map<std::string, double>& lhs, const std::map<std::string, double>& rhs) {
+static bool mapCompare (const std::map<std::string, realFloat>& lhs, const std::map<std::string, realFloat>& rhs) {
     return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
-static bool isAnyMapEmpty(std::vector<std::map<std::string, double> > dataParameters){
+static bool isAnyMapEmpty(std::vector<std::map<std::string, realFloat> > dataParameters){
 	for(size_t i=0; i<dataParameters.size(); i++){
 		if(dataParameters[i].size() == 0)
 			return true;

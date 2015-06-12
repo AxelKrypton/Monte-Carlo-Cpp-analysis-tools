@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_SUITE(withNumberOfBins_binning)
 	 * leaving out the number of elements that "fall" away during binning.
 	 */
 
-	static void testBinningWithNumberOfBins(int numberOfElements, int numberOfBins, double expectedFirstMoment)
+	static void testBinningWithNumberOfBins(int numberOfElements, int numberOfBins, realFloat expectedFirstMoment)
 	{
 		TestDataSample<> testSample(numberOfElements, arrayPosition);
 		DataSample* originalSample = testSample.getDataSample();
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_SUITE(withNumberOfBins_binning)
 	{
 		int evenNumberOfElements = 24;
 		int evenDesiredNumberOfElementsOfBinnedDataSample = 12;
-		double expectedFirstMoment = 11.5;
+		realFloat expectedFirstMoment = 11.5;
 		testBinningWithNumberOfBins(evenNumberOfElements, evenDesiredNumberOfElementsOfBinnedDataSample, expectedFirstMoment);
 	}
 
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_SUITE(withNumberOfBins_binning)
 	{
 		int oddNumberOfElements = 25;
 		int evenDesiredNumberOfElementsOfBinnedDataSample = 12;
-		double expectedFirstMoment = 11.5;
+		realFloat expectedFirstMoment = 11.5;
 		testBinningWithNumberOfBins(oddNumberOfElements, evenDesiredNumberOfElementsOfBinnedDataSample, expectedFirstMoment);
 	}
 
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_SUITE(withNumberOfBins_binning)
 	{
 		int evenNumberOfElements = 26;
 		int oddDesiredNumberOfElementsOfBinnedDataSample = 11;
-		double expectedFirstMoment = 10.5;
+		realFloat expectedFirstMoment = 10.5;
 		testBinningWithNumberOfBins(evenNumberOfElements, oddDesiredNumberOfElementsOfBinnedDataSample, expectedFirstMoment);
 	}
 
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_SUITE(withNumberOfBins_binning)
 	{
 		int oddNumberOfElements = 29;
 		int oddDesiredNumberOfElementsOfBinnedDataSample = 9;
-		double expectedFirstMoment = 13.;
+		realFloat expectedFirstMoment = 13.;
 		testBinningWithNumberOfBins(oddNumberOfElements, oddDesiredNumberOfElementsOfBinnedDataSample, expectedFirstMoment);
 	}
 
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_SUITE(withBinsize_binning)
 	 * leaving out the number of elements that "fall" away during binning.
 	 */
 
-	void testBinningWithBinsize(int numberOfElements, int binsize, double expectedFirstMoment)
+	void testBinningWithBinsize(int numberOfElements, int binsize, realFloat expectedFirstMoment)
 	{
 		TestDataSample<> testSample(numberOfElements, arrayPosition);
 		DataSample* originalSample = testSample.getDataSample();
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_SUITE(withBinsize_binning)
 	{
 		int evenNumberOfElements = 24;
 		int evenBinsize = 12;
-		double expectedFirstMoment = 11.5;
+		realFloat expectedFirstMoment = 11.5;
 		testBinningWithBinsize(evenNumberOfElements, evenBinsize, expectedFirstMoment);
 	}
 
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_SUITE(withBinsize_binning)
 	{
 		int oddNumberOfElements = 21;
 		int evenBinsize = 12;
-		double expectedFirstMoment = 5.5;
+		realFloat expectedFirstMoment = 5.5;
 		testBinningWithBinsize(oddNumberOfElements, evenBinsize, expectedFirstMoment);
 	}
 
@@ -274,7 +274,7 @@ BOOST_AUTO_TEST_SUITE(withBinsize_binning)
 	{
 		int evenNumberOfElements = 34;
 		int oddBinsize = 3;
-		double expectedFirstMoment = 16.;
+		realFloat expectedFirstMoment = 16.;
 		testBinningWithBinsize(evenNumberOfElements, oddBinsize, expectedFirstMoment);
 	}
 
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_SUITE(withBinsize_binning)
 	{
 		int oddNumberOfElements = 47;
 		int oddBinsize = 19;
-		double expectedFirstMoment = 18.5;
+		realFloat expectedFirstMoment = 18.5;
 		testBinningWithBinsize(oddNumberOfElements, oddBinsize, expectedFirstMoment);
 	}
 
@@ -299,9 +299,9 @@ BOOST_AUTO_TEST_SUITE(binningWithBinsizeAndNumberOfBins)
 
 		DataSampleBasic tmp (filename);
 		BinnedDataSampleFromBinsize binnedSample(tmp, binsize);
-		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), 1., doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), 1., realFloatPrecisionInPercent);
 		BinnedDataSampleFromNumberOfBins binnedSample2 (tmp, numberOfBins);
-		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), binnedSample2.getNthMoment(1), doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), binnedSample2.getNthMoment(1), realFloatPrecisionInPercent);
 	}
 
 	static void testBinningWithBinsizeAndNumberOfBins(std::string filename, int desiredBinsize, int desiredNumberOfBins)
@@ -309,8 +309,8 @@ BOOST_AUTO_TEST_SUITE(binningWithBinsizeAndNumberOfBins)
 		DataSampleBasic tmp (filename);
 		BinnedDataSampleFromBinsize binnedSample (tmp, desiredBinsize);
 		BinnedDataSampleFromNumberOfBins binnedSample2 (tmp, desiredNumberOfBins);
-		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), binnedSample2.getNthMoment(1), doublePrecisionInPercent);
-		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(2), binnedSample2.getNthMoment(2), doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(1), binnedSample2.getNthMoment(1), realFloatPrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(binnedSample.getNthMoment(2), binnedSample2.getNthMoment(2), realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(test2)

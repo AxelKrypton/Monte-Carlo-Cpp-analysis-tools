@@ -1,6 +1,7 @@
 #ifndef OBSERVABLES_HPP_
 #define OBSERVABLES_HPP_
 
+#include "../types.hpp"
 #include <map>
 #include <sstream>
 #include <array>
@@ -30,11 +31,11 @@ enum ErrorCalculationMethod { bootstrap = 1, jackknife };
 class Moments {
 public:
 	Moments(){};
-	void insert(const unsigned int& whichMoment, const double& momentValue){
-		moments.insert(std::pair<unsigned int, double>(whichMoment, momentValue));
+	void insert(const unsigned int& whichMoment, const realFloat& momentValue){
+		moments.insert(std::pair<unsigned int, realFloat>(whichMoment, momentValue));
 	}
-	double operator[](const unsigned int& whichMoment){
-		std::multimap<unsigned int, double>::iterator itWhichMoment = moments.find(whichMoment);
+	realFloat operator[](const unsigned int& whichMoment){
+		std::multimap<unsigned int, realFloat>::iterator itWhichMoment = moments.find(whichMoment);
 		if(itWhichMoment == moments.end())
 			throw std::out_of_range("Moments::[] accessed an invalid moment! Aborting...");
 		else if(moments.count(itWhichMoment->first) > 1)
@@ -42,22 +43,22 @@ public:
 		else
 			return itWhichMoment->second;
 	}
-	std::vector<double> operator()(const unsigned int& whichMoment){
-		std::multimap<unsigned int, double>::iterator itWhichMoment = moments.find(whichMoment);
+	std::vector<realFloat> operator()(const unsigned int& whichMoment){
+		std::multimap<unsigned int, realFloat>::iterator itWhichMoment = moments.find(whichMoment);
 		if(itWhichMoment == moments.end())
 			throw std::out_of_range("Moments::() accessed an invalid moment! Aborting...");
 		else if(moments.count(itWhichMoment->first) == 1)
 			throw std::invalid_argument("Moments::() accessed a moment for which only one value is set, NOT ALLOWED! Aborting...");
 		else{
-			std::vector<double> returnVec;
-			std::multimap<unsigned int, double>::iterator itRangeWhichMoment;
+			std::vector<realFloat> returnVec;
+			std::multimap<unsigned int, realFloat>::iterator itRangeWhichMoment;
 			for (itRangeWhichMoment=moments.equal_range(itWhichMoment->first).first; itRangeWhichMoment!=moments.equal_range(itWhichMoment->first).second; ++itRangeWhichMoment)
 				returnVec.push_back(itRangeWhichMoment->second);
 			return returnVec;
 		}
 	}
 private:
-	std::multimap<unsigned int, double> moments;
+	std::multimap<unsigned int, realFloat> moments;
 };
 
 class MomentsEstimators {
@@ -107,7 +108,7 @@ private:
  *       Think whether put it as private member and in case do it.
  */
 
-typedef std::function<double(Moments)> functionForObservable;
+typedef std::function<realFloat(Moments)> functionForObservable;
 typedef std::function<DataSample(MomentsEstimators)> functionForEstimators;
 typedef DataSample (*functionForEstimatorsForJackknife)(std::vector<DataSample>);
 /*

@@ -1,6 +1,8 @@
 #ifndef LQCDREWEIGHTINGPARAMETERS_HPP_
 #define LQCDREWEIGHTINGPARAMETERS_HPP_
 
+#include "../types.hpp"
+
 #include "iostream"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -13,8 +15,8 @@ class ReweightingParameters{
 	 * TODO: implement! Here the methods for a general reweighting in N par should be put.
 	 *       Then the LqcdReweightingParameters should be a particular case of this class.
 	 *       One idea is to make some getters here be overwritten by those of the child class.
-	 *       For example here getNewBetaRange_low should return a std::vector<double> and
-	 *       in LqcdReweightingParameters just one double. Actually I do not know if this can
+	 *       For example here getNewBetaRange_low should return a std::vector<realFloat> and
+	 *       in LqcdReweightingParameters just one realFloat. Actually I do not know if this can
 	 *       be done overwriting methods, maybe a class template would be better. For the moment
 	 *       leave like that since we can use polymorphism in the Reweighter class constructor!
 	 */
@@ -31,8 +33,8 @@ public:
 	std::string getInputfile();
 	std::string getOutputfilePrefix();
 	uint getNumberOfNewBetaPoints();
-	double getNewBetaRange_low();
-	double getNewBetaRange_high();
+	realFloat getNewBetaRange_low();
+	realFloat getNewBetaRange_high();
 	bool getDeactivateReweightingForMean();
 	bool getDeactivateReweightingForVariance();
 	bool getDeactivateReweightingForSkewness();
@@ -42,7 +44,7 @@ public:
 	bool getUseBootstrapAsErrorMethod();
 	bool getUseSimulatedPointsAsNewPoints();
 	int getNumberOfBootstrapResample();
-	double getWeightPrecision();
+	realFloat getWeightPrecision();
 	bool getIsMeanKnownToBeZero();
 	unsigned int getNumberOfMultipleColumnsForSingleObservable();
 
@@ -54,8 +56,8 @@ private:
 	std::string inputfile;
 	std::string outputfilePrefix;
 	uint numberOfNewBetaPoints;
-	double newBetaRange_low;
-	double newBetaRange_high;
+	realFloat newBetaRange_low;
+	realFloat newBetaRange_high;
 	bool deactivateReweightingForMean;
 	bool deactivateReweightingForVariance;
 	bool deactivateReweightingForSkewness;
@@ -63,7 +65,7 @@ private:
 	bool useJackknifeAsErrorMethod;
 	bool useBootstrapAsErrorMethod;
 	bool useSimulatedPointsAsNewPoints;
-	double weightPrecision;
+	realFloat weightPrecision;
 	int numberOfBootstrapResample;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
     bool isMeanKnownToBeZero;

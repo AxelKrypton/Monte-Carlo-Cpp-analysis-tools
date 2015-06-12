@@ -15,7 +15,7 @@ SimulationData::SimulationData()
 	throw std::invalid_argument("SimulationData needs input file for construction!");
 }
 
-SimulationData::SimulationData(std::map<std::string, double> simulationParametersIn, std::string filenameIn, const int offset) :
+SimulationData::SimulationData(std::map<std::string, realFloat> simulationParametersIn, std::string filenameIn, const int offset) :
 	simulationParameters(simulationParametersIn), datafileName(filenameIn)
 {
 	if(simulationParametersIn.size() == 0)
@@ -58,12 +58,12 @@ int SimulationData::getNumberOfDataSample(){
 }
 
 
-std::map<std::string, double> SimulationData::getSimulationParameters(){
+std::map<std::string, realFloat> SimulationData::getSimulationParameters(){
 	return simulationParameters;
 }
 
 
-double SimulationData::getParameterValue(std::string parameterName)
+realFloat SimulationData::getParameterValue(std::string parameterName)
 {
 	//This would be one line with c++11 with .at()
 	if(simulationParameters.find(parameterName) == simulationParameters.end())

@@ -4,7 +4,7 @@
 
 #include <random>
 #include "SimulationDataContainer.hpp"
-#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePrecisionInPercent
+#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For realFloatPrecisionInPercent
 
 BOOST_AUTO_TEST_SUITE(build)
 
@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_SUITE(InsertCentralMoments)
         std::vector<unsigned int> moments{0,1};
         simDataCont = simDataCont.buildAndGetMomentsPerData(moments, 0);
         const int newNumberOfColumns = 6;
-        const double FilesAfter[3][6][3] = {{{1.0, 1.0, 1.0}, {1.1, 1.4, 1.7}, {1.0, 1.0, 1.0}, {1.2, 1.5, 1.8}, {1.0, 1.0, 1.0}, {1.3, 1.6, -1.9}},
+        const realFloat FilesAfter[3][6][3] = {{{1.0, 1.0, 1.0}, {1.1, 1.4, 1.7}, {1.0, 1.0, 1.0}, {1.2, 1.5, 1.8}, {1.0, 1.0, 1.0}, {1.3, 1.6, -1.9}},
         									{{1.0, 1.0, 1.0}, {2.1, 2.4, 2.7}, {1.0, 1.0, 1.0}, {2.2, 2.5, 2.8}, {1.0, 1.0, 1.0}, {2.3, -2.6, 2.9}},
         									{{1.0, 1.0, 1.0}, {3.1, 3.4, 3.7}, {1.0, 1.0, 1.0}, {3.2, 3.5, 3.8}, {1.0, 1.0, 1.0}, {-3.3, 3.6, -3.9}}};
 
@@ -252,14 +252,14 @@ BOOST_AUTO_TEST_SUITE(InsertCentralMoments)
         std::vector<unsigned int> useMultipleColumns{0};
         simDataCont = simDataCont.buildAndGetMomentsPerData(moments, 0, useMultipleColumns);
         const int newNumberOfColumns = 3;
-        const double SecondMoment[3] = {0.688333333333333, 0.648333333333333, 0.588333333333333,};
-        const double ThirdMoment[3] = {-21.7715, -27.2085, -33.4555};
-        const double FourthMoment[3] = {-163.68, -218.484, -285.1368};
+        const realFloat SecondMoment[3] = {0.688333333333333, 0.648333333333333, 0.588333333333333,};
+        const realFloat ThirdMoment[3] = {-21.7715, -27.2085, -33.4555};
+        const realFloat FourthMoment[3] = {-163.68, -218.484, -285.1368};
         BOOST_REQUIRE_EQUAL(simDataCont[0].getNumberOfDataSample(), newNumberOfColumns);
         for(int i=0; i<3; i++){
-            BOOST_REQUIRE_CLOSE(simDataCont[0][0][i], SecondMoment[i], doublePrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(simDataCont[0][1][i], ThirdMoment[i], doublePrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(simDataCont[0][2][i], FourthMoment[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][0][i], SecondMoment[i], realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][1][i], ThirdMoment[i], realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][2][i], FourthMoment[i], realFloatPrecisionInPercent);
         }
     }
 
@@ -271,20 +271,20 @@ BOOST_AUTO_TEST_SUITE(InsertCentralMoments)
         std::vector<unsigned int> useMultipleColumns{0};
         simDataCont = simDataCont.buildAndGetMomentsPerData(moments, 0, useMultipleColumns);
         const int newNumberOfColumns = 6;
-        const double FirstMoment1[3] = {3.1, 3.4, 3.7};
-        const double FirstMoment2[3] = {3.2, 3.5, 3.8};
-        const double FirstMoment3[3] = {-3.3, -3.6, -3.9};
-        const double FirstMoment4[3] = {5.0, 5.1, 5.2};
-        const double SecondMoment[3] = {0.688333333333333, 0.648333333333333, 0.588333333333333,};
-        const double FourthMoment[3] = {-163.68, -218.484, -285.1368};
+        const realFloat FirstMoment1[3] = {3.1, 3.4, 3.7};
+        const realFloat FirstMoment2[3] = {3.2, 3.5, 3.8};
+        const realFloat FirstMoment3[3] = {-3.3, -3.6, -3.9};
+        const realFloat FirstMoment4[3] = {5.0, 5.1, 5.2};
+        const realFloat SecondMoment[3] = {0.688333333333333, 0.648333333333333, 0.588333333333333,};
+        const realFloat FourthMoment[3] = {-163.68, -218.484, -285.1368};
         BOOST_REQUIRE_EQUAL(simDataCont[0].getNumberOfDataSample(), newNumberOfColumns);
         for(int i=0; i<3; i++){
-            BOOST_REQUIRE_CLOSE(simDataCont[0][0][i], SecondMoment[i], doublePrecisionInPercent);
-        	BOOST_REQUIRE_CLOSE(simDataCont[0][1][i], FirstMoment1[i], doublePrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(simDataCont[0][2][i], FirstMoment2[i], doublePrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(simDataCont[0][3][i], FirstMoment3[i], doublePrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(simDataCont[0][4][i], FirstMoment4[i], doublePrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(simDataCont[0][5][i], FourthMoment[i], doublePrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][0][i], SecondMoment[i], realFloatPrecisionInPercent);
+        	BOOST_REQUIRE_CLOSE(simDataCont[0][1][i], FirstMoment1[i], realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][2][i], FirstMoment2[i], realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][3][i], FirstMoment3[i], realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][4][i], FirstMoment4[i], realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(simDataCont[0][5][i], FourthMoment[i], realFloatPrecisionInPercent);
         }
     }
 
@@ -295,7 +295,7 @@ BOOST_AUTO_TEST_SUITE(InsertCentralMoments)
 		std::vector<unsigned int> moments{0,1};
 		simDataCont = simDataCont.buildAndGetMomentsPerData(moments, 1);
 		const int newNumberOfColumns = 5;
-		const double FilesAfter[3][5][3] = {{{1.1, 1.4, 1.7}, {1.0, 1.0, 1.0}, {1.2, 1.5, 1.8}, {1.0, 1.0, 1.0}, {1.3, 1.6, -1.9}},
+		const realFloat FilesAfter[3][5][3] = {{{1.1, 1.4, 1.7}, {1.0, 1.0, 1.0}, {1.2, 1.5, 1.8}, {1.0, 1.0, 1.0}, {1.3, 1.6, -1.9}},
 											{{2.1, 2.4, 2.7}, {1.0, 1.0, 1.0}, {2.2, 2.5, 2.8}, {1.0, 1.0, 1.0}, {2.3, -2.6, 2.9}},
 											{{3.1, 3.4, 3.7}, {1.0, 1.0, 1.0}, {3.2, 3.5, 3.8}, {1.0, 1.0, 1.0}, {-3.3, 3.6, -3.9}}};
 
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_SUITE(InsertCentralMoments)
 		std::vector<unsigned int> moments{0,1};
 		simDataCont = simDataCont.buildAndGetMomentsPerData(moments, 2);
 		const int newNumberOfColumns = 4;
-		const double FilesAfter[3][4][3] = {{{1.1, 1.4, 1.7}, {1.2, 1.5, 1.8}, {1.0, 1.0, 1.0}, {1.3, 1.6, -1.9}},
+		const realFloat FilesAfter[3][4][3] = {{{1.1, 1.4, 1.7}, {1.2, 1.5, 1.8}, {1.0, 1.0, 1.0}, {1.3, 1.6, -1.9}},
 											{{2.1, 2.4, 2.7}, {2.2, 2.5, 2.8}, {1.0, 1.0, 1.0}, {2.3, -2.6, 2.9}},
 											{{3.1, 3.4, 3.7}, {3.2, 3.5, 3.8}, {1.0, 1.0, 1.0}, {-3.3, 3.6, -3.9}}};
 

@@ -6,7 +6,7 @@
 
 #include "MomentsReweighterHelper.hpp"
 #include "MomentsReweighter.hpp"
-#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePrecisionInPercent
+#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For realFloatPrecisionInPercent
 
 class MomentsReweighterHelperTest{
 public:

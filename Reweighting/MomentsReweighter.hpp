@@ -78,19 +78,19 @@ class MomentsReweighterAbstract {
 public:
     virtual ~MomentsReweighterAbstract() {}
 	//Getters
-	std::vector<std::vector<double> > getValuesOfSimulationParameters();
-	std::vector<std::vector<double> > getValuesOfNewParameters();
+	std::vector<std::vector<realFloat> > getValuesOfSimulationParameters();
+	std::vector<std::vector<realFloat> > getValuesOfNewParameters();
 	int getNumberOfNewPoints();
-	std::vector<double> getLogZAtSimulatedPoints();
-	std::vector<double> getLogZAtNewPoints();
-	double getPrecisionToCalculateLogZ();
+	std::vector<realFloat> getLogZAtSimulatedPoints();
+	std::vector<realFloat> getLogZAtNewPoints();
+	realFloat getPrecisionToCalculateLogZ();
 	std::vector<std::vector<Moments> > getMomentsAtNewPoints();
 	std::vector<std::vector<MomentsEstimators> > getMomentsEstimatorsAtNewPoints();
 	//Setters
-    virtual void setPrecisionToCalculateLogZ(double precisionToCalculateLogZ) = 0;
-    virtual void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn) = 0;
+    virtual void setPrecisionToCalculateLogZ(realFloat precisionToCalculateLogZ) = 0;
+    virtual void setNewRangesOfParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn) = 0;
     virtual void setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn) = 0;
-    virtual void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+    virtual void setNewParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn,
                                   std::vector<unsigned int> newNumberOfPointsOfParametersIn) = 0;
 protected:
     MomentsReweighterAbstract() = delete;
@@ -100,24 +100,24 @@ protected:
     void calculateAndSetLogZAtSimulatedPoints();
     void calculateAndSetLogZAtNewPoints();
     void calculateAndSetReweightedMomentsAndMomentsEstimators();
-    void prepareObservablesBeforeReweighting(std::vector<double> &);
-    void restoreObservablesAfterReweighting(std::vector<double> minimumOfEachObservable,
-                                            std::vector<std::vector<double> > *reweightedObservablesFromRawData,
-                                            std::valarray<std::vector<std::vector<double> > > *jackknifePartialPred);
-    std::vector<std::vector<double> > calculateReweightedObservableValues(bool useUncorrData = false,
+    void prepareObservablesBeforeReweighting(std::vector<realFloat> &);
+    void restoreObservablesAfterReweighting(std::vector<realFloat> minimumOfEachObservable,
+                                            std::vector<std::vector<realFloat> > *reweightedObservablesFromRawData,
+                                            std::valarray<std::vector<std::vector<realFloat> > > *jackknifePartialPred);
+    std::vector<std::vector<realFloat> > calculateReweightedObservableValues(bool useUncorrData = false,
                                                                           const int entryToBeLeftOut = -1,
-                                                                          std::vector<double> *logZAtSimulationPointToBeUsed = NULL,
-                                                                          std::vector<double> *logZAtNewPointsToBeUsed = NULL);
-    std::vector<double> calculateLogZAtSimulatedPoints(bool useUncorrData, const int entryToBeLeftOut,
-                                                       std::vector<double> *logZAtSimulationPointToStartFrom = NULL, bool printUserInfo = false);
-    std::vector<double> calculateLogZAtNewPoints(std::vector<std::vector<double> > valuesOfParametersAtWhichLogZIsCalculated,
+                                                                          std::vector<realFloat> *logZAtSimulationPointToBeUsed = NULL,
+                                                                          std::vector<realFloat> *logZAtNewPointsToBeUsed = NULL);
+    std::vector<realFloat> calculateLogZAtSimulatedPoints(bool useUncorrData, const int entryToBeLeftOut,
+                                                       std::vector<realFloat> *logZAtSimulationPointToStartFrom = NULL, bool printUserInfo = false);
+    std::vector<realFloat> calculateLogZAtNewPoints(std::vector<std::vector<realFloat> > valuesOfParametersAtWhichLogZIsCalculated,
                                                  bool useUncorrData = false, const int entryToBeLeftOut = -1,
-                                                 std::vector<double> *logZAtSimulationPointToBeUsed = NULL);
+                                                 std::vector<realFloat> *logZAtSimulationPointToBeUsed = NULL);
     //This getter again only for testing reason
     SimulationDataContainer getSimulationDataContainer(bool raw = true);
     //Method used in calculateAndGetReweightedObservables to select data to calculate observables and errors and to set them
-	void extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<double> >& reweightedObservablesFromRawData,
-															const std::valarray<std::vector<std::vector<double> > >& estimatorsForErrorsCalculation);
+	void extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<realFloat> >& reweightedObservablesFromRawData,
+															const std::valarray<std::vector<std::vector<realFloat> > >& estimatorsForErrorsCalculation);
 
 private:
     //Method in which "valuesOfNewParameters" is filled and some checks are done
@@ -153,10 +153,10 @@ private:
 	 *     beta 5.0   chem_pot 1.5
 	 *     beta 5.0   chem_pot 2.0
 	 */
-	std::vector<std::vector<double> >  valuesOfSimulationParameters;
-	std::vector<std::vector<double> >  valuesOfNewParameters;
-	std::vector<double> logZAtSimulatedPoints;
-	std::vector<double> logZAtNewPoints;
+	std::vector<std::vector<realFloat> >  valuesOfSimulationParameters;
+	std::vector<std::vector<realFloat> >  valuesOfNewParameters;
+	std::vector<realFloat> logZAtSimulatedPoints;
+	std::vector<realFloat> logZAtNewPoints;
 	std::vector<std::vector<Moments> > momentsAtNewPoints;
 	std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints;
 
@@ -166,11 +166,11 @@ private:
 	 *
 	 * NOTE: the following two elements could be unified in c++11 with std::tuple
 	 */
-	std::vector<std::pair<double, double> >  newRangesOfParameters;
+	std::vector<std::pair<realFloat, realFloat> >  newRangesOfParameters;
 	std::vector<unsigned int>  newNumberOfPointsOfParameters;
 	bool useSimulatedPointsAsNewPoints;
 
-	double precisionOfIterativeProcedureToCalculateLogZ;
+	realFloat precisionOfIterativeProcedureToCalculateLogZ;
 };
 
 
@@ -187,7 +187,7 @@ public:
     }
 
     //Setters
-    void setNewRangesOfParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn){
+    void setNewRangesOfParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn){
         MomentsReweighterAbstract::setNewRangesOfParameters(newRangesOfParametersIn);
         calculateAndSetLogZAtNewPoints();
         calculateAndSetReweightedMomentsAndMomentsEstimators();
@@ -199,14 +199,14 @@ public:
         calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
 
-    void setNewParameters(std::vector<std::pair<double, double> >  newRangesOfParametersIn,
+    void setNewParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn,
                           std::vector<unsigned int> newNumberOfPointsOfParametersIn){
         MomentsReweighterAbstract::setNewParameters(newRangesOfParametersIn, newNumberOfPointsOfParametersIn);
         calculateAndSetLogZAtNewPoints();
         calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
 
-    void setPrecisionToCalculateLogZ(double precisionToCalculateLogZ){
+    void setPrecisionToCalculateLogZ(realFloat precisionToCalculateLogZ){
     	MomentsReweighterAbstract::setPrecisionToCalculateLogZ(precisionToCalculateLogZ);
 		calculateAndSetLogZAtSimulatedPoints();
 		calculateAndSetLogZAtNewPoints();

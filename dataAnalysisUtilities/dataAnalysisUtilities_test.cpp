@@ -9,7 +9,7 @@
 #include "binnedDataSample.hpp"
 #include <iomanip>
 
-static void checkEstimateAndError(EstimateAndError expectedEstimateAndError, EstimateAndError calculatedEstimateAndError, double testPrecision)
+static void checkEstimateAndError(EstimateAndError expectedEstimateAndError, EstimateAndError calculatedEstimateAndError, realFloat testPrecision)
 {
 	BOOST_CHECK_CLOSE(expectedEstimateAndError.error, calculatedEstimateAndError.error, testPrecision);
 	BOOST_CHECK_CLOSE(expectedEstimateAndError.estimate, calculatedEstimateAndError.estimate, testPrecision);
@@ -22,11 +22,11 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 		if(expectedMeanAndError.estimate == 0.0){
 			EstimateAndError meanAndError_zeroMean = calcMeanAndErrorOfUncorrelatedDataSample(*sample, true);
 			//Trivial test, but better than nothing
-			checkEstimateAndError(expectedMeanAndError, meanAndError_zeroMean, doublePrecisionInPercent);
+			checkEstimateAndError(expectedMeanAndError, meanAndError_zeroMean, realFloatPrecisionInPercent);
 		}
 		//Leave in any case this test, more significant
 		EstimateAndError meanAndError = calcMeanAndErrorOfUncorrelatedDataSample(*sample);
-		checkEstimateAndError(expectedMeanAndError, meanAndError, doublePrecisionInPercent);
+		checkEstimateAndError(expectedMeanAndError, meanAndError, realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(test1)
@@ -50,11 +50,11 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
 		testMeanAndError(sample, expectedMeanAndError);
 	}
 
-	static double expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
+	static realFloat expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
 	{
-		double secondMoment = sample.getNthMoment(2);
-		double firstMoment = sample.getNthMoment(1);
-		double prefactor = 1. / (numberOfElements - 1.);
+		realFloat secondMoment = sample.getNthMoment(2);
+		realFloat firstMoment = sample.getNthMoment(1);
+		realFloat prefactor = 1. / (numberOfElements - 1.);
 		return prefactor * ( secondMoment - pow(firstMoment, 2.) );
 	}
 
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 		return parameters;
 	}
 
-	static void checkMeanAndErrorWithBinsize(std::string file, int binsize, EstimateAndError expected, double testPrecision)
+	static void checkMeanAndErrorWithBinsize(std::string file, int binsize, EstimateAndError expected, realFloat testPrecision)
 	{
 		Parameters parameters = createParameters(binsize, file);
 
@@ -118,13 +118,13 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 
 	//This file has 1005 entries, from which 5 are discarded when binning with binsize 100
 	std::string fileThatDoesExist = "datafile.example";
-	double precisionOfDataInFileInPercent = 1e-10;
+	realFloat precisionOfDataInFileInPercent = 1e-10;
 	
 	BOOST_AUTO_TEST_CASE(error1)
 	{
 		int binsize = 1;
-		double expectedMean = 5.61305299427553583e-01;
-		double expectedError = 3.44121381077520906E-004;
+		realFloat expectedMean = 5.61305299427553583e-01;
+		realFloat expectedError = 3.44121381077520906E-004;
 		
 		EstimateAndError expectedEstimateAndError(expectedMean, expectedError);
 		checkMeanAndErrorWithBinsize(fileThatDoesExist, binsize, expectedEstimateAndError, precisionOfDataInFileInPercent);
@@ -134,8 +134,8 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 	{
 		int binsize = 100;
 
-		double expectedMean = 0.56125906512982415;
-		double expectedError = 1.1564370727055974e-03;
+		realFloat expectedMean = 0.56125906512982415;
+		realFloat expectedError = 1.1564370727055974e-03;
 
 		EstimateAndError expectedEstimateAndError(expectedMean, expectedError);
 		checkMeanAndErrorWithBinsize(fileThatDoesExist, binsize, expectedEstimateAndError, precisionOfDataInFileInPercent);
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 
 	//This file has 1005 entries, from which 5 are discarded when binning with number of bins 10
 	std::string fileThatDoesExist = "datafile.example";
-	double precisionOfDataInFileInPercent = 1e-10;
+	realFloat precisionOfDataInFileInPercent = 1e-10;
 	int numberOfBins = 10;
 
 	static Parameters createParameters(int numberOfBins, std::string file = "noFileGiven")
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 		return parameters;
 	}
 	
-	static void checkMeanErrorWithNumberOfBins(std::string file, int numberOfBins, EstimateAndError expected, double testPrecision)
+	static void checkMeanErrorWithNumberOfBins(std::string file, int numberOfBins, EstimateAndError expected, realFloat testPrecision)
 	{
 		Parameters parameters = createParameters(numberOfBins, file);
 
@@ -205,8 +205,8 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 	{
 		int numberOfBins = 1005;
 		
-		double expectedMean = 5.61305299427553583e-01;
-		double expectedError = 3.44121381077520906E-004;
+		realFloat expectedMean = 5.61305299427553583e-01;
+		realFloat expectedError = 3.44121381077520906E-004;
 
 		EstimateAndError expectedEstimateAndError(expectedMean, expectedError);
 		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedEstimateAndError, precisionOfDataInFileInPercent);
@@ -214,8 +214,8 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 
 	BOOST_AUTO_TEST_CASE(error2)
 	{
-		double expectedMean = 0.56125906512982415;
-		double expectedError = 1.1564370727055974e-03;
+		realFloat expectedMean = 0.56125906512982415;
+		realFloat expectedError = 1.1564370727055974e-03;
 
 		EstimateAndError expectedEstimateAndError(expectedMean, expectedError);
 		checkMeanErrorWithNumberOfBins(fileThatDoesExist, numberOfBins, expectedEstimateAndError, precisionOfDataInFileInPercent);
@@ -247,15 +247,15 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(varianceAndError)
 
-	double expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
+	realFloat expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
 	{
-		double secondMoment = sample.getNthMoment(2);
-		double firstMoment = sample.getNthMoment(1);
-		double prefactor = numberOfElements / (numberOfElements - 1.);
+		realFloat secondMoment = sample.getNthMoment(2);
+		realFloat firstMoment = sample.getNthMoment(1);
+		realFloat prefactor = numberOfElements / (numberOfElements - 1.);
 		return prefactor * ( secondMoment - pow(firstMoment, 2.) );
 	}
 
-	static void testVarianceAndError(DataSample * sample, EstimateAndError expected, double testPrecision, bool isMeanKnownToBeZero = false)
+	static void testVarianceAndError(DataSample * sample, EstimateAndError expected, realFloat testPrecision, bool isMeanKnownToBeZero = false)
 	{
 		if(isMeanKnownToBeZero){
 			EstimateAndError varianceAndError_zeroMean = calcVarianceAndErrorOfUncorrelatedDataSample(*sample, true);
@@ -272,10 +272,10 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		int numberOfElements = 2674;
 		TestDataSample<> testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
-		double expectedValue = expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(*sample, numberOfElements);
+		realFloat expectedValue = expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(*sample, numberOfElements);
 
 		EstimateAndError varianceAndError = calcVarianceAndErrorOfUncorrelatedDataSample(*sample);
-		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedValue, doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(varianceAndError.estimate, expectedValue, realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(test1)
@@ -283,11 +283,11 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		int numberOfElements = 2674;
 		DataSample sample(numberOfElements);
 
-		double expectedVariance = 0.;
-		double expectedError = 0.;
+		realFloat expectedVariance = 0.;
+		realFloat expectedError = 0.;
 		
 		EstimateAndError expected(expectedVariance, expectedError);
-		testVarianceAndError(&sample, expected, doublePrecisionInPercent, true);
+		testVarianceAndError(&sample, expected, realFloatPrecisionInPercent, true);
 	}
 
 	BOOST_AUTO_TEST_CASE(test2)
@@ -296,11 +296,11 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		TestDataSample<> testSample(numberOfElements, ones);
 		DataSample* sample = testSample.getDataSample();
 
-		double expectedVariance = 0.;
-		double expectedError = 0.;
+		realFloat expectedVariance = 0.;
+		realFloat expectedError = 0.;
 
 		EstimateAndError expected(expectedVariance, expectedError);
-		testVarianceAndError(sample, expected, doublePrecisionInPercent);
+		testVarianceAndError(sample, expected, realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(test3)
@@ -309,12 +309,12 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		TestDataSample<> testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 
-		double expectedVariance = 458447.5;
-		double expectedError = 8465.84748859;
+		realFloat expectedVariance = 458447.5;
+		realFloat expectedError = 8465.84748859;
 
 		//todo: check this again!
 		//the difference in the error estimate exceeds 1e-13, most likely due to rounding errors.
-		double testPrecision = doublePrecisionInPercent*1e3;
+		realFloat testPrecision = realFloatPrecisionInPercent*1e3;
 
 		EstimateAndError expected(expectedVariance, expectedError);
 		testVarianceAndError(sample, expected, testPrecision);
@@ -326,21 +326,21 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 		TestDataSample<> testSample(numberOfElements, onesMinusOnes);
 		DataSample* sample = testSample.getDataSample();
 
-		double expectedVariance = numberOfElements/(numberOfElements-1.);
-		double expectedError = 0;
+		realFloat expectedVariance = numberOfElements/(numberOfElements-1.);
+		realFloat expectedError = 0;
 
 		EstimateAndError expected(expectedVariance, expectedError);
-		testVarianceAndError(sample, expected, doublePrecisionInPercent, true);
+		testVarianceAndError(sample, expected, realFloatPrecisionInPercent, true);
 	}
 
 	BOOST_AUTO_TEST_CASE(withBinning)
 	{
 		std::string gaussianData = "gaussianNumbers_0_1_0_3.dat";
 		
-		double expectedVariance = 1.;
-		double expectedError = 5e-3;
+		realFloat expectedVariance = 1.;
+		realFloat expectedError = 5e-3;
 
-		double expectedPrecisionInPercent = 1;
+		realFloat expectedPrecisionInPercent = 1;
 
 		const char * arguments[] = {"foo", "--binsize=1000", gaussianData.c_str()};
 		Parameters parameters(3, arguments);
@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 	{
 		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
 		
-		double expectedSkewness = 1.;
+		realFloat expectedSkewness = 1.;
 
 		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
 		Parameters parameters(3, arguments);
@@ -369,7 +369,7 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 		DataSample sample(gaussianData);
 
 		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
-        double NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
+        realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
                 fabs(skewnessAndError.estimate - expectedSkewness) / skewnessAndError.error;
 
         BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
@@ -380,7 +380,7 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 	{
 		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
 
-		double expectedSkewness = 1.;
+		realFloat expectedSkewness = 1.;
 
 		const char * arguments[] = {"foo", "--isMeanKnownToBeZero", "--binsize=100", gaussianData.c_str()};
 		Parameters parameters(4, arguments);
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 		DataSample sample(gaussianData);
 
 		EstimateAndError skewnessAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
-        double NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
+        realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
                 fabs(skewnessAndError.estimate - expectedSkewness) / skewnessAndError.error;
 
         BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
@@ -404,7 +404,7 @@ BOOST_AUTO_TEST_CASE(withBinning1)
 	{
 		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
 		
-		double expectedKurtosis = 3.;
+		realFloat expectedKurtosis = 3.;
 
 		const char * arguments[] = {"foo", "--binsize=100", gaussianData.c_str()};
 		Parameters parameters(3, arguments);
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE(withBinning1)
 		DataSample sample(gaussianData);
 
 		EstimateAndError kurtosisAndError = calcBinderAndErrorOfDataSample(sample, parameters);
-        double NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
+        realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
                 fabs(kurtosisAndError.estimate - expectedKurtosis) / kurtosisAndError.error;
 
         BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE(withBinning1)
 	{
 		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
 
-		double expectedKurtosis = 3.;
+		realFloat expectedKurtosis = 3.;
 
 		const char * arguments[] = {"foo", "--isMeanKnownToBeZero", "--binsize=100", gaussianData.c_str()};
 		Parameters parameters(4, arguments);
@@ -431,7 +431,7 @@ BOOST_AUTO_TEST_CASE(withBinning1)
 		DataSample sample(gaussianData);
 
 		EstimateAndError kurtosisAndError = calcBinderAndErrorOfDataSample(sample, parameters);
-		double NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
+		realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
                 fabs(kurtosisAndError.estimate - expectedKurtosis) / kurtosisAndError.error;
 
         BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
@@ -465,7 +465,7 @@ BOOST_AUTO_TEST_SUITE(autocorrelation)
 		 *  it is print to screen]
 		 *
 		 * Nevertheless there are some rounding errors because the calculation is carried out differently
-		 * from how we do. This is the reason why here we do not use "doublePrecisionInPercent"
+		 * from how we do. This is the reason why here we do not use "realFloatPrecisionInPercent"
 		 * but only 3.e-10 in the boost check of the error.
 		 */
 		for(uint i=0; i<result.size(); i++){
@@ -486,7 +486,7 @@ BOOST_AUTO_TEST_SUITE(autocorrelation)
 
 		/*
 		 * See the comment above for the reason why we use 1.e-10 instead
-		 * of "doublePrecisionInPercent" in the boost check.
+		 * of "realFloatPrecisionInPercent" in the boost check.
 		 */
 		for(uint i=0; i<result.size(); i++){
 			BOOST_CHECK_CLOSE(result[i].estimate, referenceTauValues[i], 1.e-10);

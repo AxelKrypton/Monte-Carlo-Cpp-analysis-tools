@@ -86,7 +86,7 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 }
 
 
-std::vector<std::vector<double> > Reweighter::getValuesOfNewParameters(){
+std::vector<std::vector<realFloat> > Reweighter::getValuesOfNewParameters(){
 	return valuesOfNewParameters;
 }
 

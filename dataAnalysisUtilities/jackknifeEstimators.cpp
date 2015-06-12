@@ -13,7 +13,7 @@ DataSample(sampleIn)
 {
 	checkIfJackknifeCanBePerformed(numberOfElements);
 	int normalization = numberOfElements - 1;
-	double sumOfDataSampleElements = sampleIn.sum();
+	realFloat sumOfDataSampleElements = sampleIn.sum();
 	//todo: do this removing specific elements -> less rounding errors
 	setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
 }
@@ -51,13 +51,13 @@ DataSampleBasic JackknifeEstimators::createJackknifeEstimatorsWithBinning(int nu
 	std::cout << "create binned jackknife estimators with number of bins: " << numberOfBins << " and binsize: " << binsize << std::endl;
 
 	DataSampleBasic cutSample = sampleSlice(0, binsize*numberOfBins, 1);
-	double sumOfAllElementsInBinnedSample = cutSample.sum();
+	realFloat sumOfAllElementsInBinnedSample = cutSample.sum();
 	int numberOfElementsInBinndedSample = cutSample.getNumberOfElements();
 
 	DataSampleBasic binnedDataSample(numberOfBins);
 	for (int iteration = 0; iteration < numberOfBins; iteration++)
 	{
-		double sumOfAllElementsInBin = ( sampleSlice(iteration * binsize,	binsize, 1) ).sum();
+		realFloat sumOfAllElementsInBin = ( sampleSlice(iteration * binsize,	binsize, 1) ).sum();
 		binnedDataSample[iteration] = (sumOfAllElementsInBinnedSample - sumOfAllElementsInBin) / (numberOfElementsInBinndedSample - binsize);
 	}
 	return binnedDataSample;

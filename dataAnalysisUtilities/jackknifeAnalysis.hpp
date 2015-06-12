@@ -4,8 +4,8 @@
 #include "DataSample.hpp"
 #include "EstimateAndError.hpp"
 
-double calculateJacknifeEstimate(DataSample sampleWithJackknifeEstimators);
-double calculateJacknifeError(DataSample sampleWithJackknifeEstimators);
+realFloat calculateJacknifeEstimate(DataSample sampleWithJackknifeEstimators);
+realFloat calculateJacknifeError(DataSample sampleWithJackknifeEstimators);
 
 EstimateAndError jackknifeAnalysis(DataSample sampleWithUncorrelatedData, DataSample (*function)(DataSample &) );
 EstimateAndError jackknifeAnalysis(DataSample sampleWithUncorrelatedData1,

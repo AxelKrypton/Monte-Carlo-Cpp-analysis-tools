@@ -16,14 +16,14 @@ public:
 		value = 0.;
 	}
 
-	void set(double valueIn)
+	void set(realFloat valueIn)
 	{
 		value = valueIn;
 		calculated = true;
 	};
 
 	bool calculated;
-	double value;
+	realFloat value;
 };
 
 /*
@@ -65,7 +65,7 @@ public:
 		initMoments();
 	}
 
-	DataSample(std::valarray<double> valuesIn):
+	DataSample(std::valarray<realFloat> valuesIn):
 		DataSampleBasic(valuesIn)
 	{
 		initMoments();
@@ -77,8 +77,8 @@ public:
 		initMoments();
 	}
 
-	double getNthCentralMoment(int n);
-	double getNthMoment(int n);
+	realFloat getNthCentralMoment(int n);
+	realFloat getNthMoment(int n);
 	DataSampleBasic getNthCentralMomentPerDataPoint(int n);
 	DataSampleBasic getNthMomentPerDataPoint(int n);
 	int getUpperLimitForNthMoment();
@@ -87,8 +87,8 @@ public:
 protected:
 	int getNumberOfMoments();
 	void initMoments();
-	double calcNthMoment(int n);
-	double calcNthCentralMoment(int n);
+	realFloat calcNthMoment(int n);
+	realFloat calcNthCentralMoment(int n);
 	DataSampleBasic calcNthMomentPerDataPoint(int n);
 	DataSampleBasic calcNthCentralMomentPerDataPoint(int n);
 

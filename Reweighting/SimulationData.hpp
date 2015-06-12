@@ -9,19 +9,19 @@ class SimulationData
 {
 public:
 	SimulationData();
-	SimulationData(std::map<std::string, double> simulationParametersIn, std::string filenameIn, const int offset = 0);
+	SimulationData(std::map<std::string, realFloat> simulationParametersIn, std::string filenameIn, const int offset = 0);
 
 	int getNumberOfSimulationParameters();
 	int getNumberOfDataSample();
-	double getParameterValue(std::string parameterName);
-	std::map<std::string, double> getSimulationParameters();
+	realFloat getParameterValue(std::string parameterName);
+	std::map<std::string, realFloat> getSimulationParameters();
     std::string getDatafileName();
 	DataSampleBasic& operator[](int index);
     void appendNewColumnOfData(DataSampleBasic sampleIn);
     void deleteColumnOfData(const int whichColumn);
 
 private:
-	std::map<std::string, double> simulationParameters;
+	std::map<std::string, realFloat> simulationParameters;
 	std::string datafileName;
 	std::vector<DataSampleBasic> simulationRawData;
 };

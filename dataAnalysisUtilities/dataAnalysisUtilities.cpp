@@ -35,7 +35,7 @@ static void printBinningInformation(const Parameters& parameters, std::string ob
 }
 
 
-static double meanOfDataSample(DataSample & sampleIn)
+static realFloat meanOfDataSample(DataSample & sampleIn)
 {
 	return sampleIn.getNthMoment(1);
 }
@@ -47,16 +47,16 @@ static double meanOfDataSample(DataSample & sampleIn)
  * as the pseudovalues for the mean
  * are again the original data points.
  */
-static double unbiasedVarianceOfMean(DataSample & sampleIn, bool isMeanKnownToBeZero)
+static realFloat unbiasedVarianceOfMean(DataSample & sampleIn, bool isMeanKnownToBeZero)
 {
-	return isMeanKnownToBeZero ? 1. / double(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthMoment(2)
-							   : 1. / double(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthCentralMoment(2);
+	return isMeanKnownToBeZero ? 1. / realFloat(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthMoment(2)
+							   : 1. / realFloat(sampleIn.getNumberOfElements() - 1) * sampleIn.getNthCentralMoment(2);
 }
 
 EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn, bool isMeanKnownToBeZero)
 {
-	double mean = 0.;
-	double error = 0.;
+	realFloat mean = 0.;
+	realFloat error = 0.;
 
 	if(!isMeanKnownToBeZero) mean = meanOfDataSample(sampleIn);
 	error = sqrt( unbiasedVarianceOfMean(sampleIn, isMeanKnownToBeZero) );
@@ -86,7 +86,7 @@ EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters 
  * the "variance" of entry x_j ( (x_j - mean)^2 ) and treat
  * it the same way as an error on a mean.
  */
-static double unbiasedErrorOfVariance(DataSample & varianceSample)
+static realFloat unbiasedErrorOfVariance(DataSample & varianceSample)
 {
 	return sqrt( unbiasedVarianceOfMean(varianceSample, 0) );
 }
@@ -104,17 +104,17 @@ static double unbiasedErrorOfVariance(DataSample & varianceSample)
  * Note that for the mean the unbiased variance yields
  * the same error as jackknifing.
  */
-static double unbiasedVarianceOfDataSample(DataSample & sampleIn, bool isMeanKnownToBeZero)
+static realFloat unbiasedVarianceOfDataSample(DataSample & sampleIn, bool isMeanKnownToBeZero)
 {
-	return isMeanKnownToBeZero ? double(sampleIn.getNumberOfElements()) / double(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthMoment(2)
-							   : double(sampleIn.getNumberOfElements()) / double(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthCentralMoment(2);
+	return isMeanKnownToBeZero ? realFloat(sampleIn.getNumberOfElements()) / realFloat(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthMoment(2)
+							   : realFloat(sampleIn.getNumberOfElements()) / realFloat(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthCentralMoment(2);
 }
 
 //TODO: Bad to pass both isMeanKnownToBeZero and parameters that contains the first. Once done the todo in  dataAnalysisUtilities.hpp, this is basically solved!
 static EstimateAndError calcVarianceAndError(DataSample& sampleIn, bool isMeanKnownToBeZero , Parameters *parameters = NULL, bool shouldUseBinning = false)
 {
-	double variance = 0.;
-	double error = 0.;
+	realFloat variance = 0.;
+	realFloat error = 0.;
 
 	DataSample varianceSample = isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(2) : sampleIn.getNthCentralMomentPerDataPoint(2);
 	if ( shouldUseBinning )
@@ -201,11 +201,11 @@ EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameter
  * Once this set X of estimators is ready one can
  *   - either use the jackknife function above with a trivial f in order to get a value with
  *     error for C(t)
- *      --->  jackknife(X, [] (double val) -> double {return val;})
+ *      --->  jackknife(X, [] (realFloat val) -> realFloat {return val;})
  *   - or build other sets of estimators like X at different times and use them to build a set Y
  *     of estimators for the integrated_autocorrelation_time at time t (see eq. (4.14)). Again
  *     use the jackknife function above with a trivial f in order to get a value with error for tau_int(t)
- *      --->  jackknife(Y, [] (double val) -> double {return val;})
+ *      --->  jackknife(Y, [] (realFloat val) -> realFloat {return val;})
  *  In both cases, one can produce plots similar to those of Figure 4.1-4.2.
  *
  *  Plotting the resulting data with errors, from the FIRST plateau, one can make the final estimate
@@ -253,7 +253,7 @@ std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEstimatesOf
 
 	std::vector<DataSample> integratedTimeBinnedSets;
 	//The first array of integratedTimeBinnedSets must be an array of ones
-	integratedTimeBinnedSets.push_back(DataSample(std::valarray<double>(1.0, autocorrelationFunctionValuesBinnedSets[0].getNumberOfElements())));
+	integratedTimeBinnedSets.push_back(DataSample(std::valarray<realFloat>(1.0, autocorrelationFunctionValuesBinnedSets[0].getNumberOfElements())));
 
 	for(int time=1; time<parameters.timeMaxAutocorrelationFunction; time++){
 		integratedTimeBinnedSets.push_back((integratedTimeBinnedSets[time-1]
@@ -279,8 +279,8 @@ void calcAutocorrelationAndErrorOfDataSample(DataSample & sample, Parameters par
 {
 	std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(sample, parameters);
 
-	std::vector<double> estimates;
-	std::vector<double> errors;
+	std::vector<realFloat> estimates;
+	std::vector<realFloat> errors;
 	for (int i = 0; i< int(result.size()); i++ )
 	{
 		estimates.push_back(result[i].estimate);
@@ -297,7 +297,7 @@ static DataSampleBasic autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(
 {
 	DataSampleBasic x_first  = sample.sampleSlice(0, sample.getNumberOfElements() - time, 1);
 	DataSampleBasic x_second = sample.sampleSlice(time, sample.getNumberOfElements() - time, 1);
-	double data_mean = sample.getNthMoment(1);
+	realFloat data_mean = sample.getNthMoment(1);
 	/*
 	 * Since we do not know in general if the "true" mean value of our sample is zero, we will
 	 * always substitute it by its estimator (the mean of the sample itself), but then we introduce

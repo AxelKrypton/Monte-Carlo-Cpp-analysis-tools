@@ -11,7 +11,7 @@ int main(int argc, const char ** argv)
 		LqcdReweightingParameters parameters(argc, argv);
 		Reweighter reweighter(parameters);
 		std::vector<std::vector<Observables> > reweightedObservables = reweighter.getReweightedObservables();
-		std::vector<std::vector<double> > newBetaValues = reweighter.getValuesOfNewParameters();
+		std::vector<std::vector<realFloat> > newBetaValues = reweighter.getValuesOfNewParameters();
 		writeLqcdReweightingResultsToFile(newBetaValues, reweightedObservables, parameters.getOutputfilePrefix() );
 	}
 	//todo: move catch block into own function?

@@ -10,14 +10,14 @@ struct RawDataForReweightingAndMetainformation {
 	//Information coming from the configuration file
 	SimulationDataContainer rawData;
 	std::vector<std::string> namesOfParametersIgnoringMetaParameters;
-    std::vector<std::vector<double> > valuesOfSimulationParametersIgnoringMetaParameters;
-    std::vector<double> valuesOfSpecifiedLogZ;
+    std::vector<std::vector<realFloat> > valuesOfSimulationParametersIgnoringMetaParameters;
+    std::vector<realFloat> valuesOfSpecifiedLogZ;
     //Information coming from the user
-    std::vector<std::pair<double, double> >  newRangesOfParameters;
+    std::vector<std::pair<realFloat, realFloat> >  newRangesOfParameters;
     std::vector<unsigned int>  newNumberOfPointsOfParameters;
     bool useSimulatedPointsAsNewPoints;
     bool isMeanKnownToBeZero;
-    double precisionToCalculateLogZ;
+    realFloat precisionToCalculateLogZ;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
     ErrorCalculationMethod errorMethod;
     std::shared_ptr<int> bootstrapNumber;
@@ -44,17 +44,17 @@ public:
 	 *            case LqcdReweightingParameters. It is temporary in order to make everything work!
 	 */
 	Reweighter(LqcdReweightingParameters parameters);
-	std::vector<std::vector<double> > getValuesOfNewParameters();
+	std::vector<std::vector<realFloat> > getValuesOfNewParameters();
 	std::vector<std::vector<Observables> > getReweightedObservables();
 private:
 	ReweighterIO reweighterIO;
 	std::vector<std::string> quantitiesToBeReweighted;
 	unsigned int maximumMomentNeededOverall;
-    std::vector<std::pair<double, double> >  newRangesOfParameters;
+    std::vector<std::pair<realFloat, realFloat> >  newRangesOfParameters;
     std::vector<unsigned int>  newNumberOfPointsOfParameters;
     bool useSimulatedPointsAsNewPoints;
-    std::vector<std::vector<double> > valuesOfNewParameters;
-	double precisionOfIterativeProcedureToCalculateLogZ;
+    std::vector<std::vector<realFloat> > valuesOfNewParameters;
+	realFloat precisionOfIterativeProcedureToCalculateLogZ;
 	std::vector<std::vector<Observables> > observablesAtNewPoints;
 	//The following methods are here in order to be tested one by one (in principle they could be static function in the .cpp file)
 	Reweighter(std::initializer_list<std::string>);

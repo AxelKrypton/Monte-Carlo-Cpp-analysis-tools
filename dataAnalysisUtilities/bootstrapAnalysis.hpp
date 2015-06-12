@@ -8,6 +8,6 @@
  * common in the literature, it is used here just to mean the result of the calculation of the chosen observable on
  * the re-sampled data set
  */
-double calculateBootstrapError(DataSample& sampleWithBootstrapEstimators);
+realFloat calculateBootstrapError(DataSample& sampleWithBootstrapEstimators);
 
 #endif /* BOOTSTRAPANALYSIS_HPP_ */

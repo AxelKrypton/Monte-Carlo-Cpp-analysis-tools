@@ -55,13 +55,13 @@ BOOST_AUTO_TEST_SUITE(defaults)
 	
 	BOOST_AUTO_TEST_CASE(newRange_high)
 	{
-		double defaultValue = 2.;
+		realFloat defaultValue = 2.;
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNewBetaRange_high() );
 	}
 	
 	BOOST_AUTO_TEST_CASE(newRange_low)
 	{
-		double defaultValue = 1.;
+		realFloat defaultValue = 1.;
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNewBetaRange_low() );
 	}
 	
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_SUITE(defaults)
 
 	BOOST_AUTO_TEST_CASE(WeightPrecision)
 	{
-		double defaultValue = 1.e-7;
+		realFloat defaultValue = 1.e-7;
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getWeightPrecision() );
 	}
 
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_CHECK(filename == parameters.getInputfile());
 	}
 
-	static LqcdReweightingParameters createParametersForArgumentSettingCheck_longOption(std::string argumentName, double newValue)
+	static LqcdReweightingParameters createParametersForArgumentSettingCheck_longOption(std::string argumentName, realFloat newValue)
 	{
 		std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
 		int numberOfArguments = 4;
@@ -183,14 +183,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 	
 	BOOST_AUTO_TEST_CASE(newRange_high)
 	{
-		double newValue = 65.123;
+		realFloat newValue = 65.123;
 		std::string argumentName = "--newBetaRange_high";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_high() );
 	}
 	
 	BOOST_AUTO_TEST_CASE(newRange_low)
 	{
-		double newValue = 14.563;
+		realFloat newValue = 14.563;
 		std::string argumentName = "--newBetaRange_low";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_low() );
 	}
@@ -348,14 +348,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 
 	BOOST_AUTO_TEST_CASE(numColsForSingleObs)
 	{
-		double newValue = 4;
+		realFloat newValue = 4;
 		std::string argumentName = "--numberOfMultipleColumns";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfMultipleColumnsForSingleObservable() );
 	}
 
 	BOOST_AUTO_TEST_CASE(weightPrecision)
 	{
-		double newValue = 1.e-08;
+		realFloat newValue = 1.e-08;
 		std::string argumentName = "--weightPrecision";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getWeightPrecision() );
 	}

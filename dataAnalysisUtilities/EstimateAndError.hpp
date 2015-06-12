@@ -7,12 +7,12 @@ public:
 	EstimateAndError() :
 		estimate(0.), error(0.)
 	{}
-	EstimateAndError(double mean, double error) :
+	EstimateAndError(realFloat mean, realFloat error) :
 		estimate(mean), error(error)
 	{}
 
-	double estimate;
-	double error;
+	realFloat estimate;
+	realFloat error;
 };
 
 #endif

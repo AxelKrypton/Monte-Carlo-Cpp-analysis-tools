@@ -3,14 +3,14 @@
 #include "MomentsReweighterHelper.hpp"
 
 static std::vector<std::string> getNamesOfParametersIgnoringMetaParameters(SimulationData);
-static std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer);
+static std::vector<std::vector<realFloat> > getValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer);
 static std::vector<Binsizes> getValuesOfSpecifiedBinsizes(SimulationDataContainer);
-static std::vector<double> getValuesOfSpecifiedLogZ(SimulationDataContainer);
+static std::vector<realFloat> getValuesOfSpecifiedLogZ(SimulationDataContainer);
 static void extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(SimulationData, std::vector<std::string>&, const std::vector<std::string>&);
-static void extractValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer, std::vector<std::vector<double> >& , const std::vector<std::string>&);
+static void extractValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer, std::vector<std::vector<realFloat> >& , const std::vector<std::string>&);
 static void extractValuesOfSpecifiedBinsizes(SimulationDataContainer, std::vector<Binsizes>& , const std::string&);
-static void extractValuesOfSpecifiedLogZ(SimulationDataContainer, std::vector<double>& , const std::string&);
-static bool isLastEntryPresentMoreThanOnce(std::vector<std::vector<double> >);
+static void extractValuesOfSpecifiedLogZ(SimulationDataContainer, std::vector<realFloat>& , const std::string&);
+static bool isLastEntryPresentMoreThanOnce(std::vector<std::vector<realFloat> >);
 static void checkCorrectnessOfConfigurationFileForReweighting(SimulationDataContainer, const std::vector<std::string>, int);
 static bool isLabelMatchingAnyMetaParameter(const std::string&, const std::vector<std::string>&);
 
@@ -104,8 +104,8 @@ static std::vector<std::string> getNamesOfParametersIgnoringMetaParameters(Simul
     return result;
 }
 
-static std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer simDataCont){
-    std::vector<std::vector<double> > result;
+static std::vector<std::vector<realFloat> > getValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer simDataCont){
+    std::vector<std::vector<realFloat> > result;
     extractValuesOfSimulationParametersIgnoringMetaParameters(simDataCont, result, MomentsReweighterHelper::metaParameters);
     return result;
 }
@@ -116,8 +116,8 @@ static std::vector<Binsizes> getValuesOfSpecifiedBinsizes(SimulationDataContaine
 	return result;
 }
 
-static std::vector<double> getValuesOfSpecifiedLogZ(SimulationDataContainer simDataCont){
-	std::vector<double> result;
+static std::vector<realFloat> getValuesOfSpecifiedLogZ(SimulationDataContainer simDataCont){
+	std::vector<realFloat> result;
 	extractValuesOfSpecifiedLogZ(simDataCont, result, MomentsReweighterHelper::metaParameters[0]);
 	return result;
 }
@@ -133,24 +133,24 @@ static bool isLabelMatchingAnyMetaParameter(const std::string& label, const std:
 static void extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(SimulationData simData,
                                                                              std::vector<std::string>& parNames,
                                                                              const std::vector<std::string>& metaParameters){
-    std::map<std::string, double> auxMap;
+    std::map<std::string, realFloat> auxMap;
     auxMap = simData.getSimulationParameters();
     parNames.clear();
-    for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
+    for(std::map<std::string, realFloat>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
         if(!isLabelMatchingAnyMetaParameter(it->first, metaParameters))
             parNames.push_back(it->first);
     }
 }
 
 static void extractValuesOfSimulationParametersIgnoringMetaParameters(SimulationDataContainer simDataCont,
-                                                                      std::vector<std::vector<double> >& valuesOfSimPar,
+                                                                      std::vector<std::vector<realFloat> >& valuesOfSimPar,
                                                                       const std::vector<std::string>& metaParameters){
-    std::map<std::string, double> auxMap;
-    std::vector<double> auxVector;
+    std::map<std::string, realFloat> auxMap;
+    std::vector<realFloat> auxVector;
     valuesOfSimPar.clear();
     for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
         auxMap = simDataCont[i].getSimulationParameters();
-        for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
+        for(std::map<std::string, realFloat>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
         	if(!isLabelMatchingAnyMetaParameter(it->first, metaParameters))
                 auxVector.push_back(it->second);
         }
@@ -165,12 +165,12 @@ static void extractValuesOfSimulationParametersIgnoringMetaParameters(Simulation
  * otherwise we throw an exception, since at least one binsize is required!
  */
 static void extractValuesOfSpecifiedBinsizes(SimulationDataContainer simDataCont, std::vector<Binsizes>& valuesOfBinsizes, const std::string& binsizeLabel){
-	std::map<std::string, double> auxMap;
+	std::map<std::string, realFloat> auxMap;
 	valuesOfBinsizes = std::vector<Binsizes>(simDataCont.getNumberOfDatafiles(), Binsizes());
 	for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
 		auxMap = simDataCont[i].getSimulationParameters();
 		bool found = false;
-		for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
+		for(std::map<std::string, realFloat>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
 			if((it->first) == binsizeLabel){
 				found = true;
 				if(it->second <= 0)
@@ -204,12 +204,12 @@ static void extractValuesOfSpecifiedBinsizes(SimulationDataContainer simDataCont
  * We have to take trace for the logZ not provided. Since logZ
  * can take any real values, when not provided we set it to 'nan'.
  */
-static void extractValuesOfSpecifiedLogZ(SimulationDataContainer simDataCont, std::vector<double>& valuesOfLogZ, const std::string& logZLabel){
-	std::map<std::string, double> auxMap;
-	valuesOfLogZ = std::vector<double>(simDataCont.getNumberOfDatafiles(), NAN);
+static void extractValuesOfSpecifiedLogZ(SimulationDataContainer simDataCont, std::vector<realFloat>& valuesOfLogZ, const std::string& logZLabel){
+	std::map<std::string, realFloat> auxMap;
+	valuesOfLogZ = std::vector<realFloat>(simDataCont.getNumberOfDatafiles(), NAN);
 	for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
 		auxMap = simDataCont[i].getSimulationParameters();
-		for(std::map<std::string, double>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
+		for(std::map<std::string, realFloat>::iterator it=auxMap.begin(); it!=auxMap.end(); it++){
 			if((it->first) == logZLabel)
 				valuesOfLogZ[i] = it->second;
 		}
@@ -220,7 +220,7 @@ static void extractValuesOfSpecifiedLogZ(SimulationDataContainer simDataCont, st
 static void checkCorrectnessOfConfigurationFileForReweighting(SimulationDataContainer simDataCont,
                                                               const std::vector<std::string> metaPar, int numObs){
     std::vector<std::string> parNames, auxParNames;
-    std::vector<std::vector<double> > parValues;
+    std::vector<std::vector<realFloat> > parValues;
     extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(simDataCont[0], parNames, metaPar);
     int numberOfObservablesToBeReweighted = simDataCont[0].getNumberOfDataSample() - parNames.size();
     for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
@@ -249,6 +249,6 @@ static void checkCorrectnessOfConfigurationFileForReweighting(SimulationDataCont
     }
 }
 
-static bool isLastEntryPresentMoreThanOnce(std::vector<std::vector<double> > parValues){
+static bool isLastEntryPresentMoreThanOnce(std::vector<std::vector<realFloat> > parValues){
     return (parValues.size() > 1) && (std::find(parValues.begin(), parValues.end()-1, parValues.back()) != parValues.end()-1);
 }

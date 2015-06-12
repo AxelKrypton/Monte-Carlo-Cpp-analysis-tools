@@ -1,14 +1,14 @@
 #include "jackknifeAnalysis.hpp"
 #include "jackknifeEstimators.hpp"
 
-double calculateJacknifeEstimate(DataSample sampleWithJackknifeEstimators)
+realFloat calculateJacknifeEstimate(DataSample sampleWithJackknifeEstimators)
 {
     return sampleWithJackknifeEstimators.getNthMoment(1);
 }
 
-double calculateJacknifeError(DataSample sampleWithJackknifeEstimators)
+realFloat calculateJacknifeError(DataSample sampleWithJackknifeEstimators)
 {
-    DataSample tmp ( (sampleWithJackknifeEstimators - sampleWithJackknifeEstimators.getNthMoment(1) )^( (double(2)) )  );
+    DataSample tmp ( (sampleWithJackknifeEstimators - sampleWithJackknifeEstimators.getNthMoment(1) )^( (realFloat(2)) )  );
     return sqrt(tmp.getNthMoment(1) * (sampleWithJackknifeEstimators.getNumberOfElements() - 1));
 }
 
@@ -19,8 +19,8 @@ EstimateAndError jackknifeAnalysis(DataSample sampleWithUncorrelatedData1, DataS
 	
 	DataSample functionAppliedToEstimators = function(jackSample1, jackSample2);
 	
-    double estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
-	double error = calculateJacknifeError(functionAppliedToEstimators);
+    realFloat estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
+	realFloat error = calculateJacknifeError(functionAppliedToEstimators);
 	
 	return EstimateAndError(estimate, error);
 }
@@ -31,8 +31,8 @@ EstimateAndError jackknifeAnalysis(DataSample sampleWithUncorrelatedData, DataSa
 
     DataSample functionAppliedToEstimators = function(jackSample);
 
-    double estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
-    double error = calculateJacknifeError(functionAppliedToEstimators);
+    realFloat estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
+    realFloat error = calculateJacknifeError(functionAppliedToEstimators);
 
     return EstimateAndError(estimate, error);
 }
@@ -47,8 +47,8 @@ EstimateAndError jackknifeAnalysis(std::vector<DataSample> samplesWithUncorrelat
 
     DataSample functionAppliedToEstimators = function(jackknifeEstimators);
 
-    double estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
-    double error = calculateJacknifeError(functionAppliedToEstimators);
+    realFloat estimate = calculateJacknifeEstimate(functionAppliedToEstimators);
+    realFloat error = calculateJacknifeError(functionAppliedToEstimators);
 
     return EstimateAndError(estimate, error);
 }

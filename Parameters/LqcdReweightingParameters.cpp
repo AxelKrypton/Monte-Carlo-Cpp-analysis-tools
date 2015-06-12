@@ -21,8 +21,8 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
 		("file,f", po::value<std::string>(&inputfile), "Inputfile containing metainformation for reweighting procedure.")
 		("outputfilePrefix", po::value<std::string>(&outputfilePrefix)->default_value("reweightedData"), "Prefix for output file.")
 		("numberOfNewBetaPoints", po::value<uint>(&numberOfNewBetaPoints)->default_value(2), "Number of new points to produce with reweighting.")
-		("newBetaRange_high", po::value<double>(&newBetaRange_high)->default_value(2), "Upper limit of new beta range of to cover with reweighting.")
-		("newBetaRange_low", po::value<double>(&newBetaRange_low)->default_value(1), "Lower limit of new beta range of to cover with reweighting.")
+		("newBetaRange_high", po::value<realFloat>(&newBetaRange_high)->default_value(2), "Upper limit of new beta range of to cover with reweighting.")
+		("newBetaRange_low", po::value<realFloat>(&newBetaRange_low)->default_value(1), "Lower limit of new beta range of to cover with reweighting.")
 		("deactivateReweightingForMean", po::value<bool>(&deactivateReweightingForMean)->default_value(false)->implicit_value(true), "Do not perform reweighting for the mean of the data.")
 		("deactivateReweightingForVariance", po::value<bool>(&deactivateReweightingForVariance)->default_value(false)->implicit_value(true), "Do not perform reweighting for the variance of the data.")
 		("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false)->implicit_value(true), "Do not perform reweighting for the skewness of the data.")
@@ -34,7 +34,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
         ("useBootstrapAsErrorMethod", po::value<bool>(&useBootstrapAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Bootstrap.")
         ("numberOfBootstrapResample", po::value<int>(&numberOfBootstrapResample)->default_value(100), "Number of resamples to be done in the bootstrap.")
         ("useSimulatedPointsAsNewPoints", po::value<bool>(&useSimulatedPointsAsNewPoints)->default_value(false)->implicit_value(true), "Perform reweighting evaluating the observables at the simulated points (given in the configuration file).")
-        ("weightPrecision", po::value<double>(&weightPrecision)->default_value(1.e-7), "Precision for iterative finding of optimal weights.");
+        ("weightPrecision", po::value<realFloat>(&weightPrecision)->default_value(1.e-7), "Precision for iterative finding of optimal weights.");
 		
 	//option "file" can be given without option description
 	positionalOptions.add("file", 1);
@@ -151,12 +151,12 @@ std::string LqcdReweightingParameters::getOutputfilePrefix()
 	return outputfilePrefix;
 }
 
-double LqcdReweightingParameters::getNewBetaRange_low()
+realFloat LqcdReweightingParameters::getNewBetaRange_low()
 {
 	return newBetaRange_low;
 }
 
-double LqcdReweightingParameters::getNewBetaRange_high()
+realFloat LqcdReweightingParameters::getNewBetaRange_high()
 {
 	return newBetaRange_high;
 }
@@ -205,7 +205,7 @@ int LqcdReweightingParameters::getNumberOfBootstrapResample()
 	return numberOfBootstrapResample;
 }
 
-double LqcdReweightingParameters::getWeightPrecision()
+realFloat LqcdReweightingParameters::getWeightPrecision()
 {
 	return weightPrecision;
 }

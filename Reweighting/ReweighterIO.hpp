@@ -47,10 +47,10 @@ private:
 	bool isMeanKnownToBeZero;
 	std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
 	std::vector<std::string> namesOfParametersIgnoringMetaParameters; //just vector of string because the simulation parameters are the same for ALL data files!
-	std::vector<std::vector<double> > valuesOfSimulationParametersIgnoringMetaParameters;
+	std::vector<std::vector<realFloat> > valuesOfSimulationParametersIgnoringMetaParameters;
 	//Specific member for each meta parameter
 	std::vector<Binsizes> valuesOfSpecifiedBinsizes;
-	std::vector<double> valuesOfSpecifiedLogZ;
+	std::vector<realFloat> valuesOfSpecifiedLogZ;
 	ErrorCalculationMethod errorMethod;
 	std::shared_ptr<int> bootstrapNumber;
 };

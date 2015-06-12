@@ -10,24 +10,24 @@
 #include <type_traits>
 
 
-template <class T = double> class TestDataSample
+template <class T = realFloat> class TestDataSample
 {
 public:
   	TestDataSample(int length, FillType fillType = zeros, T* referenceValue = NULL):
-		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent), fillType(fillType)
+		referenceValue(referenceValue), testPrecision(realFloatPrecisionInPercent), fillType(fillType)
 	{
-	  if(!(std::is_same<T, double>::value) && !(std::is_same<T, DataSampleBasic>::value))
+	  if(!(std::is_same<T, realFloat>::value) && !(std::is_same<T, DataSampleBasic>::value))
 		  throw std::invalid_argument("TestDataSample created with an invalid template type!");
-	  std::valarray<double> * testValues = initDataSampleBasedOnFillType(length);
+	  std::valarray<realFloat> * testValues = initDataSampleBasedOnFillType(length);
 	  dataSampleInstance = new DataSample(*testValues);
 	  delete testValues;
 	  actualValue = NULL;
 	}
 
 	TestDataSample(std::string dataFilename, int column = 1, int offset = 0, T* referenceValue = NULL):
-		referenceValue(referenceValue), testPrecision(doublePrecisionInPercent)
+		referenceValue(referenceValue), testPrecision(realFloatPrecisionInPercent)
 	{
-        if(!(std::is_same<T, double>::value) && !(std::is_same<T, DataSampleBasic>::value))
+        if(!(std::is_same<T, realFloat>::value) && !(std::is_same<T, DataSampleBasic>::value))
         	throw std::invalid_argument("TestDataSample created with an invalid template type!");
 		actualValue = NULL;
 		dataSampleInstance = new DataSample(dataFilename, column, offset);
@@ -56,13 +56,13 @@ protected:
 	void testActualValueAgainstReferenceValue()
 	{
 		/*
-		 * Here I cast T objects to double or to DataSampleBasic since the compiler doesn't know it is the case (we are inside the if)
+		 * Here I cast T objects to realFloat or to DataSampleBasic since the compiler doesn't know it is the case (we are inside the if)
 		 * TODO: it is quite ugly code. Think how to improve it, maybe template specialization!?
 		 */
 		if(actualValue != NULL && referenceValue != NULL){
-			if(std::is_same<T, double>::value)
+			if(std::is_same<T, realFloat>::value)
 				//Here I cast T objects to DataSampleBasic since the compiler doesn't know it is the case (we are inside the if)
-				BOOST_CHECK_CLOSE(*(reinterpret_cast<double*>(actualValue)), *(reinterpret_cast<double*>(referenceValue)), testPrecision);
+				BOOST_CHECK_CLOSE(*(reinterpret_cast<realFloat*>(actualValue)), *(reinterpret_cast<realFloat*>(referenceValue)), testPrecision);
 			else if (std::is_same<T, DataSampleBasic>::value){
 				//Here I cast T objects to DataSampleBasic since the compiler doesn't know it is the case (we are inside the if)
 				for(int i=0; i<(*reinterpret_cast<DataSampleBasic*>(actualValue)).getNumberOfElements(); i++)
@@ -72,36 +72,36 @@ protected:
 		}
 	}
 
-	std::valarray<double>* initDataSampleBasedOnFillType(int length)
+	std::valarray<realFloat>* initDataSampleBasedOnFillType(int length)
 	{
 		  if ( fillType == zeros )
 		  {
-			  return new std::valarray<double>(length);
+			  return new std::valarray<realFloat>(length);
 		  }
 		  else if ( fillType == ones )
 		  {
-			  std::valarray<double> tmp = makeValarrayWithOnes(length);
-			  return new std::valarray<double>(tmp);
+			  std::valarray<realFloat> tmp = makeValarrayWithOnes(length);
+			  return new std::valarray<realFloat>(tmp);
 		  }
 		  else if ( fillType == onesMinusOnes )
 		  {
-			  std::valarray<double> tmp = makeValarrayWithOnesAndMinusOnes(length);
-			  return new std::valarray<double>(tmp);
+			  std::valarray<realFloat> tmp = makeValarrayWithOnesAndMinusOnes(length);
+			  return new std::valarray<realFloat>(tmp);
 		  }
 		  else if ( fillType == arrayPosition )
 		  {
-			  std::valarray<double> tmp = makeValarrayWithArrayPosition(length);
-			  return new std::valarray<double>(tmp);
+			  std::valarray<realFloat> tmp = makeValarrayWithArrayPosition(length);
+			  return new std::valarray<realFloat>(tmp);
 		  }
 		  else if ( fillType == entriesSymmetricBetweenZeroAndOne )
 		  {
-			  std::valarray<double> tmp = makeValarrayWithEntriesBetweenZeroAndOne(length);
-			  return new std::valarray<double>(tmp);
+			  std::valarray<realFloat> tmp = makeValarrayWithEntriesBetweenZeroAndOne(length);
+			  return new std::valarray<realFloat>(tmp);
 		  }
 		  else if ( fillType == bigAndSmallEntries )
 		  {
-			  std::valarray<double> tmp = makeValarrayWithBigAndSmallEntries(length/2);
-			  return new std::valarray<double>(tmp);
+			  std::valarray<realFloat> tmp = makeValarrayWithBigAndSmallEntries(length/2);
+			  return new std::valarray<realFloat>(tmp);
 		  }
 		  else
 		  {
@@ -112,23 +112,23 @@ protected:
 	DataSample * dataSampleInstance;
 	T* referenceValue;
 	T* actualValue;
-	double testPrecision;
+	realFloat testPrecision;
 	FillType fillType;
 };
 
 class TestDataSampleNthMoment : public TestDataSample<>
 {
 public:
-	TestDataSampleNthMoment(int n, int length, FillType fillType, double &referenceValue) :
+	TestDataSampleNthMoment(int n, int length, FillType fillType, realFloat &referenceValue) :
 		TestDataSample(length, fillType, &referenceValue)
 	{
-		actualValue = new double;
+		actualValue = new realFloat;
 		*actualValue = dataSampleInstance->getNthMoment(n);
 	};
-	TestDataSampleNthMoment(int n, std::string dataFilename, double referenceValue = 0, int column = 1, int offset = 0.) :
+	TestDataSampleNthMoment(int n, std::string dataFilename, realFloat referenceValue = 0, int column = 1, int offset = 0.) :
 		TestDataSample(dataFilename, column, offset, &referenceValue)
 	{
-		actualValue = new double;
+		actualValue = new realFloat;
 		*actualValue = dataSampleInstance->getNthMoment(n);
 	};
 };
@@ -137,10 +137,10 @@ public:
 class TestDataSampleNthCentralMoment : public TestDataSample<>
 {
 public:
-	TestDataSampleNthCentralMoment(int n, int length, FillType fillType, double &referenceValue) :
+	TestDataSampleNthCentralMoment(int n, int length, FillType fillType, realFloat &referenceValue) :
 		TestDataSample(length, fillType, &referenceValue)
 	{
-		actualValue = new double;
+		actualValue = new realFloat;
 		*actualValue = dataSampleInstance->getNthCentralMoment(n);
 	};
 };

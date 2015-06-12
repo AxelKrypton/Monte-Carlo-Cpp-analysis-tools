@@ -7,10 +7,10 @@
 
 DataSampleBasic::DataSampleBasic(int length)
 {
-	setValues(std::valarray<double>(length));
+	setValues(std::valarray<realFloat>(length));
 }
 
-DataSampleBasic::DataSampleBasic(std::valarray<double> valuesIn)
+DataSampleBasic::DataSampleBasic(std::valarray<realFloat> valuesIn)
 {
 	setValues(valuesIn);
 }
@@ -20,7 +20,7 @@ DataSampleBasic::DataSampleBasic(std::string dataFilename, int column, int offse
 	setValues(readDataFromFile(dataFilename, column, offset, isAnyEntryBad));
 }
 
-void DataSampleBasic::setValues(std::valarray<double> valuesIn)
+void DataSampleBasic::setValues(std::valarray<realFloat> valuesIn)
 {
 	checkIfNumberOfElementsIsValid(valuesIn.size());
 	values = valuesIn;
@@ -33,7 +33,7 @@ void DataSampleBasic::setValues(DataSampleBasic sampleIn)
 	values = sampleIn.values;
 }
 
-static void checkDivisionFactor(double factorIn)
+static void checkDivisionFactor(realFloat factorIn)
 {
 	if(factorIn == 0.)
 	{
@@ -47,27 +47,27 @@ void checkNumberOfElements(int lhs, int rhs)
 		throw std::invalid_argument("DataSamples have different number of elements!");
 }
 
-double DataSampleBasic::sum()
+realFloat DataSampleBasic::sum()
 {
 	return values.sum();
 }
 
-double DataSampleBasic::max()
+realFloat DataSampleBasic::max()
 {
     return values.max();
 }
 
-double DataSampleBasic::min()
+realFloat DataSampleBasic::min()
 {
     return values.min();
 }
 
-double& DataSampleBasic::operator[](size_t index)
+realFloat& DataSampleBasic::operator[](size_t index)
 {
 	return values[index];
 }
 
-DataSampleBasic& DataSampleBasic::operator+=(double factor)
+DataSampleBasic& DataSampleBasic::operator+=(realFloat factor)
 {
 	values += factor;
 	return *this;
@@ -80,7 +80,7 @@ DataSampleBasic& DataSampleBasic::operator+=(DataSampleBasic sampleIn)
 	return *this;
 }
 
-DataSampleBasic& DataSampleBasic::operator-=(double factor)
+DataSampleBasic& DataSampleBasic::operator-=(realFloat factor)
 {
 	values -= factor;
 	return *this;
@@ -93,7 +93,7 @@ DataSampleBasic& DataSampleBasic::operator-=(DataSampleBasic sampleIn)
 	return *this;
 }
 
-DataSampleBasic& DataSampleBasic::operator*=(double factor)
+DataSampleBasic& DataSampleBasic::operator*=(realFloat factor)
 {
 	values *= factor;
 	return *this;
@@ -106,7 +106,7 @@ DataSampleBasic& DataSampleBasic::operator*=(DataSampleBasic sampleIn)
 	return *this;
 }
 
-DataSampleBasic& DataSampleBasic::operator/=(double factor)
+DataSampleBasic& DataSampleBasic::operator/=(realFloat factor)
 {
 	checkDivisionFactor(factor);
 	values /= factor;
@@ -122,23 +122,23 @@ DataSampleBasic& DataSampleBasic::operator/=(DataSampleBasic sampleIn)
 
 DataSampleBasic& DataSampleBasic::operator^=(int n)
 {
-	values = std::pow(values, double(n));
+	values = std::pow(values, realFloat(n));
 	return *this;
 }
 
-DataSampleBasic& DataSampleBasic::operator^=(double n)
+DataSampleBasic& DataSampleBasic::operator^=(realFloat n)
 {
 	values = std::pow(values, n);
 	return *this;
 }
 
-DataSampleBasic operator+(DataSampleBasic sampleIn, double factor)
+DataSampleBasic operator+(DataSampleBasic sampleIn, realFloat factor)
 {
 	sampleIn += factor;
 	return sampleIn;
 }
 
-DataSampleBasic operator+(double factor, DataSampleBasic sampleIn)
+DataSampleBasic operator+(realFloat factor, DataSampleBasic sampleIn)
 {
 	sampleIn += factor;
 	return sampleIn;
@@ -151,13 +151,13 @@ DataSampleBasic operator+(DataSampleBasic lhs, DataSampleBasic rhs)
 	return lhs;
 }
 
-DataSampleBasic operator-(DataSampleBasic sampleIn, double factor)
+DataSampleBasic operator-(DataSampleBasic sampleIn, realFloat factor)
 {
 	sampleIn -= factor;
 	return sampleIn;
 }
 
-DataSampleBasic operator-(double factor, DataSampleBasic sampleIn)
+DataSampleBasic operator-(realFloat factor, DataSampleBasic sampleIn)
 {
 	sampleIn -= factor;
 	sampleIn *= -1.;
@@ -171,13 +171,13 @@ DataSampleBasic operator-(DataSampleBasic lhs, DataSampleBasic rhs)
 	return lhs;
 }
 
-DataSampleBasic operator*(DataSampleBasic sampleIn, double factor)
+DataSampleBasic operator*(DataSampleBasic sampleIn, realFloat factor)
 {
 	sampleIn *= factor;
 	return sampleIn;
 }
 
-DataSampleBasic operator*(double factor, DataSampleBasic sampleIn)
+DataSampleBasic operator*(realFloat factor, DataSampleBasic sampleIn)
 {
 	sampleIn *= factor;
 	return sampleIn;
@@ -190,13 +190,13 @@ DataSampleBasic operator*(DataSampleBasic lhs, DataSampleBasic rhs)
 	return lhs;
 }
 
-DataSampleBasic operator/(DataSampleBasic sampleIn, double factor)
+DataSampleBasic operator/(DataSampleBasic sampleIn, realFloat factor)
 {
 	checkDivisionFactor(factor);
 	return sampleIn /= factor;
 }
 
-DataSampleBasic operator/(double factor, DataSampleBasic sampleIn)
+DataSampleBasic operator/(realFloat factor, DataSampleBasic sampleIn)
 {
 	for(int i=0; i<sampleIn.getNumberOfElements(); i++)
 		checkDivisionFactor(sampleIn[i]);
@@ -216,7 +216,7 @@ DataSampleBasic operator^(DataSampleBasic sampleIn, int n)
 	return sampleIn ^= n;
 }
 
-DataSampleBasic operator^(DataSampleBasic sampleIn, double n)
+DataSampleBasic operator^(DataSampleBasic sampleIn, realFloat n)
 {
 	return sampleIn ^= n;
 }
@@ -249,17 +249,17 @@ void DataSampleBasic::checkIfNumberOfElementsIsValid(int length)
 		throw std::invalid_argument("Cannot create dataSample with zero or less elements!");
 	//todo: think about better warning!
 	//if(length > roughEstimateOfNumberOfEntriesWhereDoublePrecisionMayBeInvalid)
-		//std::cout << "Warning: the datasize is such that double precision may not be valid anymore (depending on the data)!" << std::endl;
+		//std::cout << "Warning: the datasize is such that realFloat precision may not be valid anymore (depending on the data)!" << std::endl;
 }
 
-double defaultFunction(double in)
+realFloat defaultFunction(realFloat in)
 {
 	return in;
 }
 
-DataSampleBasic DataSampleBasic::applyFunction(double (*function)(double))
+DataSampleBasic DataSampleBasic::applyFunction(realFloat (*function)(realFloat))
 {
-	std::valarray<double> functionAppliedToArray = values.apply(function);
+	std::valarray<realFloat> functionAppliedToArray = values.apply(function);
 	DataSampleBasic dataSample(functionAppliedToArray);
 	return dataSample;
 }

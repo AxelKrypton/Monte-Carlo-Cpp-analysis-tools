@@ -7,7 +7,7 @@ std::string getFilenameForObservables(Parameters parameters)
 	return parameters.analysisOutputFilePrefix + parameters.file + parameters.analysisOutputFilePostfix;
 }
 
-void printEstimateAndError(std::string estimateName, double estimateValue, double errorValue)
+void printEstimateAndError(std::string estimateName, realFloat estimateValue, realFloat errorValue)
 {
 	std::cout << "# " << estimateName << "\t\tError" << std::endl;
 	std::cout << std::scientific << estimateValue << "\t" << errorValue << std::endl;
@@ -15,7 +15,7 @@ void printEstimateAndError(std::string estimateName, double estimateValue, doubl
 
 //todo: add test for exception
 //todo: merge these two fcts.
-void writeEstimateAndErrorToFile(std::string estimateName, double estimateValue, double errorValue, std::string filename)
+void writeEstimateAndErrorToFile(std::string estimateName, realFloat estimateValue, realFloat errorValue, std::string filename)
 {
 	std::ofstream outputstream;
 	outputstream.open(filename.c_str(), std::ios::app);
@@ -29,7 +29,7 @@ void writeEstimateAndErrorToFile(std::string estimateName, double estimateValue,
 	}
 }
 
-void writeEstimateAndErrorArraysToFile(std::string estimateName, std::vector<double> estimate, std::vector<double> error, std::string filename)
+void writeEstimateAndErrorArraysToFile(std::string estimateName, std::vector<realFloat> estimate, std::vector<realFloat> error, std::string filename)
 {
 	std::cout << "# Writing estimate and error array of \"" << estimateName << "\" to file \"" << filename << "\"" << std::endl;
 	std::ofstream outputstream;
@@ -54,9 +54,9 @@ public:
 		filename = outputfilePrefix + "_" + quantityName;
 	}
 	
-	void append(double betaValue, Observables observables)
+	void append(realFloat betaValue, Observables observables)
 	{
-		std::pair<double, Observables > tmpPair(betaValue, observables );
+		std::pair<realFloat, Observables > tmpPair(betaValue, observables );
 		values.push_back( tmpPair );
 	}
 	
@@ -82,10 +82,10 @@ public:
 private:
 	std::string quantityName;
 	std::string filename;
-	std::vector < std::pair<double, Observables> > values;
+	std::vector < std::pair<realFloat, Observables> > values;
 };
 
-static void checkInputSizes(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
+static void checkInputSizes(std::vector<std::vector<realFloat> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
 {
 	if ( reweightedData.size() == 0 )
 	{
@@ -110,7 +110,7 @@ static void checkInputSizes(std::vector<std::vector<double> > & newBetaValues, s
 	std::cout << "# Found " << numberOfQuantities << " reweighted quantities." << std::endl;
 }
 
-void writeLqcdReweightingResultsToFile(std::vector<std::vector<double> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData, std::string outputfilePrefix)
+void writeLqcdReweightingResultsToFile(std::vector<std::vector<realFloat> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData, std::string outputfilePrefix)
 {
 	try{
 		checkInputSizes(newBetaValues, reweightedData);

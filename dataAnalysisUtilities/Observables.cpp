@@ -6,7 +6,7 @@
 static std::vector<DataSample> getMomentsPerDataPoint(DataSample&, std::initializer_list<unsigned int>, bool);
 static Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters&, std::string);
 static void printBinningInformation(const Parameters&, std::string);
-static double evaluateErrorBasedOnMethod(DataSample, ErrorCalculationMethod);
+static realFloat evaluateErrorBasedOnMethod(DataSample, ErrorCalculationMethod);
 template<typename T> static T getPowerOfFirstMomentUsingSeveralEstimate(const std::vector<T>&, const int);
 
 /*****************************************************************************************/
@@ -90,7 +90,7 @@ functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToEstimatorsForJac
 {
 	if(isMeanZero)
 		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 0) throw std::invalid_argument("Invalid call to Mean function with zero mean for estimators!");
-															   return DataSample(std::valarray<double>(0.0, in[0].getNumberOfElements())); };
+															   return DataSample(std::valarray<realFloat>(0.0, in[0].getNumberOfElements())); };
 	else
 		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 1) throw std::invalid_argument("Invalid call to Mean function for estimators!"); return in[0]; };
 }
@@ -115,9 +115,9 @@ functionForObservable Mean::getFunctionToCalculateObservable(bool useMultipleEst
 		throw std::logic_error("The Mean::getFunctionToCalculateObservable method should not be called with isMeanZero==true!! Aborting...");
 	else{
 		if(useMultipleEstimate){
-			return [] (Moments in) -> double { return getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 1); };
+			return [] (Moments in) -> realFloat { return getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1); };
 		}else
-			return [] (Moments in) -> double { return in[1]; };
+			return [] (Moments in) -> realFloat { return in[1]; };
 	}
 }
 
@@ -190,17 +190,17 @@ functionForEstimators Variance::getFunctionToBeAppliedToEstimators(bool useMulti
 functionForObservable Variance::getFunctionToCalculateObservable(bool useMultipleEstimate)
 {
 	if(isMeanZero)
-		return [] (Moments in) -> double { return in[2]; };
+		return [] (Moments in) -> realFloat { return in[2]; };
 	else{
 		if(useMultipleEstimate){
-			return [] (Moments in) -> double {
-				double firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 1);
+			return [] (Moments in) -> realFloat {
+				realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
 				return in[2] - firstMoment * firstMoment;
 
-//				return in[2] - getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2);
+//				return in[2] - getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 2);
 			};
 		}else
-			return [] (Moments in) -> double { return in[2] - in[1] * in[1]; };
+			return [] (Moments in) -> realFloat { return in[2] - in[1] * in[1]; };
 	}
 }
 
@@ -277,21 +277,21 @@ functionForEstimators Skewness::getFunctionToBeAppliedToEstimators(bool useMulti
 functionForObservable Skewness::getFunctionToCalculateObservable(bool useMultipleEstimate)
 {
 	if(isMeanZero)
-		return [] (Moments in) -> double { return in[3] / pow(in[2], 1.5); };
+		return [] (Moments in) -> realFloat { return in[3] / pow(in[2], 1.5); };
 	else{
 		if(useMultipleEstimate){
-			return [] (Moments in) -> double {
-				double firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 1);
-				double x2 = in[2]; double x3 = in[3];
+			return [] (Moments in) -> realFloat {
+				realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
+				realFloat x2 = in[2]; realFloat x3 = in[3];
 				return (x3-3*x2*firstMoment+2*firstMoment*firstMoment*firstMoment)/(pow(x2-firstMoment*firstMoment, 1.5));
 
-//				double firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2);
-//				double firstMomentCubic = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 3);
+//				realFloat firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 2);
+//				realFloat firstMomentCubic = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 3);
 //				return (x3-3*x2*firstMoment+2*firstMomentCubic)/(pow(x2-firstMomentSquared, 1.5));
 			};
 		}else{
-			return [] (Moments in) -> double {
-				double x1 = in[1]; double x2 = in[2]; double x3 = in[3];
+			return [] (Moments in) -> realFloat {
+				realFloat x1 = in[1]; realFloat x2 = in[2]; realFloat x3 = in[3];
 				return (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5));
 			};
 		}
@@ -375,21 +375,21 @@ functionForEstimators BinderCumulant::getFunctionToBeAppliedToEstimators(bool us
 functionForObservable BinderCumulant::getFunctionToCalculateObservable(bool useMultipleEstimate	)
 {
 	if(isMeanZero)
-		return [] (Moments in) -> double { return in[4] / pow(in[2], 2.0); };
+		return [] (Moments in) -> realFloat { return in[4] / pow(in[2], 2.0); };
 	else{
 		if(useMultipleEstimate){
-			return [] (Moments in) -> double {
-				double firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 1);
-				double x2 = in[2]; double x3 = in[3]; double x4 = in[4];
+			return [] (Moments in) -> realFloat {
+				realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
+				realFloat x2 = in[2]; realFloat x3 = in[3]; realFloat x4 = in[4];
 				return (x4-4*x3*firstMoment+6*x2*firstMoment*firstMoment-3*firstMoment*firstMoment*firstMoment*firstMoment)/(pow(x2-firstMoment*firstMoment, 2.0));
 
-//				double firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 2);
-//				double firstMomentQuartic = getPowerOfFirstMomentUsingSeveralEstimate<double>(in(1), 4);
+//				realFloat firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 2);
+//				realFloat firstMomentQuartic = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 4);
 //				return (x4-4*x3*firstMoment+6*x2*firstMomentSquared-3*firstMomentQuartic)/(pow(x2-firstMomentSquared, 2.0));
 			};
 		}else{
-			return [] (Moments in) -> double {
-				double x1 = in[1]; double x2 = in[2]; double x3 = in[3]; double x4 = in[4];
+			return [] (Moments in) -> realFloat {
+				realFloat x1 = in[1]; realFloat x2 = in[2]; realFloat x3 = in[3]; realFloat x4 = in[4];
 				return (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0));
 			};
 		}
@@ -414,7 +414,7 @@ static std::vector<DataSample> getMomentsPerDataPoint(DataSample& sampleIn, std:
 	return returnVec;
 }
 
-static double evaluateErrorBasedOnMethod(DataSample dataSample, ErrorCalculationMethod errorMethod){
+static realFloat evaluateErrorBasedOnMethod(DataSample dataSample, ErrorCalculationMethod errorMethod){
 	if(errorMethod == jackknife)
 		return calculateJacknifeError(dataSample);
 	else if (errorMethod == bootstrap)

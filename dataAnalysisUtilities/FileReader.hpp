@@ -60,7 +60,7 @@ public:
 		
 		std::cout << "# read " << data.size() << " data points from file \"" << filename << "\"" << std::endl;
 		
-		return DataSampleBasic( std::valarray<double>(data.data(), data.size()) );
+		return DataSampleBasic( std::valarray<realFloat>(data.data(), data.size()) );
 	}
 
 private:
@@ -103,7 +103,7 @@ private:
 	void extractContentFromLine()
 	{
 		std::string currentEntry;
-		double currentNumber = 0.;
+		realFloat currentNumber = 0.;
 		std::stringstream ss (line);
 		for(int i=0; i<column; i++)
 		{
@@ -126,8 +126,8 @@ private:
 	std::ifstream infile;
 	std::string line;
 	std::string filename;
-	std::vector<double> data;
-	double currentNumber;
+	std::vector<realFloat> data;
+	realFloat currentNumber;
 	int column;
 	int offset;
 	int lineCounter;

@@ -3,7 +3,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Reweighter.hpp"
-#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For doublePrecisionInPercent
+#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp" // For realFloatPrecisionInPercent
 
 static void compareReweightingProcedures(ReweightingProcedure& reference, ReweightingProcedure& calculated){
 	std::sort(reference.binsizesToBeUsed.begin(), reference.binsizesToBeUsed.end());
@@ -249,13 +249,13 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
 													  "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--deactivateReweightingForVariance",
 													  "--deactivateReweightingForSkewness", "--deactivateReweightingForBinder"};
         ReweighterTester reweighter(options, true);
-        double referenceValuesObs1NewPoints[] = {0.513201682060, 0.513258510947, 0.513316165254, 0.513374651344, 0.513433975214, 0.513494142470,
+        realFloat referenceValuesObs1NewPoints[] = {0.513201682060, 0.513258510947, 0.513316165254, 0.513374651344, 0.513433975214, 0.513494142470,
         										 0.513555158307, 0.513617027480, 0.513679754278, 0.513743342503, 0.513807795437, 0.513873115823,
         										 0.513939305834, 0.514006367050, 0.514074300428, 0.514143106283, 0.514212784255, 0.514283333291,
         										 0.514354751616, 0.514427036709, 0.514500185286, 0.514574193271, 0.514649055778, 0.514724767094,
         										 0.514801320653, 0.514878709028, 0.514956923909, 0.515035956091, 0.515115795462, 0.515196430993};
 
-        double referenceValuesObs2NewPoints[] = {0.512565539027, 0.512620638254, 0.512676556317, 0.512733299285, 0.512790872858, 0.512849282342,
+        realFloat referenceValuesObs2NewPoints[] = {0.512565539027, 0.512620638254, 0.512676556317, 0.512733299285, 0.512790872858, 0.512849282342,
         										 0.512908532626, 0.512968628155, 0.513029572905, 0.513091370361, 0.513154023485, 0.513217534696,
         										 0.513281905844, 0.513347138179, 0.513413232332, 0.513480188285, 0.513548005351, 0.513616682143,
         										 0.513686216557, 0.513756605745, 0.513827846094, 0.513899933203, 0.513972861865, 0.514046626048,
@@ -280,7 +280,7 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
 													  "--newBetaRange_high=5.363", "--numberOfNewBetaPoints=51", "--deactivateReweightingForVariance",
 													  "--deactivateReweightingForSkewness", "--deactivateReweightingForBinder"};
         ReweighterTester reweighter(options, true);
-        double referenceValuesObsNewPoints[] = {0.511622217173, 0.511770790824, 0.511922922294, 0.512078816370, 0.512238695862, 0.512402801577,
+        realFloat referenceValuesObsNewPoints[] = {0.511622217173, 0.511770790824, 0.511922922294, 0.512078816370, 0.512238695862, 0.512402801577,
         										0.512571391956, 0.512744742291, 0.512923143444, 0.513106900003, 0.513296327766, 0.513491750494,
         										0.513693495837, 0.513901890370, 0.514117253685, 0.514339891515, 0.514570087889, 0.514808096378,
         										0.515054130536, 0.515308353702, 0.515570868411, 0.515841705718, 0.516120814849, 0.516408053606,
@@ -310,7 +310,7 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
 													  "--newBetaRange_high=5.363", "--numberOfNewBetaPoints=51", "--deactivateReweightingForVariance",
 													  "--deactivateReweightingForSkewness", "--deactivateReweightingForBinder"};
         ReweighterTester reweighter(options, true);
-		double referenceValuesObsNewPoints[] = {0.511622217173, 0.511770790824, 0.511922922294, 0.512078816370, 0.512238695862, 0.512402801577,
+		realFloat referenceValuesObsNewPoints[] = {0.511622217173, 0.511770790824, 0.511922922294, 0.512078816370, 0.512238695862, 0.512402801577,
 												0.512571391956, 0.512744742291, 0.512923143444, 0.513106900003, 0.513296327766, 0.513491750494,
 												0.513693495837, 0.513901890370, 0.514117253685, 0.514339891515, 0.514570087889, 0.514808096378,
 												0.515054130536, 0.515308353702, 0.515570868411, 0.515841705718, 0.516120814849, 0.516408053606,
@@ -356,9 +356,9 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
 
         for(size_t i=0; i<valuesObsNewPoints1.size(); i++){
         		BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.estimate,
-        							valuesObsNewPoints2[2*i][0].mean.estimate, doublePrecisionInPercent);
+        							valuesObsNewPoints2[2*i][0].mean.estimate, realFloatPrecisionInPercent);
 				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.error,
-									valuesObsNewPoints2[2*i][0].mean.error, doublePrecisionInPercent);
+									valuesObsNewPoints2[2*i][0].mean.error, realFloatPrecisionInPercent);
         }
     }
 
@@ -396,14 +396,14 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
 												     "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--deactivateReweightingForMean",
 													 "--deactivateReweightingForSkewness", "--deactivateReweightingForBinder"};
        ReweighterTester reweighter(options, true);
-       double referenceValuesObs1NewPoints[] = {1.360382497662e-05, 1.380206166679e-05, 1.400187465334e-05, 1.420317840867e-05, 1.440588225665e-05,
+       realFloat referenceValuesObs1NewPoints[] = {1.360382497662e-05, 1.380206166679e-05, 1.400187465334e-05, 1.420317840867e-05, 1.440588225665e-05,
     		   	   	   	   	   	   	   	   	    1.460988958896e-05, 1.481509729023e-05, 1.502139672521e-05, 1.522867261927e-05, 1.543680369204e-05,
     		   	   	   	   	   	   	   	   	    1.564566235018e-05, 1.585511466440e-05, 1.606502048768e-05, 1.627523344711e-05, 1.648560084400e-05,
     		   	   	   	   	   	   	   	   	    1.669596383169e-05, 1.690615752914e-05, 1.711601110549e-05, 1.732534802779e-05, 1.753398594168e-05,
     		   	   	   	   	   	   	   	   	    1.774173728597e-05, 1.794840926933e-05, 1.815380404546e-05, 1.835771925196e-05, 1.855994818922e-05,
     		   	   	   	   	   	   	   	   	    1.876028030456e-05, 1.895850142108e-05, 1.915439410266e-05, 1.934773840867e-05, 1.953831225004e-05};
 
-       double referenceValuesObs2NewPoints[] = {1.427912489987e-05, 1.447082186090e-05, 1.466399284294e-05, 1.485855167371e-05, 1.505440624228e-05,
+       realFloat referenceValuesObs2NewPoints[] = {1.427912489987e-05, 1.447082186090e-05, 1.466399284294e-05, 1.485855167371e-05, 1.505440624228e-05,
     		   	   	   	   	   	   	   	   	    1.525145868059e-05, 1.544960513528e-05, 1.564873585130e-05, 1.584873494864e-05, 1.604948062173e-05,
     		   	   	   	   	   	   	   	   	    1.625084475421e-05, 1.645269338274e-05, 1.665488615382e-05, 1.685727680922e-05, 1.705971313576e-05,
     		   	   	   	   	   	   	   	   	    1.726203684049e-05, 1.746408385900e-05, 1.766568464595e-05, 1.786666369691e-05, 1.806684052041e-05,
@@ -426,7 +426,7 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
 													 "--newBetaRange_high=5.363", "--numberOfNewBetaPoints=51", "--deactivateReweightingForMean",
 													 "--deactivateReweightingForSkewness", "--deactivateReweightingForBinder"};
 		ReweighterTester reweighter(options, true);
-		double referenceValuesObsNewPoints[] = {1.180411821738e-05, 1.208232047961e-05, 1.237626373973e-05, 1.268738973464e-05, 1.301714973234e-05,
+		realFloat referenceValuesObsNewPoints[] = {1.180411821738e-05, 1.208232047961e-05, 1.237626373973e-05, 1.268738973464e-05, 1.301714973234e-05,
 											   1.336698100046e-05, 1.373827541457e-05, 1.413234305597e-05, 1.455036960651e-05, 1.499336639338e-05,
 											   1.546211444214e-05, 1.595710172614e-05, 1.647845354596e-05, 1.702585886609e-05, 1.759849318694e-05,
 											   1.819493996719e-05, 1.881311462187e-05, 1.945019478350e-05, 2.010256123064e-05, 2.076575570353e-05,
@@ -449,7 +449,7 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
 													 "--newBetaRange_high=5.363", "--numberOfNewBetaPoints=51", "--deactivateReweightingForMean",
 													 "--deactivateReweightingForSkewness", "--deactivateReweightingForBinder"};
 		ReweighterTester reweighter(options, true);
-		double referenceValuesObsNewPoints[] = {1.180411821738e-05, 1.208232047961e-05, 1.237626373973e-05, 1.268738973464e-05, 1.301714973234e-05,
+		realFloat referenceValuesObsNewPoints[] = {1.180411821738e-05, 1.208232047961e-05, 1.237626373973e-05, 1.268738973464e-05, 1.301714973234e-05,
 											   1.336698100046e-05, 1.373827541457e-05, 1.413234305597e-05, 1.455036960651e-05, 1.499336639338e-05,
 											   1.546211444214e-05, 1.595710172614e-05, 1.647845354596e-05, 1.702585886609e-05, 1.759849318694e-05,
 											   1.819493996719e-05, 1.881311462187e-05, 1.945019478350e-05, 2.010256123064e-05, 2.076575570353e-05,
@@ -482,9 +482,9 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
 		std::vector<std::vector<Observables> > valuesObsNewPoints2 = reweighter.getReweightedObservables();
 		for(size_t i=0; i<valuesObsNewPoints1.size(); i++){
 		   BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.estimate,
-							   valuesObsNewPoints2[2*i][0].susceptibility.estimate, doublePrecisionInPercent);
+							   valuesObsNewPoints2[2*i][0].susceptibility.estimate, realFloatPrecisionInPercent);
 		   BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.error,
-							   valuesObsNewPoints2[2*i][0].susceptibility.error, doublePrecisionInPercent);
+							   valuesObsNewPoints2[2*i][0].susceptibility.error, realFloatPrecisionInPercent);
 		}
 	}
 
@@ -511,9 +511,9 @@ BOOST_AUTO_TEST_SUITE(skewReweighting)
 		std::vector<std::vector<Observables> > valuesObsNewPoints2 = reweighter.getReweightedObservables();
 		for(size_t i=0; i<valuesObsNewPoints1.size(); i++){
 					BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.estimate,
-										valuesObsNewPoints2[2*i][0].skewness.estimate, doublePrecisionInPercent);
+										valuesObsNewPoints2[2*i][0].skewness.estimate, realFloatPrecisionInPercent);
 					BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.error,
-										valuesObsNewPoints2[2*i][0].skewness.error, doublePrecisionInPercent);
+										valuesObsNewPoints2[2*i][0].skewness.error, realFloatPrecisionInPercent);
 		}
     }
 
@@ -542,13 +542,13 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
 												     "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--deactivateReweightingForMean",
 													 "--deactivateReweightingForVariance", "--deactivateReweightingForSkewness"};
        ReweighterTester reweighter(options, true);
-       double referenceValuesObs1NewPoints[] = {3.5205774110429, 3.4807737008814, 3.442477210548, 3.4037029932582, 3.3653794540319,
+       realFloat referenceValuesObs1NewPoints[] = {3.5205774110429, 3.4807737008814, 3.442477210548, 3.4037029932582, 3.3653794540319,
     		   	   	   	   	   	   	   	   	    3.3271694919781, 3.2893191924935, 3.2517669935291, 3.2145794083487, 3.1776753963335,
     		   	   	   	   	   	   	   	   	    3.1412806437041, 3.1050859101799, 3.0692214035074, 3.0339697047747, 2.9992945338063,
     		   	   	   	   	   	   	   	   	    2.964863198033, 2.9309712131526, 2.8974492080148, 2.8647880816396, 2.8323795139447,
     		   	   	   	   	   	   	   	   	    2.8006289747345, 2.7696074074128, 2.7390329606036, 2.7092668179192, 2.6799608951626,
     		   	   	   	   	   	   	   	   	    2.6513990026967, 2.6234188717639, 2.5962574744089, 2.5695977262519, 2.5439835141037};
-       double referenceValuesObs2NewPoints[] = {3.4359305019427, 3.4029554561537, 3.3692843338757, 3.3356419804267, 3.3027418555954,
+       realFloat referenceValuesObs2NewPoints[] = {3.4359305019427, 3.4029554561537, 3.3692843338757, 3.3356419804267, 3.3027418555954,
     		   	   	   	   	   	   	   	   	    3.269674983937, 3.2367272416051, 3.2039112085534, 3.1712624586088, 3.1389758519909,
     		   	   	   	   	   	   	   	   	    3.1066851847734, 3.0747419315319, 3.0432158762126, 3.0117309466358, 2.9807535591756,
     		   	   	   	   	   	   	   	   	    2.9499462312277, 2.9195688180622, 2.8897888452079, 2.8602595356053, 2.8311959138636,
@@ -576,7 +576,7 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
 													 "--newBetaRange_high=5.363", "--numberOfNewBetaPoints=51", "--deactivateReweightingForMean",
 													 "--deactivateReweightingForVariance", "--deactivateReweightingForSkewness"};
 		ReweighterTester reweighter(options, true);
-		double referenceValuesObsNewPoints[] = {3.663706836831, 3.696484687413, 3.723885962225, 3.747903662848, 3.765346818340, 3.776222888418,
+		realFloat referenceValuesObsNewPoints[] = {3.663706836831, 3.696484687413, 3.723885962225, 3.747903662848, 3.765346818340, 3.776222888418,
 											   3.779868405965, 3.775221978283, 3.762713121619, 3.740995303963, 3.709608980699, 3.669847657356,
 											   3.621044095174, 3.563347667599, 3.497876974793, 3.425192488040, 3.346254664697, 3.262279245763,
 											   3.174213891238, 3.083592999229, 2.991712008107, 2.899850309765, 2.809412714627, 2.721682512149,
@@ -602,7 +602,7 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
 													 "--newBetaRange_high=5.363", "--numberOfNewBetaPoints=51", "--deactivateReweightingForMean",
 													 "--deactivateReweightingForVariance", "--deactivateReweightingForSkewness"};
 		ReweighterTester reweighter(options, true);
-		double referenceValuesObsNewPoints[] = {3.663706836831, 3.696484687413, 3.723885962225, 3.747903662848, 3.765346818340, 3.776222888418,
+		realFloat referenceValuesObsNewPoints[] = {3.663706836831, 3.696484687413, 3.723885962225, 3.747903662848, 3.765346818340, 3.776222888418,
 											   3.779868405965, 3.775221978283, 3.762713121619, 3.740995303963, 3.709608980699, 3.669847657356,
 											   3.621044095174, 3.563347667599, 3.497876974793, 3.425192488040, 3.346254664697, 3.262279245763,
 											   3.174213891238, 3.083592999229, 2.991712008107, 2.899850309765, 2.809412714627, 2.721682512149,
@@ -636,9 +636,9 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
 		std::vector<std::vector<Observables> > valuesObsNewPoints2 = reweighter.getReweightedObservables();
 		for(size_t i=0; i<valuesObsNewPoints1.size(); i++){
 		   BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].binderCumulant.estimate,
-							   valuesObsNewPoints2[2*i][0].binderCumulant.estimate, doublePrecisionInPercent);
+							   valuesObsNewPoints2[2*i][0].binderCumulant.estimate, realFloatPrecisionInPercent);
 		   BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].binderCumulant.error,
-							   valuesObsNewPoints2[2*i][0].binderCumulant.error, doublePrecisionInPercent);
+							   valuesObsNewPoints2[2*i][0].binderCumulant.error, realFloatPrecisionInPercent);
 		}
 	}
 
@@ -653,13 +653,13 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
 													  "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--deactivateReweightingForMean",
 													  "--deactivateReweightingForVariance", "--deactivateReweightingForSkewness", "--isMeanKnownToBeZero"};
 		ReweighterTester reweighter(options, true);
-		double referenceValuesObs1NewPoints[] = {1.0002080009271, 1.0002109757484, 1.0002139718772, 1.0002169879343, 1.0002200224499,
+		realFloat referenceValuesObs1NewPoints[] = {1.0002080009271, 1.0002109757484, 1.0002139718772, 1.0002169879343, 1.0002200224499,
 											   	 1.000223073867, 1.0002261405343, 1.0002292207125, 1.0002323125673, 1.0002354141729,
 											     1.0002385235095, 1.0002416384649, 1.0002447568338, 1.0002478763189, 1.0002509945324,
 											     1.000254108997, 1.0002572171479, 1.0002603163353, 1.0002634038266, 1.0002664768095,
 											     1.0002695323963, 1.0002725676281, 1.0002755794772, 1.0002785648541, 1.0002815206128,
 											     1.0002844435548, 1.0002873304381, 1.0002901779811, 1.0002929828719, 1.0002957417751};
-		double referenceValuesObs2NewPoints[] = {1.00021870046, 1.0002215815738, 1.0002244825491, 1.0002274019851, 1.0002303383938,
+		realFloat referenceValuesObs2NewPoints[] = {1.00021870046, 1.0002215815738, 1.0002244825491, 1.0002274019851, 1.0002303383938,
 											     1.0002332902004, 1.0002362557408, 1.0002392332605, 1.000242220915, 1.0002452167689,
 											     1.0002482187969, 1.0002512248821, 1.000254232818, 1.0002572403095, 1.0002602449731,
 											     1.0002632443403, 1.0002662358576, 1.0002692168908, 1.0002721847263, 1.0002751365755,
@@ -694,21 +694,21 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
 
 		for(size_t i=0; i<valuesObsNewPoints1.size(); i++){
 			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.estimate,
-							    valuesObsNewPoints2[2*i][0].mean.estimate, doublePrecisionInPercent);
+							    valuesObsNewPoints2[2*i][0].mean.estimate, realFloatPrecisionInPercent);
 			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.error,
-							    valuesObsNewPoints2[2*i][0].mean.error, doublePrecisionInPercent);
+							    valuesObsNewPoints2[2*i][0].mean.error, realFloatPrecisionInPercent);
 			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.estimate,
-							    valuesObsNewPoints2[2*i][0].susceptibility.estimate, doublePrecisionInPercent);
+							    valuesObsNewPoints2[2*i][0].susceptibility.estimate, realFloatPrecisionInPercent);
 			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.error,
-							    valuesObsNewPoints2[2*i][0].susceptibility.error, doublePrecisionInPercent);
+							    valuesObsNewPoints2[2*i][0].susceptibility.error, realFloatPrecisionInPercent);
 			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.estimate,
-							    valuesObsNewPoints2[2*i][0].skewness.estimate, doublePrecisionInPercent);
+							    valuesObsNewPoints2[2*i][0].skewness.estimate, realFloatPrecisionInPercent);
 			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.error,
-							    valuesObsNewPoints2[2*i][0].skewness.error, doublePrecisionInPercent);
+							    valuesObsNewPoints2[2*i][0].skewness.error, realFloatPrecisionInPercent);
 			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].binderCumulant.estimate,
-							    valuesObsNewPoints2[2*i][0].binderCumulant.estimate, doublePrecisionInPercent);
+							    valuesObsNewPoints2[2*i][0].binderCumulant.estimate, realFloatPrecisionInPercent);
 			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].binderCumulant.error,
-							    valuesObsNewPoints2[2*i][0].binderCumulant.error, doublePrecisionInPercent);
+							    valuesObsNewPoints2[2*i][0].binderCumulant.error, realFloatPrecisionInPercent);
 		}
 	}
 
@@ -730,21 +730,21 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
 		for(size_t i=0; i<valuesObsNewPoints1.size(); i++){
 			for(size_t j=0; j<valuesObsNewPoints1[i].size(); j++){
 				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].mean.estimate,
-									valuesObsNewPoints2[2*i][j].mean.estimate, doublePrecisionInPercent);
+									valuesObsNewPoints2[2*i][j].mean.estimate, realFloatPrecisionInPercent);
 				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].mean.error,
-									valuesObsNewPoints2[2*i][j].mean.error, doublePrecisionInPercent);
+									valuesObsNewPoints2[2*i][j].mean.error, realFloatPrecisionInPercent);
 				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].susceptibility.estimate,
-									valuesObsNewPoints2[2*i][j].susceptibility.estimate, doublePrecisionInPercent);
+									valuesObsNewPoints2[2*i][j].susceptibility.estimate, realFloatPrecisionInPercent);
 				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].susceptibility.error,
-									valuesObsNewPoints2[2*i][j].susceptibility.error, doublePrecisionInPercent);
+									valuesObsNewPoints2[2*i][j].susceptibility.error, realFloatPrecisionInPercent);
 				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].skewness.estimate,
-									valuesObsNewPoints2[2*i][j].skewness.estimate, doublePrecisionInPercent);
+									valuesObsNewPoints2[2*i][j].skewness.estimate, realFloatPrecisionInPercent);
 				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].skewness.error,
-									valuesObsNewPoints2[2*i][j].skewness.error, doublePrecisionInPercent);
+									valuesObsNewPoints2[2*i][j].skewness.error, realFloatPrecisionInPercent);
 				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].binderCumulant.estimate,
-									valuesObsNewPoints2[2*i][j].binderCumulant.estimate, doublePrecisionInPercent);
+									valuesObsNewPoints2[2*i][j].binderCumulant.estimate, realFloatPrecisionInPercent);
 				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].binderCumulant.error,
-									valuesObsNewPoints2[2*i][j].binderCumulant.error, doublePrecisionInPercent);
+									valuesObsNewPoints2[2*i][j].binderCumulant.error, realFloatPrecisionInPercent);
 			}
 		}
 	}

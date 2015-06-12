@@ -10,35 +10,35 @@
 
 BOOST_AUTO_TEST_SUITE(precision)
 
-	BOOST_AUTO_TEST_CASE(doublePrecision1)
+	BOOST_AUTO_TEST_CASE(realFloatPrecision1)
 	{
 		int numberOfValidDigitsOnSystem = DBL_DIG; //from <cfloat>
 		int desiredNumberOfValidDigits = 15;
 		BOOST_REQUIRE_EQUAL(numberOfValidDigitsOnSystem,desiredNumberOfValidDigits );
 	}
 
-	BOOST_AUTO_TEST_CASE(doublePrecision2)
+	BOOST_AUTO_TEST_CASE(realFloatPrecision2)
 	{
-		double numberCorrectUpTo15thDigit        = 1234567890123450e-15;
-		double anotherNumberCorrectUpTo15thDigit = 1234567890123452e-15;
-		BOOST_CHECK_CLOSE(numberCorrectUpTo15thDigit, anotherNumberCorrectUpTo15thDigit, doublePrecisionInPercent);
+		realFloat numberCorrectUpTo15thDigit        = 1234567890123450e-15;
+		realFloat anotherNumberCorrectUpTo15thDigit = 1234567890123452e-15;
+		BOOST_CHECK_CLOSE(numberCorrectUpTo15thDigit, anotherNumberCorrectUpTo15thDigit, realFloatPrecisionInPercent);
 	}
 
-	BOOST_AUTO_TEST_CASE(doublePrecision3)
+	BOOST_AUTO_TEST_CASE(realFloatPrecision3)
 	{
-		double numberCorrectUpTo15thDigit        = 123456789012345.0;
-		double anotherNumberCorrectUpTo15thDigit = 123456789012345.2;
-		BOOST_CHECK_CLOSE(numberCorrectUpTo15thDigit, anotherNumberCorrectUpTo15thDigit, doublePrecisionInPercent);
+		realFloat numberCorrectUpTo15thDigit        = 123456789012345.0;
+		realFloat anotherNumberCorrectUpTo15thDigit = 123456789012345.2;
+		BOOST_CHECK_CLOSE(numberCorrectUpTo15thDigit, anotherNumberCorrectUpTo15thDigit, realFloatPrecisionInPercent);
 	}
 
-	BOOST_AUTO_TEST_CASE(doublePrecision4)
+	BOOST_AUTO_TEST_CASE(realFloatPrecision4)
 	{
-		double twoThird = 2./3.;
-		double oneHalf = .5;
-		double oneThird = twoThird * oneHalf;
+		realFloat twoThird = 2./3.;
+		realFloat oneHalf = .5;
+		realFloat oneThird = twoThird * oneHalf;
 		//                 digits:    1234567890123456
-		double oneThirdTo15thDigit = 3333333333333339e-16;
-		BOOST_CHECK_CLOSE(oneThird, oneThirdTo15thDigit, doublePrecisionInPercent);
+		realFloat oneThirdTo15thDigit = 3333333333333339e-16;
+		BOOST_CHECK_CLOSE(oneThird, oneThirdTo15thDigit, realFloatPrecisionInPercent);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 	BOOST_AUTO_TEST_CASE(setSpecificValue)
 	{
 		int numberOfElements = 10;
-		double someValue = 1.23456789;
+		realFloat someValue = 1.23456789;
 		int index = numberOfElements/2;
 		DataSampleBasic sample(numberOfElements);
 		sample[index] = someValue;
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 999;
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
 		sample += 2.;
-		BOOST_CHECK_CLOSE(sample.sum(), 3.*numberOfElements, doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample.sum(), 3.*numberOfElements, realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(addition_wholeSample_compound_invalidArgument)
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample1(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic sample2(makeValarrayWithOnes(numberOfElements));
 		sample1 += sample2;
-		BOOST_CHECK_CLOSE(sample1.sum(), 2.*numberOfElements, doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample1.sum(), 2.*numberOfElements, realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(addition1)
@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 666;
 		DataSampleBasic sample1(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic sample2 = sample1 + 1.;
-		BOOST_CHECK_CLOSE(sample2.sum(), 2.*numberOfElements, doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample2.sum(), 2.*numberOfElements, realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(addition2)
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 666;
 		DataSampleBasic sample1(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic sample2 = 1. + sample1;
-		BOOST_CHECK_CLOSE(sample2.sum(), 2.*numberOfElements, doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample2.sum(), 2.*numberOfElements, realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(addition_wholeSample_invalidArgument)
@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample1(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic sample2(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic sample3 = sample1 + sample2;
-		BOOST_CHECK_CLOSE(sample3.sum(), 2.*numberOfElements, doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample3.sum(), 2.*numberOfElements, realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(subtraction_compound)
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 999;
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
 		sample -= 1.;
-		BOOST_CHECK_CLOSE(sample.sum(), 0., doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample.sum(), 0., realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(subtraction_wholeSample_compound)
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample1(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic sample2(makeValarrayWithOnes(numberOfElements));
 		sample1 -= sample2;
-		BOOST_CHECK_CLOSE(sample1.sum(), 0., doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample1.sum(), 0., realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(subtraction_wholeSample_compound_invalidArgument)
@@ -291,7 +291,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 345;
 		DataSampleBasic sample1(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic sample2 = sample1 - 1.;
-		BOOST_CHECK_CLOSE(sample2.sum(), 0., doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample2.sum(), 0., realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(subtraction2)
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 345;
 		DataSampleBasic sample1(makeValarrayWithArrayPosition(numberOfElements));
 		DataSampleBasic sample2 = 1. - sample1;
-		BOOST_CHECK_CLOSE(sample2.sum(), 1. - 0.5*(numberOfElements-2)*(numberOfElements-1), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample2.sum(), 1. - 0.5*(numberOfElements-2)*(numberOfElements-1), realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(subtraction_wholeSample_invalidArgument)
@@ -316,7 +316,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample1(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic sample2(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic sample3 = sample1 - sample2;
-		BOOST_CHECK_CLOSE(sample3.sum(), 0., doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample3.sum(), 0., realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(powerFunction_compound)
@@ -325,7 +325,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample(makeValarrayWithArrayPosition(numberOfElements));
 		DataSampleBasic sampleSquared(makeValarrayWithSquaredArrayPosition(numberOfElements));
 		sample ^= 2;
-		BOOST_CHECK_CLOSE(sample.sum(), sampleSquared.sum(), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample.sum(), sampleSquared.sum(), realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(powerFunction)
@@ -334,7 +334,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample(makeValarrayWithArrayPosition(numberOfElements));
 		DataSampleBasic sampleSquared(makeValarrayWithSquaredArrayPosition(numberOfElements));
 		DataSampleBasic sampleSquared2 = sample^2;
-		BOOST_CHECK_CLOSE(sampleSquared2.sum(), sampleSquared.sum(), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sampleSquared2.sum(), sampleSquared.sum(), realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(powerFunctionDouble_compound)
@@ -343,7 +343,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample(makeValarrayWithArrayPosition(numberOfElements));
 		DataSampleBasic sampleSquared(makeValarrayWithSquaredArrayPosition(numberOfElements));
 		sampleSquared ^= 0.5;
-		BOOST_CHECK_CLOSE(sample.sum(), sampleSquared.sum(), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample.sum(), sampleSquared.sum(), realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(powerFunctionDouble)
@@ -352,7 +352,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample(makeValarrayWithArrayPosition(numberOfElements));
 		DataSampleBasic sampleSquared(makeValarrayWithSquaredArrayPosition(numberOfElements));
 		DataSampleBasic rooted = sampleSquared ^ 0.5;
-		BOOST_CHECK_CLOSE(sample.sum(), rooted.sum(), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample.sum(), rooted.sum(), realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(shiftAndPower1)
@@ -360,25 +360,25 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 311;
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic shifted = (sample - 0.)^1;
-		BOOST_CHECK_CLOSE(sample.sum(), shifted.sum(), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample.sum(), shifted.sum(), realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(shiftAndPower2)
 	{
 		int numberOfElements = 311;
-		double expectedValue = 311.;
+		realFloat expectedValue = 311.;
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic shifted = (sample - 0.)^0;
-		BOOST_CHECK_CLOSE(expectedValue, shifted.sum(), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(expectedValue, shifted.sum(), realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(shiftAndPower3)
 	{
 		int numberOfElements = 311;
-		double expectedValue = 0.;
+		realFloat expectedValue = 0.;
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic shifted = ( sample -1.)^1;
-		BOOST_CHECK_CLOSE(expectedValue, shifted.sum(), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(expectedValue, shifted.sum(), realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(shiftAndPower4)
@@ -387,7 +387,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample(makeValarrayWithArrayPosition(numberOfElements));
 		DataSampleBasic shifted = (sample - 0.)^2;
 		DataSampleBasic sample2(makeValarrayWithSquaredArrayPosition(numberOfElements));
-		BOOST_CHECK_CLOSE(sample2.sum(), shifted.sum(), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample2.sum(), shifted.sum(), realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(mulitplication_compound)
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 432;
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic multiplied = sample*(1./numberOfElements);
-		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1., doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1., realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(mulitplication3)
@@ -419,7 +419,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 432;
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic multiplied = (1./numberOfElements)*sample;
-		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1., doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1., realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(mulitplication_wholeSample_compound_invalidArgument)
@@ -437,7 +437,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample2(makeValarrayWithOnes(numberOfElements));
 		sample2 *= (1./numberOfElements);
 		sample1 *= sample2;
-		BOOST_REQUIRE_CLOSE(sample1.sum(), 1, doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(sample1.sum(), 1, realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(multiplication_wholeSample)
@@ -447,7 +447,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample2(makeValarrayWithOnes(numberOfElements));
 		sample2 /= numberOfElements;
 		DataSampleBasic multiplied = sample1 * sample2;
-		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1, doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1, realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(multiplication_wholeSample_invalidArgument)
@@ -484,7 +484,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 432;
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
 		sample /= numberOfElements;
-		BOOST_CHECK_CLOSE(sample.sum(), 1., doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sample.sum(), 1., realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(division_wholeSample_compound_invalidArgument)
@@ -502,7 +502,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample2(makeValarrayWithOnes(numberOfElements));
 		sample2 *= numberOfElements;
 		sample1 /= sample2;
-		BOOST_REQUIRE_CLOSE(sample1.sum(), 1, doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(sample1.sum(), 1, realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(division1)
@@ -510,7 +510,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		int numberOfElements = 66;
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic divided = sample/ numberOfElements;
-		BOOST_REQUIRE_CLOSE(divided.sum(), 1., doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(divided.sum(), 1., realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(division2)
@@ -520,7 +520,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		sample += 1.0;
 		sample ^= 6.0;
 		DataSampleBasic divided = 1.0 / sample;
-		BOOST_REQUIRE_CLOSE(divided.sum(), pow(M_PI,6.)/945., doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(divided.sum(), pow(M_PI,6.)/945., realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(division_wholeSample_invalidArgument)
@@ -538,7 +538,7 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample2(makeValarrayWithOnes(numberOfElements));
 		sample2 /= (1./numberOfElements);
 		DataSampleBasic divided = sample1 / sample2;
-		BOOST_REQUIRE_CLOSE(divided.sum(), 1., doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(divided.sum(), 1., realFloatPrecisionInPercent);
 	}
 
     BOOST_AUTO_TEST_CASE(comparison)
@@ -610,7 +610,7 @@ BOOST_AUTO_TEST_SUITE(slice)
 		int numberOfElements = 66;
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic sample2 = sample.sampleSlice(0, numberOfElements/2, 2);
-		BOOST_REQUIRE_CLOSE(sample.sum()/2., sample2.sum(), doublePrecisionInPercent);
+		BOOST_REQUIRE_CLOSE(sample.sum()/2., sample2.sum(), realFloatPrecisionInPercent);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -718,7 +718,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(applyFunction)
 
-	double square(double in)
+	realFloat square(realFloat in)
 	{
 		return in * in;
 	}
@@ -728,7 +728,7 @@ BOOST_AUTO_TEST_SUITE(applyFunction)
 		int numberOfElements = 53;
 		DataSampleBasic sample(makeValarrayWithArrayPosition(numberOfElements));
 		DataSampleBasic sampleFromFunction = sample.applyFunction();
-		BOOST_CHECK_CLOSE(sampleFromFunction.sum(), sample.sum(), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sampleFromFunction.sum(), sample.sum(), realFloatPrecisionInPercent);
 	}
 
 	BOOST_AUTO_TEST_CASE(applyFunction2)
@@ -737,7 +737,7 @@ BOOST_AUTO_TEST_SUITE(applyFunction)
 		DataSampleBasic sample(makeValarrayWithArrayPosition(numberOfElements));
 		DataSampleBasic sampleSquared(makeValarrayWithSquaredArrayPosition(numberOfElements));
 		DataSampleBasic sampleFromFunction = sample.applyFunction(square);
-		BOOST_CHECK_CLOSE(sampleFromFunction.sum(), sampleSquared.sum(), doublePrecisionInPercent);
+		BOOST_CHECK_CLOSE(sampleFromFunction.sum(), sampleSquared.sum(), realFloatPrecisionInPercent);
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

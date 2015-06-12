@@ -21,9 +21,9 @@ class ReweighterIOTester{
 public:
 	ReweighterIOTester(std::string filename, bool useJackknife = false) : reweighterIO(createLqcdParameters(filename, useJackknife)){};
 	std::vector<std::string> getNamesOfParametersIgnoringMetaParameters(){ return reweighterIO.namesOfParametersIgnoringMetaParameters; };
-	std::vector<std::vector<double> > getValuesOfSimulationParametersIgnoringMetaParameters(){ return reweighterIO.valuesOfSimulationParametersIgnoringMetaParameters; };
+	std::vector<std::vector<realFloat> > getValuesOfSimulationParametersIgnoringMetaParameters(){ return reweighterIO.valuesOfSimulationParametersIgnoringMetaParameters; };
 	std::vector<Binsizes> getValuesOfSpecifiedBinsizes(){ return reweighterIO.valuesOfSpecifiedBinsizes; };
-	std::vector<double> getValuesOfSpecifiedLogZ(){ return reweighterIO.valuesOfSpecifiedLogZ; };
+	std::vector<realFloat> getValuesOfSpecifiedLogZ(){ return reweighterIO.valuesOfSpecifiedLogZ; };
 	ErrorCalculationMethod getErrorMethod(){ return reweighterIO.errorMethod; };
 	int getBootstrapNumber(){ return *(reweighterIO.bootstrapNumber); };
 private:
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_SUITE(build)
         std::string fileThatDoesExist = "RealTestData/configfile_6";
         ReweighterIOTester reweighterIOTester(fileThatDoesExist);
         std::string referenceParName = "beta";
-        std::vector<std::vector<double> > referenceParValue(3, std::vector<double>(1));
+        std::vector<std::vector<realFloat> > referenceParValue(3, std::vector<realFloat>(1));
         referenceParValue[0][0] = 5.355;
         referenceParValue[1][0] = 5.357;
         referenceParValue[2][0] = 5.360;
@@ -135,8 +135,8 @@ BOOST_AUTO_TEST_SUITE(build)
 	{
 		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
 		ReweighterIOTester reweighterIOTester(fileThatDoesExist);
-		std::vector<double> referenceLogZ({NAN, 3.14, NAN});
-		std::vector<double> gottenLogZ = reweighterIOTester.getValuesOfSpecifiedLogZ();
+		std::vector<realFloat> referenceLogZ({NAN, 3.14, NAN});
+		std::vector<realFloat> gottenLogZ = reweighterIOTester.getValuesOfSpecifiedLogZ();
 		BOOST_REQUIRE_EQUAL(gottenLogZ.size(), 3);
 		BOOST_REQUIRE(isnan(gottenLogZ[0]));
 		BOOST_REQUIRE_EQUAL(gottenLogZ[1], referenceLogZ[1]);
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //        std::vector<unsigned int> momentsToBeReweighted{1, 2, 3, 4};
 //        std::vector<int> binsizesToBeUsed{2, 2, 2};
 //        RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed);
-//        std::vector<std::pair<double, double> > newRanges = {std::make_pair(4.2, 4.6), std::make_pair(0.8, 1.2)};
+//        std::vector<std::pair<realFloat, realFloat> > newRanges = {std::make_pair(4.2, 4.6), std::make_pair(0.8, 1.2)};
 //		std::vector< unsigned int> newNumPoints(2, 3);
 //		rawDataAndMetaInfo.newRangesOfParameters = newRanges;
 //		rawDataAndMetaInfo.newNumberOfPointsOfParameters = newNumPoints;
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //		RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed);
 //        MomentsReweighterHelper reweightingDataHandler(rawDataAndMetaInfo);
 //        MomentsReweighter* reweighter = new MomentsReweighter(rawDataAndMetaInfo);
-//        std::vector<double> simulatedLogZ = reweighter->getLogZAtSimulatedPoints();
+//        std::vector<realFloat> simulatedLogZ = reweighter->getLogZAtSimulatedPoints();
 //        std::string outputFileName = "testWritingConfigFile";
 //        reweightingDataHandler.writeNewConfigurationFileWithMetaparameters(*reweighter, outputFileName);
 //        BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //													   "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30"};
 //        reweighter = new MomentsReweighter(ReweighterTester(options2).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed));
 //        for(size_t i=0; i<simulatedLogZ.size(); i++)
-//            BOOST_REQUIRE_CLOSE(reweighter->getLogZAtSimulatedPoints()[i], simulatedLogZ[i], doublePrecisionInPercent);
+//            BOOST_REQUIRE_CLOSE(reweighter->getLogZAtSimulatedPoints()[i], simulatedLogZ[i], realFloatPrecisionInPercent);
 //        if(boost::filesystem::exists(outputFileName))
 //            boost::filesystem::remove(outputFileName);
 //        delete reweighter;
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //        BOOST_REQUIRE_MESSAGE(boost::filesystem::exists( outputFileName ) == true, "Something bad happened creating a file!");
 //        BOOST_REQUIRE_THROW(reweightingDataHandler.writeNewPointsToFileWithLogZ(reweighter, outputFileName), std::invalid_argument);
 //        boost::filesystem::remove(outputFileName);
-//        std::vector<double> newLogZ = reweighter.getLogZAtNewPoints();
+//        std::vector<realFloat> newLogZ = reweighter.getLogZAtNewPoints();
 //        reweightingDataHandler.writeNewPointsToFileWithLogZ(reweighter, outputFileName);
 //        BOOST_REQUIRE_EQUAL(boost::filesystem::exists( outputFileName ), true);
 //        if(boost::filesystem::exists(outputFileName))

@@ -19,7 +19,7 @@
  *  3 - The minimum number of bins among the files is found. This will be used to bin the data
  *      in all the files. Therefore, it will happen that in a lot of files the actual binsize used
  *      will be bigger than the provided one. The idea behind this is that a binsize almost equal
- *      to the double of the autocorrelation time should be given, in order to obtain after the
+ *      to the realFloat of the autocorrelation time should be given, in order to obtain after the
  *      binning procedure a set of uncorrelated data. If then one use a bigger binsize than that
  *      provided, the new data will be as well uncorrelated.
  *
@@ -57,7 +57,7 @@ private:
     SimulationDataContainer simulationRawDataContainer;
     SimulationDataContainer simulationUncorrDataContainer;
     std::vector<std::string> namesOfParametersIgnoringMetaParameters;
-    std::vector<std::vector<double> > valuesOfSimulationParametersIgnoringMetaParameters;
+    std::vector<std::vector<realFloat> > valuesOfSimulationParametersIgnoringMetaParameters;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
     std::vector<unsigned int> momentsToBeReweighted;
     unsigned int maximumMomentNeededOverall;
