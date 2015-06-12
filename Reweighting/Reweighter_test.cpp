@@ -728,24 +728,22 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
 		std::vector<std::vector<Observables> > valuesObsNewPoints2 = reweighter2.getReweightedObservables();
 
 		for(size_t i=0; i<valuesObsNewPoints1.size(); i++){
-			for(size_t j=0; j<valuesObsNewPoints1[i].size(); j++){
-				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].mean.estimate,
-									valuesObsNewPoints2[2*i][j].mean.estimate, doublePrecisionInPercent);
-				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].mean.error,
-									valuesObsNewPoints2[2*i][j].mean.error, doublePrecisionInPercent);
-				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].susceptibility.estimate,
-									valuesObsNewPoints2[2*i][j].susceptibility.estimate, doublePrecisionInPercent);
-				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].susceptibility.error,
-									valuesObsNewPoints2[2*i][j].susceptibility.error, doublePrecisionInPercent);
-				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].skewness.estimate,
-									valuesObsNewPoints2[2*i][j].skewness.estimate, doublePrecisionInPercent);
-				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].skewness.error,
-									valuesObsNewPoints2[2*i][j].skewness.error, doublePrecisionInPercent);
-				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].binderCumulant.estimate,
-									valuesObsNewPoints2[2*i][j].binderCumulant.estimate, doublePrecisionInPercent);
-				BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][j].binderCumulant.error,
-									valuesObsNewPoints2[2*i][j].binderCumulant.error, doublePrecisionInPercent);
-			}
+			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.estimate,
+					valuesObsNewPoints2[2*i][0].mean.estimate, doublePrecisionInPercent);
+			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.error,
+					valuesObsNewPoints2[2*i][0].mean.error, doublePrecisionInPercent);
+			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.estimate,
+					valuesObsNewPoints2[2*i][0].susceptibility.estimate, doublePrecisionInPercent);
+			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.error,
+					valuesObsNewPoints2[2*i][0].susceptibility.error, doublePrecisionInPercent);
+			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.estimate,
+					valuesObsNewPoints2[2*i][0].skewness.estimate, doublePrecisionInPercent);
+			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.error,
+					valuesObsNewPoints2[2*i][0].skewness.error, doublePrecisionInPercent);
+			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].binderCumulant.estimate,
+					valuesObsNewPoints2[2*i][0].binderCumulant.estimate, doublePrecisionInPercent);
+			BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].binderCumulant.error,
+					valuesObsNewPoints2[2*i][0].binderCumulant.error, doublePrecisionInPercent);
 		}
 	}
 
