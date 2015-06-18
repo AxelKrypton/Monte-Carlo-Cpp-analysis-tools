@@ -11,7 +11,20 @@ add_library(dataAnalysisUtilities
 	Observables.cpp
 )
 
+add_library(supportSourceForReweighting
+	DataSampleBasic.cpp
+	DataSample.cpp
+	binnedDataSample.cpp
+	jackknifeEstimators.cpp
+	jackknifeAnalysis.cpp
+	bootstrapAnalysis.cpp
+	binning.cpp
+	Observables.cpp
+)
+target_compile_definitions(supportSourceForReweighting PUBLIC -D_USE_BIG_FLOAT_ -DNUM_DECIMAL_DIGITS=${DIGITS_PREC})
+
 target_link_libraries(dataAnalysisUtilities IO Parameters)
+target_link_libraries(supportSourceForReweighting IO Parameters)
 
 configure_file(datafile.example datafile.example COPYONLY)
 configure_file(datafile2.example datafile2.example COPYONLY)

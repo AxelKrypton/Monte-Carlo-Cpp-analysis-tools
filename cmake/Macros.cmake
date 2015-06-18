@@ -55,5 +55,15 @@ macro(add_modules DEST MODULE)
 	target_link_libraries(${DEST} ${_MODULES})
 endmacro()
 
+# Here a macro basically identical to the above one
+# but only to add a sub-folder to the project without
+# linking part.
+macro(add_set_of_subdirectories MODULE)
+	set(_MODULES "${ARGV}")
+	foreach(_MODULE ${_MODULES})
+		add_subdirectory(${_MODULE})
+		set_property(GLOBAL APPEND PROPERTY DOC_SOURCE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/${_MODULE}")
+	endforeach()
+endmacro()
 
 

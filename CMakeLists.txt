@@ -26,33 +26,40 @@ endif(CMAKE_COMPILER_IS_GNUCC)
 find_package(Boost REQUIRED COMPONENTS regex filesystem system program_options unit_test_framework)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
-## These two variables are needed to create the main library StAT
-## NOTE: So far they are empty, but they can be useful in future
-set_abs_paths(StAT_FILES 
-)
-set(StAT_USED_LIBS ${Boost_LIBRARIES}
+find_package( MPFR REQUIRED )
+include_directories( SYSTEM ${MPFR_INCLUDE_DIR} )
+
+# Allow to choose the digits precision for reweighting
+set(DIGITS_PREC "34" CACHE STRING "The number of decimal digits used in the Reweighting executable.")
+string(REGEX MATCH "^[0-9]+$" TMP "${DIGITS_PREC}")
+if(TMP STREQUAL "")
+	message(SEND_ERROR "DIGITS_PREC must be an integer positive number. \"${DIGITS_PREC}\" is not a valid value.")
+endif(TMP STREQUAL "")
+
+#Gather in a list all the external used libraries
+set(StAT_USED_LIBS ${Boost_LIBRARIES} ${MPFR_LIBRARIES}
 )
 
-## Create the main library StAT
-add_library(StAT ${StAT_FILES})
-
-## Add to StAT each sub-directory linking it to the StAT library (see Macros.cmake in cmake folder)
-add_modules(StAT
+# Add to the project each sub-directory as it is, no linking to nothing (see Macros.cmake in cmake folder)
+add_set_of_subdirectories(
 	Parameters
 	IO
 	dataAnalysisUtilities
 	Reweighting
 )
 
-## Link used libraries to StAT
-target_link_libraries(StAT ${StAT_USED_LIBS})
-#set_target_properties(StAT PROPERTIES LINK_INTERFACE_MULTIPLICITY 4)
-
-## The actual executables (frontends)
+# The actual executables (frontends)
+#
+# NOTE: Here, the linking of the executable is done manually since some
+#       sub-libraries are compiled with the definition _USE_BIG_FLOAT_ and
+#       some others no. 
+#
 add_executable(dataAnalysis executables/dataAnalysis.cpp)
-target_link_libraries(dataAnalysis StAT)
+target_link_libraries(dataAnalysis dataAnalysisUtilities Parameters IO ${StAT_USED_LIBS})
+
 add_executable(lqcdReweighting executables/lqcdReweighting.cpp)
-target_link_libraries(lqcdReweighting StAT)
+target_compile_definitions(lqcdReweighting PUBLIC -D_USE_BIG_FLOAT_ -DNUM_DECIMAL_DIGITS=${DIGITS_PREC})
+target_link_libraries(lqcdReweighting Reweighting Parameters IO ${StAT_USED_LIBS})
 
 #include scripts-directory
 add_subdirectory("${CMAKE_SOURCE_DIR}/Scripts")
