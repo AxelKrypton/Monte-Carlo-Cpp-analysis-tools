@@ -390,7 +390,15 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		BOOST_CHECK_CLOSE(sample2.sum(), shifted.sum(), realFloatPrecisionInPercent);
 	}
 
-	BOOST_AUTO_TEST_CASE(mulitplication_compound)
+	BOOST_AUTO_TEST_CASE(mulitplication_compound1)
+	{
+		int numberOfElements = 432;
+		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
+		sample *= 1;
+		BOOST_REQUIRE_EQUAL(sample.sum(), 432);
+	}
+
+	BOOST_AUTO_TEST_CASE(mulitplication_compound2)
 	{
 		int numberOfElements = 432;
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
@@ -420,6 +428,22 @@ BOOST_AUTO_TEST_SUITE(operatorsAndFunctions)
 		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
 		DataSampleBasic multiplied = (1./numberOfElements)*sample;
 		BOOST_REQUIRE_CLOSE(multiplied.sum(), 1., realFloatPrecisionInPercent);
+	}
+
+	BOOST_AUTO_TEST_CASE(mulitplication4)
+	{
+		int numberOfElements = 432;
+		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
+		DataSampleBasic multiplied = sample * 1;
+		BOOST_REQUIRE_EQUAL(multiplied.sum(), 432);
+	}
+
+	BOOST_AUTO_TEST_CASE(mulitplication5)
+	{
+		int numberOfElements = 432;
+		DataSampleBasic sample(makeValarrayWithOnes(numberOfElements));
+		DataSampleBasic multiplied = 1*sample;
+		BOOST_REQUIRE_EQUAL(multiplied.sum(), 432);
 	}
 
 	BOOST_AUTO_TEST_CASE(mulitplication_wholeSample_compound_invalidArgument)

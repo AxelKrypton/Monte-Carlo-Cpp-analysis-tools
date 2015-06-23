@@ -1,4 +1,6 @@
-add_definitions( -D_USE_BIG_FLOAT_ -DNUM_DECIMAL_DIGITS=${DIGITS_PREC} )
+if( USE_REW_MULTI_PRECISION )
+	add_definitions( -D_USE_BIG_FLOAT_ )
+endif( USE_REW_MULTI_PRECISION )
 
 add_library(Reweighting 
 	SimulationData.cpp
@@ -20,7 +22,7 @@ add_custom_target(ReweightingFiles ALL
 
 add_unit_test(SimulationData SimulationData_test Reweighting ${MPFR_LIBRARIES})
 add_unit_test(SimulationDataContainer SimulationDataContainer_test Reweighting ${MPFR_LIBRARIES})
-add_unit_test(MomentsReweighterHelper MomentsReweighterHelper_test Reweighting Parameters ${MPFR_LIBRARIES})
-add_unit_test(MomentsReweighter MomentsReweighter_test Reweighting Parameters ${MPFR_LIBRARIES})
-add_unit_test(ReweighterIO ReweighterIO_test Reweighting Parameters ${MPFR_LIBRARIES})
-add_unit_test(Reweighter Reweighter_test Reweighting Parameters ${MPFR_LIBRARIES})
+add_unit_test(MomentsReweighterHelper MomentsReweighterHelper_test Reweighting Parameters_Reweighting ${MPFR_LIBRARIES})
+add_unit_test(MomentsReweighter MomentsReweighter_test Reweighting Parameters_Reweighting ${MPFR_LIBRARIES})
+add_unit_test(ReweighterIO ReweighterIO_test Reweighting Parameters_Reweighting ${MPFR_LIBRARIES})
+add_unit_test(Reweighter Reweighter_test Reweighting Parameters_Reweighting ${MPFR_LIBRARIES})

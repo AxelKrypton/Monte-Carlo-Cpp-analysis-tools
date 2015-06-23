@@ -21,10 +21,12 @@ add_library(supportSourceForReweighting
 	binning.cpp
 	Observables.cpp
 )
-target_compile_definitions(supportSourceForReweighting PUBLIC -D_USE_BIG_FLOAT_ -DNUM_DECIMAL_DIGITS=${DIGITS_PREC})
+if( USE_REW_MULTI_PRECISION )
+	target_compile_definitions(supportSourceForReweighting PUBLIC -D_USE_BIG_FLOAT_)
+endif( USE_REW_MULTI_PRECISION )
 
 target_link_libraries(dataAnalysisUtilities IO Parameters)
-target_link_libraries(supportSourceForReweighting IO Parameters)
+target_link_libraries(supportSourceForReweighting IO Parameters ${MPFR_LIBRARIES})
 
 configure_file(datafile.example datafile.example COPYONLY)
 configure_file(datafile2.example datafile2.example COPYONLY)

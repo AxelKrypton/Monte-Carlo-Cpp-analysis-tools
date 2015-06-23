@@ -15,7 +15,7 @@ DataSample(sampleIn)
 	int normalization = numberOfElements - 1;
 	realFloat sumOfDataSampleElements = sampleIn.sum();
 	//todo: do this removing specific elements -> less rounding errors
-	setValues( (*this - sumOfDataSampleElements) * (-1./normalization) );
+	setValues( (*this - sumOfDataSampleElements) * (realFloat)(-1./normalization) );
 }
 
 void checkDiscardedElements(int valueIn, std::string descriptionIn, int numberOfElements)

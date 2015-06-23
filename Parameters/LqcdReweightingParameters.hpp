@@ -2,7 +2,6 @@
 #define LQCDREWEIGHTINGPARAMETERS_HPP_
 
 #include "../types.hpp"
-
 #include "iostream"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>

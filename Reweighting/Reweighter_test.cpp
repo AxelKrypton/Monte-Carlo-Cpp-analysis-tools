@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
 		std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.getReweightedObservables();
 		for(size_t i=0; i < valuesObsNewPoints.size(); i++){
 			BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-8);
-			BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].mean.error, 1.e-6);
+			BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].mean.error, (realFloat)1.e-6);
 		}
 	}
 
@@ -463,7 +463,7 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
 		std::vector<std::vector<Observables> > valuesObsNewPoints = reweighter.getReweightedObservables();
 		for(size_t i=0; i < valuesObsNewPoints.size(); i++){
 		   BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 2e-7);
-		   BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].susceptibility.error, 1.e-6);
+		   BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].susceptibility.error, realFloat(1.e-6));
 		}
 	}
 
@@ -617,7 +617,7 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
 			   BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 0.0025);
 		   else
 			   BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].binderCumulant.estimate, 1.e-8);
-		   BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].binderCumulant.error, 1.e-6);
+		   BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].binderCumulant.error, (realFloat)1.e-6);
 		}
 	}
 

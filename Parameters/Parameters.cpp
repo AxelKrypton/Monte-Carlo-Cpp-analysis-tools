@@ -44,6 +44,7 @@ Parameters::Parameters(int argc, const char ** argv)
 
 	checkParsedArguments(vm, desc);
 	printParameters();
+
 }
 
 void Parameters::checkParsedArguments(po::variables_map & vm, po::options_description & desc)

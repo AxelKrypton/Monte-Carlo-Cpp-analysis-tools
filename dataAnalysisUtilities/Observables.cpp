@@ -459,13 +459,13 @@ template<typename T> static T getPowerOfFirstMomentUsingSeveralEstimate(const st
 
 	switch(power){
 	case 1:
-		return (estimates[0] + estimates[1] + estimates[2] + estimates[3])/4.0;
+		return (estimates[0] + estimates[1] + estimates[2] + estimates[3])/(realFloat)4.0;
 	case 2:
 		return ((estimates[0] * estimates[1]) + (estimates[0] * estimates[2]) + (estimates[0] * estimates[3]) +
-				(estimates[1] * estimates[2]) + (estimates[1] * estimates[3]) + (estimates[2] * estimates[3]))/6.0;
+				(estimates[1] * estimates[2]) + (estimates[1] * estimates[3]) + (estimates[2] * estimates[3]))/(realFloat)6.0;
 	case 3:
 		return ((estimates[0] * estimates[1] * estimates[2]) + (estimates[0] * estimates[1] * estimates[3]) +
-				(estimates[0] * estimates[2] * estimates[3]) + (estimates[1] * estimates[2] * estimates[3]))/4.0;
+				(estimates[0] * estimates[2] * estimates[3]) + (estimates[1] * estimates[2] * estimates[3]))/(realFloat)4.0;
 	case 4:
 		return (estimates[0] * estimates[1] * estimates[2] * estimates[3]);
 	default:

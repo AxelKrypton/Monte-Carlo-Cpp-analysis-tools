@@ -236,14 +236,14 @@ static DataSample getMomentUsingMultipleColumns(const int moment, std::vector<Da
     //TODO: Implement the following in a general way with recursive functions
     if(tempSamples.size() == 4){
         if(moment == 1)
-            return (tempSamples[0] + tempSamples[1] + tempSamples[2] + tempSamples[3])/4.;
+            return (tempSamples[0] + tempSamples[1] + tempSamples[2] + tempSamples[3])/(realFloat)4.0;
         else if(moment == 2)
             return ((tempSamples[0]*tempSamples[1]) + (tempSamples[0]*tempSamples[2]) +
                     (tempSamples[0]*tempSamples[3]) + (tempSamples[1]*tempSamples[2]) +
-                    (tempSamples[1]*tempSamples[3]) + (tempSamples[2]*tempSamples[3]))/6.;
+                    (tempSamples[1]*tempSamples[3]) + (tempSamples[2]*tempSamples[3]))/(realFloat)6.0;
         else if(moment == 3)
             return ((tempSamples[0]*tempSamples[1]*tempSamples[2]) + (tempSamples[0]*tempSamples[1]*tempSamples[3]) +
-                    (tempSamples[0]*tempSamples[2]*tempSamples[3]) + (tempSamples[1]*tempSamples[2]*tempSamples[3]))/4.;
+                    (tempSamples[0]*tempSamples[2]*tempSamples[3]) + (tempSamples[1]*tempSamples[2]*tempSamples[3]))/(realFloat)4.0;
         else
             return tempSamples[0]*tempSamples[1]*tempSamples[2]*tempSamples[3];
     }else{

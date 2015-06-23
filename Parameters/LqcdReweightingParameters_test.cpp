@@ -56,13 +56,13 @@ BOOST_AUTO_TEST_SUITE(defaults)
 	BOOST_AUTO_TEST_CASE(newRange_high)
 	{
 		realFloat defaultValue = 2.;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNewBetaRange_high() );
+		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue), boost::lexical_cast<std::string>(createParametersForDefaultCheck().getNewBetaRange_high()) );
 	}
 	
 	BOOST_AUTO_TEST_CASE(newRange_low)
 	{
 		realFloat defaultValue = 1.;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNewBetaRange_low() );
+		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue), boost::lexical_cast<std::string>(createParametersForDefaultCheck().getNewBetaRange_low()) );
 	}
 	
 	BOOST_AUTO_TEST_CASE(deactivateReweightingForMean)
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_SUITE(defaults)
 	BOOST_AUTO_TEST_CASE(WeightPrecision)
 	{
 		realFloat defaultValue = 1.e-7;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getWeightPrecision() );
+		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue), boost::lexical_cast<std::string>(createParametersForDefaultCheck().getWeightPrecision()) );
 	}
 
 	BOOST_AUTO_TEST_CASE(useSimAsNewPoints)
@@ -185,14 +185,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 	{
 		realFloat newValue = 65.123;
 		std::string argumentName = "--newBetaRange_high";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_high() );
+		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(newValue), boost::lexical_cast<std::string>(createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_high()) );
 	}
 	
 	BOOST_AUTO_TEST_CASE(newRange_low)
 	{
 		realFloat newValue = 14.563;
 		std::string argumentName = "--newBetaRange_low";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_low() );
+		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(newValue), boost::lexical_cast<std::string>(createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_low()) );
 	}
 	
 	static LqcdReweightingParameters createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(std::string argumentName)
@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 
 	BOOST_AUTO_TEST_CASE(numColsForSingleObs)
 	{
-		realFloat newValue = 4;
+		int newValue = 4;
 		std::string argumentName = "--numberOfMultipleColumns";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfMultipleColumnsForSingleObservable() );
 	}
@@ -357,7 +357,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 	{
 		realFloat newValue = 1.e-08;
 		std::string argumentName = "--weightPrecision";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getWeightPrecision() );
+		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(newValue), boost::lexical_cast<std::string>(createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getWeightPrecision()) );
 	}
 	
 	BOOST_AUTO_TEST_CASE(useSimAsNewPoints_implicit)

@@ -93,6 +93,12 @@ DataSampleBasic& DataSampleBasic::operator-=(DataSampleBasic sampleIn)
 	return *this;
 }
 
+DataSampleBasic& DataSampleBasic::operator*=(int factor)
+{
+	values *= factor;
+	return *this;
+}
+
 DataSampleBasic& DataSampleBasic::operator*=(realFloat factor)
 {
 	values *= factor;
@@ -160,7 +166,7 @@ DataSampleBasic operator-(DataSampleBasic sampleIn, realFloat factor)
 DataSampleBasic operator-(realFloat factor, DataSampleBasic sampleIn)
 {
 	sampleIn -= factor;
-	sampleIn *= -1.;
+	sampleIn *= (realFloat)-1.;
 	return sampleIn;
 }
 
@@ -169,6 +175,18 @@ DataSampleBasic operator-(DataSampleBasic lhs, DataSampleBasic rhs)
 	checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
 	lhs -= rhs;
 	return lhs;
+}
+
+DataSampleBasic operator*(DataSampleBasic sampleIn, int factor)
+{
+	sampleIn *= factor;
+	return sampleIn;
+}
+
+DataSampleBasic operator*(int factor, DataSampleBasic sampleIn)
+{
+	sampleIn *= factor;
+	return sampleIn;
 }
 
 DataSampleBasic operator*(DataSampleBasic sampleIn, realFloat factor)

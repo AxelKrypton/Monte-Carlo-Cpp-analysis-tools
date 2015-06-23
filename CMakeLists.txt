@@ -1,6 +1,11 @@
 cmake_minimum_required (VERSION 2.8.3)
 project(StATools)
 
+#Check that the user deleted in the cache the precision variable
+if(EXISTS CMakeCache.txt)
+	message(WARNING "Before running cmake, delete the CMakeCache.txt file to be prompted about multiprecision option in the correct order.")
+endif(EXISTS CMakeCache.txt)
+
 ## we have some custom CMake stuff
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Macros)
@@ -29,12 +34,18 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 find_package( MPFR REQUIRED )
 include_directories( SYSTEM ${MPFR_INCLUDE_DIR} )
 
-# Allow to choose the digits precision for reweighting
-set(DIGITS_PREC "34" CACHE STRING "The number of decimal digits used in the Reweighting executable.")
-string(REGEX MATCH "^[0-9]+$" TMP "${DIGITS_PREC}")
-if(TMP STREQUAL "")
-	message(SEND_ERROR "DIGITS_PREC must be an integer positive number. \"${DIGITS_PREC}\" is not a valid value.")
-endif(TMP STREQUAL "")
+# Allow to choose whether to use multi-precision and in case the digits precision for reweighting
+option( USE_REW_MULTI_PRECISION "Use arbitrary precision arithmetics in Reweighting" OFF )
+if( USE_REW_MULTI_PRECISION )
+	set(DIGITS_PREC "34" CACHE STRING "The number of decimal digits used in the Reweighting executable.")
+	string(REGEX MATCH "^[0-9]+$" TMP "${DIGITS_PREC}")
+	if(TMP STREQUAL "")
+		message(SEND_ERROR "DIGITS_PREC must be an integer positive number. \"${DIGITS_PREC}\" is not a valid value.")
+	endif(TMP STREQUAL "")
+	add_definitions( -DNUM_DECIMAL_DIGITS=${DIGITS_PREC} )
+else( USE_REW_MULTI_PRECISION )
+	add_definitions( -DNUM_DECIMAL_DIGITS=15 )
+endif( USE_REW_MULTI_PRECISION )
 
 #Gather in a list all the external used libraries
 set(StAT_USED_LIBS ${Boost_LIBRARIES} ${MPFR_LIBRARIES}
@@ -58,8 +69,10 @@ add_executable(dataAnalysis executables/dataAnalysis.cpp)
 target_link_libraries(dataAnalysis dataAnalysisUtilities Parameters IO ${StAT_USED_LIBS})
 
 add_executable(lqcdReweighting executables/lqcdReweighting.cpp)
-target_compile_definitions(lqcdReweighting PUBLIC -D_USE_BIG_FLOAT_ -DNUM_DECIMAL_DIGITS=${DIGITS_PREC})
-target_link_libraries(lqcdReweighting Reweighting Parameters IO ${StAT_USED_LIBS})
+if( USE_REW_MULTI_PRECISION )
+	target_compile_definitions(lqcdReweighting PUBLIC -D_USE_BIG_FLOAT_)
+endif( USE_REW_MULTI_PRECISION )	
+target_link_libraries(lqcdReweighting Reweighting Parameters_Reweighting IO_Reweighting ${StAT_USED_LIBS})
 
 #include scripts-directory
 add_subdirectory("${CMAKE_SOURCE_DIR}/Scripts")

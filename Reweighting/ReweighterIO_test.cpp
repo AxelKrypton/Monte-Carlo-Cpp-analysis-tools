@@ -93,7 +93,11 @@ BOOST_AUTO_TEST_SUITE(build)
         referenceParValue[1][0] = 5.357;
         referenceParValue[2][0] = 5.360;
         BOOST_REQUIRE_EQUAL(reweighterIOTester.getNamesOfParametersIgnoringMetaParameters()[0], referenceParName);
-        BOOST_REQUIRE(reweighterIOTester.getValuesOfSimulationParametersIgnoringMetaParameters() == referenceParValue);
+        for(size_t i=0; i<referenceParValue.size(); i++){
+        	for(size_t j=0; j<referenceParValue[i].size(); j++){
+        		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(reweighterIOTester.getValuesOfSimulationParametersIgnoringMetaParameters()[i][j]), boost::lexical_cast<std::string>(referenceParValue[i][j]));
+        	}
+        }
     }
 
     BOOST_AUTO_TEST_CASE(build5)
@@ -138,9 +142,9 @@ BOOST_AUTO_TEST_SUITE(build)
 		std::vector<realFloat> referenceLogZ({NAN, 3.14, NAN});
 		std::vector<realFloat> gottenLogZ = reweighterIOTester.getValuesOfSpecifiedLogZ();
 		BOOST_REQUIRE_EQUAL(gottenLogZ.size(), 3);
-		BOOST_REQUIRE(isnan(gottenLogZ[0]));
-		BOOST_REQUIRE_EQUAL(gottenLogZ[1], referenceLogZ[1]);
-		BOOST_REQUIRE(isnan(gottenLogZ[2]));
+		BOOST_REQUIRE((boost::math::isnan)(gottenLogZ[0]));  //parenthesis around boost::math::isnan crucial otherwise the std lib macro is called!
+		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(gottenLogZ[1]), boost::lexical_cast<std::string>(referenceLogZ[1]));
+		BOOST_REQUIRE((boost::math::isnan)(gottenLogZ[2])); //parenthesis around boost::math::isnan crucial otherwise the std lib macro is called!
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

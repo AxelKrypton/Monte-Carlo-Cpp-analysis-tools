@@ -118,12 +118,11 @@ RawDataForReweightingAndMetainformation Reweighter::getRawDataForReweightingAndM
 
 LqcdReweightingParameters Reweighter::createLqcdParameters(std::initializer_list<std::string> options)
 {
-	std::vector<const char*> tmp;
-	tmp.push_back(std::string("foo").c_str());
-	for(auto i: options)
-		tmp.push_back(i.c_str());
-	int numberOfArguments = (int)tmp.size();
-	LqcdReweightingParameters parameters(numberOfArguments, tmp.data());
+	std::vector<std::string> optionsAsStrings(options);
+	optionsAsStrings.insert(optionsAsStrings.begin(), "foo");
+	std::vector<const char *> argv(optionsAsStrings.size());
+	std::transform(optionsAsStrings.begin(), optionsAsStrings.end(), argv.begin(), [](std::string& str){return str.c_str();});
+	LqcdReweightingParameters parameters((int)argv.size(), argv.data());
 	return parameters;
 }
 
@@ -302,11 +301,11 @@ static bool isObservableToBeEvaluatedUsingMultipleColumns(const unsigned int obs
 static void setMeanToZeroAtNewPoints(std::vector<std::vector<Observables> >& observables){
 	for(size_t newPoint=0; newPoint<observables.size(); newPoint++){
 		for(size_t obsInFile=0; obsInFile<observables[newPoint].size(); obsInFile++){
-			if(std::isnan(observables[newPoint][obsInFile].mean.estimate))
+			if((boost::math::isnan)(observables[newPoint][obsInFile].mean.estimate)) //parenthesis around boost::math::isnan crucial otherwise the std lib macro is called!
 				observables[newPoint][obsInFile].mean.estimate = 0.0;
 			else
 				throw std::logic_error("Error setting mean.estimate to 0.0 since it should be NAN but it isn't!");
-			if(std::isnan(observables[newPoint][obsInFile].mean.error))
+			if((boost::math::isnan)(observables[newPoint][obsInFile].mean.error)) //parenthesis around boost::math::isnan crucial otherwise the std lib macro is called!
 				observables[newPoint][obsInFile].mean.error = 0.0;
 			else
 				throw std::logic_error("Error setting mean.error to 0.0 since it should be NAN but it isn't!");

@@ -9,6 +9,9 @@
 #include "../dataAnalysisUtilities/jackknifeAnalysis.hpp"
 #include "../dataAnalysisUtilities/bootstrapAnalysis.hpp"
 
+#include <boost/math/special_functions/expm1.hpp>
+#include <boost/math/special_functions/log1p.hpp>
+
 static void writeNewPoints(std::vector<std::vector<realFloat> >&, std::vector<std::vector<realFloat> >, std::vector<realFloat>, int=0, int=0);
 static void findIflogZHasToBeCalculated(std::vector<realFloat>, std::vector<int>&);
 static realFloat logarithmic_sum(realFloat, realFloat);
@@ -29,7 +32,7 @@ MomentsReweighterAbstract::MomentsReweighterAbstract(RawDataForReweightingAndMet
 	logZAtSimulatedPoints = rawDataForReweightingAndMetainformationIn.valuesOfSpecifiedLogZ;
 	//Set to zero not given value of logZ. TODO: This should be done in calculateLogZAtSimulatedPoints
 	for(size_t i=0; i<logZAtSimulatedPoints.size(); i++){
-		if(isnan(logZAtSimulatedPoints[i]))
+		if((boost::math::isnan)(logZAtSimulatedPoints[i])) //parenthesis around boost::math::isnan crucial otherwise the std lib macro is called!
 			logZAtSimulatedPoints[i] = 0.0;
 	}
 	calculateNewPoints();
@@ -313,6 +316,8 @@ std::vector<realFloat> MomentsReweighterAbstract::calculateLogZAtSimulatedPoints
      * TODO: Benchmark in real life if these two blocks can be merged, i.e. how long takes the
      *       indices set up in the else here below.
      */
+	using std::abs;
+
 	if(entryToBeLeftOut >= momentsReweighterHelper.numberOfBinsToBeUsed[0]) //Here negative values mean do not leave out entry, so no check is done!
 		throw std::out_of_range("Invalid entry to be left out in \"calculateLogZAtSimulatedPointsUsingUncorrDataAndLeavingOutOneEntry\" function.");
 
@@ -323,30 +328,36 @@ std::vector<realFloat> MomentsReweighterAbstract::calculateLogZAtSimulatedPoints
     if (printUserInfo){
     	std::cout << "==========================================================\n";
     	std::cout << " Calculating LogZ At Simulated Points (precision = " << precisionOfIterativeProcedureToCalculateLogZ << ")..." << std::endl;
+    	std::cout.precision(NUM_DECIMAL_DIGITS);
     }
     if(logZAtSimulationPointToStartFrom != &logZAtSimulatedPoints || resultLogZ == std::vector<realFloat>(logZAtSimulatedPoints.size(), 0)){
-    	realFloat residuum, valueResiduumForOutput=1;
+    	realFloat residuumNew, residuumOld, valueResiduumForOutput=1;
+    	int iter=0;
         std::vector<realFloat> newLogZ(valuesOfSimulationParameters.size());
         while(true){
+        	iter++;
             newLogZ = calculateLogZAtNewPoints(valuesOfSimulationParameters, useUncorrData, entryToBeLeftOut, &resultLogZ);
-            residuum=0.0;
+            residuumOld=residuumNew=0.0;
             //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
             for(size_t indexSimulations = 0; indexSimulations < valuesOfSimulationParameters.size(); indexSimulations++){
-                residuum += expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations])
-                           *expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations]);
+                residuumNew += boost::math::expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations])
+                           *boost::math::expm1(newLogZ[indexSimulations] - resultLogZ[indexSimulations]);
                 //here one should put eq.(8.34)
             }
-			if(printUserInfo && residuum < valueResiduumForOutput){
-			  std::cout << "   Residuum = " << sqrt(residuum) << std::endl;
+			if(printUserInfo && residuumNew < valueResiduumForOutput){
+			  std::cout << "   Residuum = " << sqrt(residuumNew) << std::endl;
 			  valueResiduumForOutput/=10.;
 			}
-            if(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ)
+            if(sqrt(residuumNew) > precisionOfIterativeProcedureToCalculateLogZ){
             	resultLogZ = newLogZ;
+            	if(abs(residuumOld-residuumNew) < pow(10, -NUM_DECIMAL_DIGITS))
+            		throw std::runtime_error("Iterative procedure to calculate logZ got stuck after " + std::to_string(iter) + " iterations with " + boost::lexical_cast<std::string>(residuumNew));
+            }
             else
             	break;
 	    }
         if (printUserInfo){
-        	std::cout << " ...done!" << std::endl;
+        	std::cout << " ...done in " <<  iter << " iterations!" << std::endl;
         	std::cout << "==========================================================\n\n";
         }
         return resultLogZ;
@@ -365,8 +376,8 @@ std::vector<realFloat> MomentsReweighterAbstract::calculateLogZAtSimulatedPoints
             residuum = 0.0;
             //todo: think if it is worth to make logZAt___Points valarray instead of vector to use valarray functionalities here.
             for(size_t indexSimulations = 0; indexSimulations < valuesOfParametersAtWhichLogZHasToBeCalculated.size(); indexSimulations++){
-                residuum += expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]])
-                           *expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]]);
+                residuum += boost::math::expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]])
+                           *boost::math::expm1(newLogZ[indexSimulations] - logZAtSimulatedPoints[indicesOfParametersAtWhichLogZHasToBeCalculated[indexSimulations]]);
                 //here one should put eq.(8.34)
             }
             if(sqrt(residuum) > precisionOfIterativeProcedureToCalculateLogZ){
@@ -502,9 +513,10 @@ void MomentsReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<
                     exceptionString << " at trajectory number " << indexData << ". Impossible to take the logarithm!";
                     throw std::runtime_error(exceptionString.str());
                 }
+                momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable][indexData] = log(momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable][indexData]);
             }
-            momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable] = momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable].applyFunction(log);
-            momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][indexObservable] = momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][indexObservable].applyFunction(log);
+            for(int indexData=0; indexData<momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][indexObservable].getNumberOfElements(); indexData++)
+                momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][indexObservable][indexData] = log(momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][indexObservable][indexData]);
         }
     }
 }
@@ -516,10 +528,12 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
     //Exponential and shift, if necessary, BOTH on raw/uncorr data AND on values at new points (Jackknife partial predicitions)
     for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++){
         for(int indexSimulation=0; indexSimulation<momentsReweighterHelper.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
-            momentsReweighterHelper.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] =
-                    momentsReweighterHelper.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
-            momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable] =
-                    momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].applyFunction(exp);
+        	for(int indexData=0; indexData<momentsReweighterHelper.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].getNumberOfElements(); indexData++)
+                momentsReweighterHelper.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable][indexData] =
+                        exp(momentsReweighterHelper.simulationRawDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable][indexData]);
+        	for(int indexData=0; indexData<momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable].getNumberOfElements(); indexData++)
+                momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable][indexData] =
+                        exp(momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][numberOfReweightingParameters+indexObservable][indexData]);
         }
         for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
             if(estimatorsForErrorCalculation != NULL){
@@ -566,7 +580,6 @@ void MomentsReweighterAbstract::extractAndSetReweightedMomentsAndMomentsEstimato
 				   && find(momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns.begin(),
 						   momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns.end(), j+reweightingParameterNames.size())
 						!= momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns.end()){
-
 					//if momentsToBeReweighted[k]==1 insert as many columns as the maximum moment needed says!
 					for(unsigned int h=0; h<momentsReweighterHelper.maximumMomentNeededOverall; h++)
 						momentsAtNewPoints[i][j].insert(1, reweightedObservablesFromRawData[i][numberOfLastColumnThatHasBeenExtracted+h]);
@@ -640,8 +653,8 @@ static void writeNewPoints(std::vector<std::vector<realFloat> >&  valuesOfNewPar
  * Basically, eq.(8.12) of Barkema is implemented.
  */
 static realFloat logarithmic_sum(realFloat logx1, realFloat logx2){
-  return (logx1 >= logx2) ? logx1 + log1p(exp(logx2-logx1)) :
-                             logx2 + log1p(exp(logx1-logx2));
+  return (logx1 >= logx2) ? logx1 + boost::math::log1p(exp(logx2-logx1)) :
+                             logx2 + boost::math::log1p(exp(logx1-logx2));
 }
 
 

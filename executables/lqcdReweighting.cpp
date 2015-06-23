@@ -2,7 +2,8 @@
 #include "exitCodes.hpp"
 #include "../Parameters/LqcdReweightingParameters.hpp"
 #include "../Reweighting/Reweighter.hpp"
-#include "../IO/io_utilities.hpp"
+#include "../IO/io_utilities_reweighting.hpp"
+
 
 int main(int argc, const char ** argv)
 {
@@ -25,7 +26,7 @@ int main(int argc, const char ** argv)
 		std::cout << e.what() << std::endl;
 		exit(EXIT_ERROR);
 	}
-	catch(Parameters::parse_aborted)
+	catch(LqcdReweightingParameters::parse_aborted&)
 	{
 		//do nothing in this case...
 	}

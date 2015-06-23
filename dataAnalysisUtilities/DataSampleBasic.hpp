@@ -30,6 +30,7 @@ public:
 	DataSampleBasic& operator+=(DataSampleBasic sampleIn);
 	DataSampleBasic& operator-=(realFloat factor);
 	DataSampleBasic& operator-=(DataSampleBasic sampleIn);
+	DataSampleBasic& operator*=(int factor);
 	DataSampleBasic& operator*=(realFloat factor);
 	DataSampleBasic& operator*=(DataSampleBasic sampleIn);
 	DataSampleBasic& operator/=(realFloat factor);
@@ -62,6 +63,8 @@ DataSampleBasic operator+(DataSampleBasic lhs, DataSampleBasic rhs);
 DataSampleBasic operator-(DataSampleBasic sampleIn, realFloat factor);
 DataSampleBasic operator-(realFloat factor, DataSampleBasic sampleIn);
 DataSampleBasic operator-(DataSampleBasic lhs, DataSampleBasic rhs);
+DataSampleBasic operator*(DataSampleBasic sampleIn, int factor);
+DataSampleBasic operator*(int factor, DataSampleBasic sampleIn);
 DataSampleBasic operator*(DataSampleBasic sampleIn, realFloat factor);
 DataSampleBasic operator*(realFloat factor, DataSampleBasic sampleIn);
 DataSampleBasic operator*(DataSampleBasic lhs, DataSampleBasic rhs);

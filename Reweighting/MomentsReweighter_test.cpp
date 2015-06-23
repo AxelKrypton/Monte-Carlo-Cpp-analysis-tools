@@ -161,7 +161,10 @@ BOOST_AUTO_TEST_SUITE(getters)
 	{
         std::vector<std::vector<realFloat> > refParameters = {{4.0, 0.7, -1.e12},{4.5, 1.0, -5.e12},{4.5, 1.3, -1.e13}};
         MomentsReweighterTest momentsReweighterTest = createMomentsReweighterTestForGettersAndSettersTests();
-        BOOST_REQUIRE(refParameters == momentsReweighterTest.getValuesOfSimulationParameters());
+        for(size_t i=0; i<refParameters.size(); i++){
+        	for(size_t j=0; j<refParameters[i].size(); j++)
+        		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(refParameters[i][j]), boost::lexical_cast<std::string>(momentsReweighterTest.getValuesOfSimulationParameters()[i][j]));
+        }
 	}
 
 	BOOST_AUTO_TEST_CASE(getters2)
@@ -169,7 +172,10 @@ BOOST_AUTO_TEST_SUITE(getters)
 		MomentsReweighterTest momentsReweighterTest = createMomentsReweighterTestForGettersAndSettersTests();
 		std::vector<std::vector<realFloat> > refPoints = {{4.2, 0.8, -1.6e12}, {4.2, 0.8, -1.2e12}, {4.2, 1.2, -1.6e12}, {4.2, 1.2, -1.2e12},
 													   {4.6, 0.8, -1.6e12}, {4.6, 0.8, -1.2e12}, {4.6, 1.2, -1.6e12}, {4.6, 1.2, -1.2e12}};
-        BOOST_REQUIRE(refPoints == momentsReweighterTest.getValuesOfNewParameters());
+        for(size_t i=0; i<refPoints.size(); i++){
+        	for(size_t j=0; j<refPoints[i].size(); j++)
+        		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(refPoints[i][j]), boost::lexical_cast<std::string>(momentsReweighterTest.getValuesOfNewParameters()[i][j]));
+        }
 	}
 
 	BOOST_AUTO_TEST_CASE(getters3)
@@ -185,21 +191,21 @@ BOOST_AUTO_TEST_SUITE(getters)
         realFloat referenceLogZAtSimulatedPoints[3] = {0.0, 0.0, 0.0};
         BOOST_REQUIRE_EQUAL(momentsReweighterTest.getLogZAtSimulatedPoints().size(), 3);
         for(size_t i=0; i<momentsReweighterTest.getLogZAtSimulatedPoints().size(); i++)
-            BOOST_REQUIRE_EQUAL(momentsReweighterTest.getLogZAtSimulatedPoints()[i], referenceLogZAtSimulatedPoints[i]);
+            BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(momentsReweighterTest.getLogZAtSimulatedPoints()[i]), boost::lexical_cast<std::string>(referenceLogZAtSimulatedPoints[i]));
 	}
 
 	BOOST_AUTO_TEST_CASE(getters5)
 	{
         MomentsReweighterTest momentsReweighterTest = createMomentsReweighterTestForGettersAndSettersTests();
-        BOOST_REQUIRE_EQUAL(momentsReweighterTest.getLogZAtNewPoints().size(), 0);
+        BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(momentsReweighterTest.getLogZAtNewPoints().size()), "0");
 	}
 
 	BOOST_AUTO_TEST_CASE(getters6)
 	{
 		MomentsReweighterTest momentsReweighterTest = createMomentsReweighterTestForGettersAndSettersTests();
 		MomentsReweighterTest momentsReweighterTest2 = createMomentsReweighterTestForGettersAndSettersTests("0.001");
-		BOOST_REQUIRE_EQUAL(momentsReweighterTest.getPrecisionToCalculateLogZ(), 1.e-7);
-		BOOST_REQUIRE_EQUAL(momentsReweighterTest2.getPrecisionToCalculateLogZ(), 0.001);
+		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(momentsReweighterTest.getPrecisionToCalculateLogZ()), "1e-07");
+		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(momentsReweighterTest2.getPrecisionToCalculateLogZ()), "0.001");
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -216,7 +222,11 @@ BOOST_AUTO_TEST_SUITE(setters)
         BOOST_REQUIRE_NO_THROW(momentsReweighterTest->setNewRangesOfParameters(newRanges));
 		std::vector<std::vector<realFloat> > refPoints = {{4.2, 0.7, -1.6e12}, {4.2, 0.7, -1.2e12}, {4.2, 1.3, -1.6e12}, {4.2, 1.3, -1.2e12},
 													   {4.6, 0.7, -1.6e12}, {4.6, 0.7, -1.2e12}, {4.6, 1.3, -1.6e12}, {4.6, 1.3, -1.2e12}};
-        BOOST_REQUIRE(refPoints == momentsReweighterTest->getValuesOfNewParameters());
+        for(size_t i=0; i<refPoints.size(); i++){
+        	for(size_t j=0; j<refPoints[i].size(); j++){
+        		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(refPoints[i][j]), boost::lexical_cast<std::string>(momentsReweighterTest->getValuesOfNewParameters()[i][j]));
+        	}
+        }
         delete momentsReweighterTest;
 	}
 
@@ -240,8 +250,12 @@ BOOST_AUTO_TEST_SUITE(setters)
         BOOST_REQUIRE_NO_THROW(momentsReweighterTest.setNewParameters(newRanges, newNumPoints));
 		std::vector<std::vector<realFloat> > refPoints = {{4.2, 0.7, -1.6e12}, {4.2, 0.7, -1.2e12}, {4.2, 1.3, -1.6e12}, {4.2, 1.3, -1.2e12},
 													   {4.6, 0.7, -1.6e12}, {4.6, 0.7, -1.2e12}, {4.6, 1.3, -1.6e12}, {4.6, 1.3, -1.2e12}};
-        BOOST_REQUIRE(refPoints == momentsReweighterTest.getValuesOfNewParameters());
-        BOOST_REQUIRE_EQUAL(momentsReweighterTest.getNumberOfNewPoints(), 8);
+		BOOST_REQUIRE_EQUAL(momentsReweighterTest.getNumberOfNewPoints(), 8);
+        for(size_t i=0; i<refPoints.size(); i++){
+        	for(size_t j=0; j<refPoints[i].size(); j++){
+        		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(refPoints[i][j]), boost::lexical_cast<std::string>(momentsReweighterTest.getValuesOfNewParameters()[i][j]));
+        	}
+        }
 	}
 
 	BOOST_AUTO_TEST_CASE(setters4)
@@ -261,7 +275,7 @@ BOOST_AUTO_TEST_SUITE(setters)
         MomentsReweighterTest momentsReweighterTest(createMomentsReweighterTestForGettersAndSettersTests("0.1"));
         BOOST_REQUIRE_THROW(momentsReweighterTest.setPrecisionToCalculateLogZ(-3.e-10), std::range_error);
         BOOST_REQUIRE_NO_THROW(momentsReweighterTest.setPrecisionToCalculateLogZ(1.e-10));
-        BOOST_REQUIRE_EQUAL(momentsReweighterTest.getPrecisionToCalculateLogZ(), 1.e-10);
+        BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(momentsReweighterTest.getPrecisionToCalculateLogZ()), "1e-10");
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -350,7 +364,7 @@ BOOST_AUTO_TEST_SUITE(logZ)
         std::vector<realFloat> simulatedLogZ = momentsReweighterTest.testCalculateLogZAtSimulatedPoints();
 
         BOOST_CHECK_CLOSE(referenceLogZAtSimulatedPoints[0], simulatedLogZ[0], 1.e-8);
-        BOOST_REQUIRE_EQUAL(referenceLogZAtSimulatedPoints[1], simulatedLogZ[1]);
+        BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(referenceLogZAtSimulatedPoints[1]), boost::lexical_cast<std::string>(simulatedLogZ[1]));
         BOOST_CHECK_CLOSE(referenceLogZAtSimulatedPoints[2], simulatedLogZ[2], 1.e-8);
         /*
          * For some reason, setting one or more values of logZ in the configfile as done here,
@@ -559,7 +573,7 @@ BOOST_AUTO_TEST_SUITE(extractionColumns)
 		std::vector<std::vector<realFloat> > reweightedObservablesFromRawData(reweighter.getNumberOfNewPoints());
 		std::valarray<std::vector<std::vector<realFloat> > > estimatorsForErrorsCalculation(reweighter.getNumberOfNewPoints());
 		for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
-			reweightedObservablesFromRawData[i] = {2,3,1,1,1,1,4}; //Of course fake numbers, just for testing
+			reweightedObservablesFromRawData[i] = {2,3,1,1,1,1,4,5,5,5,5,6,6,6,6,7,7,7,7}; //Of course fake numbers, just for testing
 		for(int i=0; i < reweighter.getNumberOfNewPoints(); i++)
 			estimatorsForErrorsCalculation[i] = reweightedObservablesFromRawData;
 		reweighter.testExtractAndSetReweightedMomentsAndMomentsEstimators(reweightedObservablesFromRawData, estimatorsForErrorsCalculation);
@@ -573,6 +587,11 @@ BOOST_AUTO_TEST_SUITE(extractionColumns)
 			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0][2], 2.0);
 			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0][3], 3.0);
 			BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][0][4], 4.0);
+			for(size_t j=1; j<4; j++){ //7obs in the file but 4 as single obs => 4 obs
+				for(size_t k=1; k<=4; k++){ //Moments
+					BOOST_REQUIRE_EQUAL(momentsAtNewPoints[i][j][k], j+4);
+				}
+			}
 		}
 	}
 
