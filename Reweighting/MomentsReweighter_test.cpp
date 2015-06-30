@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_SUITE(build)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-static MomentsReweighterTest createMomentsReweighterTestForGettersAndSettersTests(std::string precisionLogZ = "1.e-7"){
+static MomentsReweighterTest createMomentsReweighterTestForGettersAndSettersTests(std::string precisionLogZ = "1e-7"){
 	std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 	std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useBootstrapAsErrorMethod", "--weightPrecision=" + precisionLogZ};
 	RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation({1}, {1,1,1});
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_SUITE(getters)
 	{
 		MomentsReweighterTest momentsReweighterTest = createMomentsReweighterTestForGettersAndSettersTests();
 		MomentsReweighterTest momentsReweighterTest2 = createMomentsReweighterTestForGettersAndSettersTests("0.001");
-		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(momentsReweighterTest.getPrecisionToCalculateLogZ()), "1e-07");
+		BOOST_REQUIRE_EQUAL(momentsReweighterTest.getPrecisionToCalculateLogZ(), 1e-07);
 		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(momentsReweighterTest2.getPrecisionToCalculateLogZ()), "0.001");
 	}
 

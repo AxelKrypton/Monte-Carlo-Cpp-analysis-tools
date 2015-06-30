@@ -10,23 +10,25 @@ add_library(dataAnalysisUtilities
 	binning.cpp
 	Observables.cpp
 )
+target_link_libraries(dataAnalysisUtilities IO Parameters)
 
-add_library(supportSourceForReweighting
-	DataSampleBasic.cpp
-	DataSample.cpp
-	binnedDataSample.cpp
-	jackknifeEstimators.cpp
-	jackknifeAnalysis.cpp
-	bootstrapAnalysis.cpp
-	binning.cpp
-	Observables.cpp
-)
 if( USE_REW_MULTI_PRECISION )
-	target_compile_definitions(supportSourceForReweighting PUBLIC -D_USE_BIG_FLOAT_)
+
+	add_library(supportSourceForMultiprecisionReweighting
+		DataSampleBasic.cpp
+		DataSample.cpp
+		binnedDataSample.cpp
+		jackknifeEstimators.cpp
+		jackknifeAnalysis.cpp
+		bootstrapAnalysis.cpp
+		binning.cpp
+		Observables.cpp
+	)
+	target_compile_definitions(supportSourceForMultiprecisionReweighting PUBLIC -D_USE_BIG_FLOAT_)
+	target_link_libraries(supportSourceForMultiprecisionReweighting IO Parameters ${MPFR_LIBRARIES})
+		
 endif( USE_REW_MULTI_PRECISION )
 
-target_link_libraries(dataAnalysisUtilities IO Parameters)
-target_link_libraries(supportSourceForReweighting IO Parameters ${MPFR_LIBRARIES})
 
 configure_file(datafile.example datafile.example COPYONLY)
 configure_file(datafile2.example datafile2.example COPYONLY)

@@ -1,5 +1,20 @@
+#if( USE_REW_MULTI_PRECISION )
+#	add_definitions( -D_USE_BIG_FLOAT_ )
+#endif( USE_REW_MULTI_PRECISION )
+
 if( USE_REW_MULTI_PRECISION )
-	add_definitions( -D_USE_BIG_FLOAT_ )
+	
+	add_library(MultiprecisionReweighting 
+		SimulationData.cpp
+		SimulationDataContainer.cpp
+	    MomentsReweighterHelper.cpp
+		MomentsReweighter.cpp
+		ReweighterIO.cpp
+		Reweighter.cpp
+	)
+	target_compile_definitions(MultiprecisionReweighting PUBLIC -D_USE_BIG_FLOAT_)
+	target_link_libraries(MultiprecisionReweighting supportSourceForMultiprecisionReweighting)
+
 endif( USE_REW_MULTI_PRECISION )
 
 add_library(Reweighting 
@@ -10,8 +25,7 @@ add_library(Reweighting
 	ReweighterIO.cpp
 	Reweighter.cpp
 )
-
-target_link_libraries(Reweighting supportSourceForReweighting)
+target_link_libraries(Reweighting dataAnalysisUtilities)
 
 #This is to copy a files to the build directory
 add_custom_target(ReweightingFiles ALL

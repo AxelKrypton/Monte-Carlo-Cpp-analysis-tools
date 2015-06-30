@@ -10,6 +10,11 @@ endif(EXISTS CMakeCache.txt)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Macros)
 
+# if a user doesn't specify anything he probably isn't interested in debug information
+if(NOT CMAKE_BUILD_TYPE)
+        set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
 ## Have the user asked for tests
 enable_testing()
 
@@ -37,12 +42,12 @@ include_directories( SYSTEM ${MPFR_INCLUDE_DIR} )
 # Allow to choose whether to use multi-precision and in case the digits precision for reweighting
 option( USE_REW_MULTI_PRECISION "Use arbitrary precision arithmetics in Reweighting" OFF )
 if( USE_REW_MULTI_PRECISION )
-	set(DIGITS_PREC "34" CACHE STRING "The number of decimal digits used in the Reweighting executable.")
-	string(REGEX MATCH "^[0-9]+$" TMP "${DIGITS_PREC}")
+	set(USE_REW_NUM_DECIMAL_DIGITS "34" CACHE STRING "The number of decimal digits used in the Reweighting executable.")
+	string(REGEX MATCH "^[0-9]+$" TMP "${USE_REW_NUM_DECIMAL_DIGITS}")
 	if(TMP STREQUAL "")
-		message(SEND_ERROR "DIGITS_PREC must be an integer positive number. \"${DIGITS_PREC}\" is not a valid value.")
+		message(SEND_ERROR "USE_REW_NUM_DECIMAL_DIGITS must be an integer positive number. \"${USE_REW_NUM_DECIMAL_DIGITS}\" is not a valid value.")
 	endif(TMP STREQUAL "")
-	add_definitions( -DNUM_DECIMAL_DIGITS=${DIGITS_PREC} )
+	add_definitions( -DNUM_DECIMAL_DIGITS=${USE_REW_NUM_DECIMAL_DIGITS} )
 else( USE_REW_MULTI_PRECISION )
 	add_definitions( -DNUM_DECIMAL_DIGITS=15 )
 endif( USE_REW_MULTI_PRECISION )
@@ -71,8 +76,15 @@ target_link_libraries(dataAnalysis dataAnalysisUtilities Parameters IO ${StAT_US
 add_executable(lqcdReweighting executables/lqcdReweighting.cpp)
 if( USE_REW_MULTI_PRECISION )
 	target_compile_definitions(lqcdReweighting PUBLIC -D_USE_BIG_FLOAT_)
+	target_link_libraries(lqcdReweighting MultiprecisionReweighting Parameters_MultiprecisionReweighting IO_MultiprecisionReweighting ${StAT_USED_LIBS})
+else( USE_REW_MULTI_PRECISION )
+	target_link_libraries(lqcdReweighting Reweighting Parameters_Reweighting IO_Reweighting ${StAT_USED_LIBS})
 endif( USE_REW_MULTI_PRECISION )	
-target_link_libraries(lqcdReweighting Reweighting Parameters_Reweighting IO_Reweighting ${StAT_USED_LIBS})
+
 
 #include scripts-directory
 add_subdirectory("${CMAKE_SOURCE_DIR}/Scripts")
+
+
+
+
