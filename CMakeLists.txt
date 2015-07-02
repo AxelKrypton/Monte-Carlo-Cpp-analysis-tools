@@ -1,11 +1,6 @@
 cmake_minimum_required (VERSION 2.8.3)
 project(StATools)
 
-#Check that the user deleted in the cache the precision variable
-if(EXISTS CMakeCache.txt)
-	message(WARNING "Before running cmake, delete the CMakeCache.txt file to be prompted about multiprecision option in the correct order.")
-endif(EXISTS CMakeCache.txt)
-
 ## we have some custom CMake stuff
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Macros)
@@ -42,7 +37,7 @@ include_directories( SYSTEM ${MPFR_INCLUDE_DIR} )
 # Allow to choose whether to use multi-precision and in case the digits precision for reweighting
 option( USE_REW_MULTI_PRECISION "Use arbitrary precision arithmetics in Reweighting" OFF )
 if( USE_REW_MULTI_PRECISION )
-	set(USE_REW_NUM_DECIMAL_DIGITS "34" CACHE STRING "The number of decimal digits used in the Reweighting executable.")
+	set(USE_REW_NUM_DECIMAL_DIGITS "34" CACHE STRING "The number of decimal digits used in the Reweighting executable (ignored if USE_REW_MULTI_PRECISION==OFF).")
 	string(REGEX MATCH "^[0-9]+$" TMP "${USE_REW_NUM_DECIMAL_DIGITS}")
 	if(TMP STREQUAL "")
 		message(SEND_ERROR "USE_REW_NUM_DECIMAL_DIGITS must be an integer positive number. \"${USE_REW_NUM_DECIMAL_DIGITS}\" is not a valid value.")
