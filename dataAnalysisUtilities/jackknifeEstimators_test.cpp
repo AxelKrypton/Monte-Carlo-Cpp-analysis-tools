@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 	BOOST_AUTO_TEST_CASE(firstMoment1)
 	{
 		int numberOfElements = 89;
-		TestDataSample<> testSample(numberOfElements, arrayPosition);
+		TestDataSample<realFloat> testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 		JackknifeEstimators jackknifeSample(*sample);
 		BOOST_REQUIRE_CLOSE(sample->getNthMoment(1), jackknifeSample.getNthMoment(1), realFloatPrecisionInPercent);
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 	BOOST_AUTO_TEST_CASE(firstMoment2)
 	{
 		int numberOfElements = 1e3;
-		TestDataSample<> testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
+		TestDataSample<realFloat> testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
 		DataSample* sample = testSample.getDataSample();
 		JackknifeEstimators jackknifeSample(*sample);
 		BOOST_REQUIRE_CLOSE(sample->getNthMoment(1), jackknifeSample.getNthMoment(1), realFloatPrecisionInPercent);
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 	BOOST_AUTO_TEST_CASE(secondMoment1)
 	{
 		int numberOfElements = 45;
-		TestDataSample<> testSample(numberOfElements, arrayPosition);
+		TestDataSample<realFloat> testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 		JackknifeEstimators jackknifeSample(*sample);
 		realFloat expectedValue = calcExpectedValueForSecondMomentOfJackknifeEstimatorsBasedOnAnalyticExpression(*sample, numberOfElements);
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 	BOOST_AUTO_TEST_CASE(secondMoment2)
 	{
 		int numberOfElements = 5e3;
-		TestDataSample<> testSample(numberOfElements, arrayPosition);
+		TestDataSample<realFloat> testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 		JackknifeEstimators jackknifeSample(*sample);
 		realFloat expectedValue = calcExpectedValueForSecondMomentOfJackknifeEstimatorsBasedOnAnalyticExpression(*sample, numberOfElements);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 	BOOST_AUTO_TEST_CASE(variance)
 	{
 		int numberOfElements = 43;
-		TestDataSample<> testSample(numberOfElements, arrayPosition);
+		TestDataSample<realFloat> testSample(numberOfElements, arrayPosition);
 		DataSample* sample = testSample.getDataSample();
 		JackknifeEstimators jackknifeSample(*sample);
 		realFloat jackknifeVariance = pow(calculateJacknifeError(jackknifeSample), 2.);
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithNumberOfBins)
 	{
 		int numberOfElements = 1e3;
 		int numberOfBins = 1e3;
-		TestDataSample<> testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
+		TestDataSample<realFloat> testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
 		DataSample* sample = testSample.getDataSample();
 		JackknifeEstimatorsFromBinningWithNumberOfBins jackknifeSample(*sample, numberOfBins);
 		BOOST_REQUIRE_CLOSE(sample->getNthMoment(1), jackknifeSample.getNthMoment(1), realFloatPrecisionInPercent);
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithNumberOfBins)
 	BOOST_AUTO_TEST_CASE(jackknifeVariance)
 	{
 		int numberOfElements = 43;
-		TestDataSample<> testSample(numberOfElements, arrayPosition);
+		TestDataSample<realFloat> testSample(numberOfElements, arrayPosition);
 		DataSampleBasic* sample = testSample.getDataSample();
 		JackknifeEstimators jackknifeSample(*sample);
 		JackknifeEstimatorsFromBinningWithNumberOfBins jackknifeSample2(*sample, numberOfElements);
@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithBinsize)
 	{
 		int numberOfElements = 1e3;
 		int binsize = 1;
-		TestDataSample<> testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
+		TestDataSample<realFloat> testSample(numberOfElements, entriesSymmetricBetweenZeroAndOne);
 		DataSample* sample = testSample.getDataSample();
 		JackknifeEstimatorsFromBinningWithBinsize jackknifeSample(*sample, binsize);
 		BOOST_REQUIRE_CLOSE(sample->getNthMoment(1), jackknifeSample.getNthMoment(1), realFloatPrecisionInPercent);
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithBinsize)
 	{
 		int numberOfElements = 43;
 		int binsize = 1;
-		TestDataSample<> testSample(numberOfElements, arrayPosition);
+		TestDataSample<realFloat> testSample(numberOfElements, arrayPosition);
 		DataSampleBasic* sample = testSample.getDataSample();
 		JackknifeEstimators jackknifeSample(*sample);
 		JackknifeEstimatorsFromBinningWithBinsize jackknifeSample2(*sample, binsize);

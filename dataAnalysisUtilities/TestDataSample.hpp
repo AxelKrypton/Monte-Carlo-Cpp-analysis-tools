@@ -9,37 +9,52 @@
 #include "dataSampleTestUtilities.hpp"
 #include <type_traits>
 
+static std::valarray<realFloat>* initDataSampleBasedOnFillType(int, FillType);
 
-template <class T = realFloat> class TestDataSample
+/*
+ * Declaring the template but NOT defining it allows to provide specializations that are the only ones
+ * possible to be called. If one tries to declare this template with a different type, it will result in
+ * a compilation error.
+ */
+template <class T> class TestDataSample;
+
+//Case 1: realFloat
+template<> class TestDataSample<realFloat>
 {
 public:
-  	TestDataSample(int length, FillType fillType = zeros, T* referenceValue = NULL):
-		referenceValue(referenceValue), testPrecision(realFloatPrecisionInPercent), fillType(fillType)
+  	TestDataSample(int length, FillType fillType = zeros, realFloat* referenceValueIn = NULL):
+		testPrecision(realFloatPrecisionInPercent), fillType(fillType)
 	{
-	  if(!(std::is_same<T, realFloat>::value) && !(std::is_same<T, DataSampleBasic>::value))
-		  throw std::invalid_argument("TestDataSample created with an invalid template type!");
-	  std::valarray<realFloat> * testValues = initDataSampleBasedOnFillType(length);
-	  dataSampleInstance = new DataSample(*testValues);
-	  delete testValues;
-	  actualValue = NULL;
+  		if(referenceValueIn == NULL)
+  			isReferenceValueGiven = false;
+  		else{
+  			isReferenceValueGiven = true;
+  			referenceValue = *referenceValueIn;
+  		}
+  		std::valarray<realFloat> * testValues = initDataSampleBasedOnFillType(length, fillType);
+  		dataSampleInstance = new DataSample(*testValues);
+  		delete testValues;
+  		actualValue = 12345.6789; //It doesn't matter which number I put here, this is initialized in child class
 	}
 
-	TestDataSample(std::string dataFilename, int column = 1, int offset = 0, T* referenceValue = NULL):
-		referenceValue(referenceValue), testPrecision(realFloatPrecisionInPercent)
+	TestDataSample(std::string dataFilename, int column = 1, int offset = 0, realFloat* referenceValueIn = NULL):
+		testPrecision(realFloatPrecisionInPercent)
 	{
-        if(!(std::is_same<T, realFloat>::value) && !(std::is_same<T, DataSampleBasic>::value))
-        	throw std::invalid_argument("TestDataSample created with an invalid template type!");
-		actualValue = NULL;
+		if(referenceValueIn == NULL)
+			isReferenceValueGiven = false;
+		else{
+			isReferenceValueGiven = true;
+			referenceValue = *referenceValueIn;
+		}
 		dataSampleInstance = new DataSample(dataFilename, column, offset);
 		fillType = zeros;
+  		actualValue = 12345.6789; //It doesn't matter which number I put here, this is initialized in child class
 	}
 
 	virtual ~TestDataSample()
 	{
 		testActualValueAgainstReferenceValue();
 		delete dataSampleInstance;
-		if(actualValue != NULL) delete actualValue;
-		//Do not delete referenceValue since the memory it points to is "coming from outside the class"
 	}
 
 	int getNumberOfElements()
@@ -55,93 +70,111 @@ public:
 protected:
 	void testActualValueAgainstReferenceValue()
 	{
-		/*
-		 * Here I cast T objects to realFloat or to DataSampleBasic since the compiler doesn't know it is the case (we are inside the if)
-		 * TODO: it is quite ugly code. Think how to improve it, maybe template specialization!?
-		 */
-		if(actualValue != NULL && referenceValue != NULL){
-			if(std::is_same<T, realFloat>::value)
-				//Here I cast T objects to DataSampleBasic since the compiler doesn't know it is the case (we are inside the if)
-				BOOST_CHECK_CLOSE(*(reinterpret_cast<realFloat*>(actualValue)), *(reinterpret_cast<realFloat*>(referenceValue)), testPrecision);
-			else if (std::is_same<T, DataSampleBasic>::value){
-				//Here I cast T objects to DataSampleBasic since the compiler doesn't know it is the case (we are inside the if)
-				for(int i=0; i<(*reinterpret_cast<DataSampleBasic*>(actualValue)).getNumberOfElements(); i++)
-					BOOST_CHECK_CLOSE((*reinterpret_cast<DataSampleBasic*>(actualValue))[i], (*reinterpret_cast<DataSampleBasic*>(referenceValue))[i], testPrecision);
-			} else
-				throw std::logic_error("Thrown an exception that should never be thrown! Investigate!");
-		}
-	}
-
-	std::valarray<realFloat>* initDataSampleBasedOnFillType(int length)
-	{
-		  if ( fillType == zeros )
-		  {
-			  return new std::valarray<realFloat>(length);
-		  }
-		  else if ( fillType == ones )
-		  {
-			  std::valarray<realFloat> tmp = makeValarrayWithOnes(length);
-			  return new std::valarray<realFloat>(tmp);
-		  }
-		  else if ( fillType == onesMinusOnes )
-		  {
-			  std::valarray<realFloat> tmp = makeValarrayWithOnesAndMinusOnes(length);
-			  return new std::valarray<realFloat>(tmp);
-		  }
-		  else if ( fillType == arrayPosition )
-		  {
-			  std::valarray<realFloat> tmp = makeValarrayWithArrayPosition(length);
-			  return new std::valarray<realFloat>(tmp);
-		  }
-		  else if ( fillType == entriesSymmetricBetweenZeroAndOne )
-		  {
-			  std::valarray<realFloat> tmp = makeValarrayWithEntriesBetweenZeroAndOne(length);
-			  return new std::valarray<realFloat>(tmp);
-		  }
-		  else if ( fillType == bigAndSmallEntries )
-		  {
-			  std::valarray<realFloat> tmp = makeValarrayWithBigAndSmallEntries(length/2);
-			  return new std::valarray<realFloat>(tmp);
-		  }
-		  else
-		  {
-			  throw std::invalid_argument("Unknown fillType selected!");
-		  }
+		if(isReferenceValueGiven == true)
+			BOOST_CHECK_CLOSE(actualValue, referenceValue, testPrecision);
 	}
 
 	DataSample * dataSampleInstance;
-	T* referenceValue;
-	T* actualValue;
+	bool isReferenceValueGiven;
+	realFloat referenceValue;
+	realFloat actualValue;
 	realFloat testPrecision;
 	FillType fillType;
 };
 
-class TestDataSampleNthMoment : public TestDataSample<>
+//Case 2: DataSampleBasic
+template<> class TestDataSample<DataSampleBasic>
 {
 public:
-	TestDataSampleNthMoment(int n, int length, FillType fillType, realFloat &referenceValue) :
-		TestDataSample(length, fillType, &referenceValue)
+  	TestDataSample(int length, FillType fillType = zeros, DataSampleBasic* referenceValueIn = NULL):
+		testPrecision(realFloatPrecisionInPercent), fillType(fillType)
 	{
-		actualValue = new realFloat;
-		*actualValue = dataSampleInstance->getNthMoment(n);
+  		if(referenceValueIn == NULL)
+  			isReferenceValueGiven = false;
+  		else{
+  			isReferenceValueGiven = true;
+  			referenceValue = *referenceValueIn;
+  		}
+  		std::valarray<realFloat> * testValues = initDataSampleBasedOnFillType(length, fillType);
+  		dataSampleInstance = new DataSample(*testValues);
+  		delete testValues;
+  		actualValue = DataSampleBasic(); //It doesn't matter which number I put here, this is initialized in child class
+	}
+
+	TestDataSample(std::string dataFilename, int column = 1, int offset = 0, DataSampleBasic* referenceValueIn = NULL):
+		testPrecision(realFloatPrecisionInPercent)
+	{
+  		if(referenceValueIn == NULL)
+  			isReferenceValueGiven = false;
+  		else{
+  			isReferenceValueGiven = true;
+  			referenceValue = *referenceValueIn;
+  		}
+		dataSampleInstance = new DataSample(dataFilename, column, offset);
+		fillType = zeros;
+  		actualValue = DataSampleBasic(); //It doesn't matter which number I put here, this is initialized in child class
+	}
+
+	virtual ~TestDataSample()
+	{
+		testActualValueAgainstReferenceValue();
+		delete dataSampleInstance;
+	}
+
+	int getNumberOfElements()
+	{
+		return dataSampleInstance->getNumberOfElements();
+	}
+
+	DataSample* getDataSample()
+	{
+		return dataSampleInstance;
+	}
+
+protected:
+	void testActualValueAgainstReferenceValue()
+	{
+		for(int i=0; i<actualValue.getNumberOfElements(); i++)
+			BOOST_CHECK_CLOSE(actualValue[i], referenceValue[i], testPrecision);
+	}
+
+	DataSample * dataSampleInstance;
+	bool isReferenceValueGiven;
+	DataSampleBasic referenceValue;
+	DataSampleBasic actualValue;
+	realFloat testPrecision;
+	FillType fillType;
+};
+
+
+
+/***************************************************************************/
+
+//Children classes
+
+class TestDataSampleNthMoment : public TestDataSample<realFloat>
+{
+public:
+	TestDataSampleNthMoment(int n, int length, FillType fillType, realFloat referenceValue) :
+		TestDataSample<realFloat>(length, fillType, &referenceValue)
+	{
+		actualValue = dataSampleInstance->getNthMoment(n);
 	};
 	TestDataSampleNthMoment(int n, std::string dataFilename, realFloat referenceValue = 0, int column = 1, int offset = 0.) :
-		TestDataSample(dataFilename, column, offset, &referenceValue)
+		TestDataSample<realFloat>(dataFilename, column, offset, &referenceValue)
 	{
-		actualValue = new realFloat;
-		*actualValue = dataSampleInstance->getNthMoment(n);
+		actualValue = dataSampleInstance->getNthMoment(n);
 	};
 };
 
 
-class TestDataSampleNthCentralMoment : public TestDataSample<>
+class TestDataSampleNthCentralMoment : public TestDataSample<realFloat>
 {
 public:
-	TestDataSampleNthCentralMoment(int n, int length, FillType fillType, realFloat &referenceValue) :
-		TestDataSample(length, fillType, &referenceValue)
+	TestDataSampleNthCentralMoment(int n, int length, FillType fillType, realFloat referenceValue) :
+		TestDataSample<realFloat>(length, fillType, &referenceValue)
 	{
-		actualValue = new realFloat;
-		*actualValue = dataSampleInstance->getNthCentralMoment(n);
+		actualValue = dataSampleInstance->getNthCentralMoment(n);
 	};
 };
 
@@ -149,11 +182,10 @@ public:
 class TestDataSampleNthMomentPerDataPoint : public TestDataSample<DataSampleBasic>
 {
 public:
-	TestDataSampleNthMomentPerDataPoint(int n, int length, FillType fillType, DataSampleBasic &referenceValue) :
+	TestDataSampleNthMomentPerDataPoint(int n, int length, FillType fillType, DataSampleBasic referenceValue) :
 		TestDataSample<DataSampleBasic>(length, fillType, &referenceValue)
 	{
-		actualValue = new DataSampleBasic(length);
-		*actualValue = dataSampleInstance->getNthMomentPerDataPoint(n);
+		actualValue = dataSampleInstance->getNthMomentPerDataPoint(n);
 	};
 };
 
@@ -161,13 +193,52 @@ public:
 class TestDataSampleNthCentralMomentPerDataPoint : public TestDataSample<DataSampleBasic>
 {
 public:
-	TestDataSampleNthCentralMomentPerDataPoint(int n, int length, FillType fillType, DataSampleBasic &referenceValue) :
+	TestDataSampleNthCentralMomentPerDataPoint(int n, int length, FillType fillType, DataSampleBasic referenceValue) :
 		TestDataSample<DataSampleBasic>(length, fillType, &referenceValue)
 	{
-		actualValue = new DataSampleBasic;
-		*actualValue = dataSampleInstance->getNthCentralMomentPerDataPoint(n);
+		actualValue = dataSampleInstance->getNthCentralMomentPerDataPoint(n);
 	};
 };
 
+
+/**************************************************************************************************/
+
+
+static std::valarray<realFloat>* initDataSampleBasedOnFillType(int length, FillType fillType)
+{
+	  if ( fillType == zeros )
+	  {
+		  return new std::valarray<realFloat>(length);
+	  }
+	  else if ( fillType == ones )
+	  {
+		  std::valarray<realFloat> tmp = makeValarrayWithOnes(length);
+		  return new std::valarray<realFloat>(tmp);
+	  }
+	  else if ( fillType == onesMinusOnes )
+	  {
+		  std::valarray<realFloat> tmp = makeValarrayWithOnesAndMinusOnes(length);
+		  return new std::valarray<realFloat>(tmp);
+	  }
+	  else if ( fillType == arrayPosition )
+	  {
+		  std::valarray<realFloat> tmp = makeValarrayWithArrayPosition(length);
+		  return new std::valarray<realFloat>(tmp);
+	  }
+	  else if ( fillType == entriesSymmetricBetweenZeroAndOne )
+	  {
+		  std::valarray<realFloat> tmp = makeValarrayWithEntriesBetweenZeroAndOne(length);
+		  return new std::valarray<realFloat>(tmp);
+	  }
+	  else if ( fillType == bigAndSmallEntries )
+	  {
+		  std::valarray<realFloat> tmp = makeValarrayWithBigAndSmallEntries(length/2);
+		  return new std::valarray<realFloat>(tmp);
+	  }
+	  else
+	  {
+		  throw std::invalid_argument("Unknown fillType selected!");
+	  }
+}
 
 #endif /* TESTDATASAMPLE_HPP_ */
