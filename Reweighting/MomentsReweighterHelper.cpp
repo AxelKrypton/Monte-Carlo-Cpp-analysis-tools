@@ -135,17 +135,23 @@ static void printBinsizesActuallyUsed(SimulationDataContainer simDataCont, std::
             maxLengthDataFilename = simDataCont[1].getDatafileName().length();
     }
     std::cout << "\n";
-    for(size_t i=0; i<maxLengthDataFilename+50; i++)
+    for(size_t i=0; i<maxLengthDataFilename+60; i++)
         std::cout << "=";
     std::cout << "\n";
 
     for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
+    	std::ostringstream givenBinsizes;
+    	givenBinsizes << "{";
+    	for(int j=1; j<=4; j++)
+    		givenBinsizes << simDataCont[i].getSimulationParameters()["binsize" + std::to_string(j)] << ",";
+    	givenBinsizes.seekp(givenBinsizes.tellp() - long(1));
+    	givenBinsizes << "}";
         std::cout << simDataCont[i].getDatafileName();
-        std::cout << "   Given binsize = " << simDataCont[i].getSimulationParameters()["binsize"];
+        std::cout << "   Given binsize = " << givenBinsizes.str();
         std::cout << "    Used binsize = " << simDataCont[i][0].getNumberOfElements()/numberOfBinsToBeUsed[i] << "\n";
     }
 
-    for(size_t i=0; i<maxLengthDataFilename+50; i++)
+    for(size_t i=0; i<maxLengthDataFilename+60; i++)
         std::cout << "=";
     std::cout << "\n\n";
 }

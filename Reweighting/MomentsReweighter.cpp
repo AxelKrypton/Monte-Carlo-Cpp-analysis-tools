@@ -174,7 +174,12 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
 		// construct a trivial random generator engine from a time-based seed:
 		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 		std::default_random_engine generator(seed);
+		int numberOfBootstrapEstForOutput=0;
     	for(int iBoot=0; iBoot<(*(momentsReweighterHelper.bootstrapNumber)); iBoot++){
+    		if(iBoot >= numberOfBootstrapEstForOutput){
+    			std::cout << "     - Calculating estimator number " << iBoot << "...\n";
+    			numberOfBootstrapEstForOutput += *(momentsReweighterHelper.bootstrapNumber)/10;
+    		}
     		momentsReweighterHelper.simulationUncorrDataContainer =
     				momentsReweighterHelper.simulationRawDataContainer.getUncorrelatedSimulationDataSet(momentsReweighterHelper.numberOfBinsToBeUsed, bootstrap, &generator);
     		std::vector<realFloat> logZAtSimulatedPointsUsingUncorrData = calculateLogZAtSimulatedPoints(true, -1, &smartGuessForLogZ);
