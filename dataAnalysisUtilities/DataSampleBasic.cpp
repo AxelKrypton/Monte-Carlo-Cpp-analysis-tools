@@ -49,7 +49,28 @@ void checkNumberOfElements(int lhs, int rhs)
 
 realFloat DataSampleBasic::sum()
 {
+	/*
+	 * The std implementation of the sum is
+	 *
+	 * template<typename _Tp> inline _Tp __valarray_sum(const _Tp* __f, const _Tp* __l)
+	 * {
+	 *    _Tp __r = _Tp();
+	 *    while (__f != __l)
+	 *      __r += *__f++;
+	 *    return __r;
+	 * }
+	 *
+	 * and it clearly breaks down when _Tp is a type whose default initialization value is not zero!
+	 * This is the case for the boost/multiprecision library that uses nan as default value!
+	 */
+#ifdef _USE_BIG_FLOAT_
+	realFloat sum = 0.0;
+	for(size_t i=0; i<values.size(); i++)
+		sum += values[i];
+	return sum;
+#else
 	return values.sum();
+#endif
 }
 
 realFloat DataSampleBasic::max()
