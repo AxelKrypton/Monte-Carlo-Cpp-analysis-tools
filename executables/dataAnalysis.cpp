@@ -7,8 +7,10 @@ int main(int argc, const char ** argv)
 {
 	try
 	{
+	    std::cout << std::endl << "#------------------------------------------------------------------------------------" << std::endl;
 		Parameters parameters(argc, argv);
 		DatafileAnalyzer analyzer(parameters);
+		std::cout << "#------------------------------------------------------------------------------------" << std::endl << std::endl;
 	}
 	//todo: move catch block into own function?
 	catch ( wrongBinningParameter &e)
@@ -21,7 +23,7 @@ int main(int argc, const char ** argv)
 		std::cout << e.what() << std::endl;
 		exit(EXIT_ERROR);
 	}
-	catch(Parameters::parse_aborted)
+	catch(Parameters::parse_aborted&)
 	{
 		//do nothing in this case...
 	}
