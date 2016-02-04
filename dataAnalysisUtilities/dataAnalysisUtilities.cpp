@@ -27,7 +27,7 @@ static Parameters buildLocalParametersWithCorrectBinningInformation(const Parame
 }
 
 static void printBinningInformation(const Parameters& parameters, std::string observable){
-	std::cout << "### Performing binning in " << observable << " calculation using ";
+	std::cout << "# Performing binning in " << observable << " calculation using ";
 	if(parameters.useNumberOfBinsForBinning)
 		std::cout << parameters.numberOfBins << " as number of bins!\n";
 	else
@@ -64,7 +64,7 @@ EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample & sampleIn,
 	return EstimateAndError(mean, error);
 }
 
-EstimateAndError calcMeanAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
+EstimateAndError calcMeanAndErrorOfDataSample(DataSample sampleIn, Parameters parameters)
 {
 	Parameters binningParameters = buildLocalParametersWithCorrectBinningInformation(parameters, "mean");
 	printBinningInformation(binningParameters, "MEAN");
@@ -142,12 +142,12 @@ EstimateAndError calcVarianceAndErrorOfUncorrelatedDataSample(DataSample & sampl
 	return calcVarianceAndError(sampleIn, isMeanKnownToBeZero);
 }
 
-EstimateAndError calcVarianceAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
+EstimateAndError calcVarianceAndErrorOfDataSample(DataSample sampleIn, Parameters parameters)
 {
 	return calcVarianceAndError(sampleIn, parameters.isMeanKnownToBeZero, &parameters, true);
 }
 
-EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
+EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample sampleIn, Parameters parameters)
 {
 	/**
 		* Skewness gamma_1 is defined as:
@@ -171,7 +171,7 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample & sampleIn, Paramet
 	return jackknifeAnalysis(sampleForJack, calcSkewness);
 }
 
-EstimateAndError calcBinderAndErrorOfDataSample(DataSample & sampleIn, Parameters parameters)
+EstimateAndError calcBinderAndErrorOfDataSample(DataSample sampleIn, Parameters parameters)
 {
 	/**
 	 * The Fourth Std. Moment beta_2 is defined as:
