@@ -114,6 +114,12 @@ typedef DataSample (*functionForEstimatorsForJackknife)(std::vector<DataSample>)
 /*
  * TODO: Change the last line above with the following:
  *           typedef std::function<DataSample(std::vector<DataSample>)> functionForEstimatorsForJackknife;
+ *       Actually it could be possible that this can be completely removed and only the std::function<DataSample(MomentsEstimators)>
+ *       can be used. The thing that one should think of is that in jackknifeAnalysis the functions take as second argument a function that
+ *       has in input a vector of DataSample and there the MomentsEstimators are not used. It should be possible to use there the MomentsEstimators
+ *       and one could have here just one single functionForEstimators.
+ *
+ *       This is also the reason why for the moment there are no static members with this function that is hard coded in the getter.
  */
 
 
@@ -151,6 +157,11 @@ public:
 	static const std::initializer_list<unsigned int> neededMoments;
 	static const std::initializer_list<unsigned int> neededMomentsWithZeroMean;
 	static const std::string observableName;
+    static const functionForObservable functionToCalculateOservableWithNonZeroMean;
+    static const functionForObservable functionToCalculateOservableWithMultipleEstimates;
+    static const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean;
+    static const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates;
+    static DataSample evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 private:
 	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
 	void printCorrectBinningInformation(const Parameters& parameters);
@@ -169,6 +180,13 @@ public:
 	static constexpr std::initializer_list<unsigned int> neededMoments = {1, 2};
 	static constexpr std::initializer_list<unsigned int> neededMomentsWithZeroMean = { {2} };
 	static const std::string observableName;
+    static const functionForObservable functionToCalculateOservableWithZeroMean;
+    static const functionForObservable functionToCalculateOservableWithNonZeroMean;
+    static const functionForObservable functionToCalculateOservableWithMultipleEstimates;
+    static const functionForEstimators functionToBeAppliedToEstimatorsWithZeroMean;
+    static const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean;
+    static const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates;
+    static DataSample evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 private:
 	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
 	void printCorrectBinningInformation(const Parameters& parameters);
@@ -187,6 +205,13 @@ public:
 	static constexpr std::initializer_list<unsigned int> neededMoments = {1, 2, 3};
 	static constexpr std::initializer_list<unsigned int> neededMomentsWithZeroMean = {2, 3};
 	static const std::string observableName;
+    static const functionForObservable functionToCalculateOservableWithZeroMean;
+    static const functionForObservable functionToCalculateOservableWithNonZeroMean;
+    static const functionForObservable functionToCalculateOservableWithMultipleEstimates;
+    static const functionForEstimators functionToBeAppliedToEstimatorsWithZeroMean;
+    static const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean;
+    static const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates;
+    static DataSample evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 private:
 	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
 	void printCorrectBinningInformation(const Parameters& parameters);
@@ -205,6 +230,13 @@ public:
 	static constexpr std::initializer_list<unsigned int> neededMoments = {1, 2, 3, 4};
 	static constexpr std::initializer_list<unsigned int> neededMomentsWithZeroMean = {2, 4};
 	static const std::string observableName;
+    static const functionForObservable functionToCalculateOservableWithZeroMean;
+    static const functionForObservable functionToCalculateOservableWithNonZeroMean;
+    static const functionForObservable functionToCalculateOservableWithMultipleEstimates;
+    static const functionForEstimators functionToBeAppliedToEstimatorsWithZeroMean;
+    static const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean;
+    static const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates;
+    static DataSample evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 private:
 	Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
 	void printCorrectBinningInformation(const Parameters& parameters);

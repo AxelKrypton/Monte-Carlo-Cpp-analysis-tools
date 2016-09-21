@@ -217,6 +217,15 @@ BOOST_AUTO_TEST_SUITE(MeanTest)
 		BOOST_CHECK_SMALL(mean.getValueAndError().error, 1.e-7);
 	}
 
+    BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)
+    {
+        double referenceValueNonZeroMean = 5.126236900933244e-01;
+        DataSample resultNonZeroMean = Mean::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
+        for(int i=0; i<resultNonZeroMean.getNumberOfElements(); i++){
+            BOOST_CHECK_CLOSE(resultNonZeroMean[i], referenceValueNonZeroMean, realFloatPrecisionInPercent);
+        }
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
@@ -264,6 +273,18 @@ BOOST_AUTO_TEST_SUITE(VarianceTest)
 		BOOST_CHECK_SMALL(variance	.getValueAndError().error, 1.e-7);
 	}
 
+    BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)
+    {
+        double referenceValueZeroMean = 2.627932923896761e-01;
+        double referenceValueNonZeroMean = 1.024474477934190e-05;
+        DataSample resultZeroMean = Variance::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true);
+        DataSample resultNonZeroMean = Variance::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
+        for(int i=0; i<resultZeroMean.getNumberOfElements(); i++){
+            BOOST_CHECK_CLOSE(resultZeroMean[i], referenceValueZeroMean, realFloatPrecisionInPercent);
+            BOOST_CHECK_CLOSE(resultNonZeroMean[i], referenceValueNonZeroMean, realFloatPrecisionInPercent);
+        }
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
@@ -303,6 +324,18 @@ BOOST_AUTO_TEST_SUITE(SkewnessTest)
 		BOOST_CHECK_CLOSE(skewness.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
 		BOOST_CHECK_SMALL(skewness.getValueAndError().error, 1.e-7);
 	}
+
+    BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)
+    {
+        double referenceValueZeroMean = 1.0000586137849100;
+        double referenceValueNonZeroMean = 0.5728362972699335;
+        DataSample resultZeroMean = Skewness::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true);
+        DataSample resultNonZeroMean = Skewness::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
+        for(int i=0; i<resultZeroMean.getNumberOfElements(); i++){
+            BOOST_CHECK_CLOSE(resultZeroMean[i], referenceValueZeroMean, realFloatPrecisionInPercent);
+            BOOST_CHECK_CLOSE(resultNonZeroMean[i], referenceValueNonZeroMean, realFloatPrecisionInPercent);
+        }
+    }
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -350,6 +383,18 @@ BOOST_AUTO_TEST_SUITE(BinderCumulantTest)
 		BOOST_CHECK_CLOSE(binder.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
 		BOOST_CHECK_SMALL(binder.getValueAndError().error, 3.e-7);
 	}
+
+	BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)
+    {
+	    double referenceValueZeroMean = 1.00015649139308;
+	    double referenceValueNonZeroMean = 3.36129098137853;
+        DataSample resultZeroMean = BinderCumulant::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true);
+        DataSample resultNonZeroMean = BinderCumulant::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
+        for(int i=0; i<resultZeroMean.getNumberOfElements(); i++){
+            BOOST_CHECK_CLOSE(resultZeroMean[i], referenceValueZeroMean, realFloatPrecisionInPercent);
+            BOOST_CHECK_CLOSE(resultNonZeroMean[i], referenceValueNonZeroMean, realFloatPrecisionInPercent);
+        }
+    }
 
 BOOST_AUTO_TEST_SUITE_END()
 

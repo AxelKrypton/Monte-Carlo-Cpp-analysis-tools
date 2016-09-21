@@ -8,6 +8,51 @@ static Parameters buildLocalParametersWithCorrectBinningInformation(const Parame
 static void printBinningInformation(const Parameters&, std::string);
 static realFloat evaluateErrorBasedOnMethod(DataSample, ErrorCalculationMethod);
 template<typename T> static T getPowerOfFirstMomentUsingSeveralEstimate(const std::vector<T>&, const int);
+//Use here an anonymous namespace because I am not sure about use of static keyword in template specialization
+namespace {
+    //TODO: Think whether it is possible to unify the following two templates in only one
+    template<typename OBSERVABLE> functionForObservable pickUpCorrectFunctionForObservable(const bool isMeanZero, const bool useMultipleEstimate){
+        if(isMeanZero)
+            return OBSERVABLE::functionToCalculateOservableWithZeroMean;
+        else{
+            if(useMultipleEstimate)
+                return OBSERVABLE::functionToCalculateOservableWithMultipleEstimates;
+            else
+                return OBSERVABLE::functionToCalculateOservableWithNonZeroMean;
+        }
+    }
+    template<typename OBSERVABLE> functionForEstimators pickUpCorrectFunctionForEstimator(const bool isMeanZero, const bool useMultipleEstimate){
+        if(isMeanZero)
+            return OBSERVABLE::functionToBeAppliedToEstimatorsWithZeroMean;
+        else{
+            if(useMultipleEstimate)
+                return OBSERVABLE::functionToBeAppliedToEstimatorsWithMultipleEstimates;
+            else
+                return OBSERVABLE::functionToBeAppliedToEstimatorsWithNonZeroMean;
+        }
+    }
+    //Specialization for Mean case (we want to throw in the zeroMean case!)
+    template<> functionForObservable pickUpCorrectFunctionForObservable<Mean>(const bool isMeanZero, const bool useMultipleEstimate){
+        if(isMeanZero)
+            throw std::logic_error("The Mean::getFunctionToCalculateObservable method should not be called with isMeanZero==true!! Aborting...");
+        else{
+            if(useMultipleEstimate)
+                return Mean::functionToCalculateOservableWithMultipleEstimates;
+            else
+                return Mean::functionToCalculateOservableWithNonZeroMean;
+        }
+    }
+    template<> functionForEstimators pickUpCorrectFunctionForEstimator<Mean>(const bool isMeanZero, const bool useMultipleEstimate){
+        if(isMeanZero)
+            throw std::logic_error("The Mean::getFunctionToBeAppliedToEstimators method should not be called with isMeanZero==true!! Aborting...");
+        else{
+            if(useMultipleEstimate)
+                return Mean::functionToBeAppliedToEstimatorsWithMultipleEstimates;
+            else
+                return Mean::functionToBeAppliedToEstimatorsWithNonZeroMean;
+        }
+    }
+}
 
 /*****************************************************************************************/
 
@@ -62,6 +107,10 @@ std::vector<DataSample> ObservableAbstract::getBinnedNeededMoments(std::vector<D
 const std::initializer_list<unsigned int> Mean::neededMoments = {1};
 const std::initializer_list<unsigned int> Mean::neededMomentsWithZeroMean = {};
 const std::string Mean::observableName = "MEAN";
+const functionForObservable Mean::functionToCalculateOservableWithNonZeroMean = [] (Moments in) -> realFloat { return in[1]; };
+const functionForObservable Mean::functionToCalculateOservableWithMultipleEstimates = [] (Moments in) -> realFloat { return getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1); };
+const functionForEstimators Mean::functionToBeAppliedToEstimatorsWithNonZeroMean = [] (MomentsEstimators in) -> DataSample { return in[1]; };
+const functionForEstimators Mean::functionToBeAppliedToEstimatorsWithMultipleEstimates = [] (MomentsEstimators in) -> DataSample { return getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1); };
 
 Mean::Mean(DataSample& dataSample, Parameters parameters) : ObservableAbstract(parameters.isMeanKnownToBeZero)
 {
@@ -95,30 +144,19 @@ functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToEstimatorsForJac
 		return [] (std::vector<DataSample> in) -> DataSample { if(in.size() != 1) throw std::invalid_argument("Invalid call to Mean function for estimators!"); return in[0]; };
 }
 
-//TODO: Unify the following two function with a static template
 functionForEstimators Mean::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
 {
-	if(isMeanZero)
-		throw std::logic_error("The Mean::getFunctionToBeAppliedToEstimators method should not be called with isMeanZero==true!! Aborting...");
-	else{
-		if(useMultipleEstimate)
-			return [] (MomentsEstimators in) -> DataSample { return getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1); };
-		else
-			return [] (MomentsEstimators in) -> DataSample { return in[1]; };
-	}
-
+	return pickUpCorrectFunctionForEstimator<Mean>(isMeanZero, useMultipleEstimate);
 }
 
 functionForObservable Mean::getFunctionToCalculateObservable(bool useMultipleEstimate)
 {
-	if(isMeanZero)
-		throw std::logic_error("The Mean::getFunctionToCalculateObservable method should not be called with isMeanZero==true!! Aborting...");
-	else{
-		if(useMultipleEstimate){
-			return [] (Moments in) -> realFloat { return getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1); };
-		}else
-			return [] (Moments in) -> realFloat { return in[1]; };
-	}
+    return pickUpCorrectFunctionForObservable<Mean>(isMeanZero, useMultipleEstimate);
+}
+
+DataSample Mean::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)
+{
+    return pickUpCorrectFunctionForEstimator<Mean>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
 std::initializer_list<unsigned int> Mean::getNeededMoments()
@@ -135,6 +173,18 @@ std::initializer_list<unsigned int> Mean::getNeededMoments()
 constexpr std::initializer_list<unsigned int> Variance::neededMoments;
 constexpr std::initializer_list<unsigned int> Variance::neededMomentsWithZeroMean;
 const std::string Variance::observableName = "VARIANCE";
+const functionForObservable Variance::functionToCalculateOservableWithZeroMean = [] (Moments in) -> realFloat { return in[2]; };
+const functionForObservable Variance::functionToCalculateOservableWithNonZeroMean = [] (Moments in) -> realFloat { return in[2] - in[1] * in[1]; };
+const functionForObservable Variance::functionToCalculateOservableWithMultipleEstimates = [] (Moments in) -> realFloat {
+    realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
+    return in[2] - firstMoment * firstMoment;
+};
+const functionForEstimators Variance::functionToBeAppliedToEstimatorsWithZeroMean = [] (MomentsEstimators in) -> DataSample { return in[2]; };
+const functionForEstimators Variance::functionToBeAppliedToEstimatorsWithNonZeroMean = [] (MomentsEstimators in) -> DataSample { return in[2] - (in[1] ^ 2); };
+const functionForEstimators Variance::functionToBeAppliedToEstimatorsWithMultipleEstimates = [] (MomentsEstimators in) -> DataSample {
+    DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
+    return in[2] - firstMoment * firstMoment;
+};
 
 Variance::Variance(DataSample& dataSample, Parameters parameters) : ObservableAbstract(parameters.isMeanKnownToBeZero)
 {
@@ -169,39 +219,19 @@ functionForEstimatorsForJackknife Variance::getFunctionToBeAppliedToEstimatorsFo
 
 }
 
-//TODO: Unify the following two function with a static template
 functionForEstimators Variance::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
 {
-	if(isMeanZero)
-		return [] (MomentsEstimators in) -> DataSample { return in[2]; };
-	else{
-		if(useMultipleEstimate){
-			return [] (MomentsEstimators in) -> DataSample {
-				DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
-				return in[2] - firstMoment * firstMoment;
-
-//				return in[2] - getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2);
-			};
-		}else
-			return [] (MomentsEstimators in) -> DataSample { return in[2] - (in[1] ^ 2); };
-	}
+    return pickUpCorrectFunctionForEstimator<Variance>(isMeanZero, useMultipleEstimate);
 }
 
 functionForObservable Variance::getFunctionToCalculateObservable(bool useMultipleEstimate)
 {
-	if(isMeanZero)
-		return [] (Moments in) -> realFloat { return in[2]; };
-	else{
-		if(useMultipleEstimate){
-			return [] (Moments in) -> realFloat {
-				realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
-				return in[2] - firstMoment * firstMoment;
+    return pickUpCorrectFunctionForObservable<Variance>(isMeanZero, useMultipleEstimate);
+}
 
-//				return in[2] - getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 2);
-			};
-		}else
-			return [] (Moments in) -> realFloat { return in[2] - in[1] * in[1]; };
-	}
+DataSample Variance::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)
+{
+    return pickUpCorrectFunctionForEstimator<Variance>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
 std::initializer_list<unsigned int> Variance::getNeededMoments()
@@ -218,6 +248,24 @@ std::initializer_list<unsigned int> Variance::getNeededMoments()
 constexpr std::initializer_list<unsigned int> Skewness::neededMoments;
 constexpr std::initializer_list<unsigned int> Skewness::neededMomentsWithZeroMean;
 const std::string Skewness::observableName = "SKEWNESS";
+const functionForObservable Skewness::functionToCalculateOservableWithZeroMean = [] (Moments in) -> realFloat { return in[3] / pow(in[2], 1.5); };
+const functionForObservable Skewness::functionToCalculateOservableWithNonZeroMean = [] (Moments in) -> realFloat {
+    realFloat x1 = in[1]; realFloat x2 = in[2]; realFloat x3 = in[3];
+    return (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5));
+};
+const functionForObservable Skewness::functionToCalculateOservableWithMultipleEstimates = [] (Moments in) -> realFloat {
+    realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
+    realFloat x2 = in[2]; realFloat x3 = in[3];
+    return (x3-3*x2*firstMoment+2*firstMoment*firstMoment*firstMoment)/(pow(x2-firstMoment*firstMoment, 1.5));
+};
+const functionForEstimators Skewness::functionToBeAppliedToEstimatorsWithZeroMean = [] (MomentsEstimators in) -> DataSample { return in[3] / (in[2] ^ 1.5); };
+const functionForEstimators Skewness::functionToBeAppliedToEstimatorsWithNonZeroMean = [] (MomentsEstimators in) -> DataSample {
+    return (in[3] - ((3 * in[2]) * in[1]) + (2 * (in[1] ^ 3)))/((in[2] - (in[1] ^ 2)) ^ 1.5);
+};
+const functionForEstimators Skewness::functionToBeAppliedToEstimatorsWithMultipleEstimates = [] (MomentsEstimators in) -> DataSample {
+    DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
+    return (in[3] - ((3 * in[2]) * firstMoment) + (2 * firstMoment * firstMoment * firstMoment))/((in[2] - firstMoment * firstMoment) ^ 1.5);
+};
 
 Skewness::Skewness(DataSample& dataSample, Parameters parameters) : ObservableAbstract(parameters.isMeanKnownToBeZero)
 {
@@ -254,48 +302,19 @@ functionForEstimatorsForJackknife Skewness::getFunctionToBeAppliedToEstimatorsFo
 															   return (ex3 - ((3 * ex2) * ex1) + (2 * (ex1 ^ 3)))/((ex2 - (ex1 ^ 2)) ^ 1.5); };
 }
 
-//TODO: Unify the following two function with a static template
 functionForEstimators Skewness::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
 {
-	if(isMeanZero)
-		return [] (MomentsEstimators in) -> DataSample { return in[3] / (in[2] ^ 1.5); };
-	else{
-		if(useMultipleEstimate){
-			return [] (MomentsEstimators in) -> DataSample {
-				DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
-				return (in[3] - ((3 * in[2]) * firstMoment) + (2 * firstMoment * firstMoment * firstMoment))/((in[2] - firstMoment * firstMoment) ^ 1.5);
-
-//				DataSample firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2);
-//				DataSample firstMomentCubic = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 3);
-//				return (in[3] - ((3 * in[2]) * firstMoment) + (2 * firstMomentCubic))/((in[2] - firstMomentSquared) ^ 1.5);
-			};
-		}else
-			return [] (MomentsEstimators in) -> DataSample { return (in[3] - ((3 * in[2]) * in[1]) + (2 * (in[1] ^ 3)))/((in[2] - (in[1] ^ 2)) ^ 1.5); };
-	}
+    return pickUpCorrectFunctionForEstimator<Skewness>(isMeanZero, useMultipleEstimate);
 }
 
 functionForObservable Skewness::getFunctionToCalculateObservable(bool useMultipleEstimate)
 {
-	if(isMeanZero)
-		return [] (Moments in) -> realFloat { return in[3] / pow(in[2], 1.5); };
-	else{
-		if(useMultipleEstimate){
-			return [] (Moments in) -> realFloat {
-				realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
-				realFloat x2 = in[2]; realFloat x3 = in[3];
-				return (x3-3*x2*firstMoment+2*firstMoment*firstMoment*firstMoment)/(pow(x2-firstMoment*firstMoment, 1.5));
+    return pickUpCorrectFunctionForObservable<Skewness>(isMeanZero, useMultipleEstimate);
+}
 
-//				realFloat firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 2);
-//				realFloat firstMomentCubic = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 3);
-//				return (x3-3*x2*firstMoment+2*firstMomentCubic)/(pow(x2-firstMomentSquared, 1.5));
-			};
-		}else{
-			return [] (Moments in) -> realFloat {
-				realFloat x1 = in[1]; realFloat x2 = in[2]; realFloat x3 = in[3];
-				return (x3-3*x2*x1+2*x1*x1*x1)/(pow(x2-x1*x1, 1.5));
-			};
-		}
-	}
+DataSample Skewness::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)
+{
+    return pickUpCorrectFunctionForEstimator<Skewness>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
 std::initializer_list<unsigned int> Skewness::getNeededMoments()
@@ -312,6 +331,24 @@ std::initializer_list<unsigned int> Skewness::getNeededMoments()
 constexpr std::initializer_list<unsigned int> BinderCumulant::neededMoments;
 constexpr std::initializer_list<unsigned int> BinderCumulant::neededMomentsWithZeroMean;
 const std::string BinderCumulant::observableName = "BINDER CUMULANT";
+const functionForObservable BinderCumulant::functionToCalculateOservableWithZeroMean = [] (Moments in) -> realFloat { return in[4] / pow(in[2], 2.0); };
+const functionForObservable BinderCumulant::functionToCalculateOservableWithNonZeroMean = [] (Moments in) -> realFloat {
+    realFloat x1 = in[1]; realFloat x2 = in[2]; realFloat x3 = in[3]; realFloat x4 = in[4];
+    return (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0));
+};
+const functionForObservable BinderCumulant::functionToCalculateOservableWithMultipleEstimates = [] (Moments in) -> realFloat {
+    realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
+    realFloat x2 = in[2]; realFloat x3 = in[3]; realFloat x4 = in[4];
+    return (x4-4*x3*firstMoment+6*x2*firstMoment*firstMoment-3*firstMoment*firstMoment*firstMoment*firstMoment)/(pow(x2-firstMoment*firstMoment, 2.0));
+};
+const functionForEstimators BinderCumulant::functionToBeAppliedToEstimatorsWithZeroMean = [] (MomentsEstimators in) -> DataSample { return in[4] / (in[2] ^ 2.0); };
+const functionForEstimators BinderCumulant::functionToBeAppliedToEstimatorsWithNonZeroMean = [] (MomentsEstimators in) -> DataSample {
+    return (in[4] - (4 * in[3] * in[1]) + (6 * in[2] * in[1] * in[1]) - (3 * in[1] * in[1] * in[1] * in[1]))/((in[2] - (in[1] ^ 2)) ^ 2);
+};
+const functionForEstimators BinderCumulant::functionToBeAppliedToEstimatorsWithMultipleEstimates = [] (MomentsEstimators in) -> DataSample {
+    DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
+    return (in[4] - (4 * in[3] * firstMoment) + (6 * in[2] * firstMoment * firstMoment) - (3 * firstMoment * firstMoment * firstMoment * firstMoment))/((in[2] - (firstMoment ^ 2)) ^ 2);
+};
 
 BinderCumulant::BinderCumulant(DataSample& dataSample, Parameters parameters) : ObservableAbstract(parameters.isMeanKnownToBeZero)
 {
@@ -349,51 +386,19 @@ functionForEstimatorsForJackknife BinderCumulant::getFunctionToBeAppliedToEstima
 															   return (ex4 - (4 * ex3 * ex1) + (6 * ex2 * ex1 * ex1) - (3 * ex1 * ex1 * ex1 * ex1))/((ex2 - (ex1 ^ 2)) ^ 2); };
 }
 
-//TODO: Unify the following two function with a static template
 functionForEstimators BinderCumulant::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
 {
-	if(isMeanZero)
-		return [] (MomentsEstimators in) -> DataSample { return in[4] / (in[2] ^ 2.0); };
-	else{
-		if(useMultipleEstimate){
-			return [] (MomentsEstimators in) -> DataSample {
-				DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
-				return (in[4] - (4 * in[3] * firstMoment) + (6 * in[2] * firstMoment * firstMoment) - (3 * firstMoment * firstMoment * firstMoment * firstMoment))/((in[2] - (firstMoment ^ 2)) ^ 2);
-
-//				DataSample firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 2);
-//				DataSample firstMomentQuartic = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 4);
-//				return (in[4] - (4 * in[3] * firstMoment) + (6 * in[2] * firstMomentSquared) - (3 * firstMomentQuartic))/((in[2] - firstMomentSquared) ^ 2);
-			};
-		}else{
-			return [] (MomentsEstimators in) -> DataSample {
-				return (in[4] - (4 * in[3] * in[1]) + (6 * in[2] * in[1] * in[1]) - (3 * in[1] * in[1] * in[1] * in[1]))/((in[2] - (in[1] ^ 2)) ^ 2);
-			};
-		}
-	}
+    return pickUpCorrectFunctionForEstimator<BinderCumulant>(isMeanZero, useMultipleEstimate);
 }
 
 functionForObservable BinderCumulant::getFunctionToCalculateObservable(bool useMultipleEstimate	)
 {
-	if(isMeanZero)
-		return [] (Moments in) -> realFloat { return in[4] / pow(in[2], 2.0); };
-	else{
-		if(useMultipleEstimate){
-			return [] (Moments in) -> realFloat {
-				realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
-				realFloat x2 = in[2]; realFloat x3 = in[3]; realFloat x4 = in[4];
-				return (x4-4*x3*firstMoment+6*x2*firstMoment*firstMoment-3*firstMoment*firstMoment*firstMoment*firstMoment)/(pow(x2-firstMoment*firstMoment, 2.0));
+    return pickUpCorrectFunctionForObservable<BinderCumulant>(isMeanZero, useMultipleEstimate);
+}
 
-//				realFloat firstMomentSquared = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 2);
-//				realFloat firstMomentQuartic = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 4);
-//				return (x4-4*x3*firstMoment+6*x2*firstMomentSquared-3*firstMomentQuartic)/(pow(x2-firstMomentSquared, 2.0));
-			};
-		}else{
-			return [] (Moments in) -> realFloat {
-				realFloat x1 = in[1]; realFloat x2 = in[2]; realFloat x3 = in[3]; realFloat x4 = in[4];
-				return (x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0));
-			};
-		}
-	}
+DataSample BinderCumulant::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)
+{
+    return pickUpCorrectFunctionForEstimator<BinderCumulant>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
 std::initializer_list<unsigned int> BinderCumulant::getNeededMoments()
@@ -451,8 +456,9 @@ static void printBinningInformation(const Parameters& parameters, std::string ob
 		std::cout << parameters.binsize << " as binsize!\n";
 }
 
-//TODO: Implement the following class in a general way
 
+
+//TODO: Implement the following function in a general way
 template<typename T> static T getPowerOfFirstMomentUsingSeveralEstimate(const std::vector<T>& estimates, const int power){
 	if(estimates.size() != 4)
 		throw std::invalid_argument("So far only 4 multiple estimates are allowed in quantities calculations! Aborting...");
