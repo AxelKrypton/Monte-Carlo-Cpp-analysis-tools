@@ -64,6 +64,7 @@ AutocorrelationAnalyzer::AutocorrelationAnalyzer(DataSample &sample, Parameters 
 AnalyzerWrapperBasic::AnalyzerWrapperBasic(std::string name, std::string outputFilename):
 	estimateName(name), outputFilename(outputFilename)
 {
+    std::cout << "#------------------------------------------------------------------------------------" << std::endl;
 	std::cout << "# Analyse " << name << "..." << std::endl;
 }
 
