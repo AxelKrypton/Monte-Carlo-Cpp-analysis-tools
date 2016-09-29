@@ -46,6 +46,7 @@ public:
 	Reweighter(LqcdReweightingParameters parameters);
 	std::vector<std::vector<realFloat> > getValuesOfNewParameters();
 	std::vector<std::vector<Observables> > getReweightedObservables();
+	std::vector<std::vector<std::map<std::string, DataSample> > > getReweightedObservablesEstimators();
 private:
 	ReweighterIO reweighterIO;
 	std::vector<std::string> quantitiesToBeReweighted;
@@ -56,6 +57,7 @@ private:
     std::vector<std::vector<realFloat> > valuesOfNewParameters;
 	realFloat precisionOfIterativeProcedureToCalculateLogZ;
 	std::vector<std::vector<Observables> > observablesAtNewPoints;
+	std::unique_ptr<std::vector<std::vector<std::map<std::string, DataSample> > > > observablesEstimatorsAtNewPoints; //e.g. [newPoint][obsInFile][Skewness::observableName]
 	//The following methods are here in order to be tested one by one (in principle they could be static function in the .cpp file)
 	Reweighter(std::initializer_list<std::string>);
 	static LqcdReweightingParameters createLqcdParameters(std::initializer_list<std::string>);
