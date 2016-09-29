@@ -17,22 +17,42 @@ public:
 		values.push_back( tmpPair );
 	}
 
-	void printToFile()
+	void printToFile(const unsigned int* estimatorNumber = nullptr)
 	{
-		std::cout << "# Writing reweighted data for \"" << quantityName << "\" to file \"" << filename << "\"" << std::endl;
-		std::ofstream outputstream;
-		outputstream.open(filename.c_str(), std::ios::app);
-		if(outputstream.is_open()) {
-			outputstream << "# beta\t\t" << values[0].second.getMetaInformation() << std::endl;
+		if(estimatorNumber==nullptr){
+            std::cout << "# Writing reweighted data for \"" << quantityName << "\" to file \"" << filename << "\"" << std::endl;
+            std::ofstream outputstream;
+            outputstream.open(filename.c_str(), std::ios::app);
+            if(outputstream.is_open()) {
+                outputstream << "# beta\t\t" << values[0].second.getMetaInformation() << std::endl;
 
-			for (uint index = 0; index < values.size(); index ++)
-			{
-				outputstream << std::scientific << values[index].first << "\t" << values[index].second.getObservablesAsString() << std::endl;
-			}
-			outputstream.close();
-		}
-		else {
-			throw std::invalid_argument("Could open file for output. Aborting!");
+                for (unsigned int index = 0; index < values.size(); index ++)
+                {
+                    outputstream << std::scientific << values[index].first << "\t" << values[index].second.getObservablesAsString() << std::endl;
+                }
+                outputstream.close();
+            }
+            else {
+                throw std::invalid_argument("Could open file for output. Aborting!");
+            }
+		}else{
+		    static bool alreadyPrintedToFile = false;
+		    if(alreadyPrintedToFile == false)
+		        std::cout << "# Writing observable estimators for \"" << quantityName << "\" to file \"" << filename << "\"" << std::endl;
+		    std::ofstream outputstream;
+		    outputstream.open(filename.c_str(), std::ios::app);
+		    if(outputstream.is_open()){
+		        if(alreadyPrintedToFile == false)
+		            outputstream << "#estimator\tbeta\t\t" << values[0].second.getMetaInformation() << std::endl;
+		        for (unsigned int index = 0; index < values.size(); index ++)
+		            outputstream << *estimatorNumber << "\t\t" << std::scientific << values[index].first << "\t" << values[index].second.getObservablesAsString() << std::endl;
+		        outputstream.close();
+		    }
+		    else {
+		        throw std::invalid_argument("Could open file for output. Aborting!");
+		    }
+		    if(alreadyPrintedToFile == false) alreadyPrintedToFile = true;
+		    values.clear();
 		}
 	}
 
@@ -43,15 +63,15 @@ private:
 };
 
 
-static void checkInputSizes(std::vector<std::vector<realFloat> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData)
+template<typename T> static void checkInputSizes(std::vector<std::vector<realFloat> > & newBetaValues, std::vector<std::vector<T> > & reweightedData)
 {
 	if ( reweightedData.size() == 0 )
 	{
 		throw std::exception();
 	}
 
-	uint numberOfNewPoints = reweightedData.size();
-	uint numberOfQuantities = reweightedData[0].size();
+	unsigned int numberOfNewPoints = reweightedData.size();
+	unsigned int numberOfQuantities = reweightedData[0].size();
 
 	if ( numberOfQuantities <= 0 )
 	{
@@ -69,7 +89,7 @@ static void checkInputSizes(std::vector<std::vector<realFloat> > & newBetaValues
 }
 
 
-void writeLqcdReweightingResultsToFile(std::vector<std::vector<realFloat> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData, std::string outputfilePrefix)
+void writeLqcdReweightedObservablesToFile(std::vector<std::vector<realFloat> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData, std::string outputfilePrefix)
 {
 	try{
 		checkInputSizes(newBetaValues, reweightedData);
@@ -80,27 +100,90 @@ void writeLqcdReweightingResultsToFile(std::vector<std::vector<realFloat> > & ne
 		return;
 	}
 
-	std::vector<LqcdReweightedData> ReweightedQuantities;
-	uint numberOfNewPoints = reweightedData.size();
-	uint numberOfQuantities = reweightedData[0].size();
+	std::vector<LqcdReweightedData> reweightedQuantities;
+	unsigned int numberOfNewPoints = reweightedData.size();
+	unsigned int numberOfQuantities = reweightedData[0].size();
 
-	for (uint quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)
+	for (unsigned int quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)
 	{
 		LqcdReweightedData reweightedQuantity( "quantity" + boost::lexical_cast<std::string>(quantityIndex + 1), outputfilePrefix );
 
-		for (uint iteration=0; iteration < numberOfNewPoints; iteration ++)
+		for (unsigned int iteration=0; iteration < numberOfNewPoints; iteration ++)
 		{
 			reweightedQuantity.append( newBetaValues[iteration][0], reweightedData[iteration][quantityIndex] ) ;
 		}
 
-		ReweightedQuantities.push_back (reweightedQuantity);
+		reweightedQuantities.push_back (reweightedQuantity);
 	}
 
-	for(uint quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex ++)
+	for(unsigned int quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex ++)
 	{
-		ReweightedQuantities[quantityIndex].printToFile();
+		reweightedQuantities[quantityIndex].printToFile();
 	}
 }
 
 
 
+static std::vector<Observables> convertMapOfObservableNameAndDataSampleToVectorOfObservables(std::map<std::string, DataSample> inputMap){
+
+    if(inputMap.empty())
+        throw std::logic_error("Called \"convertMapOfObservableNameAndDataSampleToVectorOfObservables\" function with empty map!");
+
+    const int numberOfEstimatorsPerQuantity = inputMap.begin()->second.getNumberOfElements();
+    std::vector<Observables> returnValue(numberOfEstimatorsPerQuantity, Observables());
+
+    for(auto& mapElement: inputMap) {
+        if(mapElement.second.getNumberOfElements() != numberOfEstimatorsPerQuantity)
+            throw std::logic_error("In \"convertMapOfObservableNameAndDataSampleToVectorOfObservables\" map seems to contain different DataSample sizes, not allowed!");
+        for(int dataIndex=0; dataIndex<mapElement.second.getNumberOfElements(); dataIndex++){
+            if(mapElement.first == Mean::observableName)
+                returnValue[dataIndex].mean.estimate = mapElement.second[dataIndex];
+            else if (mapElement.first == Variance::observableName)
+                returnValue[dataIndex].susceptibility.estimate = mapElement.second[dataIndex];
+            else if (mapElement.first == Skewness::observableName)
+                returnValue[dataIndex].skewness.estimate = mapElement.second[dataIndex];
+            else if (mapElement.first == BinderCumulant::observableName)
+                returnValue[dataIndex].binderCumulant.estimate = mapElement.second[dataIndex];
+            else
+                throw std::invalid_argument("In \"convertMapOfObservableNameAndDataSampleToVectorOfObservables\" map seems to contain unknown observable!");
+        }
+    }
+
+    return returnValue;
+}
+
+void writeLqcdReweightedObservablesEstimatorsToFile(std::vector<std::vector<realFloat> >& newBetaValues,
+                                                    std::vector<std::vector<std::map<std::string,DataSample> > >& reweightedEstimators, std::string outputfilePrefix)
+{
+    try{
+        std::cout << std::endl;
+        checkInputSizes(newBetaValues, reweightedEstimators);
+    }catch(std::invalid_argument& e){
+        throw e;
+    }catch(std::exception& e){
+        std::cout << "\n   No reweighting procedure has been performed, probably because none was asked. No file will be created.\n" << std::endl;
+        return;
+    }
+
+    unsigned int numberOfNewPoints = reweightedEstimators.size();
+    unsigned int numberOfQuantities = reweightedEstimators[0].size();
+    std::vector<std::vector<std::vector<Observables> > > reweightedEstimatorsNew(numberOfNewPoints, std::vector<std::vector<Observables> >(numberOfQuantities, std::vector<Observables>()));
+
+    for(unsigned int newPointIndex=0; newPointIndex < numberOfNewPoints; newPointIndex ++){
+        for(unsigned int quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)
+            reweightedEstimatorsNew[newPointIndex][quantityIndex] = convertMapOfObservableNameAndDataSampleToVectorOfObservables(reweightedEstimators[newPointIndex][quantityIndex]);
+    }
+
+    unsigned int numberOfEstimators = reweightedEstimatorsNew[0][0].size();
+
+    for(unsigned int quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++){
+        LqcdReweightedData reweightedQuantity( "estimatorsQuantity" + std::to_string(quantityIndex + 1), outputfilePrefix );
+        for(unsigned int estimatorIndex=0; estimatorIndex<numberOfEstimators; estimatorIndex++){
+            for(unsigned int newPointIndex=0; newPointIndex < numberOfNewPoints; newPointIndex ++){
+                reweightedQuantity.append( newBetaValues[newPointIndex][0], reweightedEstimatorsNew[newPointIndex][quantityIndex][estimatorIndex] ) ;
+            }
+            reweightedQuantity.printToFile(&estimatorIndex);
+        }
+    }
+
+}

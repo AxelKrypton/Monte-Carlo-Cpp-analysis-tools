@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_SUITE(defaults)
 
 	BOOST_AUTO_TEST_CASE(numberOfNewPoints)
 	{
-		uint defaultValue = 2;
+		unsigned int defaultValue = 2;
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfNewBetaPoints() );
 	}
 	
@@ -134,6 +134,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getUseSimulatedPointsAsNewPoints() );
 	}
 
+	BOOST_AUTO_TEST_CASE(printEstimatorsToFile)
+    {
+        bool defaultValue = false;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getPrintEstimatorsToFile() );
+    }
+
 	BOOST_AUTO_TEST_CASE(numColsForSingleObs)
 	{
 		unsigned int defaultValue = 0;
@@ -176,7 +182,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 
 	BOOST_AUTO_TEST_CASE(numberOfNewPoints)
 	{
-		uint newValue = 2;
+		unsigned int newValue = 2;
 		std::string argumentName = "--numberOfNewBetaPoints";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfNewBetaPoints() );
 	}
@@ -373,5 +379,19 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		std::string argumentName = "--useSimulatedPointsAsNewPoints";
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getUseSimulatedPointsAsNewPoints() );
 	}
+
+	BOOST_AUTO_TEST_CASE(printEstimatorsToFile_implicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--printEstimatorsToFile";
+        BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getPrintEstimatorsToFile() );
+    }
+
+    BOOST_AUTO_TEST_CASE(printEstimatorsToFile_explicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--printEstimatorsToFile";
+        BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getPrintEstimatorsToFile() );
+    }
 
 BOOST_AUTO_TEST_SUITE_END()

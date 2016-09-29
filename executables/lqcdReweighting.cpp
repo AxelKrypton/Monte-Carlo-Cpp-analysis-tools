@@ -9,11 +9,17 @@ int main(int argc, const char ** argv)
 {
 	try
 	{
-		LqcdReweightingParameters parameters(argc, argv);
-		Reweighter reweighter(parameters);
-		std::vector<std::vector<Observables> > reweightedObservables = reweighter.getReweightedObservables();
-		std::vector<std::vector<realFloat> > newBetaValues = reweighter.getValuesOfNewParameters();
-		writeLqcdReweightingResultsToFile(newBetaValues, reweightedObservables, parameters.getOutputfilePrefix() );
+	    LqcdReweightingParameters parameters(argc, argv);
+	    Reweighter reweighter(parameters);
+	    std::vector<std::vector<Observables> > reweightedObservables = reweighter.getReweightedObservables();
+	    std::vector<std::vector<realFloat> > newBetaValues = reweighter.getValuesOfNewParameters();
+	    //TODO: Think weather the following Output functions should be a responsibility of ReweighterIO
+	    writeLqcdReweightedObservablesToFile(newBetaValues, reweightedObservables, parameters.getOutputfilePrefix() );
+	    if(parameters.getPrintEstimatorsToFile()){
+	        std::vector<std::vector<std::map<std::string,DataSample> > > reweightedObservablesEstimators = reweighter.getReweightedObservablesEstimators();
+	        writeLqcdReweightedObservablesEstimatorsToFile(newBetaValues, reweightedObservablesEstimators, parameters.getOutputfilePrefix());
+	    }
+	    std::cout << std::endl;
 	}
 	//todo: move catch block into own function?
 	catch ( wrongBinningParameter &e)

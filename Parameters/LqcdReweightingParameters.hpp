@@ -31,7 +31,7 @@ public:
 	
 	std::string getInputfile();
 	std::string getOutputfilePrefix();
-	uint getNumberOfNewBetaPoints();
+	unsigned int getNumberOfNewBetaPoints();
 	realFloat getNewBetaRange_low();
 	realFloat getNewBetaRange_high();
 	bool getDeactivateReweightingForMean();
@@ -42,6 +42,7 @@ public:
 	bool getUseJackknifeAsErrorMethod();
 	bool getUseBootstrapAsErrorMethod();
 	bool getUseSimulatedPointsAsNewPoints();
+	bool getPrintEstimatorsToFile();
 	int getNumberOfBootstrapResample();
 	realFloat getWeightPrecision();
 	bool getIsMeanKnownToBeZero();
@@ -54,7 +55,7 @@ private:
 	
 	std::string inputfile;
 	std::string outputfilePrefix;
-	uint numberOfNewBetaPoints;
+	unsigned int numberOfNewBetaPoints;
 	realFloat newBetaRange_low;
 	realFloat newBetaRange_high;
 	bool deactivateReweightingForMean;
@@ -64,6 +65,7 @@ private:
 	bool useJackknifeAsErrorMethod;
 	bool useBootstrapAsErrorMethod;
 	bool useSimulatedPointsAsNewPoints;
+	bool printEstimatorsToFile;
 	realFloat weightPrecision;
 	int numberOfBootstrapResample;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;

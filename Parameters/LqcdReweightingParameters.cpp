@@ -20,7 +20,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
 		("help,h", "Produce this help message")
 		("file,f", po::value<std::string>(&inputfile), "Inputfile containing metainformation for reweighting procedure.")
 		("outputfilePrefix", po::value<std::string>(&outputfilePrefix)->default_value("reweightedData"), "Prefix for output file.")
-		("numberOfNewBetaPoints", po::value<uint>(&numberOfNewBetaPoints)->default_value(2), "Number of new points to produce with reweighting.")
+		("numberOfNewBetaPoints", po::value<unsigned int>(&numberOfNewBetaPoints)->default_value(2), "Number of new points to produce with reweighting.")
 		("newBetaRange_high", po::value<realFloat>(&newBetaRange_high)->default_value(2), "Upper limit of new beta range of to cover with reweighting.")
 		("newBetaRange_low", po::value<realFloat>(&newBetaRange_low)->default_value(1), "Lower limit of new beta range of to cover with reweighting.")
 		("deactivateReweightingForMean", po::value<bool>(&deactivateReweightingForMean)->default_value(false)->implicit_value(true), "Do not perform reweighting for the mean of the data.")
@@ -33,6 +33,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
         ("useJackknifeAsErrorMethod", po::value<bool>(&useJackknifeAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Jackknife. ATTENTION: This method implies to use the biggest binsize for all raw data points. Unless the statistics is such that the number of uncorrelated data points is not affected, this method will in general overestimate the errors!!!")
         ("useBootstrapAsErrorMethod", po::value<bool>(&useBootstrapAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Bootstrap.")
         ("numberOfBootstrapResample", po::value<int>(&numberOfBootstrapResample)->default_value(100), "Number of resamples to be done in the bootstrap.")
+        ("printEstimatorsToFile", po::value<bool>(&printEstimatorsToFile)->default_value(false)->implicit_value(true), "Print the observables estimators out of which the error is calculated to a file.")
         ("useSimulatedPointsAsNewPoints", po::value<bool>(&useSimulatedPointsAsNewPoints)->default_value(false)->implicit_value(true), "Perform reweighting evaluating the observables at the simulated points (given in the configuration file).")
         ("weightPrecision", po::value<realFloat>(&weightPrecision)->default_value(1.e-7), "Precision for iterative finding of optimal weights.");
 		
@@ -136,7 +137,7 @@ void LqcdReweightingParameters::printParameters()
 	std::cout << separator << std::endl;
 }
 
-uint LqcdReweightingParameters::getNumberOfNewBetaPoints()
+unsigned int LqcdReweightingParameters::getNumberOfNewBetaPoints()
 {
 	return numberOfNewBetaPoints;
 }
@@ -198,6 +199,11 @@ bool LqcdReweightingParameters::getUseBootstrapAsErrorMethod()
 bool LqcdReweightingParameters::getUseSimulatedPointsAsNewPoints()
 {
 	return useSimulatedPointsAsNewPoints;
+}
+
+bool LqcdReweightingParameters::getPrintEstimatorsToFile()
+{
+    return printEstimatorsToFile;
 }
 
 int LqcdReweightingParameters::getNumberOfBootstrapResample()
