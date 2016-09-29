@@ -468,7 +468,7 @@ BOOST_AUTO_TEST_SUITE(autocorrelation)
 		 * from how we do. This is the reason why here we do not use "realFloatPrecisionInPercent"
 		 * but only 3.e-10 in the boost check of the error.
 		 */
-		for(uint i=0; i<result.size(); i++){
+		for(unsigned int i=0; i<result.size(); i++){
             BOOST_REQUIRE_CLOSE(result[i].estimate, referenceCorrFuncValues[i], 3.e-10);
             BOOST_REQUIRE_CLOSE(result[i].error, referenceCorrFuncErrors[i], 3.e-10);
 		}
@@ -488,7 +488,7 @@ BOOST_AUTO_TEST_SUITE(autocorrelation)
 		 * See the comment above for the reason why we use 1.e-10 instead
 		 * of "realFloatPrecisionInPercent" in the boost check.
 		 */
-		for(uint i=0; i<result.size(); i++){
+		for(unsigned int i=0; i<result.size(); i++){
 			BOOST_CHECK_CLOSE(result[i].estimate, referenceTauValues[i], 1.e-10);
 			BOOST_CHECK_CLOSE(result[i].error, referenceTauErrors[i], 1.e-10);
 		}

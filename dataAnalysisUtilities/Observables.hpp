@@ -269,7 +269,7 @@ public:
 		std::string getMetaInformation()
 		{
 			std::string metaInfos = "";
-			for (uint index = 0; index < observableNames.size(); index ++)
+			for (unsigned int index = 0; index < observableNames.size(); index ++)
 			{
 				metaInfos += observableNames[index] + "\t\t\terror\t\t\t";
 			}
