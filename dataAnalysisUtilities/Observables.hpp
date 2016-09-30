@@ -261,9 +261,9 @@ public:
                     skewness(NAN, NAN), binderCumulant(NAN, NAN)
 										{
 												observableNames.push_back("mean" );
-												observableNames.push_back("susc");
-												observableNames.push_back("skew");
-												observableNames.push_back("binder");
+												observableNames.push_back("variance");
+												observableNames.push_back("skewness");
+												observableNames.push_back("kurtosis");
 										}
 										
 		std::string getMetaInformation()
