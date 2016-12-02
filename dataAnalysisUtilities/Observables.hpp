@@ -5,6 +5,7 @@
 #include <map>
 #include <sstream>
 #include <array>
+#include <functional>
 #include "EstimateAndError.hpp"
 #include "DataSample.hpp"
 
