@@ -256,7 +256,7 @@ std::vector<realFloat> MomentsReweighterAbstract::calculateLogZAtNewPoints(std::
         logZAtSimulationPointToBeUsed = &logZAtSimulatedPoints;
 
 	std::vector<realFloat> outputValuesOfLogZ(valuesOfParametersAtWhichLogZIsCalculated.size());
-	realFloat logarithmOfDenominator;
+	realFloat logarithmOfDenominator = std::numeric_limits<double>::quiet_NaN(); //meaningless initial value, since variable will be initialized later.
 	size_t numberOfReweightingParameters = reweightingParameterNames.size();
 	size_t numberOfSimulationsDone = valuesOfSimulationParameters.size();
 	for(size_t indexNewPoint = 0; indexNewPoint < valuesOfParametersAtWhichLogZIsCalculated.size(); indexNewPoint++){
@@ -452,7 +452,7 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
     size_t numberOfSimulationsDone = valuesOfSimulationParameters.size();
     size_t numberOfNewPoints = valuesOfNewParameters.size();
     std::vector<std::vector<realFloat> > outputValuesOfObservables(numberOfNewPoints, std::vector<realFloat>(momentsReweighterHelper.numberOfObservablesToBeReweighted));
-    realFloat logarithmOfDenominator;
+    realFloat logarithmOfDenominator = std::numeric_limits<double>::quiet_NaN(); //meaningless initial value, since variable will be initialized later.
     for(size_t indexNewPoint = 0; indexNewPoint < numberOfNewPoints; indexNewPoint++){
         bool firstValue = true;
         for(size_t indexSimulation1 = 0; indexSimulation1 < numberOfSimulationsDone; indexSimulation1++){
