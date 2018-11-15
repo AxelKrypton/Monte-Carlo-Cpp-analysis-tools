@@ -7,8 +7,8 @@ int main(int argc, const char ** argv)
 {
 	try
 	{
-	    std::cout << std::endl << "#------------------------------------------------------------------------------------" << std::endl;
 		Parameters parameters(argc, argv);
+		std::cout << std::endl << "#------------------------------------------------------------------------------------" << std::endl;
 		DatafileAnalyzer analyzer(parameters);
 		std::cout << "#------------------------------------------------------------------------------------" << std::endl << std::endl;
 	}
