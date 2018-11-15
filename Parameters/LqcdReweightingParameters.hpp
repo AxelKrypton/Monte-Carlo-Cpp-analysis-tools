@@ -37,7 +37,7 @@ public:
 	bool getDeactivateReweightingForMean();
 	bool getDeactivateReweightingForVariance();
 	bool getDeactivateReweightingForSkewness();
-	bool getDeactivateReweightingForBinder();
+	bool getDeactivateReweightingForKurtosis();
     std::vector<unsigned int> getColumnsToBeReweightedUsingMultipleColumns();
 	bool getUseJackknifeAsErrorMethod();
 	bool getUseBootstrapAsErrorMethod();
@@ -61,7 +61,7 @@ private:
 	bool deactivateReweightingForMean;
 	bool deactivateReweightingForVariance;
 	bool deactivateReweightingForSkewness;
-	bool deactivateReweightingForBinder;
+	bool deactivateReweightingForKurtosis;
 	bool useJackknifeAsErrorMethod;
 	bool useBootstrapAsErrorMethod;
 	bool useSimulatedPointsAsNewPoints;

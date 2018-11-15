@@ -153,8 +153,8 @@ static std::vector<std::string> getQuantitiesToBeReweighted(LqcdReweightingParam
 		quantities.push_back(Variance::observableName);
 	if(!parameters.getDeactivateReweightingForSkewness())
 		quantities.push_back(Skewness::observableName);
-	if(!parameters.getDeactivateReweightingForBinder())
-		quantities.push_back(BinderCumulant::observableName);
+	if(!parameters.getDeactivateReweightingForKurtosis())
+		quantities.push_back(Kurtosis::observableName);
 	return quantities;
 }
 
@@ -178,8 +178,8 @@ static std::initializer_list<unsigned int> getNeededMomentsBasedOnObservableName
 		return isMeanZero ? Variance::neededMomentsWithZeroMean : Variance::neededMoments;
 	else if(obsName == Skewness::observableName)
 		return isMeanZero ? Skewness::neededMomentsWithZeroMean : Skewness::neededMoments;
-	else if(obsName == BinderCumulant::observableName)
-		return isMeanZero ? BinderCumulant::neededMomentsWithZeroMean : BinderCumulant::neededMoments;
+	else if(obsName == Kurtosis::observableName)
+		return isMeanZero ? Kurtosis::neededMomentsWithZeroMean : Kurtosis::neededMoments;
 	else
 		throw std::invalid_argument("Unknown observable in \"getNeededMomentsBasedOnObservableName\" function!");
 }
@@ -290,8 +290,8 @@ static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<
 					observables[newPoint][obsInFile].susceptibility = Variance(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate).getValueAndError();
 				else if(quantity == Skewness::observableName)
 					observables[newPoint][obsInFile].skewness = Skewness(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate).getValueAndError();
-				else if(quantity == BinderCumulant::observableName)
-					observables[newPoint][obsInFile].binderCumulant = BinderCumulant(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate).getValueAndError();
+				else if(quantity == Kurtosis::observableName)
+					observables[newPoint][obsInFile].kurtosis = Kurtosis(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate).getValueAndError();
 				else
 					throw std::invalid_argument("Unknown observable in \"setObservablesAtNewPointsFromMomentsAndMomentEstimators\" function!");
 			}
@@ -345,8 +345,8 @@ static void setObservablesEstimatorsAtNewPointsFromMomentsEstimators(std::vector
                     observablesEstimators[newPoint][obsInFile][Variance::observableName]= Variance::evaluateObservableOnMomentEstimators(momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
                 else if(quantity == Skewness::observableName)
                     observablesEstimators[newPoint][obsInFile][Skewness::observableName] = Skewness::evaluateObservableOnMomentEstimators(momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
-                else if(quantity == BinderCumulant::observableName)
-                    observablesEstimators[newPoint][obsInFile][BinderCumulant::observableName] = BinderCumulant::evaluateObservableOnMomentEstimators(momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
+                else if(quantity == Kurtosis::observableName)
+                    observablesEstimators[newPoint][obsInFile][Kurtosis::observableName] = Kurtosis::evaluateObservableOnMomentEstimators(momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
                 else
                     throw std::invalid_argument("Unknown observable in \"setObservablesAtNewPointsFromMomentsAndMomentEstimators\" function!");
             }

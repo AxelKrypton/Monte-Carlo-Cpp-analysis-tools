@@ -23,7 +23,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
         ("deactivateReweightingForMean", po::value<bool>(&deactivateReweightingForMean)->default_value(false)->implicit_value(true), "Do not perform reweighting for the mean of the data.")
         ("deactivateReweightingForVariance", po::value<bool>(&deactivateReweightingForVariance)->default_value(false)->implicit_value(true), "Do not perform reweighting for the variance of the data.")
         ("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false)->implicit_value(true), "Do not perform reweighting for the skewness of the data.")
-        ("deactivateReweightingForBinder", po::value<bool>(&deactivateReweightingForBinder)->default_value(false)->implicit_value(true), "Do not perform reweighting for the binder cumulant of the data.")
+        ("deactivateReweightingForKurtosis", po::value<bool>(&deactivateReweightingForKurtosis)->default_value(false)->implicit_value(true), "Do not perform reweighting for the kurtosis of the data.")
         ("obsMultipleColumns", po::value<std::vector<unsigned int> >(&columnsToBeReweightedUsingMultipleColumns)->multitoken(), getHelpDescription("obsMultipleColumns").c_str())
         ("numberOfMultipleColumnsForSingleObservable", po::value<unsigned int>(&numberOfMultipleColumnsForSingleObservable)->default_value(0), "Number of columns to be considered referred to the same observable.")
         ("isMeanKnownToBeZero", po::value<bool>(&isMeanKnownToBeZero)->default_value(false)->implicit_value(true), "ALL observables are known a priori to have zero mean.")
@@ -123,13 +123,13 @@ void LqcdReweightingParameters::printParameters()
     {
         std::cout << "#\tSkewness of data" << std::endl;
     }
-    if ( deactivateReweightingForBinder )
+    if ( deactivateReweightingForKurtosis )
     {
-        std::cout << "#\tDo NOT reweight binder cumulant of data" << std::endl;
+        std::cout << "#\tDo NOT reweight kurtosis of data" << std::endl;
     }
     else
     {
-        std::cout << "#\tBinder cumulant of data" << std::endl;
+        std::cout << "#\tKurtosis of data" << std::endl;
     }
     std::cout << separator << std::endl;
 }
@@ -174,9 +174,9 @@ bool LqcdReweightingParameters::getDeactivateReweightingForSkewness()
     return deactivateReweightingForSkewness;
 }
 
-bool LqcdReweightingParameters::getDeactivateReweightingForBinder()
+bool LqcdReweightingParameters::getDeactivateReweightingForKurtosis()
 {
-    return deactivateReweightingForBinder;
+    return deactivateReweightingForKurtosis;
 }
 
 std::vector<unsigned int> LqcdReweightingParameters::getColumnsToBeReweightedUsingMultipleColumns(){

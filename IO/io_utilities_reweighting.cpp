@@ -142,8 +142,8 @@ static std::vector<Observables> convertMapOfObservableNameAndDataSampleToVectorO
                 returnValue[dataIndex].susceptibility.estimate = mapElement.second[dataIndex];
             else if (mapElement.first == Skewness::observableName)
                 returnValue[dataIndex].skewness.estimate = mapElement.second[dataIndex];
-            else if (mapElement.first == BinderCumulant::observableName)
-                returnValue[dataIndex].binderCumulant.estimate = mapElement.second[dataIndex];
+            else if (mapElement.first == Kurtosis::observableName)
+                returnValue[dataIndex].kurtosis.estimate = mapElement.second[dataIndex];
             else
                 throw std::invalid_argument("In \"convertMapOfObservableNameAndDataSampleToVectorOfObservables\" map seems to contain unknown observable!");
         }

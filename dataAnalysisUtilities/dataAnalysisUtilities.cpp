@@ -17,7 +17,7 @@ static Parameters buildLocalParametersWithCorrectBinningInformation(const Parame
 	}else if(observable == "skewness"){
 		tmp.binsize = std::max(tmp.binsizeCentralMoments[2], tmp.binsizeCentralMoments[3]);
 		tmp.numberOfBins = std::min(tmp.numberOfBinsCentralMoments[2], tmp.numberOfBinsCentralMoments[3]);
-	}else if(observable == "Binder"){
+	}else if(observable == "kurtosis"){
 		tmp.binsize = std::max(tmp.binsizeCentralMoments[2], tmp.binsizeCentralMoments[4]);
 		tmp.numberOfBins = std::min(tmp.numberOfBinsCentralMoments[2], tmp.numberOfBinsCentralMoments[4]);
 	}else{
@@ -171,26 +171,26 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample sampleIn, Parameter
 	return jackknifeAnalysis(sampleForJack, calcSkewness);
 }
 
-EstimateAndError calcBinderAndErrorOfDataSample(DataSample sampleIn, Parameters parameters)
+EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample sampleIn, Parameters parameters)
 {
 	/**
 	 * The Fourth Std. Moment beta_2 is defined as:
 	 *   beta_2 = <(x-mu)^4> / <(x-mu)^2>^2
-	 * This is also referred to as "Binder-cumulant"
-	 * The Kurtosis gamma_2 is defined as:
+	 * This is also referred to as "kurtosis"
+	 * The excess kurtosis gamma_2 is defined as:
 	 *   gamma_2 = beta_2 - 3
 	 */
 	DataSample fourthCentralMoment = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(4) : sampleIn.getNthCentralMomentPerDataPoint(4);
 	DataSample secondCentralMoment = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(2) : sampleIn.getNthCentralMomentPerDataPoint(2);
 	
-	Parameters binningParameters = buildLocalParametersWithCorrectBinningInformation(parameters, "Binder");
-	printBinningInformation(binningParameters, "BINDER CUMULANT");
+	Parameters binningParameters = buildLocalParametersWithCorrectBinningInformation(parameters, "kurtosis");
+	printBinningInformation(binningParameters, "KURTOSIS");
 	DataSample binnedSample1 = performBinning(fourthCentralMoment, binningParameters);
 	DataSample binnedSample2 = performBinning(secondCentralMoment, binningParameters);
 	
-	auto calcBinder = [] (DataSample & in1, DataSample & in2) -> DataSample { return in1 / (in2 ^ 2.); };
+	auto calcKurtosis = [] (DataSample & in1, DataSample & in2) -> DataSample { return in1 / (in2 ^ 2.); };
 
-	return jackknifeAnalysis(binnedSample1, binnedSample2, calcBinder);
+	return jackknifeAnalysis(binnedSample1, binnedSample2, calcKurtosis);
 }
 
 /*

@@ -398,7 +398,7 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(binderAndError)
+BOOST_AUTO_TEST_SUITE(kurtosisAndError)
 
 BOOST_AUTO_TEST_CASE(withBinning1)
 	{
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_CASE(withBinning1)
 	
 		DataSample sample(gaussianData);
 
-		EstimateAndError kurtosisAndError = calcBinderAndErrorOfDataSample(sample, parameters);
+		EstimateAndError kurtosisAndError = calcKurtosisAndErrorOfDataSample(sample, parameters);
         realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
                 fabs(kurtosisAndError.estimate - expectedKurtosis) / kurtosisAndError.error;
 
@@ -430,7 +430,7 @@ BOOST_AUTO_TEST_CASE(withBinning1)
 
 		DataSample sample(gaussianData);
 
-		EstimateAndError kurtosisAndError = calcBinderAndErrorOfDataSample(sample, parameters);
+		EstimateAndError kurtosisAndError = calcKurtosisAndErrorOfDataSample(sample, parameters);
 		realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue =
                 fabs(kurtosisAndError.estimate - expectedKurtosis) / kurtosisAndError.error;
 

@@ -149,8 +149,8 @@ BOOST_AUTO_TEST_SUITE(defaults)
 
 	BOOST_AUTO_TEST_CASE(analyzeKurtosis)
 	{
-		bool doNotAnalyzeBinderCumulant_default = false;
-		BOOST_REQUIRE_EQUAL(doNotAnalyzeBinderCumulant_default, createParametersForDefaultCheck().doNotAnalyzeBinderCumulant);
+		bool doNotAnalyzeKurtosis_default = false;
+		BOOST_REQUIRE_EQUAL(doNotAnalyzeKurtosis_default, createParametersForDefaultCheck().doNotAnalyzeKurtosis);
 	}
 
 	BOOST_AUTO_TEST_CASE(analysisOutputFilePrefix)
@@ -575,15 +575,15 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 	BOOST_AUTO_TEST_CASE(analyzeKurtosis1)
 	{
 		bool newValue = true;
-		std::string argumentName = "--doNotAnalyzeBinder";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).doNotAnalyzeBinderCumulant);
+		std::string argumentName = "--doNotAnalyzeKurtosis";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).doNotAnalyzeKurtosis);
 	}
 
 	BOOST_AUTO_TEST_CASE(analyzeKurtosis2)
 	{
 		bool newValue = true;
-		std::string argumentName = "--doNotAnalyzeBinder";
-		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).doNotAnalyzeBinderCumulant);
+		std::string argumentName = "--doNotAnalyzeKurtosis";
+		BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_implicitOption(argumentName).doNotAnalyzeKurtosis);
 	}
 
 	BOOST_AUTO_TEST_CASE(analysisOutputFilePrefix)

@@ -102,7 +102,7 @@ static Moments buildMomentsForTest(){
 	 *     mean = 0.5120788163699608		-> zero mean: 0.0
 	 * variance = 1.268738973830841e-05		-> zero mean: 0.2622374015645983
 	 * skewness = 0.5694793357428045		-> zero mean: 1.000072760979389
-	 *   binder = 3.7478114121524830		-> zero mean: 1.000194288875983
+	 * kurtosis = 3.7478114121524830		-> zero mean: 1.000194288875983
 	 */
 }
 
@@ -143,7 +143,7 @@ static MomentsEstimators buildMomentsEstimatorsForTest(){
 	 * bootstrap     mean = 1.1520239122276158e-03
 	 * bootstrap variance = 3.0259317682406541e-06
 	 * bootstrap skewness = not present in the reference code
-	 * bootstrap   binder = 7.2132403917648602e-01
+	 * bootstrap kurtosis = 7.2132403917648602e-01
 	 */
 }
 
@@ -340,56 +340,56 @@ BOOST_AUTO_TEST_SUITE(SkewnessTest)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(BinderCumulantTest)
+BOOST_AUTO_TEST_SUITE(KurtosisTest)
 
 	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)
 	{
 		EstimateAndError referenceValue(1.000194288875983, 0.0);
-		BinderCumulant binder(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
-		BOOST_CHECK_CLOSE(binder.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-		BOOST_CHECK_SMALL(binder.getValueAndError().error, 1.e-7);
+		Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
+		BOOST_CHECK_CLOSE(kurtosis.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+		BOOST_CHECK_SMALL(kurtosis.getValueAndError().error, 1.e-7);
 	}
 
 	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
 	{
 		EstimateAndError referenceValue(3.7478114121524830, 0.0);
-		BinderCumulant binder(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
-		BOOST_CHECK_CLOSE(binder.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-		BOOST_CHECK_SMALL(binder.getValueAndError().error, 3.e-7);
+		Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
+		BOOST_CHECK_CLOSE(kurtosis.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+		BOOST_CHECK_SMALL(kurtosis.getValueAndError().error, 3.e-7);
 	}
 
 	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
 	{
 		EstimateAndError referenceValue(3.7478114121524830, 7.2132403917648602e-01);
-		BinderCumulant binder(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
-		BOOST_CHECK_CLOSE(binder.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-		BOOST_CHECK_CLOSE(binder.getValueAndError().error, referenceValue.error, realFloatPrecisionInPercent);
+		Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
+		BOOST_CHECK_CLOSE(kurtosis.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+		BOOST_CHECK_CLOSE(kurtosis.getValueAndError().error, referenceValue.error, realFloatPrecisionInPercent);
 	}
 
-	//TODO: Test for BinderCumulant binder(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
+	//TODO: Test for Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
 
 	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
 	{
 		EstimateAndError referenceValue(1.000194288875983, 0.0);
-		BinderCumulant binder(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
-		BOOST_CHECK_CLOSE(binder.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-		BOOST_CHECK_SMALL(binder.getValueAndError().error, 1.e-7);
+		Kurtosis kurtosis(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
+		BOOST_CHECK_CLOSE(kurtosis.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+		BOOST_CHECK_SMALL(kurtosis.getValueAndError().error, 1.e-7);
 	}
 
 	BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
 	{
 		EstimateAndError referenceValue(3.7478114121524830, 0.0);
-		BinderCumulant binder(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
-		BOOST_CHECK_CLOSE(binder.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-		BOOST_CHECK_SMALL(binder.getValueAndError().error, 3.e-7);
+		Kurtosis kurtosis(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
+		BOOST_CHECK_CLOSE(kurtosis.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+		BOOST_CHECK_SMALL(kurtosis.getValueAndError().error, 3.e-7);
 	}
 
 	BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)
     {
 	    double referenceValueZeroMean = 1.00015649139308;
 	    double referenceValueNonZeroMean = 3.36129098137853;
-        DataSample resultZeroMean = BinderCumulant::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true);
-        DataSample resultNonZeroMean = BinderCumulant::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
+        DataSample resultZeroMean = Kurtosis::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true);
+        DataSample resultNonZeroMean = Kurtosis::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
         for(int i=0; i<resultZeroMean.getNumberOfElements(); i++){
             BOOST_CHECK_CLOSE(resultZeroMean[i], referenceValueZeroMean, realFloatPrecisionInPercent);
             BOOST_CHECK_CLOSE(resultNonZeroMean[i], referenceValueNonZeroMean, realFloatPrecisionInPercent);
@@ -398,7 +398,7 @@ BOOST_AUTO_TEST_SUITE(BinderCumulantTest)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-//TODO: Develop tests for Mean, Variance, Skewness, BinderCumulant classes with Jackknife from estimators!
+//TODO: Develop tests for Mean, Variance, Skewness, Kurtosis classes with Jackknife from estimators!
 
 
 

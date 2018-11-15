@@ -223,11 +223,11 @@ private:
 };
 
 
-class BinderCumulant : public ObservableAbstract {
+class Kurtosis : public ObservableAbstract {
 public:
-	BinderCumulant() = delete;
-	BinderCumulant(DataSample& dataSample, Parameters parameters);
-	BinderCumulant(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate = false);
+	Kurtosis() = delete;
+	Kurtosis(DataSample& dataSample, Parameters parameters);
+	Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate = false);
 	static constexpr std::initializer_list<unsigned int> neededMoments = {1, 2, 3, 4};
 	static constexpr std::initializer_list<unsigned int> neededMomentsWithZeroMean = {2, 4};
 	static const std::string observableName;
@@ -257,9 +257,9 @@ class Observables
 {
 public:
 //    Observables() : mean(0.0, 0.0), susceptibility(0.0, 0.0),
-//                    skewness(0.0, 0.0), binderCumulant(0.0, 0.0)
+//                    skewness(0.0, 0.0), kurtosis(0.0, 0.0)
 	Observables() : mean(NAN, NAN), susceptibility(NAN, NAN),
-                    skewness(NAN, NAN), binderCumulant(NAN, NAN)
+                    skewness(NAN, NAN), kurtosis(NAN, NAN)
 										{
 												observableNames.push_back("mean" );
 												observableNames.push_back("variance");
@@ -285,7 +285,7 @@ public:
 			values << mean.estimate << "\t" << mean.error<< "\t" ;
 			values << susceptibility.estimate << "\t" << susceptibility.error << "\t";
 			values << skewness.estimate << "\t" << skewness.error << "\t";
-			values << binderCumulant.estimate << "\t" << binderCumulant.error ;
+			values << kurtosis.estimate << "\t" << kurtosis.error ;
 			return values.str();
 		}
 
@@ -297,7 +297,7 @@ public:
     EstimateAndError mean;            // <x>                            --->  x1
     EstimateAndError susceptibility;  // <(x-mu)^2>                     --->  x2-x1^2
     EstimateAndError skewness;        // <(x-mu)^3> / <(x-mu)^2>^(3/2)  --->  (x3-3x2*x1+2*x1^3)/(x2-x1^2)^(3/2)
-    EstimateAndError binderCumulant;  // <(x-mu)^4> / <(x-mu)^2>^2      --->  (x4-4*x3*x1+6*x2*x1^2-3*x1^4)/(x2-x1^2)^2
+    EstimateAndError kurtosis;  // <(x-mu)^4> / <(x-mu)^2>^2      --->  (x4-4*x3*x1+6*x2*x1^2-3*x1^4)/(x2-x1^2)^2
     
     //TODO: Implement functions to calculate here the observables given either the DataSample or
     //      the moments and the estimators (the latter needed in Reweighting). The idea would be to

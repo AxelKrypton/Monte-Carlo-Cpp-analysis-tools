@@ -34,7 +34,7 @@ public:
 	bool doNotAnalyzeMean;
 	bool doNotAnalyzeVariance;
 	bool doNotAnalyzeSkewness;
-	bool doNotAnalyzeBinderCumulant;
+	bool doNotAnalyzeKurtosis;
 	bool binningMustFitDataSampleSize;
 	bool adjustDataSampleSizeToBinning;
 

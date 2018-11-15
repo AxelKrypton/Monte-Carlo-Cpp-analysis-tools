@@ -83,10 +83,10 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForSkewness() );
 	}
 	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForBinder)
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForKurtosis)
 	{
 		bool defaultValue = false;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForBinder() );
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForKurtosis() );
 	}
 	
 	BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero)
@@ -251,18 +251,18 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForSkewness() );
 	}
 	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForBinder_implicit)
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForKurtosis_implicit)
 	{
 		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForBinder";
-		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForBinder() );
+		std::string argumentName = "--deactivateReweightingForKurtosis";
+		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForKurtosis() );
 	}
 	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForBinder_explicit)
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForKurtosis_explicit)
 	{
 		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForBinder";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForBinder() );
+		std::string argumentName = "--deactivateReweightingForKurtosis";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForKurtosis() );
 	}
 	
 	BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero_implicit)

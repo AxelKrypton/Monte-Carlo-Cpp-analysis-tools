@@ -40,10 +40,10 @@ public:
 	SkewnessAnalyzer(DataSample &sample, const Parameters parameters);
 };
 
-class BinderAnalyzer : public AnalyzerWrapper
+class KurtosisAnalyzer : public AnalyzerWrapper
 {
 public:
-	BinderAnalyzer(DataSample &sample, const Parameters parameters);
+	KurtosisAnalyzer(DataSample &sample, const Parameters parameters);
 };
 
 class AutocorrelationAnalyzer : public AnalyzerWrapperBasic

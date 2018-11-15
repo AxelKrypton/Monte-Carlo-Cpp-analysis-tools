@@ -25,9 +25,9 @@ parameters(parametersIn)
 		{
 			SkewnessAnalyzer(sample, parameters);
 		}
-		if(!parameters.doNotAnalyzeBinderCumulant)
+		if(!parameters.doNotAnalyzeKurtosis)
 		{
-			BinderAnalyzer(sample, parameters);
+			KurtosisAnalyzer(sample, parameters);
 		}
 	}
 }
@@ -49,10 +49,10 @@ SkewnessAnalyzer::SkewnessAnalyzer(DataSample &sample, const Parameters paramete
 {
 	estimateAndError = calcSkewnessAndErrorOfDataSample(sample, parameters);
 }
-BinderAnalyzer::BinderAnalyzer(DataSample &sample, const Parameters parameters):
-	AnalyzerWrapper("Binder", getFilenameForObservables(parameters))
+KurtosisAnalyzer::KurtosisAnalyzer(DataSample &sample, const Parameters parameters):
+	AnalyzerWrapper("Kurtosis", getFilenameForObservables(parameters))
 {
-	estimateAndError = calcBinderAndErrorOfDataSample(sample, parameters);
+	estimateAndError = calcKurtosisAndErrorOfDataSample(sample, parameters);
 }
 
 AutocorrelationAnalyzer::AutocorrelationAnalyzer(DataSample &sample, Parameters parameters):
