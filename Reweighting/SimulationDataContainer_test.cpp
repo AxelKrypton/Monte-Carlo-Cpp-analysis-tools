@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_SUITE(UncorrelatedContainer)
         SimulationDataContainer simDataCont(fileThatDoesExist);
         std::vector<int> numberOfBinsVec(simDataCont.getNumberOfDatafiles(), numberOfBins);
         std::default_random_engine generator;
-        BOOST_REQUIRE_THROW(simDataCont.getUncorrelatedSimulationDataSet(numberOfBinsVec, bootstrap), std::invalid_argument)
+        BOOST_REQUIRE_THROW(simDataCont.getUncorrelatedSimulationDataSet(numberOfBinsVec, bootstrap), std::invalid_argument);
         SimulationDataContainer uncorrObject = simDataCont.getUncorrelatedSimulationDataSet(numberOfBinsVec, bootstrap, &generator);
         std::vector<int> entriesLeftOut = simDataCont.getNumberOfEntriesLeftOut(numberOfBinsVec);
         for(int i=0; i<3; i++){
