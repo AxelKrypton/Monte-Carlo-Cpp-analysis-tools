@@ -1,6 +1,8 @@
 #ifndef SIMULATIONCONTAINERDATA_HPP_
 #define SIMULATIONCONTAINERDATA_HPP_
 
+#include <random>
+
 #include "SimulationData.hpp"
 #include "../dataAnalysisUtilities/Observables.hpp"
 
