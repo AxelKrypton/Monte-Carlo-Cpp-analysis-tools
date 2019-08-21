@@ -12,18 +12,17 @@
  * for further treatment.
  */
 
-Histogram::Histogram(double binsizeIn)
+Histogram::Histogram(double binsizeIn) : binsize(binsizeIn)
 {
-    if(binsizeIn<=0)
+    if(binsize<=0)
     {
         throw std::logic_error("Histogram can't be created with negative or zero binsize.");
     }
-    binsize=binsizeIn;
 }
 
-int Histogram::getNumberOfBins(includeZeroBins)
+int Histogram::getNumberOfBins(bool includeZeroBins)
 {
-    int numberOfBins=(int)(getMaxXvalue()-getMinXvalue())/binsize;
+    int numberOfBins=static_cast<int>((getMaxXvalue()-getMinXvalue())/binsize);
     return includeZeroBins ? numberOfBins : histo.size();
 }
 
@@ -32,12 +31,21 @@ double Histogram::getBinsize()
     return binsize;
 }
 
-std::vector<double> Histogram::getHeightsOfBins() const
+std::vector<double> Histogram::getHeightsOfBins(bool includeZeroBins) const
 {
+    std::map<int, double> copyOfHisto(histo);
+    if(includeZeroBins){
+        std::cout << "Size of map before filling zero bins = " << copyOfHisto.size();
+        for(int i=copyOfHisto.begin()->first; i<=copyOfHisto.rbegin()->first; i++)
+        {
+            copyOfHisto[i]; //I just want to fill with zero not existing bins and I use the map's access-operator feature of adding not existing elements
+        }
+        std::cout << "Size after = " << copyOfHisto.size();
+    }
+
     std::vector<double> heights;
     std::map<int, double>::const_iterator it;
-    int i=0;
-    for(it=histo.begin(); it!=histo.end(); it++)
+    for(it=copyOfHisto.begin(); it!=copyOfHisto.end(); it++)
     {
         heights.push_back(it->second);
     }
@@ -59,7 +67,7 @@ double Histogram::getMinXvalue() const
 }
 
 
-std::vector<std::pair<double,double> > Histogram::getBins(includeZeroBins) const
+std::vector<std::pair<double,double> > Histogram::getBins(bool includeZeroBins) const
 {
     std::vector<std::pair<double,double> > bins;
     std::map<int, double>::const_iterator it;
@@ -69,7 +77,6 @@ std::vector<std::pair<double,double> > Histogram::getBins(includeZeroBins) const
         {
             bins.push_back(std::pair<double, double>((it->first - 0.5)*binsize,(it->first + 0.5)*binsize));
         }
-        return bins;
     }
     else
     {
@@ -77,8 +84,8 @@ std::vector<std::pair<double,double> > Histogram::getBins(includeZeroBins) const
         {
             bins.push_back(std::pair<double, double>((i - 0.5)*binsize,(i + 0.5)*binsize));
         }
-        return bins;
-    }  
+    }
+    return bins;
 } 
 
 
@@ -91,7 +98,8 @@ std::vector<std::pair<double,double> > Histogram::getBins(includeZeroBins) const
 
 double& Histogram::operator[](double obsvalue)
 {
-    int whichbin;
-    whichbin=ceil(obsvalue/binsize-0.5);
+    int whichbin=ceil(obsvalue/binsize-0.5);
     return histo[whichbin]; 
 }
+
+
