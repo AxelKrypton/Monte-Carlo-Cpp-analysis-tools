@@ -11,6 +11,7 @@ if( USE_REW_MULTI_PRECISION )
 		MomentsReweighter.cpp
 		ReweighterIO.cpp
 		Reweighter.cpp
+		Histogram.cpp
 	)
 	target_compile_definitions(MultiprecisionReweighting PUBLIC -D_USE_BIG_FLOAT_)
 	target_link_libraries(MultiprecisionReweighting supportSourceForMultiprecisionReweighting)
@@ -24,6 +25,7 @@ add_library(Reweighting
 	MomentsReweighter.cpp
 	ReweighterIO.cpp
 	Reweighter.cpp
+	Histogram.cpp
 )
 target_link_libraries(Reweighting dataAnalysisUtilities)
 
@@ -40,3 +42,4 @@ add_unit_test(MomentsReweighterHelper MomentsReweighterHelper_test Reweighting P
 add_unit_test(MomentsReweighter MomentsReweighter_test Reweighting Parameters_Reweighting ${MPFR_LIBRARIES})
 add_unit_test(ReweighterIO ReweighterIO_test Reweighting Parameters_Reweighting ${MPFR_LIBRARIES})
 add_unit_test(Reweighter Reweighter_test Reweighting Parameters_Reweighting ${MPFR_LIBRARIES})
+add_unit_test(Histogram Histogram_test Reweighting ${MPFR_LIBRARIES})
