@@ -1,6 +1,9 @@
 #ifndef DATASAMPLETESTUTITLITIES_HPP_
 #define DATASAMPLETESTUTITLITIES_HPP_
 
+#include <valarray>
+#include "../types.hpp"
+
 /**
  * realFloat should be correct up to 15 digits (at least)
  * this means two realFloats should be the same relative
