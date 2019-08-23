@@ -3,6 +3,8 @@
 #include<tgmath.h>
 #include<iostream>
 
+static std::map<int,double> insertBinsWithZeroHeight(std::map<int,double>);
+
 /*****************************************************************************************/
 
 /* 
@@ -36,10 +38,7 @@ std::vector<double> Histogram::getHeightsOfBins(bool includeZeroBins) const
     std::map<int, double> copyOfHisto(histo);
     if(includeZeroBins){
         std::cout << "Size of map before filling zero bins = " << copyOfHisto.size();
-        for(int i=copyOfHisto.begin()->first; i<=copyOfHisto.rbegin()->first; i++)
-        {
-            copyOfHisto[i]; //I just want to fill with zero not existing bins and I use the map's access-operator feature of adding not existing elements
-        }
+        copyOfHisto = insertBinsWithZeroHeight(histo);
         std::cout << "Size after = " << copyOfHisto.size();
     }
 
@@ -69,21 +68,16 @@ double Histogram::getMinXvalue() const
 
 std::vector<std::pair<double,double> > Histogram::getBins(bool includeZeroBins) const
 {
+    std::map<int, double> copyOfHisto(histo);
+    if(includeZeroBins)
+    {
+        copyOfHisto=insertBinsWithZeroHeight(histo);
+    }   
     std::vector<std::pair<double,double> > bins;
     std::map<int, double>::const_iterator it;
-    if(!includeZeroBins)
+    for(it=copyOfHisto.begin(); it!=copyOfHisto.end(); it++)
     {
-        for(it=histo.begin(); it!=histo.end(); it++)
-        {
-            bins.push_back(std::pair<double, double>((it->first - 0.5)*binsize,(it->first + 0.5)*binsize));
-        }
-    }
-    else
-    {
-        for(int i=histo.begin()->first; i<=histo.rbegin()->first; i++)
-        {
-            bins.push_back(std::pair<double, double>((i - 0.5)*binsize,(i + 0.5)*binsize));
-        }
+        bins.push_back(std::pair<double, double>((it->first - 0.5)*binsize,(it->first + 0.5)*binsize));
     }
     return bins;
 } 
@@ -102,4 +96,15 @@ double& Histogram::operator[](double obsvalue)
     return histo[whichbin]; 
 }
 
+/**************************************************************************************/
+
+static std::map<int,double> insertBinsWithZeroHeight(std::map<int,double> histoWithoutZeroBins)
+{
+    std::map<int,double> filledHisto(histoWithoutZeroBins);
+    for(int i=filledHisto.begin()->first; i<=filledHisto.rbegin()->first; i++)
+        {
+            filledHisto[i]; //I just want to fill with zero not existing bins and I use the map's access-operator feature of adding not existing elements
+        }
+    return filledHisto;
+}
 
