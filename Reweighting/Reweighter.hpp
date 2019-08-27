@@ -85,7 +85,8 @@ public:
 		for(int i=0; i<rawDataAndInfo.rawData.getNumberOfDatafiles(); i++)
 			std::cout << "  - file " << i << " has " << rawDataAndInfo.rawData[i][0].getNumberOfElements() << " lines\n";
 		std::cout << "- namesOfParametersIgnoringMetaParameters: size " << rawDataAndInfo.namesOfParametersIgnoringMetaParameters.size() << "  ->  ";
-		for(auto i: rawDataAndInfo.namesOfParametersIgnoringMetaParameters) std::cout << i << " - "; std::cout << "\b\b\033[K\n";
+		for(auto i: rawDataAndInfo.namesOfParametersIgnoringMetaParameters) std::cout << i << " - ";
+		std::cout << "\b\b\033[K\n";
 		std::cout << "- valuesOfSimulationParametersIgnoringMetaParameters: size " << rawDataAndInfo.valuesOfSimulationParametersIgnoringMetaParameters.size() << "  ->  ";
 		for(size_t i=0; i<rawDataAndInfo.valuesOfSimulationParametersIgnoringMetaParameters.size(); i++){
 			for(size_t j=0; j<rawDataAndInfo.valuesOfSimulationParametersIgnoringMetaParameters[i].size(); j++)

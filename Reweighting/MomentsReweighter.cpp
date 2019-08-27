@@ -62,7 +62,7 @@ std::vector<realFloat> MomentsReweighterAbstract::getLogZAtSimulatedPoints(){
 std::vector<realFloat> MomentsReweighterAbstract::getLogZAtNewPoints(){
     if(newRangesOfParameters.size() == 0 || newNumberOfPointsOfParameters.size() == 0)
         throw std::logic_error("Values of logZ at new points cannot be retrieved without setting before the new points!");
-	return logZAtNewPoints;
+    return logZAtNewPoints;
 }
 
 
@@ -255,7 +255,7 @@ std::vector<realFloat> MomentsReweighterAbstract::calculateLogZAtNewPoints(std::
     if(logZAtSimulationPointToBeUsed == NULL)
         logZAtSimulationPointToBeUsed = &logZAtSimulatedPoints;
 
-	std::vector<realFloat> outputValuesOfLogZ(valuesOfParametersAtWhichLogZIsCalculated.size());
+    std::vector<realFloat> outputValuesOfLogZ(valuesOfParametersAtWhichLogZIsCalculated.size());
 	realFloat logarithmOfDenominator = std::numeric_limits<double>::quiet_NaN(); //meaningless initial value, since variable will be initialized later.
 	size_t numberOfReweightingParameters = reweightingParameterNames.size();
 	size_t numberOfSimulationsDone = valuesOfSimulationParameters.size();
