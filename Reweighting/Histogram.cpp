@@ -37,9 +37,7 @@ std::vector<double> Histogram::getHeightsOfBins(bool includeZeroBins) const
 {
     std::map<int, double> copyOfHisto(histo);
     if(includeZeroBins){
-        std::cout << "Size of map before filling zero bins = " << copyOfHisto.size();
         copyOfHisto = insertBinsWithZeroHeight(histo);
-        std::cout << "Size after = " << copyOfHisto.size();
     }
 
     std::vector<double> heights;
