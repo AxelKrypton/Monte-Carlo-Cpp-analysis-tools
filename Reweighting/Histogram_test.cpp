@@ -48,17 +48,28 @@ BOOST_AUTO_TEST_SUITE(getters)
     {
         const double binsize=2.0;
         std::vector<double> manualHeights, heights;
+        std::vector<double> manualHeightsWithZeroBins, heightsWithZeroBins;
+        bool includeZeroBins=true;
         Histogram hist(binsize);
         hist[0.3]=1.0;
         hist[1.3]=3.0;
         hist[6.3]=4.0;
         heights=hist.getHeightsOfBins();
+        heightsWithZeroBins=hist.getHeightsOfBins(includeZeroBins);
         manualHeights.push_back(1.0);
         manualHeights.push_back(3.0);
         manualHeights.push_back(4.0);
         BOOST_REQUIRE_EQUAL(heights.size(), manualHeights.size());
         for(unsigned int i=0; i<heights.size(); i++)
             BOOST_REQUIRE_CLOSE(heights[i], manualHeights[i], realFloatPrecisionInPercent);
+        
+        manualHeightsWithZeroBins.push_back(1.0);
+        manualHeightsWithZeroBins.push_back(3.0);
+        manualHeightsWithZeroBins.push_back(0.0);
+        manualHeightsWithZeroBins.push_back(4.0);
+        BOOST_REQUIRE_EQUAL(heightsWithZeroBins.size(), manualHeightsWithZeroBins.size());
+        for(unsigned int i=0; i<heightsWithZeroBins.size(); i++)
+            BOOST_REQUIRE_CLOSE(heightsWithZeroBins[i], manualHeightsWithZeroBins[i], realFloatPrecisionInPercent);
     }
 
     BOOST_AUTO_TEST_CASE(getters4)
@@ -85,11 +96,14 @@ BOOST_AUTO_TEST_SUITE(getters)
     {
         const double binsize=2.0;
         std::vector<std::pair<double, double> > bins, manualBins;
+        std::vector<std::pair<double, double> > binsWithZeroBins, manualBinsWithZeroBins;
+        bool includeZeroBins=true;
         Histogram hist(binsize);
         hist[0.3]=1.0;
         hist[1.3]=3.0;
         hist[6.3]=4.0;
         bins=hist.getBins();
+        binsWithZeroBins=hist.getBins(includeZeroBins);
         manualBins.push_back(std::pair<double,double> (-1.0,1.0));
         manualBins.push_back(std::pair<double,double> ( 1.0,3.0));
         manualBins.push_back(std::pair<double,double> ( 5.0,7.0));
@@ -98,11 +112,21 @@ BOOST_AUTO_TEST_SUITE(getters)
             BOOST_REQUIRE_CLOSE(bins[i].first, manualBins[i].first, realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(bins[i].second, manualBins[i].second, realFloatPrecisionInPercent);
         }
+
+        manualBinsWithZeroBins.push_back(std::pair<double,double> (-1.0,1.0));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 1.0,3.0));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 3.0,5.0));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 5.0,7.0));
+        BOOST_REQUIRE_EQUAL(binsWithZeroBins.size(), manualBinsWithZeroBins.size());
+        for(unsigned int i=0; i<binsWithZeroBins.size(); i++){
+            BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].first, manualBinsWithZeroBins[i].first, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].second, manualBinsWithZeroBins[i].second, realFloatPrecisionInPercent);
+        }
     }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(AccessOperator)
+BOOST_AUTO_TEST_SUITE(Operator)
 
     BOOST_AUTO_TEST_CASE(AccessOperator1)
     {
@@ -121,6 +145,25 @@ BOOST_AUTO_TEST_SUITE(AccessOperator)
         BOOST_REQUIRE_CLOSE(hist[arbitraryDouble], arbitraryObservable, realFloatPrecisionInPercent);
         hist[arbitraryDouble]+=arbitraryObservable;
         BOOST_REQUIRE_CLOSE(hist[arbitraryDouble], 2*arbitraryObservable, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(SubtractionOperator)
+    {
+        const double binsize=4.0;
+        std::vector<double> heights, manualHeights;
+        double arbitraryDouble=3.0;
+        Histogram hist(binsize);
+        hist[0.3]=4.0;
+        hist[2.3]=12.0;
+        hist[6.3]=16.0;
+        hist-=arbitraryDouble;
+        heights=hist.getHeightsOfBins();
+        manualHeights.push_back(1.0);
+        manualHeights.push_back(9.0);
+        manualHeights.push_back(13.0);
+        BOOST_REQUIRE_EQUAL(heights.size(), manualHeights.size());
+        for(unsigned int i=0; i<heights.size(); i++)
+            BOOST_REQUIRE_CLOSE(heights[i], manualHeights[i], realFloatPrecisionInPercent);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

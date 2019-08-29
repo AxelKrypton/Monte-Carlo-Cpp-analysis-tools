@@ -94,6 +94,16 @@ double& Histogram::operator[](double obsvalue)
     return histo[whichbin]; 
 }
 
+std::map<int,double>& Histogram::operator-=(double shiftTerm)
+{
+    std::map<int,double>::iterator it;
+    for(it=histo.begin(); it!=histo.end(); it++)
+    {
+        this->histo.at(it->first)-=shiftTerm;
+    }
+    return histo;
+}
+
 /**************************************************************************************/
 
 static std::map<int,double> insertBinsWithZeroHeight(std::map<int,double> histoWithoutZeroBins)

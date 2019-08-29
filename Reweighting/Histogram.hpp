@@ -26,6 +26,7 @@ public:
     std::vector<std::pair<double,double> > getBins(bool = false) const;
     
     double& operator[](double);
+    std::map<int,double>& operator-=(double);
 
 private:
     double binsize;
