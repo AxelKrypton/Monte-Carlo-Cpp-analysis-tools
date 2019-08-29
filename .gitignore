@@ -17,3 +17,4 @@ Debug
 .pydevproject
 .settings
 .DS_Store
+.vscode/
