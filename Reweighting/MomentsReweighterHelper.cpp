@@ -34,7 +34,8 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
 	  columnsToBeReweightedUsingMultipleColumns(rawDataForReweightingAndMetainformation.columnsToBeReweightedUsingMultipleColumns),
 	  momentsToBeReweighted(rawDataForReweightingAndMetainformation.momentsToBeReweighted),
 	  maximumMomentNeededOverall(rawDataForReweightingAndMetainformation.maximumMomentNeededOverall),
-	  errorMethod(rawDataForReweightingAndMetainformation.errorMethod), bootstrapNumber(rawDataForReweightingAndMetainformation.bootstrapNumber)
+	  errorMethod(rawDataForReweightingAndMetainformation.errorMethod), bootstrapNumber(rawDataForReweightingAndMetainformation.bootstrapNumber), reweightProbabilityDistribution(true),
+	  histoBinsize(0.1)
 {
 	std::vector<int> entriesToBeCutFromRawData;
 	setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, rawDataForReweightingAndMetainformation.binsizesToBeUsed, errorMethod,
@@ -144,7 +145,7 @@ static void printBinsizesActuallyUsed(SimulationDataContainer simDataCont, std::
     	givenBinsizes << "{";
     	for(int j=1; j<=4; j++)
     		givenBinsizes << simDataCont[i].getSimulationParameters()["binsize" + std::to_string(j)] << ",";
-    	givenBinsizes.seekp(givenBinsizes.tellp() - long(1));
+    	givenBinsizes.seekp((long)(givenBinsizes.tellp()) - long(1));
     	givenBinsizes << "}";
         std::cout << simDataCont[i].getDatafileName();
         std::cout << "   Given binsize = " << givenBinsizes.str();

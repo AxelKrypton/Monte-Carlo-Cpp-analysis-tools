@@ -225,6 +225,10 @@ void MomentsReweighterAbstract::calculateNewPoints(){
     momentsAtNewPoints = std::vector<std::vector<Moments> >(valuesOfNewParameters.size(), std::vector<Moments>(momentsReweighterHelper.numberOfObservablesGivenAsInput, Moments()));
     momentsEstimatorsAtNewPoints = std::vector<std::vector<MomentsEstimators> >(valuesOfNewParameters.size(),
     																			std::vector<MomentsEstimators>(momentsReweighterHelper.numberOfObservablesGivenAsInput, MomentsEstimators()));
+    if(momentsReweighterHelper.reweightProbabilityDistribution){
+        probabilityDistributionsAtNewBetas = std::vector<std::vector<Histogram> >(valuesOfNewParameters.size(), 
+                                                                              std::vector<Histogram>(momentsReweighterHelper.numberOfObservablesGivenAsInput,Histogram(momentsReweighterHelper.histoBinsize)));           
+    }                        
 }
 
 
@@ -477,12 +481,40 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
                     outputValuesOfObservables[indexNewPoint][indexObservable] =
                             (indexSimulation1 == 0 && (indexConfiguration == 0 || firstValue)) ? newTerm :
                             logarithmic_sum(outputValuesOfObservables[indexNewPoint][indexObservable], newTerm);
+                    
+                    /* 
+                     * In the following the probability distributions are getting reweighted. For that only take the logarithms of the heights and
+                     * not of the binsizes, how one might think, since the observables are also log(simDataCont).
+                     * We do that because for a binsize < 1 the log(Binsize) would be negative.
+                     * So to still get correct results we temporarily exponentiate the observables and use them for filling the Histogram correctly.
+                     * 
+                     * Here we also deal with the logarithms of the height which is why we have to use logarithmic_sum. 
+                     * As a condition whether we just set the height to the newHistoTerm or have to use the sum can't be that it's just the first iteration, 
+                     * because here we have multiple histograms with multiple bins. So also after a few iterations they can be empty. 
+                     * A better condition is just checking if the bin we want to fill is empty. Checking out a bin that doesn't exist will 
+                     * create a new entry of the map which is empty. But that is not a problem because 
+                     * immediately after checking a bin it will get filled.
+                     */
+                    if(momentsReweighterHelper.reweightProbabilityDistribution){
+                        realFloat newHistoTerm = -logarithmOfDenominator;
+                        realFloat tempRestoredObs=exp(simDataCont[indexSimulation1][indexObservable+numberOfReweightingParameters][indexConfiguration]);
+                        if(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs]==0){
+                            probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs] = newHistoTerm;
+                        }else{
+                            probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs] = 
+                            logarithmic_sum(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs], newHistoTerm);
+                        }
+                    }
                 }
                 firstValue = false;
             }
         }
-        for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++)
+        for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++){
             outputValuesOfObservables[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
+            if(momentsReweighterHelper.reweightProbabilityDistribution){
+            probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
+            }
+        }
     }
 
     return outputValuesOfObservables;
@@ -562,7 +594,24 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
              }
          }
      }
-
+    //Restoring Histograms by exponentiating the heights and also - if nessecary - reshifting the whole distribution
+    if(momentsReweighterHelper.reweightProbabilityDistribution){
+        for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
+            for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++){
+                Histogram tempHistogram(momentsReweighterHelper.histoBinsize);
+                for(int i=0; i< probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getNumberOfBins() ;i++){
+                    double restoredHeight=exp(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getHeightsOfBins().at(i));
+                    double middleOfBin=probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getBins().at(i).first + 0.5* momentsReweighterHelper.histoBinsize;
+                    if(minimumOfEachObservable[indexObservable] < 0){
+                    tempHistogram[middleOfBin + 2*minimumOfEachObservable[indexObservable] ]=restoredHeight;
+                    }else{
+                    tempHistogram[middleOfBin]=restoredHeight;
+                    }
+                }
+                probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable]=tempHistogram;
+            }
+        }
+    }
 }
 
 

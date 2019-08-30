@@ -3,6 +3,7 @@
 
 #include "SimulationDataContainer.hpp"
 #include "MomentsReweighterHelper.hpp"
+#include "Histogram.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 #include "../dataAnalysisUtilities/Observables.hpp"
 
@@ -159,6 +160,7 @@ private:
 	std::vector<realFloat> logZAtNewPoints;
 	std::vector<std::vector<Moments> > momentsAtNewPoints;
 	std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints;
+    std::vector<std::vector<Histogram> > probabilityDistributionsAtNewBetas;
 
 	/*
 	 * The new points are so far WITHIN the given range without counting the boundaries.
