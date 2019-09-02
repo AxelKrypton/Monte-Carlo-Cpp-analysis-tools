@@ -227,8 +227,8 @@ void MomentsReweighterAbstract::calculateNewPoints(){
     																			std::vector<MomentsEstimators>(momentsReweighterHelper.numberOfObservablesGivenAsInput, MomentsEstimators()));
     if(momentsReweighterHelper.reweightProbabilityDistribution){
         probabilityDistributionsAtNewBetas = std::vector<std::vector<Histogram> >(valuesOfNewParameters.size(), 
-                                                                              std::vector<Histogram>(momentsReweighterHelper.numberOfObservablesGivenAsInput,Histogram(momentsReweighterHelper.histoBinsize)));           
-    }                        
+                                                                                  std::vector<Histogram>(momentsReweighterHelper.numberOfObservablesGivenAsInput,Histogram(momentsReweighterHelper.histoBinsize)));
+    }
 }
 
 
@@ -498,12 +498,12 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
                     if(momentsReweighterHelper.reweightProbabilityDistribution){
                         realFloat newHistoTerm = -logarithmOfDenominator;
                         realFloat tempRestoredObs=exp(simDataCont[indexSimulation1][indexObservable+numberOfReweightingParameters][indexConfiguration]);
-                        if(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs]==0){
-                            probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs] = newHistoTerm;
-                        }else{
-                            probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs] = 
-                            logarithmic_sum(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs], newHistoTerm);
-                        }
+//                        if(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs]==0){
+//                            probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs] = newHistoTerm;
+//                        }else{
+//                            probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs] =
+//                            logarithmic_sum(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs], newHistoTerm);
+//                        }
                     }
                 }
                 firstValue = false;
@@ -511,9 +511,9 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
         }
         for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++){
             outputValuesOfObservables[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
-            if(momentsReweighterHelper.reweightProbabilityDistribution){
-            probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
-            }
+//            if(momentsReweighterHelper.reweightProbabilityDistribution){
+//                probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
+//            }
         }
     }
 
@@ -594,20 +594,21 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
              }
          }
      }
+
     //Restoring Histograms by exponentiating the heights and also - if nessecary - reshifting the whole distribution
     if(momentsReweighterHelper.reweightProbabilityDistribution){
         for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
-            for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++){
+            for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexObservable++){
                 Histogram tempHistogram(momentsReweighterHelper.histoBinsize);
-                for(int i=0; i< probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getNumberOfBins() ;i++){
-                    double restoredHeight=exp(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getHeightsOfBins().at(i));
-                    double middleOfBin=probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getBins().at(i).first + 0.5* momentsReweighterHelper.histoBinsize;
-                    if(minimumOfEachObservable[indexObservable] < 0){
-                    tempHistogram[middleOfBin + 2*minimumOfEachObservable[indexObservable] ]=restoredHeight;
-                    }else{
-                    tempHistogram[middleOfBin]=restoredHeight;
-                    }
-                }
+//                for(int i=0; i< probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getNumberOfBins() ;i++){
+//                    double restoredHeight=exp(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getHeightsOfBins().at(i));
+//                    double middleOfBin=probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getBins().at(i).first + 0.5* momentsReweighterHelper.histoBinsize;
+//                    if(minimumOfEachObservable[indexObservable] < 0){
+//                        tempHistogram[middleOfBin + 2*minimumOfEachObservable[indexObservable] ]=restoredHeight;
+//                    }else{
+//                        tempHistogram[middleOfBin]=restoredHeight;
+//                    }
+//                }
                 probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable]=tempHistogram;
             }
         }
@@ -619,6 +620,23 @@ SimulationDataContainer MomentsReweighterAbstract::getSimulationDataContainer(bo
     return (raw == true) ? momentsReweighterHelper.simulationRawDataContainer
                          : momentsReweighterHelper.simulationUncorrDataContainer;
 }
+
+std::vector<int> MomentsReweighterAbstract::getColumnsToBeConsideredReweightingProbabilityDistribution(){
+    std::vector<int> columnsToBeConsideredReweightingProbabilityDistribution;
+
+    throw std::logic_error("Function getColumnsToBeConsideredReweightingProbabilityDistribution to be implemented!");
+
+    return columnsToBeConsideredReweightingProbabilityDistribution;
+}
+
+bool MomentsReweighterAbstract::isColumnToBeConsideredReweightingProbabilityDistribution(int indexColumn){
+    static std::vector<int> columnsToBeConsideredReweightingProbabilityDistribution = getColumnsToBeConsideredReweightingProbabilityDistribution();
+
+    throw std::logic_error("Function isColumnToBeConsideredReweightingProbabilityDistribution to be implemented!");
+
+    //return find();
+}
+
 
 
 void MomentsReweighterAbstract::extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<realFloat> >& reweightedObservablesFromRawData,
@@ -710,7 +728,5 @@ static realFloat logarithmic_sum(realFloat logx1, realFloat logx2){
   return (logx1 >= logx2) ? logx1 + boost::math::log1p(exp(logx2-logx1)) :
                              logx2 + boost::math::log1p(exp(logx1-logx2));
 }
-
-
 
 

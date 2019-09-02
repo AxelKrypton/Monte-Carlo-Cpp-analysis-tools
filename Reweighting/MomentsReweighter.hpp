@@ -116,13 +116,14 @@ protected:
                                                  std::vector<realFloat> *logZAtSimulationPointToBeUsed = NULL);
     //This getter again only for testing reason
     SimulationDataContainer getSimulationDataContainer(bool raw = true);
+    std::vector<int> getColumnsToBeConsideredReweightingProbabilityDistribution();
     //Method used in calculateAndGetReweightedObservables to select data to calculate observables and errors and to set them
 	void extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<realFloat> >& reweightedObservablesFromRawData,
 															const std::valarray<std::vector<std::vector<realFloat> > >& estimatorsForErrorsCalculation);
 
 private:
-    //Method in which "valuesOfNewParameters" is filled and some checks are done
-    void calculateNewPoints();
+    void calculateNewPoints(); //Method in which "valuesOfNewParameters" is filled and some checks are done
+    bool isColumnToBeConsideredReweightingProbabilityDistribution(int);
 
     //Members
     MomentsReweighterHelper momentsReweighterHelper;

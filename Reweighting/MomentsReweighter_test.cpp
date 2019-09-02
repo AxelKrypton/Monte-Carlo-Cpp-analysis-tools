@@ -85,6 +85,10 @@ public:
         return observables;
     }
 
+    std::vector<int> testGetColumnsToBeConsideredReweightingProbabilityDistribution(){
+        return getColumnsToBeConsideredReweightingProbabilityDistribution();
+    }
+
     void testCalculateAndSetReweightedMomentsAndMomentsEstimators(){
     	calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
@@ -376,6 +380,37 @@ BOOST_AUTO_TEST_SUITE(logZ)
          */
         BOOST_REQUIRE_CLOSE(referenceLogZAtSimulatedPoints[0], simulatedLogZ[0], 2.e-5);
         BOOST_REQUIRE_CLOSE(referenceLogZAtSimulatedPoints[2], simulatedLogZ[2], 2.e-5);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(probabilityDistributionColumns)
+
+    BOOST_AUTO_TEST_CASE(probabilityDistributionColumns1)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_6";
+        std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+                                                      "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--obsMultipleColumns=1"};
+        MomentsReweighterTest reweighter(options, {1,2,3,4}, {1,1,1});
+
+    }
+
+    BOOST_AUTO_TEST_CASE(probabilityDistributionColumns2)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_6";
+        std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+                                                      "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--obsMultipleColumns=1"};
+        MomentsReweighterTest reweighter(options, {1,2,3}, {1,1,1});
+
+    }
+
+    BOOST_AUTO_TEST_CASE(probabilityDistributionColumns3)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_6";
+        std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+                                                      "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--obsMultipleColumns=1", "4"};
+        MomentsReweighterTest reweighter(options, {1,2,3}, {1,1,1});
+
     }
 
 BOOST_AUTO_TEST_SUITE_END()
