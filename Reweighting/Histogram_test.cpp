@@ -24,6 +24,16 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(getters)
 
+    BOOST_AUTO_TEST_CASE(getters0)
+    {
+        const double binsize=2.0;
+        bool dontIncludeZeroBins=false;
+        bool includeZeroBins=true;
+        Histogram hist(binsize);
+        BOOST_REQUIRE_EQUAL(hist.getNumberOfBins(dontIncludeZeroBins), 0);
+        BOOST_REQUIRE_EQUAL(hist.getNumberOfBins(includeZeroBins), 0);
+    }
+
     BOOST_AUTO_TEST_CASE(getters1)
     {
         const double binsize=2.0;

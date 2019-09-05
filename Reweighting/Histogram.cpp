@@ -24,8 +24,10 @@ Histogram::Histogram(double binsizeIn) : binsize(binsizeIn)
 
 int Histogram::getNumberOfBins(bool includeZeroBins)
 {
-    int numberOfBins=static_cast<int>((getMaxXvalue()-getMinXvalue())/binsize);
-    return includeZeroBins ? numberOfBins : histo.size();
+    if(histo.empty())
+        return 0;
+    else
+        return includeZeroBins ? static_cast<int>((getMaxXvalue()-getMinXvalue())/binsize) : histo.size();
 }
 
 double Histogram::getBinsize()
