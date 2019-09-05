@@ -56,12 +56,12 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
 
 	//Here I set the number of "real" observables given as input (neglecting the multiple columns)
 	numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
-
 	std::cout << "Obs. given as input counting multiple = " << numberOfObservablesGivenAsInput << "\n";
-
 	numberOfObservablesGivenAsInput -= columnsToBeReweightedUsingMultipleColumns.size()*(maximumMomentNeededOverall-1); //neglect multiple columns (count one column only)
-
 	std::cout << "Obs. given as input NOT counting multiple = " << numberOfObservablesGivenAsInput << "\n";
+
+	if(numberOfObservablesGivenAsInput == 0)
+	    throw std::logic_error("MomentsReweighterHelper asked to be built without any observable as input! Aborting...");
 
 	simulationRawDataContainer = simulationRawDataContainer.buildAndGetMomentsPerData(momentsToBeReweighted, namesOfParametersIgnoringMetaParameters.size(),
 																					  columnsToBeReweightedUsingMultipleColumns, maximumMomentNeededOverall);

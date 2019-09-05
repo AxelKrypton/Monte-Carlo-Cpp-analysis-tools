@@ -408,7 +408,7 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionColumns)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_6";
         std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
-                                                      "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--obsMultipleColumns=1", "4"};
+                                                      "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--obsMultipleColumns=4"};
         MomentsReweighterTest reweighter(options, {1,2,3}, {1,1,1});
 
     }
