@@ -14,6 +14,7 @@
 
 static void writeNewPoints(std::vector<std::vector<realFloat> >&, std::vector<std::vector<realFloat> >, std::vector<realFloat>, int=0, int=0);
 static void findIflogZHasToBeCalculated(std::vector<realFloat>, std::vector<int>&);
+static std::vector<bool> getCheckIfObservableUseMultipleColumns(std::vector<unsigned int>, int, int, int);
 static realFloat logarithmic_sum(realFloat, realFloat);
 
 /*****************************************************************************************/
@@ -457,6 +458,9 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
     size_t numberOfNewPoints = valuesOfNewParameters.size();
     std::vector<std::vector<realFloat> > outputValuesOfObservables(numberOfNewPoints, std::vector<realFloat>(momentsReweighterHelper.numberOfObservablesToBeReweighted));
     realFloat logarithmOfDenominator = std::numeric_limits<double>::quiet_NaN(); //meaningless initial value, since variable will be initialized later.
+    std::vector<int> columnsInputObservables;
+    if(momentsReweighterHelper.reweightProbabilityDistribution)
+        columnsInputObservables=getColumnsToBeConsideredReweightingProbabilityDistribution();
     for(size_t indexNewPoint = 0; indexNewPoint < numberOfNewPoints; indexNewPoint++){
         bool firstValue = true;
         for(size_t indexSimulation1 = 0; indexSimulation1 < numberOfSimulationsDone; indexSimulation1++){
@@ -481,42 +485,46 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
                     outputValuesOfObservables[indexNewPoint][indexObservable] =
                             (indexSimulation1 == 0 && (indexConfiguration == 0 || firstValue)) ? newTerm :
                             logarithmic_sum(outputValuesOfObservables[indexNewPoint][indexObservable], newTerm);
-                    
-                    /* 
-                     * In the following the probability distributions are getting reweighted. For that only take the logarithms of the heights and
-                     * not of the binsizes, how one might think, since the observables are also log(simDataCont).
-                     * We do that because for a binsize < 1 the log(Binsize) would be negative.
-                     * So to still get correct results we temporarily exponentiate the observables and use them for filling the Histogram correctly.
-                     * 
-                     * Here we also deal with the logarithms of the height which is why we have to use logarithmic_sum. 
-                     * As a condition whether we just set the height to the newHistoTerm or have to use the sum can't be that it's just the first iteration, 
-                     * because here we have multiple histograms with multiple bins. So also after a few iterations they can be empty. 
-                     * A better condition is just checking if the bin we want to fill is empty. Checking out a bin that doesn't exist will 
-                     * create a new entry of the map which is empty. But that is not a problem because 
-                     * immediately after checking a bin it will get filled.
-                     */
-                    if(momentsReweighterHelper.reweightProbabilityDistribution){
-                        realFloat newHistoTerm = -logarithmOfDenominator;
-                        realFloat tempRestoredObs=exp(simDataCont[indexSimulation1][indexObservable+numberOfReweightingParameters][indexConfiguration]);
-//                        if(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs]==0){
-//                            probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs] = newHistoTerm;
-//                        }else{
-//                            probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs] =
-//                            logarithmic_sum(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable][tempRestoredObs], newHistoTerm);
-//                        }
-                    }
                 }
+
+                /* 
+                * In the following the probability distributions are getting reweighted. For that only take the logarithms of the heights and
+                * not of the binsizes, how one might think, since the observables are also log(simDataCont).
+                * We do that because for a binsize < 1 the log(Binsize) would be negative.
+                * So to still get correct results we temporarily exponentiate the observables and use them for filling the Histogram correctly.
+                * 
+                * Here we also deal with the logarithms of the height which is why we have to use logarithmic_sum. 
+                * As a condition whether we just set the height to the newHistoTerm or have to use the sum can't be that it's just the first iteration, 
+                * because here we have multiple histograms with multiple bins. So also after a few iterations they can be empty. 
+                * A better condition is just checking if the bin we want to fill is empty. Checking out a bin that doesn't exist will 
+                * create a new entry of the map which is empty. But that is not a problem because 
+                * immediately after checking a bin it will get filled.
+                */
+                if(momentsReweighterHelper.reweightProbabilityDistribution){
+                    for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
+                        realFloat newHistoTerm = -logarithmOfDenominator;
+                        realFloat tempRestoredObs=exp(simDataCont[indexSimulation1][columnsInputObservables[indexInputObservable]][indexConfiguration]);
+                        if(probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable][tempRestoredObs]==0)
+                            probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable][tempRestoredObs] = newHistoTerm;
+                        else{
+                            probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable][tempRestoredObs] =
+                            logarithmic_sum(probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable][tempRestoredObs], newHistoTerm);
+                        }
+                    }
+                    
+                }
+                
                 firstValue = false;
             }
         }
-        for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++){
+        for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++)
             outputValuesOfObservables[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
-//            if(momentsReweighterHelper.reweightProbabilityDistribution){
-//                probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
-//            }
+        if(momentsReweighterHelper.reweightProbabilityDistribution){
+            for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
+                probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
+            }
         }
     }
-
     return outputValuesOfObservables;
 }
 
@@ -562,6 +570,9 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
                                      std::vector<std::vector<realFloat> > *reweightedObservablesFromRawData,
                                      std::valarray<std::vector<std::vector<realFloat> > > *estimatorsForErrorCalculation){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
+    std::vector<int> columnsInputObservables;
+    if(momentsReweighterHelper.reweightProbabilityDistribution)
+        columnsInputObservables=getColumnsToBeConsideredReweightingProbabilityDistribution();
     //Exponential and shift, if necessary, BOTH on raw/uncorr data AND on values at new points (Jackknife partial predicitions)
     for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++){
         for(int indexSimulation=0; indexSimulation<momentsReweighterHelper.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
@@ -598,18 +609,19 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
     //Restoring Histograms by exponentiating the heights and also - if nessecary - reshifting the whole distribution
     if(momentsReweighterHelper.reweightProbabilityDistribution){
         for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
-            for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexObservable++){
+            for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
                 Histogram tempHistogram(momentsReweighterHelper.histoBinsize);
-//                for(int i=0; i< probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getNumberOfBins() ;i++){
-//                    double restoredHeight=exp(probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getHeightsOfBins().at(i));
-//                    double middleOfBin=probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable].getBins().at(i).first + 0.5* momentsReweighterHelper.histoBinsize;
-//                    if(minimumOfEachObservable[indexObservable] < 0){
-//                        tempHistogram[middleOfBin + 2*minimumOfEachObservable[indexObservable] ]=restoredHeight;
-//                    }else{
-//                        tempHistogram[middleOfBin]=restoredHeight;
-//                    }
-//                }
-                probabilityDistributionsAtNewBetas[indexNewPoint][indexObservable]=tempHistogram;
+                for(int i=0; i< probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getNumberOfBins() ;i++){
+                    double restoredHeight=exp(probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getHeightsOfBins().at(i));
+                    double middleOfBin=probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getBins().at(i).first + 0.5* momentsReweighterHelper.histoBinsize;
+                    if(minimumOfEachObservable[columnsInputObservables[indexInputObservable]] < 0){
+                        tempHistogram[middleOfBin + 2*minimumOfEachObservable[columnsInputObservables[indexInputObservable]] ]=restoredHeight;
+                    }else{
+                        tempHistogram[middleOfBin]=restoredHeight;
+                    }
+                }
+                //In test this part fails, since the histograms have to be filled first to use them here. getNumberOfBins of an empty histogram will give an error 
+                probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable]=tempHistogram;
             }
         }
     }
@@ -623,21 +635,27 @@ SimulationDataContainer MomentsReweighterAbstract::getSimulationDataContainer(bo
 
 std::vector<int> MomentsReweighterAbstract::getColumnsToBeConsideredReweightingProbabilityDistribution(){
     std::vector<int> columnsToBeConsideredReweightingProbabilityDistribution;
-
-    throw std::logic_error("Function getColumnsToBeConsideredReweightingProbabilityDistribution to be implemented!");
-
+    int numberOfReweightingParameters=reweightingParameterNames.size();
+    std::vector<bool> isObservableUsingMultipleColumns=getCheckIfObservableUseMultipleColumns(momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns, momentsReweighterHelper.maximumMomentNeededOverall,
+                                                                                                        momentsReweighterHelper.numberOfObservablesGivenAsInput, numberOfReweightingParameters);
+    int rightCol=0;
+    //Every entry gets shifted by the numberOfReweightingParameters because then we can work from the 0th column, since considering the conjugated quantity only needs a hard shift
+    columnsToBeConsideredReweightingProbabilityDistribution.push_back(rightCol+numberOfReweightingParameters);//comment why the shift
+    for(int i=1; i<momentsReweighterHelper.numberOfObservablesGivenAsInput; i++)
+    {
+        if(isObservableUsingMultipleColumns.at(i-1)){
+            rightCol+=momentsReweighterHelper.maximumMomentNeededOverall + momentsReweighterHelper.momentsToBeReweighted.size()-1;
+        }else{
+            rightCol+=momentsReweighterHelper.momentsToBeReweighted.size();
+        }
+        columnsToBeConsideredReweightingProbabilityDistribution.push_back(rightCol+reweightingParameterNames.size());
+    }
     return columnsToBeConsideredReweightingProbabilityDistribution;
 }
 
-bool MomentsReweighterAbstract::isColumnToBeConsideredReweightingProbabilityDistribution(int indexColumn){
-    static std::vector<int> columnsToBeConsideredReweightingProbabilityDistribution = getColumnsToBeConsideredReweightingProbabilityDistribution();
-
-    throw std::logic_error("Function isColumnToBeConsideredReweightingProbabilityDistribution to be implemented!");
-
-    //return find();
+std::vector<std::vector<Histogram> > MomentsReweighterAbstract::getReweightedProbabilityDistributions(){
+    return probabilityDistributionsAtNewBetas;
 }
-
-
 
 void MomentsReweighterAbstract::extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<realFloat> >& reweightedObservablesFromRawData,
 																				   const std::valarray<std::vector<std::vector<realFloat> > >& estimatorsForErrorsCalculation)
@@ -719,6 +737,32 @@ static void writeNewPoints(std::vector<std::vector<realFloat> >&  valuesOfNewPar
 	}
 }
 
+static std::vector<bool> getCheckIfObservableUseMultipleColumns(std::vector<unsigned int> columnsUsingMultipleColumns, int maxMomentNeedeOverall, int numberOfObservablesGivenAsInput, int numberOfReweightingParameters){
+    std::vector<bool> checkIfObservablesUseMultipleColumns;
+    if(columnsUsingMultipleColumns.empty())
+        for(int i=0; i<numberOfObservablesGivenAsInput; i++){
+            checkIfObservablesUseMultipleColumns.push_back(false);
+        }
+    else{
+        for(size_t i=0; i<columnsUsingMultipleColumns.size(); i++)
+            columnsUsingMultipleColumns.at(i)-=numberOfReweightingParameters;
+        for(unsigned int k=0; k<columnsUsingMultipleColumns.at(0); k++)
+            checkIfObservablesUseMultipleColumns.push_back(false);
+        checkIfObservablesUseMultipleColumns.push_back(true);
+        for(size_t k=1; k<columnsUsingMultipleColumns.size(); k++){
+            int obsBetweenObsUsingMultiCols=columnsUsingMultipleColumns.at(k)-columnsUsingMultipleColumns.at(k-1)-maxMomentNeedeOverall;
+            for(int i=0; i<obsBetweenObsUsingMultiCols; i++)
+                checkIfObservablesUseMultipleColumns.push_back(false);
+            checkIfObservablesUseMultipleColumns.push_back(true);
+        }
+    }
+    if(checkIfObservablesUseMultipleColumns.size()<numberOfObservablesGivenAsInput){
+    for(size_t i=0; i< numberOfObservablesGivenAsInput-checkIfObservablesUseMultipleColumns.size(); i++)
+        checkIfObservablesUseMultipleColumns.push_back(false);
+        
+    }
+    return checkIfObservablesUseMultipleColumns;
+}
 
 /*
  * Here a tool to sum quantities using logarithms is developed.

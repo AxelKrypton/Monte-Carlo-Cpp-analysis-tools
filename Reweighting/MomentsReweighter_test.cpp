@@ -89,6 +89,27 @@ public:
         return getColumnsToBeConsideredReweightingProbabilityDistribution();
     }
 
+    std::vector<std::vector<Histogram> > testGetReweightedProbabilityDistributions(){
+        return getReweightedProbabilityDistributions();
+    }
+
+    
+    void testPrintProbabilityDistribution(std::vector<std::vector<Histogram> > histo){
+        for(int indexNewPoint=0; histo.size(); indexNewPoint++){
+            std::cout << "IndexNewPoint:  " << indexNewPoint << std::endl;
+            std::cout << "**********************************************" << std::endl;
+            for(int indexInputObservable=0; histo[indexNewPoint].size(); indexInputObservable++){
+                std::cout << "IndexNewObservable:  " << indexInputObservable << std::endl;
+                std::cout << "**********************************************" << std::endl;
+               for(int i=0; i<histo[indexNewPoint][indexInputObservable].getNumberOfBins(); i++){
+                   int whichbin=histo[indexNewPoint][indexInputObservable].getBins().at(i).first/histo[indexNewPoint][indexInputObservable].getBinsize() + 0.5;
+                   double height=histo[indexNewPoint][indexInputObservable].getHeightsOfBins().at(i);
+                   std::cout << whichbin << "    " << height << std::endl; 
+               }
+            }
+        }
+    }
+
     void testCalculateAndSetReweightedMomentsAndMomentsEstimators(){
     	calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
@@ -384,6 +405,7 @@ BOOST_AUTO_TEST_SUITE(logZ)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+
 BOOST_AUTO_TEST_SUITE(probabilityDistributionColumns)
 
     BOOST_AUTO_TEST_CASE(probabilityDistributionColumns1)
@@ -392,7 +414,17 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionColumns)
         std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
                                                       "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--obsMultipleColumns=1"};
         MomentsReweighterTest reweighter(options, {1,2,3,4}, {1,1,1});
-
+        std::vector<int> columnsInputObservables, manualColumnsInputObservables;
+        columnsInputObservables=reweighter.testGetColumnsToBeConsideredReweightingProbabilityDistribution();
+        manualColumnsInputObservables.push_back(1);
+        manualColumnsInputObservables.push_back(8);
+        manualColumnsInputObservables.push_back(12);
+        manualColumnsInputObservables.push_back(16);
+        BOOST_REQUIRE_EQUAL(columnsInputObservables.size(), manualColumnsInputObservables.size());
+        for(size_t i=0; i<columnsInputObservables.size(); i++)
+        {
+            BOOST_REQUIRE_EQUAL(columnsInputObservables.at(i),manualColumnsInputObservables.at(i));
+        }
     }
 
     BOOST_AUTO_TEST_CASE(probabilityDistributionColumns2)
@@ -401,7 +433,17 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionColumns)
         std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
                                                       "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--obsMultipleColumns=1"};
         MomentsReweighterTest reweighter(options, {1,2,3}, {1,1,1});
-
+        std::vector<int> columnsInputObservables, manualColumnsInputObservables;
+        columnsInputObservables=reweighter.testGetColumnsToBeConsideredReweightingProbabilityDistribution();
+        manualColumnsInputObservables.push_back(1);
+        manualColumnsInputObservables.push_back(7);
+        manualColumnsInputObservables.push_back(10);
+        manualColumnsInputObservables.push_back(13);
+        BOOST_REQUIRE_EQUAL(columnsInputObservables.size(), manualColumnsInputObservables.size());
+        for(size_t i=0; i<columnsInputObservables.size(); i++)
+        {
+            BOOST_REQUIRE_EQUAL(columnsInputObservables.at(i),manualColumnsInputObservables.at(i));
+        }
     }
 
     BOOST_AUTO_TEST_CASE(probabilityDistributionColumns3)
@@ -410,7 +452,17 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionColumns)
         std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
                                                       "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30", "--obsMultipleColumns=4"};
         MomentsReweighterTest reweighter(options, {1,2,3}, {1,1,1});
-
+        std::vector<int> columnsInputObservables, manualColumnsInputObservables;
+        columnsInputObservables=reweighter.testGetColumnsToBeConsideredReweightingProbabilityDistribution();
+        manualColumnsInputObservables.push_back(1);
+        manualColumnsInputObservables.push_back(4);
+        manualColumnsInputObservables.push_back(7);
+        manualColumnsInputObservables.push_back(10);
+        BOOST_REQUIRE_EQUAL(columnsInputObservables.size(), manualColumnsInputObservables.size());
+        for(size_t i=0; i<columnsInputObservables.size(); i++)
+        {
+            BOOST_REQUIRE_EQUAL(columnsInputObservables.at(i),manualColumnsInputObservables.at(i));
+        }
     }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -552,6 +604,28 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
 BOOST_AUTO_TEST_SUITE_END()
 
 
+BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)
+
+    BOOST_AUTO_TEST_CASE(probabilityDistributionReweighting1)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_1";
+    	std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+    												  "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30"};
+        MomentsReweighterTest reweighter(options, {1}, {1,1,1});
+        const int numberOfObservablesInFiles = 4; //1 obs given + 3 central moments
+        std::vector<realFloat> minimumOfObservables(numberOfObservablesInFiles, std::numeric_limits<realFloat>::max());
+        reweighter.testPrepareObservablesBeforeReweighting(minimumOfObservables);
+        reweighter.testCalculateLogZAtSimulatedPoints();
+        reweighter.testCalculateLogZAtNewPoints();
+        reweighter.testCalculateReweightedObservableValues();
+        std::vector<std::vector<Histogram> > reweightedProbabilityDistribution=reweighter.testGetReweightedProbabilityDistributions();
+        //reweighter.testPrintProbabilityDistribution(reweightedProbabilityDistribution);
+        //Printing doesn't work yet. Has to be modified
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
 BOOST_AUTO_TEST_SUITE(extractionColumns)
 
 	BOOST_AUTO_TEST_CASE(extractionColumns1)
@@ -631,8 +705,6 @@ BOOST_AUTO_TEST_SUITE(extractionColumns)
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
-
-
 
 
  //TODO: Implement tests for testCalculateAndSetReweightedMomentsAndMomentsEstimators function!
