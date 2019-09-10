@@ -94,18 +94,21 @@ public:
     }
 
     
-    void testPrintProbabilityDistribution(std::vector<std::vector<Histogram> > histo){
-        for(int indexNewPoint=0; histo.size(); indexNewPoint++){
-            std::cout << "IndexNewPoint:  " << indexNewPoint << std::endl;
+    void testPrintProbabilityDistribution(std::vector<std::vector<Histogram> > distributions){
+        for(unsigned int indexNewPoint=0; indexNewPoint<distributions.size(); indexNewPoint++){
+            std::cout << "IndexNewPoint: " << indexNewPoint << " (" << distributions.size() << " new points)" << std::endl;
             std::cout << "**********************************************" << std::endl;
-            for(int indexInputObservable=0; histo[indexNewPoint].size(); indexInputObservable++){
-                std::cout << "IndexNewObservable:  " << indexInputObservable << std::endl;
+            for(unsigned int indexInputObservable=0; indexInputObservable<distributions[indexNewPoint].size(); indexInputObservable++){
+                std::cout << "IndexNewObservable: " << indexInputObservable << " (" << distributions[indexNewPoint].size() << " input observables)" << std::endl;
                 std::cout << "**********************************************" << std::endl;
-               for(int i=0; i<histo[indexNewPoint][indexInputObservable].getNumberOfBins(); i++){
-                   int whichbin=histo[indexNewPoint][indexInputObservable].getBins().at(i).first/histo[indexNewPoint][indexInputObservable].getBinsize() + 0.5;
-                   double height=histo[indexNewPoint][indexInputObservable].getHeightsOfBins().at(i);
-                   std::cout << whichbin << "    " << height << std::endl; 
-               }
+                std::vector<std::pair<double,double> > histogramBins = distributions[indexNewPoint][indexInputObservable].getBins();
+                std::vector<double> histogramBinHeights = distributions[indexNewPoint][indexInputObservable].getHeightsOfBins();
+                for(unsigned int i=0; i<histogramBins.size(); i++){
+                    double binStart  = histogramBins[i].first;
+                    double binEnd    = histogramBins[i].second;
+                    double binMiddle = (binEnd + binStart)/2;
+                    std::cout << i << "\t" << binStart << "\t\t" << binMiddle << "\t\t" << binEnd << "\t\t" << histogramBinHeights[i] << std::endl;
+                }
             }
         }
     }
@@ -619,8 +622,8 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)
         reweighter.testCalculateLogZAtNewPoints();
         reweighter.testCalculateReweightedObservableValues();
         std::vector<std::vector<Histogram> > reweightedProbabilityDistribution=reweighter.testGetReweightedProbabilityDistributions();
-        //reweighter.testPrintProbabilityDistribution(reweightedProbabilityDistribution);
-        //Printing doesn't work yet. Has to be modified
+        reweighter.testPrintProbabilityDistribution(reweightedProbabilityDistribution);
+        // TEST TO BE ADDED
     }
 
 BOOST_AUTO_TEST_SUITE_END()
