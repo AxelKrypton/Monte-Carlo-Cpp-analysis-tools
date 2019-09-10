@@ -14,7 +14,7 @@
 
 static void writeNewPoints(std::vector<std::vector<realFloat> >&, std::vector<std::vector<realFloat> >, std::vector<realFloat>, int=0, int=0);
 static void findIflogZHasToBeCalculated(std::vector<realFloat>, std::vector<int>&);
-static std::vector<bool> getCheckIfObservableUseMultipleColumns(std::vector<unsigned int>, int, int, int);
+static std::vector<bool> areInputObservablesUsingMultipleColumns(std::vector<unsigned int>, int, int, int);
 static realFloat logarithmic_sum(realFloat, realFloat);
 
 /*****************************************************************************************/
@@ -570,9 +570,6 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
                                      std::vector<std::vector<realFloat> > *reweightedObservablesFromRawData,
                                      std::valarray<std::vector<std::vector<realFloat> > > *estimatorsForErrorCalculation){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
-    std::vector<int> columnsInputObservables;
-    if(momentsReweighterHelper.reweightProbabilityDistribution)
-        columnsInputObservables=getColumnsToBeConsideredReweightingProbabilityDistribution();
     //Exponential and shift, if necessary, BOTH on raw/uncorr data AND on values at new points (Jackknife partial predicitions)
     for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++){
         for(int indexSimulation=0; indexSimulation<momentsReweighterHelper.simulationRawDataContainer.getNumberOfDatafiles(); indexSimulation++){
@@ -607,6 +604,9 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
      }
 
     //Restoring Histograms by exponentiating the heights and also - if nessecary - reshifting the whole distribution
+    std::vector<int> columnsInputObservables;
+    if(momentsReweighterHelper.reweightProbabilityDistribution)
+        columnsInputObservables=getColumnsToBeConsideredReweightingProbabilityDistribution();
     if(momentsReweighterHelper.reweightProbabilityDistribution){
         for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
             for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
@@ -636,19 +636,26 @@ SimulationDataContainer MomentsReweighterAbstract::getSimulationDataContainer(bo
 std::vector<int> MomentsReweighterAbstract::getColumnsToBeConsideredReweightingProbabilityDistribution(){
     std::vector<int> columnsToBeConsideredReweightingProbabilityDistribution;
     int numberOfReweightingParameters=reweightingParameterNames.size();
-    std::vector<bool> isObservableUsingMultipleColumns=getCheckIfObservableUseMultipleColumns(momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns, momentsReweighterHelper.maximumMomentNeededOverall,
-                                                                                                        momentsReweighterHelper.numberOfObservablesGivenAsInput, numberOfReweightingParameters);
+    std::vector<bool> isObservableUsingMultipleColumns=areInputObservablesUsingMultipleColumns(momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns,
+                                                                                               momentsReweighterHelper.maximumMomentNeededOverall,
+                                                                                               momentsReweighterHelper.numberOfObservablesGivenAsInput,
+                                                                                               numberOfReweightingParameters);
+    /*
+     * Here we want to identify which "columns" indices in the SimulationDataContainer refer to first moments
+     * of observables, which are then those to be used to reweight the probability distributions. Since the
+     * first columns are dedicated to the conjugated quantities to the reweighting parameters, we need to do
+     * a hard shift of the valid columns, to be then able to simply access the SimulationDataContainer.
+     */
     int rightCol=0;
-    //Every entry gets shifted by the numberOfReweightingParameters because then we can work from the 0th column, since considering the conjugated quantity only needs a hard shift
-    columnsToBeConsideredReweightingProbabilityDistribution.push_back(rightCol+numberOfReweightingParameters);//comment why the shift
+    columnsToBeConsideredReweightingProbabilityDistribution.push_back(rightCol+numberOfReweightingParameters);
     for(int i=1; i<momentsReweighterHelper.numberOfObservablesGivenAsInput; i++)
     {
         if(isObservableUsingMultipleColumns.at(i-1)){
-            rightCol+=momentsReweighterHelper.maximumMomentNeededOverall + momentsReweighterHelper.momentsToBeReweighted.size()-1;
+            rightCol+=momentsReweighterHelper.maximumMomentNeededOverall-1 + momentsReweighterHelper.momentsToBeReweighted.size();
         }else{
             rightCol+=momentsReweighterHelper.momentsToBeReweighted.size();
         }
-        columnsToBeConsideredReweightingProbabilityDistribution.push_back(rightCol+reweightingParameterNames.size());
+        columnsToBeConsideredReweightingProbabilityDistribution.push_back(rightCol+numberOfReweightingParameters);
     }
     return columnsToBeConsideredReweightingProbabilityDistribution;
 }
@@ -737,29 +744,29 @@ static void writeNewPoints(std::vector<std::vector<realFloat> >&  valuesOfNewPar
 	}
 }
 
-static std::vector<bool> getCheckIfObservableUseMultipleColumns(std::vector<unsigned int> columnsUsingMultipleColumns, int maxMomentNeedeOverall, int numberOfObservablesGivenAsInput, int numberOfReweightingParameters){
+static std::vector<bool> areInputObservablesUsingMultipleColumns(std::vector<unsigned int> inputObservablesUsingMultipleColumns,
+                                                                 int maxMomentNeedeOverall, int numberOfObservablesGivenAsInput,
+                                                                 int numberOfReweightingParameters){
     std::vector<bool> checkIfObservablesUseMultipleColumns;
-    if(columnsUsingMultipleColumns.empty())
-        for(int i=0; i<numberOfObservablesGivenAsInput; i++){
+    if(inputObservablesUsingMultipleColumns.empty()){
+        for(int i=0; i<numberOfObservablesGivenAsInput; i++)
             checkIfObservablesUseMultipleColumns.push_back(false);
-        }
-    else{
-        for(size_t i=0; i<columnsUsingMultipleColumns.size(); i++)
-            columnsUsingMultipleColumns.at(i)-=numberOfReweightingParameters;
-        for(unsigned int k=0; k<columnsUsingMultipleColumns.at(0); k++)
+    } else {
+        for(size_t i=0; i<inputObservablesUsingMultipleColumns.size(); i++)
+            inputObservablesUsingMultipleColumns.at(i)-=numberOfReweightingParameters;
+        for(unsigned int k=0; k<inputObservablesUsingMultipleColumns.at(0); k++)
             checkIfObservablesUseMultipleColumns.push_back(false);
         checkIfObservablesUseMultipleColumns.push_back(true);
-        for(size_t k=1; k<columnsUsingMultipleColumns.size(); k++){
-            int obsBetweenObsUsingMultiCols=columnsUsingMultipleColumns.at(k)-columnsUsingMultipleColumns.at(k-1)-maxMomentNeedeOverall;
+        for(size_t k=1; k<inputObservablesUsingMultipleColumns.size(); k++){
+            int obsBetweenObsUsingMultiCols=inputObservablesUsingMultipleColumns.at(k)-inputObservablesUsingMultipleColumns.at(k-1)-maxMomentNeedeOverall;
             for(int i=0; i<obsBetweenObsUsingMultiCols; i++)
                 checkIfObservablesUseMultipleColumns.push_back(false);
             checkIfObservablesUseMultipleColumns.push_back(true);
         }
     }
-    if(checkIfObservablesUseMultipleColumns.size()<numberOfObservablesGivenAsInput){
-    for(size_t i=0; i< numberOfObservablesGivenAsInput-checkIfObservablesUseMultipleColumns.size(); i++)
-        checkIfObservablesUseMultipleColumns.push_back(false);
-        
+    if((int)checkIfObservablesUseMultipleColumns.size()<numberOfObservablesGivenAsInput){
+        for(size_t i=0; i< numberOfObservablesGivenAsInput-checkIfObservablesUseMultipleColumns.size(); i++)
+            checkIfObservablesUseMultipleColumns.push_back(false);
     }
     return checkIfObservablesUseMultipleColumns;
 }
