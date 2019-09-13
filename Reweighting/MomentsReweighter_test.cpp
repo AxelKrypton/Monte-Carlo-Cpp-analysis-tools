@@ -621,6 +621,7 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)
         reweighter.testCalculateLogZAtSimulatedPoints();
         reweighter.testCalculateLogZAtNewPoints();
         reweighter.testCalculateReweightedObservableValues();
+        reweighter.testRestoreObservablesAfterReweighting(minimumOfObservables,NULL,NULL);
         std::vector<std::vector<Histogram> > reweightedProbabilityDistribution=reweighter.testGetReweightedProbabilityDistributions();
         reweighter.testPrintProbabilityDistribution(reweightedProbabilityDistribution);
         // TEST TO BE ADDED
