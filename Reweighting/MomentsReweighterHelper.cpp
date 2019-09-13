@@ -35,7 +35,7 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
 	  momentsToBeReweighted(rawDataForReweightingAndMetainformation.momentsToBeReweighted),
 	  maximumMomentNeededOverall(rawDataForReweightingAndMetainformation.maximumMomentNeededOverall),
 	  errorMethod(rawDataForReweightingAndMetainformation.errorMethod), bootstrapNumber(rawDataForReweightingAndMetainformation.bootstrapNumber), reweightProbabilityDistribution(true),
-	  histoBinsize(0.1)
+	  histoBinsize(0.001)
 {
 	std::vector<int> entriesToBeCutFromRawData;
 	setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, rawDataForReweightingAndMetainformation.binsizesToBeUsed, errorMethod,

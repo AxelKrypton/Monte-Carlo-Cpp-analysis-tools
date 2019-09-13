@@ -620,7 +620,6 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
                         tempHistogram[middleOfBin]=restoredHeight;
                     }
                 }
-                //In test this part fails, since the histograms have to be filled first to use them here. getNumberOfBins of an empty histogram will give an error 
                 probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable]=tempHistogram;
             }
         }
