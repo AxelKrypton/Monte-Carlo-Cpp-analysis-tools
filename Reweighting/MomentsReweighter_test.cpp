@@ -624,7 +624,31 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)
         reweighter.testRestoreObservablesAfterReweighting(minimumOfObservables,NULL,NULL);
         std::vector<std::vector<Histogram> > reweightedProbabilityDistribution=reweighter.testGetReweightedProbabilityDistributions();
         reweighter.testPrintProbabilityDistribution(reweightedProbabilityDistribution);
-        // TEST TO BE ADDED
+    }
+
+    BOOST_AUTO_TEST_CASE(probabilityDistributionReweighting2)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_1";
+    	std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+    												  "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30"};
+        MomentsReweighterTest reweighter(options, {1}, {1,1,1});
+        const int numberOfObservablesInFiles = 4; //1 obs given + 3 central moments
+        std::vector<realFloat> minimumOfObservables(numberOfObservablesInFiles, std::numeric_limits<realFloat>::max());
+        reweighter.testPrepareObservablesBeforeReweighting(minimumOfObservables);
+        reweighter.testCalculateLogZAtSimulatedPoints();
+        reweighter.testCalculateLogZAtNewPoints();
+        reweighter.testCalculateReweightedObservableValues();
+        reweighter.testRestoreObservablesAfterReweighting(minimumOfObservables,NULL,NULL);
+        std::vector<std::vector<Histogram> > reweightedProbabilityDistribution=reweighter.testGetReweightedProbabilityDistributions();
+        for(size_t indexNewPoint=0; indexNewPoint<reweightedProbabilityDistribution.size(); indexNewPoint++){
+            for(size_t indexInputObservable=0; indexInputObservable<reweightedProbabilityDistribution[indexNewPoint].size(); indexInputObservable++){
+                double sumOfHeights=0;
+                for(size_t i=0; i<reweightedProbabilityDistribution[indexNewPoint][indexInputObservable].getHeightsOfBins().size(); i++){
+                    sumOfHeights+=reweightedProbabilityDistribution[indexNewPoint][indexInputObservable].getHeightsOfBins().at(i);
+                }
+                BOOST_REQUIRE_CLOSE(sumOfHeights, 1, 1e-8);
+            }
+        }
     }
 
 BOOST_AUTO_TEST_SUITE_END()
