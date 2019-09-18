@@ -24,7 +24,7 @@ struct RawDataForReweightingAndMetainformation {
     //Information deriving from some operations done in the program
     unsigned int maximumMomentNeededOverall; //this could not coincide with the max_element of the vector momentsToBeReweighted in the case of multiple columns per observable!!
     std::vector<unsigned int> momentsToBeReweighted;
-    std::vector<int> binsizesToBeUsed;
+    std::vector<int> binsizesToBeUsedForBinning;
 };
 
 struct ReweightingProcedure {
@@ -104,7 +104,7 @@ public:
 			std::cout << "- bootstrapNumber: "<< *(rawDataAndInfo.bootstrapNumber) << "\n";
 		std::cout << "- maximumMomentNeededOverall: "<< rawDataAndInfo.maximumMomentNeededOverall << "\n";
 		std::cout << "- momentsToBeReweighted: "; for(auto j: rawDataAndInfo.momentsToBeReweighted) std::cout << j << " "; std::cout << "\n";
-		std::cout << "- binsizesToBeUsed: "; for(auto j: rawDataAndInfo.binsizesToBeUsed) std::cout << j << " - "; std::cout << "\b\b\033[K\n";
+		std::cout << "- binsizesToBeUsed: "; for(auto j: rawDataAndInfo.binsizesToBeUsedForBinning) std::cout << j << " - "; std::cout << "\b\b\033[K\n";
 		std::cout << "----------------------------------------------------------------------\n";
 	}
 private:

@@ -38,7 +38,7 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
 	  histoBinsize(0.001)
 {
 	std::vector<int> entriesToBeCutFromRawData;
-	setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, rawDataForReweightingAndMetainformation.binsizesToBeUsed, errorMethod,
+	setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, rawDataForReweightingAndMetainformation.binsizesToBeUsedForBinning, errorMethod,
 												 numberOfBinsToBeUsed, entriesToBeCutFromRawData);
 	//Evaluate central moments per data and append them to the raw data container
 	if(momentsToBeReweighted.empty())
