@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(getters)
 
-    BOOST_AUTO_TEST_CASE(getters0)
+    BOOST_AUTO_TEST_CASE(getNumberOfBins1)
     {
         const double binsize=2.0;
         bool dontIncludeZeroBins=false;
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_SUITE(getters)
         BOOST_REQUIRE_EQUAL(hist.getNumberOfBins(includeZeroBins), 0);
     }
 
-    BOOST_AUTO_TEST_CASE(getters1)
+    BOOST_AUTO_TEST_CASE(getNumberOfBins2)
     {
         const double binsize=2.0;
         bool dontIncludeZeroBins=false;
@@ -47,14 +47,14 @@ BOOST_AUTO_TEST_SUITE(getters)
         BOOST_REQUIRE_EQUAL(hist.getNumberOfBins(includeZeroBins), 4);
     }
 
-    BOOST_AUTO_TEST_CASE(getters2)
+    BOOST_AUTO_TEST_CASE(getBinsize)
     {
         const double binsize=2.0;
         Histogram hist(binsize);
         BOOST_REQUIRE_CLOSE(hist.getBinsize(), 2.0, realFloatPrecisionInPercent);
     }
 
-    BOOST_AUTO_TEST_CASE(getters3)
+    BOOST_AUTO_TEST_CASE(getHeightsOfBins)
     {
         const double binsize=2.0;
         std::vector<double> manualHeights, heights;
@@ -82,17 +82,27 @@ BOOST_AUTO_TEST_SUITE(getters)
             BOOST_REQUIRE_CLOSE(heightsWithZeroBins[i], manualHeightsWithZeroBins[i], realFloatPrecisionInPercent);
     }
 
-    BOOST_AUTO_TEST_CASE(getters4)
-    {
-        const double binsize=2.0;
-        double upperedge;
-        Histogram hist(binsize);
-        hist[0.3]=1.0;
-        upperedge=1.0;
-        BOOST_REQUIRE_CLOSE(hist.getMaxXvalue(), upperedge, realFloatPrecisionInPercent);
-    }
+    BOOST_AUTO_TEST_CASE(getMaxXvalue1)
+        {
+            const double binsize=2.0;
+            double upperedge;
+            Histogram hist(binsize);
+            hist[0.3]=1.0;
+            upperedge=1.0;
+            BOOST_REQUIRE_CLOSE(hist.getMaxXvalue(), upperedge, realFloatPrecisionInPercent);
+        }
 
-    BOOST_AUTO_TEST_CASE(getters5)
+    BOOST_AUTO_TEST_CASE(getMaxXvalue2)
+        {
+            const double binsize=2.0;
+            const double anchor=-3.5;
+            const double upperedge=1.5;
+            Histogram hist(binsize, anchor);
+            hist[0.3]=1.0;
+            BOOST_REQUIRE_CLOSE(hist.getMaxXvalue(), upperedge, realFloatPrecisionInPercent);
+        }
+
+    BOOST_AUTO_TEST_CASE(getMinXvalue1)
     {
         const double binsize=2.0;
         double loweredge;
@@ -102,7 +112,17 @@ BOOST_AUTO_TEST_SUITE(getters)
         BOOST_REQUIRE_EQUAL(hist.getMinXvalue(), loweredge);
     }
 
-    BOOST_AUTO_TEST_CASE(getters6)
+    BOOST_AUTO_TEST_CASE(getMinXvalue2)
+    {
+        const double binsize=2.0;
+        const double anchor=13.5;
+        const double loweredge=-1.5;
+        Histogram hist(binsize, anchor);
+        hist[0.3]=1;
+        BOOST_REQUIRE_EQUAL(hist.getMinXvalue(), loweredge);
+    }
+
+    BOOST_AUTO_TEST_CASE(getBins1)
     {
         const double binsize=2.0;
         std::vector<std::pair<double, double> > bins, manualBins;
@@ -134,22 +154,67 @@ BOOST_AUTO_TEST_SUITE(getters)
         }
     }
 
+    BOOST_AUTO_TEST_CASE(getBins2)
+    {
+        const double binsize=2.0, anchor=5.5;
+        std::vector<std::pair<double, double> > bins, manualBins;
+        std::vector<std::pair<double, double> > binsWithZeroBins, manualBinsWithZeroBins;
+        bool includeZeroBins=true;
+        Histogram hist(binsize, anchor);
+        hist[0.3]=1.0;
+        hist[1.3]=3.0;
+        hist[6.3]=4.0;
+        bins=hist.getBins();
+        binsWithZeroBins=hist.getBins(includeZeroBins);
+        manualBins.push_back(std::pair<double,double> (-1.5,0.5));
+        manualBins.push_back(std::pair<double,double> ( 0.5,2.5));
+        manualBins.push_back(std::pair<double,double> ( 4.5,6.5));
+        BOOST_REQUIRE_EQUAL(bins.size(), manualBins.size());
+        for(unsigned int i=0; i<bins.size(); i++){
+            BOOST_REQUIRE_CLOSE(bins[i].first, manualBins[i].first, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(bins[i].second, manualBins[i].second, realFloatPrecisionInPercent);
+        }
+
+        manualBinsWithZeroBins.push_back(std::pair<double,double> (-1.5,0.5));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 0.5,2.5));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 2.5,4.5));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 4.5,6.5));
+        BOOST_REQUIRE_EQUAL(binsWithZeroBins.size(), manualBinsWithZeroBins.size());
+        for(unsigned int i=0; i<binsWithZeroBins.size(); i++){
+            BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].first, manualBinsWithZeroBins[i].first, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].second, manualBinsWithZeroBins[i].second, realFloatPrecisionInPercent);
+        }
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(Operator)
 
     BOOST_AUTO_TEST_CASE(AccessOperator1)
     {
-        const double binsize=2.0;
+        const double binsize=2.0, anchor=1.23;
         Histogram hist(binsize);
         double arbitraryDouble=4.3;
         BOOST_REQUIRE_NO_THROW(hist[arbitraryDouble]);
+        Histogram hist2(binsize, anchor);
+        BOOST_REQUIRE_NO_THROW(hist2[arbitraryDouble]);
     }
 
     BOOST_AUTO_TEST_CASE(AccessOperator2)
     {
         const double binsize=2.0;
         Histogram hist(binsize);
+        double arbitraryDouble=4.3, arbitraryObservable=1.7;
+        hist[arbitraryDouble]=arbitraryObservable;
+        BOOST_REQUIRE_CLOSE(hist[arbitraryDouble], arbitraryObservable, realFloatPrecisionInPercent);
+        hist[arbitraryDouble]+=arbitraryObservable;
+        BOOST_REQUIRE_CLOSE(hist[arbitraryDouble], 2*arbitraryObservable, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(AccessOperator3)
+    {
+        const double binsize=1.0, anchor=-5.5;
+        Histogram hist(binsize, anchor);
         double arbitraryDouble=4.3, arbitraryObservable=1.7;
         hist[arbitraryDouble]=arbitraryObservable;
         BOOST_REQUIRE_CLOSE(hist[arbitraryDouble], arbitraryObservable, realFloatPrecisionInPercent);

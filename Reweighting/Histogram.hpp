@@ -5,18 +5,19 @@
 #include<map>
 
 /* 
- * This class creates an object which is constructed only by binsize.
- * 'histo' is a map<int,double> and works as a container that stores
- * the binnumber as the first and the height as the second entry. 
- * 0 is used as the reference point for the histogram and is the middle
- * of the 0th bin. The Histogram gets a new entry when it gets filled.
+ * This class creates an object which is constructed specifying binsize
+ * and an anchor point. The histogram is internally stored as
+ * map<int,double> and works as a container that stores
+ * the bin-number as the first and the height as the second entry.
+ * The zero-th bin is that having the anchor as middle point.
+ * The map gets a new entry when it gets filled.
  */
 
 class Histogram
 {
 public:
     Histogram() = delete;
-    Histogram(double);
+    Histogram(double, double = 0.0);
     //Getters
     int getNumberOfBins(bool = false);
     double getBinsize();
@@ -29,8 +30,9 @@ public:
     std::map<int,double>& operator-=(double);
 
 private:
+    double anchor;
     double binsize;
-    std::map<int,double> histo;
+    std::map<int,double> histogram;
 };
 
 #endif /* HISTOGRAM_HPP_ */

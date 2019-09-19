@@ -3,7 +3,7 @@
 #include<tgmath.h>
 #include<iostream>
 
-static std::map<int,double> insertBinsWithZeroHeight(std::map<int,double>);
+static std::map<int,double> insertBinsWithZeroHeight(const std::map<int,double>&);
 
 /*****************************************************************************************/
 
@@ -14,7 +14,7 @@ static std::map<int,double> insertBinsWithZeroHeight(std::map<int,double>);
  * for further treatment.
  */
 
-Histogram::Histogram(double binsizeIn) : binsize(binsizeIn)
+Histogram::Histogram(double binsizeIn, double anchorIn) : anchor(anchorIn), binsize(binsizeIn)
 {
     if(binsize<=0)
     {
@@ -24,10 +24,10 @@ Histogram::Histogram(double binsizeIn) : binsize(binsizeIn)
 
 int Histogram::getNumberOfBins(bool includeZeroBins)
 {
-    if(histo.empty())
+    if(histogram.empty())
         return 0;
     else
-        return includeZeroBins ? static_cast<int>((getMaxXvalue()-getMinXvalue())/binsize) : histo.size();
+        return includeZeroBins ? static_cast<int>((getMaxXvalue()-getMinXvalue())/binsize) : histogram.size();
 }
 
 double Histogram::getBinsize()
@@ -37,9 +37,9 @@ double Histogram::getBinsize()
 
 std::vector<double> Histogram::getHeightsOfBins(bool includeZeroBins) const
 {
-    std::map<int, double> copyOfHisto(histo);
+    std::map<int, double> copyOfHisto(histogram);
     if(includeZeroBins){
-        copyOfHisto = insertBinsWithZeroHeight(histo);
+        copyOfHisto = insertBinsWithZeroHeight(histogram);
     }
 
     std::vector<double> heights;
@@ -54,30 +54,31 @@ std::vector<double> Histogram::getHeightsOfBins(bool includeZeroBins) const
 double Histogram::getMaxXvalue() const
 {
     std::map<int, double>::const_reverse_iterator it;
-    it=histo.rbegin();
-    return (it->first+0.5)*binsize;
+    it=histogram.rbegin();
+    return (it->first+0.5)*binsize + anchor;
 }
 
 double Histogram::getMinXvalue() const
 {
     std::map<int, double>::const_iterator it;
-    it=histo.begin();
-    return (it->first-0.5)*binsize;
+    it=histogram.begin();
+    return (it->first-0.5)*binsize + anchor;
 }
 
 
 std::vector<std::pair<double,double> > Histogram::getBins(bool includeZeroBins) const
 {
-    std::map<int, double> copyOfHisto(histo);
+    std::map<int, double> copyOfHisto(histogram);
     if(includeZeroBins)
     {
-        copyOfHisto=insertBinsWithZeroHeight(histo);
-    }   
+        copyOfHisto=insertBinsWithZeroHeight(histogram);
+    }
+
     std::vector<std::pair<double,double> > bins;
     std::map<int, double>::const_iterator it;
     for(it=copyOfHisto.begin(); it!=copyOfHisto.end(); it++)
     {
-        bins.push_back(std::pair<double, double>((it->first - 0.5)*binsize,(it->first + 0.5)*binsize));
+        bins.push_back(std::pair<double, double>((it->first - 0.5)*binsize+anchor,(it->first + 0.5)*binsize+anchor));
     }
     return bins;
 } 
@@ -92,29 +93,40 @@ std::vector<std::pair<double,double> > Histogram::getBins(bool includeZeroBins) 
 
 double& Histogram::operator[](double obsvalue)
 {
-    int whichbin=ceil(obsvalue/binsize-0.5);
-    return histo[whichbin]; 
+    /*
+     * To understand which bin the obs is in, we subtract half binsize (because
+     * by definition the anchor is in the middle of the bin) then we subract
+     * the anchor and we finally divide by binsize (taking the integer after the
+     * result):
+     *              ceil(obsvalue-0.5*binsize-anchor)/binsize
+     */
+    int whichbin=ceil((obsvalue-anchor)/binsize-0.5);
+    return histogram[whichbin]; 
 }
 
 std::map<int,double>& Histogram::operator-=(double shiftTerm)
 {
     std::map<int,double>::iterator it;
-    for(it=histo.begin(); it!=histo.end(); it++)
+    for(it=histogram.begin(); it!=histogram.end(); it++)
     {
-        this->histo.at(it->first)-=shiftTerm;
+        /*
+         * The following might make a height negative, but it can happen in reweighting
+         * (indeed it does, since we use logarithms there) and therefore we allow it.
+         */
+        histogram[it->first]-=shiftTerm;
     }
-    return histo;
+    return histogram;
 }
 
 /**************************************************************************************/
 
-static std::map<int,double> insertBinsWithZeroHeight(std::map<int,double> histoWithoutZeroBins)
+static std::map<int,double> insertBinsWithZeroHeight(const std::map<int,double>& histoWithoutZeroBins)
 {
-    std::map<int,double> filledHisto(histoWithoutZeroBins);
-    for(int i=filledHisto.begin()->first; i<=filledHisto.rbegin()->first; i++)
-        {
-            filledHisto[i]; //I just want to fill with zero not existing bins and I use the map's access-operator feature of adding not existing elements
-        }
-    return filledHisto;
+    std::map<int,double> filledHistogram(histoWithoutZeroBins);
+    for(int i=filledHistogram.begin()->first; i<=filledHistogram.rbegin()->first; i++)
+    {
+        filledHistogram[i]; //I just want to fill with zero not existing bins and I use the map's access-operator feature of adding not existing elements
+    }
+    return filledHistogram;
 }
 
