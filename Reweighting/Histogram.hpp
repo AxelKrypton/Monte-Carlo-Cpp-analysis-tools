@@ -28,6 +28,8 @@ public:
     
     double& operator[](double);
     std::map<int,double>& operator-=(double);
+    void exponentiateHeights();
+    void shift(double);
 
 private:
     double anchor;

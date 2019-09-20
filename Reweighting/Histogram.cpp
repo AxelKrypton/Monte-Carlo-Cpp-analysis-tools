@@ -43,25 +43,22 @@ std::vector<double> Histogram::getHeightsOfBins(bool includeZeroBins) const
     }
 
     std::vector<double> heights;
-    std::map<int, double>::const_iterator it;
-    for(it=copyOfHisto.begin(); it!=copyOfHisto.end(); it++)
+    for(std::pair<const int, double> bin : copyOfHisto)
     {
-        heights.push_back(it->second);
+        heights.push_back(bin.second);
     }
     return heights;
 }
 
 double Histogram::getMaxXvalue() const
 {
-    std::map<int, double>::const_reverse_iterator it;
-    it=histogram.rbegin();
+    std::map<int, double>::const_reverse_iterator it = histogram.rbegin();
     return (it->first+0.5)*binsize + anchor;
 }
 
 double Histogram::getMinXvalue() const
 {
-    std::map<int, double>::const_iterator it;
-    it=histogram.begin();
+    std::map<int, double>::const_iterator it = histogram.begin();
     return (it->first-0.5)*binsize + anchor;
 }
 
@@ -75,10 +72,9 @@ std::vector<std::pair<double,double> > Histogram::getBins(bool includeZeroBins) 
     }
 
     std::vector<std::pair<double,double> > bins;
-    std::map<int, double>::const_iterator it;
-    for(it=copyOfHisto.begin(); it!=copyOfHisto.end(); it++)
+    for(std::pair<const int, double> bin : copyOfHisto)
     {
-        bins.push_back(std::pair<double, double>((it->first - 0.5)*binsize+anchor,(it->first + 0.5)*binsize+anchor));
+        bins.push_back(std::pair<double, double>((bin.first - 0.5)*binsize+anchor,(bin.first + 0.5)*binsize+anchor));
     }
     return bins;
 } 
@@ -106,16 +102,29 @@ double& Histogram::operator[](double obsvalue)
 
 std::map<int,double>& Histogram::operator-=(double shiftTerm)
 {
-    std::map<int,double>::iterator it;
-    for(it=histogram.begin(); it!=histogram.end(); it++)
+    for(std::pair<const int,double>& bin : histogram)
     {
         /*
          * The following might make a height negative, but it can happen in reweighting
          * (indeed it does, since we use logarithms there) and therefore we allow it.
          */
-        histogram[it->first]-=shiftTerm;
+        //histogram[it->first]-=shiftTerm;
+        bin.second -= shiftTerm;
     }
     return histogram;
+}
+
+void Histogram::exponentiateHeights()
+{
+    for(std::pair<const int,double>& bin : histogram)
+    {
+        bin.second=std::exp(bin.second);
+    }
+}
+
+void Histogram::shift(double delta)
+{
+    anchor += delta;
 }
 
 /**************************************************************************************/
