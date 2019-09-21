@@ -30,6 +30,7 @@ public:
     std::map<int,double>& operator-=(double);
     void exponentiateHeights();
     void shift(double);
+    void normalize();
 
 private:
     double anchor;

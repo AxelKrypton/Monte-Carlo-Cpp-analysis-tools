@@ -127,6 +127,19 @@ void Histogram::shift(double delta)
     anchor += delta;
 }
 
+void Histogram::normalize()
+{
+    double areaOfHistogram=0.0;
+    for(std::pair<const int,double>& bin : histogram)
+    {
+        areaOfHistogram+=bin.second*binsize;
+    }
+    for(std::pair<const int,double>& bin : histogram)
+    {
+        bin.second=bin.second/areaOfHistogram;
+    }
+}
+
 /**************************************************************************************/
 
 static std::map<int,double> insertBinsWithZeroHeight(const std::map<int,double>& histoWithoutZeroBins)

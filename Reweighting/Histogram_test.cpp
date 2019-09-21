@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_SUITE(Operator)
             BOOST_REQUIRE_CLOSE(heights[i], manualHeights[i], realFloatPrecisionInPercent);
     }
 
-    BOOST_AUTO_TEST_CASE(Exponetiate)
+    BOOST_AUTO_TEST_CASE(Exponentiate)
     {
         const double binsize=4.0;
         std::vector<double> heights, manualHeights;
@@ -330,6 +330,42 @@ BOOST_AUTO_TEST_SUITE(Operator)
             BOOST_REQUIRE_CLOSE(bins[i].first, manualShiftedBins[i].first, realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(bins[i].second, manualShiftedBins[i].second, realFloatPrecisionInPercent);
         }
+    }
+
+    BOOST_AUTO_TEST_CASE(Normalize1)
+    {
+        const double binsize=4.0;
+        std::vector<double> heights, manualHeights;
+        double areaOfHistogram;
+        Histogram hist(binsize);
+        hist[0.3]=1.0;
+        hist[2.3]=3.0;
+        hist[6.3]=2.0;
+        hist.normalize();
+        heights=hist.getHeightsOfBins();
+        areaOfHistogram=1*4 + 3*4 + 2*4;
+        manualHeights.push_back(1.0/areaOfHistogram);
+        manualHeights.push_back(3.0/areaOfHistogram);
+        manualHeights.push_back(2.0/areaOfHistogram);
+        BOOST_REQUIRE_EQUAL(heights.size(), manualHeights.size());
+        for(unsigned int i=0; i<heights.size(); i++)
+            BOOST_REQUIRE_CLOSE(heights[i], manualHeights[i], realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(Normalize2)
+    {
+        const double binsize=4.0;
+        std::vector<double> heights;
+        double areaOfHistogram=0.0;
+        Histogram hist(binsize);
+        hist[0.3]=-1.0;
+        hist[2.3]=1.0;
+        hist[6.3]=2.0;
+        hist.normalize();
+        heights=hist.getHeightsOfBins();
+        for(unsigned int i=0; i<heights.size(); i++)
+            areaOfHistogram+=heights[i]*binsize;
+        BOOST_REQUIRE_CLOSE(areaOfHistogram, 1, realFloatPrecisionInPercent);
     }
 
 BOOST_AUTO_TEST_SUITE_END()
