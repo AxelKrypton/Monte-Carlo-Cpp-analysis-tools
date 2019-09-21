@@ -87,6 +87,7 @@ public:
 	realFloat getPrecisionToCalculateLogZ();
 	std::vector<std::vector<Moments> > getMomentsAtNewPoints();
 	std::vector<std::vector<MomentsEstimators> > getMomentsEstimatorsAtNewPoints();
+	std::vector<std::vector<Histogram> > getProbabilityDistributionsAtNewPoints();
 	//Setters
     virtual void setPrecisionToCalculateLogZ(realFloat precisionToCalculateLogZ) = 0;
     virtual void setNewRangesOfParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn) = 0;

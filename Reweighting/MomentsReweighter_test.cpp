@@ -13,8 +13,8 @@
 class MomentsReweighterTest : public MomentsReweighterAbstract{
 public:
     MomentsReweighterTest() = delete;
-    MomentsReweighterTest(std::initializer_list<std::string> options, std::vector<unsigned int> momentsToBeReweighted = {}, std::vector<int> binsizesToBeUsed = {})
-    	: MomentsReweighterAbstract(ReweighterTester(options).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed)){};
+    MomentsReweighterTest(std::initializer_list<std::string> options, std::vector<unsigned int> momentsToBeReweighted = {}, std::vector<int> binsizesToBeUsed = {}, bool deactivateReweightingProbabilityDistribution=false)
+    	: MomentsReweighterAbstract(ReweighterTester(options).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed, deactivateReweightingProbabilityDistribution)){};
     MomentsReweighterTest(RawDataForReweightingAndMetainformation in) : MomentsReweighterAbstract(in) {};
 
     //Setters
@@ -113,6 +113,10 @@ public:
         }
     }
 
+    double testGetBinsize(Histogram histogram){
+        return histogram.getBinsize();
+    }
+
     void testCalculateAndSetReweightedMomentsAndMomentsEstimators(){
     	calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
@@ -139,7 +143,7 @@ BOOST_AUTO_TEST_SUITE(build)
 	{
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
         std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useBootstrapAsErrorMethod"};
-        RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation({1}, {1,1,1});
+        RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation({1}, {1,1,1}, false);
         BOOST_REQUIRE_THROW(MomentsReweighterTest momentsReweighterTest(rawDataAndMetaInfo), std::invalid_argument);
 		std::vector<std::pair<realFloat, realFloat> > newRanges;
 		std::vector< unsigned int> newNumPoints;
@@ -175,7 +179,7 @@ BOOST_AUTO_TEST_SUITE_END()
 static MomentsReweighterTest createMomentsReweighterTestForGettersAndSettersTests(std::string precisionLogZ = "1e-7"){
 	std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 	std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useBootstrapAsErrorMethod", "--weightPrecision=" + precisionLogZ};
-	RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation({1}, {1,1,1});
+	RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation({1}, {1,1,1}, false);
 	std::vector<std::pair<realFloat, realFloat> > newRanges = {std::make_pair(4.2, 4.6), std::make_pair(0.8, 1.2), std::make_pair(-1.2e12, -1.6e12)};
 	std::vector< unsigned int> newNumPoints(3, 2);
 	rawDataAndMetaInfo.newRangesOfParameters = newRanges;
@@ -290,7 +294,7 @@ BOOST_AUTO_TEST_SUITE(setters)
 	{
 		std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_1";
 		std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useBootstrapAsErrorMethod", "--useSimulatedPointsAsNewPoints"};
-		MomentsReweighterTest momentsReweighterTest(ReweighterTester(options).getRawDataForReweightingAndMetainformation({1}, {1,1,1}));
+		MomentsReweighterTest momentsReweighterTest(ReweighterTester(options).getRawDataForReweightingAndMetainformation({1}, {1,1,1}, false));
 		std::vector<std::pair<realFloat, realFloat> > newRanges = {std::make_pair(4.2, 4.6), std::make_pair(0.7, 1.3), std::make_pair(-1.2e12, -1.6e12)};
 		std::vector< unsigned int> newNumPoints(3, 2);
 		BOOST_REQUIRE_THROW(momentsReweighterTest.setNewRangesOfParameters(newRanges), std::logic_error);
@@ -477,7 +481,7 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
     {
         std::string fileThatDoesExist = "GeneralTestFiles/simulationDataContainer.configfile_3";
         std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod"};
-		RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation({1,2,3,4}, {2,2,2});
+		RawDataForReweightingAndMetainformation rawDataAndMetaInfo = ReweighterTester(options).getRawDataForReweightingAndMetainformation({1,2,3,4}, {2,2,2}, false);
 		std::vector<std::pair<realFloat, realFloat> > newRanges = {std::make_pair(4.2, 4.6), std::make_pair(0.8, 1.2)};
 		std::vector< unsigned int> newNumPoints(2, 3);
 		rawDataAndMetaInfo.newRangesOfParameters = newRanges;
@@ -642,11 +646,12 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)
         std::vector<std::vector<Histogram> > reweightedProbabilityDistribution=reweighter.testGetReweightedProbabilityDistributions();
         for(size_t indexNewPoint=0; indexNewPoint<reweightedProbabilityDistribution.size(); indexNewPoint++){
             for(size_t indexInputObservable=0; indexInputObservable<reweightedProbabilityDistribution[indexNewPoint].size(); indexInputObservable++){
-                double sumOfHeights=0;
+                realFloat sumOfHeights=0;
+                realFloat binsize=reweighter.testGetBinsize(reweightedProbabilityDistribution[indexNewPoint][indexInputObservable]);
                 for(size_t i=0; i<reweightedProbabilityDistribution[indexNewPoint][indexInputObservable].getHeightsOfBins().size(); i++){
                     sumOfHeights+=reweightedProbabilityDistribution[indexNewPoint][indexInputObservable].getHeightsOfBins().at(i);
                 }
-                BOOST_REQUIRE_CLOSE(sumOfHeights, 1, 1e-8);
+                BOOST_REQUIRE_CLOSE(sumOfHeights, 1/binsize, 1e-8);
             }
         }
     }
@@ -759,17 +764,17 @@ std::vector< unsigned int> newNumPoints(1, 30);
 
     BOOST_AUTO_TEST_CASE(constructors)
     {
-        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options1).getRawDataForReweightingAndMetainformation({1},{100,100,100})));
-        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options2).getRawDataForReweightingAndMetainformation({1},{100,100,100})));
-        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options3).getRawDataForReweightingAndMetainformation({1},{100,100,100})));
-        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options4).getRawDataForReweightingAndMetainformation({1},{100,100,100})));
-        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options5).getRawDataForReweightingAndMetainformation({1},{100,100,100})));
-        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options6).getRawDataForReweightingAndMetainformation({1},{100,100,100})));
+        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options1).getRawDataForReweightingAndMetainformation({1},{100,100,100}, false)));
+        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options2).getRawDataForReweightingAndMetainformation({1},{100,100,100}, false)));
+        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options3).getRawDataForReweightingAndMetainformation({1},{100,100,100}, false)));
+        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options4).getRawDataForReweightingAndMetainformation({1},{100,100,100}, false)));
+        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options5).getRawDataForReweightingAndMetainformation({1},{100,100,100}, false)));
+        BOOST_REQUIRE_NO_THROW(MomentsReweighter momentsReweighter(ReweighterTester(options6).getRawDataForReweightingAndMetainformation({1},{100,100,100}, false)));
     }
 
     BOOST_AUTO_TEST_CASE(setters)
     {
-        MomentsReweighter *momentsReweighter= new MomentsReweighter(ReweighterTester(options1).getRawDataForReweightingAndMetainformation({1},{100,100,100}));
+        MomentsReweighter *momentsReweighter= new MomentsReweighter(ReweighterTester(options1).getRawDataForReweightingAndMetainformation({1},{100,100,100}, false));
         BOOST_REQUIRE_NO_THROW(momentsReweighter->setNewRangesOfParameters(newRanges));
         BOOST_REQUIRE_NO_THROW(momentsReweighter->setNewNumberOfPointsOfParameters(newNumPoints));
         BOOST_REQUIRE_NO_THROW(momentsReweighter->setNewParameters(newRanges, newNumPoints));
@@ -784,7 +789,7 @@ std::vector< unsigned int> newNumPoints(1, 30);
 											 112.074534846905, 110.052212146157, 108.030153405543, 106.008360647991, 103.98683593337,
 											 101.965581358779, 99.9445990587913, 97.9238912054946, 95.9034600086542, 93.8833077157218,
 											 91.863436611892, 89.8438490199233, 87.8245473000734, 85.8055338498687, 83.7868111039009};
-        MomentsReweighter momentsReweighter(ReweighterTester(options5).getRawDataForReweightingAndMetainformation({1},{100,100,100}));
+        MomentsReweighter momentsReweighter(ReweighterTester(options5).getRawDataForReweightingAndMetainformation({1},{100,100,100}, false));
         std::vector<realFloat> simulatedLogZ = momentsReweighter.getLogZAtSimulatedPoints();
         std::vector<realFloat> newLogZ = momentsReweighter.getLogZAtNewPoints();
 

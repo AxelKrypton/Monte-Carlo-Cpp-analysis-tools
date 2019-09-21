@@ -75,7 +75,7 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 
 		for(auto rewProc: reweightingProceduresToBePerformed){
 			printInformationAboutReweightingProcedure(rewProc);
-			MomentsReweighter momentsReweighter(getRawDataForReweightingAndMetainformation(rewProc.momentsToBeReweighted, rewProc.binsizesToBeUsed));
+			MomentsReweighter momentsReweighter(getRawDataForReweightingAndMetainformation(rewProc.momentsToBeReweighted, rewProc.binsizesToBeUsed, rewProc.deactivateReweightingProbabilityDistributions));
 			if(valuesOfNewParameters.empty()) valuesOfNewParameters = momentsReweighter.getValuesOfNewParameters();
 			std::vector<std::vector<Moments> > momentsAtNewPoints = momentsReweighter.getMomentsAtNewPoints();
 			std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints = momentsReweighter.getMomentsEstimatorsAtNewPoints();
@@ -124,13 +124,13 @@ std::vector<ReweightingProcedure> Reweighter::getReweightingProceduresToBePerfor
 	return getReweightingProceduresToBePerformedBasedOnBinsizesPerQuantity(binsizesToBeUsedPerQuantityToBeReweighted, reweighterIO.isMeanKnownToBeZero);
 }
 
-RawDataForReweightingAndMetainformation Reweighter::getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed){
+RawDataForReweightingAndMetainformation Reweighter::getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed, bool deactivateReweightingProbabilityDistributions){
 	return {reweighterIO.readFromFileDataContainer, reweighterIO.namesOfParametersIgnoringMetaParameters,
 			reweighterIO.valuesOfSimulationParametersIgnoringMetaParameters, reweighterIO.valuesOfSpecifiedLogZ,
 			newRangesOfParameters, newNumberOfPointsOfParameters, useSimulatedPointsAsNewPoints,
 			reweighterIO.isMeanKnownToBeZero, precisionOfIterativeProcedureToCalculateLogZ,
 			reweighterIO.columnsToBeReweightedUsingMultipleColumns, reweighterIO.errorMethod,
-			reweighterIO.bootstrapNumber, maximumMomentNeededOverall, momentsToBeReweighted, binsizesToBeUsed};
+			reweighterIO.bootstrapNumber, maximumMomentNeededOverall, momentsToBeReweighted, binsizesToBeUsed, deactivateReweightingProbabilityDistributions, reweighterIO.binsizeProbabilityDistribution};
 }
 
 LqcdReweightingParameters Reweighter::createLqcdParameters(std::initializer_list<std::string> options)

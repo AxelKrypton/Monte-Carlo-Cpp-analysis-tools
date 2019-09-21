@@ -25,12 +25,15 @@ struct RawDataForReweightingAndMetainformation {
     unsigned int maximumMomentNeededOverall; //this could not coincide with the max_element of the vector momentsToBeReweighted in the case of multiple columns per observable!!
     std::vector<unsigned int> momentsToBeReweighted;
     std::vector<int> binsizesToBeUsedForBinning;
+	bool deactivateReweightingProbabilityDistributions;
+	realFloat binsizeProbabilityDistribution;
 };
 
 struct ReweightingProcedure {
 	std::vector<unsigned int> momentsToBeReweighted;
 	std::vector<int> binsizesToBeUsed;
 	std::vector<std::string> quantitiesConsidered;
+	bool deactivateReweightingProbabilityDistributions;
 };
 
 
@@ -62,7 +65,7 @@ private:
 	Reweighter(std::initializer_list<std::string>);
 	static LqcdReweightingParameters createLqcdParameters(std::initializer_list<std::string>);
 	std::vector<ReweightingProcedure> getReweightingProceduresToBePerformed();
-	RawDataForReweightingAndMetainformation getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed);
+	RawDataForReweightingAndMetainformation getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed, bool deactivateReweightingProbabilityDistribution);
 };
 
 
@@ -74,9 +77,9 @@ public:
 	std::vector<ReweightingProcedure> getReweightingProceduresToBePerformed(){ return reweighter.getReweightingProceduresToBePerformed(); };
 	std::vector<std::vector<Observables> > getReweightedObservables(){ return reweighter.getReweightedObservables(); };
 	//The following method is used to test MomentsReweighter(Helper) class
-	RawDataForReweightingAndMetainformation getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed)
+	RawDataForReweightingAndMetainformation getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed, bool deactivateReweightingProbabilityDistribution)
 	{
-		return reweighter.getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed);
+		return reweighter.getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed, deactivateReweightingProbabilityDistribution);
 	}
 	static void printRawDataForReweightingAndMetainformation(RawDataForReweightingAndMetainformation rawDataAndInfo)
 	{

@@ -47,6 +47,8 @@ public:
 	realFloat getWeightPrecision();
 	bool getIsMeanKnownToBeZero();
 	unsigned int getNumberOfMultipleColumnsForSingleObservable();
+	bool getDeactivateReweightingForProbabilityDistribution();
+	realFloat getBinsizeProbabilityDistribution();
 
 	struct parse_aborted {};
 	
@@ -71,6 +73,8 @@ private:
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
     bool isMeanKnownToBeZero;
     unsigned int numberOfMultipleColumnsForSingleObservable;
+	bool deactivateReweightingForProbabilityDistribution;
+	realFloat binsizeProbabilityDistribution;
 };
 
 #endif

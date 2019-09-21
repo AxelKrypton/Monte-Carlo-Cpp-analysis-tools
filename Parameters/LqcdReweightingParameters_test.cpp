@@ -146,6 +146,18 @@ BOOST_AUTO_TEST_SUITE(defaults)
 		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfMultipleColumnsForSingleObservable() );
 	}
 
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForProbabilityDistribution)
+	{
+		bool defaultValue=false;
+		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForProbabilityDistribution() );
+	}
+
+	BOOST_AUTO_TEST_CASE(binsizeProbabilityDistribution)
+	{
+		realFloat defaultValue = 1.e-3;
+		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue), boost::lexical_cast<std::string>(createParametersForDefaultCheck().getBinsizeProbabilityDistribution()) );
+	}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(setArguments)
@@ -393,5 +405,26 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         std::string argumentName = "--printEstimatorsToFile";
         BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getPrintEstimatorsToFile() );
     }
+
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForProbabilityDistribution_implicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--deactivateReweightingForProbabilityDistribution";
+		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForProbabilityDistribution() );
+	}
+	
+	BOOST_AUTO_TEST_CASE(deactivateReweightingForProbabilityDistribution_explicit)
+	{
+		bool newValue = true;
+		std::string argumentName = "--deactivateReweightingForProbabilityDistribution";
+		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForProbabilityDistribution() );
+	}
+
+	BOOST_AUTO_TEST_CASE(binsizeProbabilityDistribution)
+	{
+		realFloat newValue = 1.e-04;
+		std::string argumentName = "--binsizeProbabilityDistribution";
+		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(newValue), boost::lexical_cast<std::string>(createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getBinsizeProbabilityDistribution()) );
+	}
 
 BOOST_AUTO_TEST_SUITE_END()

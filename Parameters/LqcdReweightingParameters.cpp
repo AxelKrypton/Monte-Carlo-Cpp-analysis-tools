@@ -32,7 +32,9 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
         ("numberOfBootstrapResample", po::value<int>(&numberOfBootstrapResample)->default_value(100), "Number of resamples to be done in the bootstrap.")
         ("printEstimatorsToFile", po::value<bool>(&printEstimatorsToFile)->default_value(false)->implicit_value(true), "Print the observables estimators out of which the error is calculated to a file.")
         ("useSimulatedPointsAsNewPoints", po::value<bool>(&useSimulatedPointsAsNewPoints)->default_value(false)->implicit_value(true), "Perform reweighting evaluating the observables at the simulated points (given in the configuration file).")
-        ("weightPrecision", po::value<realFloat>(&weightPrecision)->default_value(1.e-7), "Precision for iterative finding of optimal weights.");
+        ("weightPrecision", po::value<realFloat>(&weightPrecision)->default_value(1.e-7), "Precision for iterative finding of optimal weights.")
+        ("deactivateReweightingForProbabilityDistribution", po::value<bool>(&deactivateReweightingForProbabilityDistribution)->default_value(false)->implicit_value(true), "Do not perform reweighting for the probability distribution of the observables.")
+        ("binsizeProbabilityDistribution", po::value<realFloat>(&binsizeProbabilityDistribution)->default_value(1.e-3), "Size of the bins of the probability distribution.");
 
     //option "file" can be given without option description
     positionalOptions.add("file", 1);
@@ -132,6 +134,15 @@ void LqcdReweightingParameters::printParameters()
         std::cout << "#\tKurtosis of data" << std::endl;
     }
     std::cout << separator << std::endl;
+    if( deactivateReweightingForProbabilityDistribution )
+    {
+        std::cout << "#\tDo NOT reweight probability distribution of observables" << std::endl;
+    }
+    else
+    {
+        std::cout << "#\tProbability distribution of observables" << std::endl;
+    }
+    std::cout << "#   Binsize for reweighting probability distribution:\t" << binsizeProbabilityDistribution << std::endl;
 }
 
 unsigned int LqcdReweightingParameters::getNumberOfNewBetaPoints()
@@ -221,6 +232,16 @@ bool LqcdReweightingParameters::getIsMeanKnownToBeZero()
 unsigned int LqcdReweightingParameters::getNumberOfMultipleColumnsForSingleObservable()
 {
     return numberOfMultipleColumnsForSingleObservable;
+}
+
+bool LqcdReweightingParameters::getDeactivateReweightingForProbabilityDistribution()
+{
+    return deactivateReweightingForProbabilityDistribution;
+}
+
+realFloat LqcdReweightingParameters::getBinsizeProbabilityDistribution()
+{
+    return binsizeProbabilityDistribution;
 }
 
 /***************************************************************************/

@@ -53,6 +53,8 @@ private:
 	std::vector<realFloat> valuesOfSpecifiedLogZ;
 	ErrorCalculationMethod errorMethod;
 	std::shared_ptr<int> bootstrapNumber;
+	bool deactivateReweightingForProbabilityDistribution;
+	realFloat binsizeProbabilityDistribution;
 };
 
 

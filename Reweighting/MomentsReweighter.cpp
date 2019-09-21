@@ -81,6 +81,10 @@ std::vector<std::vector<MomentsEstimators> > MomentsReweighterAbstract::getMomen
 	return momentsEstimatorsAtNewPoints;
 }
 
+std::vector<std::vector<Histogram> > MomentsReweighterAbstract::getProbabilityDistributionsAtNewPoints(){
+    return probabilityDistributionsAtNewBetas;
+}
+
 
 void MomentsReweighterAbstract::setNewRangesOfParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn){
 	if(useSimulatedPointsAsNewPoints)
@@ -226,7 +230,7 @@ void MomentsReweighterAbstract::calculateNewPoints(){
     momentsAtNewPoints = std::vector<std::vector<Moments> >(valuesOfNewParameters.size(), std::vector<Moments>(momentsReweighterHelper.numberOfObservablesGivenAsInput, Moments()));
     momentsEstimatorsAtNewPoints = std::vector<std::vector<MomentsEstimators> >(valuesOfNewParameters.size(),
     																			std::vector<MomentsEstimators>(momentsReweighterHelper.numberOfObservablesGivenAsInput, MomentsEstimators()));
-    if(momentsReweighterHelper.reweightProbabilityDistribution){
+    if(!momentsReweighterHelper.deactivateReweightingProbabilityDistribution){
         probabilityDistributionsAtNewBetas = std::vector<std::vector<Histogram> >(valuesOfNewParameters.size(), 
                                                                                   std::vector<Histogram>(momentsReweighterHelper.numberOfObservablesGivenAsInput,Histogram(momentsReweighterHelper.histoBinsize)));
     }
@@ -459,7 +463,7 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
     std::vector<std::vector<realFloat> > outputValuesOfObservables(numberOfNewPoints, std::vector<realFloat>(momentsReweighterHelper.numberOfObservablesToBeReweighted));
     realFloat logarithmOfDenominator = std::numeric_limits<double>::quiet_NaN(); //meaningless initial value, since variable will be initialized later.
     std::vector<int> columnsInputObservables;
-    if(momentsReweighterHelper.reweightProbabilityDistribution)
+    if(!momentsReweighterHelper.deactivateReweightingProbabilityDistribution)
         columnsInputObservables=getColumnsToBeConsideredReweightingProbabilityDistribution();
     for(size_t indexNewPoint = 0; indexNewPoint < numberOfNewPoints; indexNewPoint++){
         bool firstValue = true;
@@ -500,7 +504,7 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
                 * create a new entry of the map which is empty. But that is not a problem because 
                 * immediately after checking a bin it will get filled.
                 */
-                if(momentsReweighterHelper.reweightProbabilityDistribution){
+                if(!momentsReweighterHelper.deactivateReweightingProbabilityDistribution){
                     for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
                         realFloat newHistoTerm = -logarithmOfDenominator;
                         realFloat tempRestoredObs=exp(simDataCont[indexSimulation1][columnsInputObservables[indexInputObservable]][indexConfiguration]);
@@ -519,7 +523,7 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
         }
         for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++)
             outputValuesOfObservables[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
-        if(momentsReweighterHelper.reweightProbabilityDistribution){
+        if(!momentsReweighterHelper.deactivateReweightingProbabilityDistribution){
             for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
                 probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
             }
@@ -605,22 +609,14 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
 
     //Restoring Histograms by exponentiating the heights and also - if nessecary - reshifting the whole distribution
     std::vector<int> columnsInputObservables;
-    if(momentsReweighterHelper.reweightProbabilityDistribution)
+    if(!momentsReweighterHelper.deactivateReweightingProbabilityDistribution){
         columnsInputObservables=getColumnsToBeConsideredReweightingProbabilityDistribution();
-    if(momentsReweighterHelper.reweightProbabilityDistribution){
         for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
             for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
-                Histogram tempHistogram(momentsReweighterHelper.histoBinsize);
-                for(int i=0; i< probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getNumberOfBins() ;i++){
-                    double restoredHeight=exp(probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getHeightsOfBins().at(i));
-                    double middleOfBin=probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getBins().at(i).first + 0.5* momentsReweighterHelper.histoBinsize;
-                    if(minimumOfEachObservable[columnsInputObservables[indexInputObservable]] < 0){
-                        tempHistogram[middleOfBin + 2*minimumOfEachObservable[columnsInputObservables[indexInputObservable]] ]=restoredHeight;
-                    }else{
-                        tempHistogram[middleOfBin]=restoredHeight;
-                    }
-                }
-                probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable]=tempHistogram;
+                    probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].exponentiateHeights();
+                    if(minimumOfEachObservable[columnsInputObservables[indexInputObservable]] < 0)
+                        probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].shift(2*minimumOfEachObservable[columnsInputObservables[indexInputObservable]]);
+                    probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].normalize();
             }
         }
     }

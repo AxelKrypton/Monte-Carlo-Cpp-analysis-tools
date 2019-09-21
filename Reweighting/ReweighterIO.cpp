@@ -26,6 +26,8 @@ ReweighterIO::ReweighterIO(LqcdReweightingParameters parameters) : readFromFileD
 	valuesOfSimulationParametersIgnoringMetaParameters = getValuesOfSimulationParametersIgnoringMetaParameters(readFromFileDataContainer);
 	valuesOfSpecifiedBinsizes = getValuesOfSpecifiedBinsizes(readFromFileDataContainer);
 	valuesOfSpecifiedLogZ = getValuesOfSpecifiedLogZ(readFromFileDataContainer);
+	deactivateReweightingForProbabilityDistribution=parameters.getDeactivateReweightingForProbabilityDistribution();
+	binsizeProbabilityDistribution=parameters.getBinsizeProbabilityDistribution();
 	int numberOfObservablesGivenAsInput = readFromFileDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
 	checkCorrectnessOfConfigurationFileForReweighting(readFromFileDataContainer, MomentsReweighterHelper::metaParameters, numberOfObservablesGivenAsInput);
 	//Set error information
