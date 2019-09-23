@@ -10,8 +10,8 @@
 
 class MomentsReweighterHelperTest{
 public:
-    MomentsReweighterHelperTest(std::initializer_list<std::string> options, std::vector<unsigned int> momentsToBeReweighted = {}, std::vector<int> binsizesToBeUsed = {}, bool deactivateReweightingProbabilityDistribution=false)
-		: momentsReweighterHelper(ReweighterTester(options).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed, deactivateReweightingProbabilityDistribution)){}
+    MomentsReweighterHelperTest(std::initializer_list<std::string> options, std::vector<unsigned int> momentsToBeReweighted = {}, std::vector<int> binsizesToBeUsed = {}, bool reweightProbabilityDistribution = true)
+		: momentsReweighterHelper(ReweighterTester(options).getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed, reweightProbabilityDistribution)){}
 	MomentsReweighterHelperTest(RawDataForReweightingAndMetainformation rawDataForReweightingAndMetainformation)
 		: momentsReweighterHelper(rawDataForReweightingAndMetainformation){}
     std::vector<int> getNumberOfBinsToBeUsed(){ return momentsReweighterHelper.numberOfBinsToBeUsed; }

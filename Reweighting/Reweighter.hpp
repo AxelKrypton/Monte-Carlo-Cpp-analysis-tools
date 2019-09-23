@@ -26,7 +26,7 @@ struct RawDataForReweightingAndMetainformation {
     std::vector<unsigned int> momentsToBeReweighted;
     std::vector<int> binsizesToBeUsedForBinning;
 	bool deactivateReweightingProbabilityDistributions;
-	realFloat binsizeProbabilityDistribution;
+	realFloat binsizeForProbabilityDistribution;
 };
 
 struct ReweightingProcedure {
@@ -65,7 +65,7 @@ private:
 	Reweighter(std::initializer_list<std::string>);
 	static LqcdReweightingParameters createLqcdParameters(std::initializer_list<std::string>);
 	std::vector<ReweightingProcedure> getReweightingProceduresToBePerformed();
-	RawDataForReweightingAndMetainformation getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed, bool deactivateReweightingProbabilityDistribution);
+	RawDataForReweightingAndMetainformation getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed, bool reweightProbabilityDistribution);
 };
 
 
@@ -77,9 +77,9 @@ public:
 	std::vector<ReweightingProcedure> getReweightingProceduresToBePerformed(){ return reweighter.getReweightingProceduresToBePerformed(); };
 	std::vector<std::vector<Observables> > getReweightedObservables(){ return reweighter.getReweightedObservables(); };
 	//The following method is used to test MomentsReweighter(Helper) class
-	RawDataForReweightingAndMetainformation getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed, bool deactivateReweightingProbabilityDistribution)
+	RawDataForReweightingAndMetainformation getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted, std::vector<int> binsizesToBeUsed, bool reweightProbabilityDistribution = true)
 	{
-		return reweighter.getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed, deactivateReweightingProbabilityDistribution);
+		return reweighter.getRawDataForReweightingAndMetainformation(momentsToBeReweighted, binsizesToBeUsed, reweightProbabilityDistribution);
 	}
 	static void printRawDataForReweightingAndMetainformation(RawDataForReweightingAndMetainformation rawDataAndInfo)
 	{

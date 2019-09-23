@@ -232,7 +232,7 @@ void MomentsReweighterAbstract::calculateNewPoints(){
     																			std::vector<MomentsEstimators>(momentsReweighterHelper.numberOfObservablesGivenAsInput, MomentsEstimators()));
     if(!momentsReweighterHelper.deactivateReweightingProbabilityDistribution){
         probabilityDistributionsAtNewBetas = std::vector<std::vector<Histogram> >(valuesOfNewParameters.size(), 
-                                                                                  std::vector<Histogram>(momentsReweighterHelper.numberOfObservablesGivenAsInput,Histogram(momentsReweighterHelper.histoBinsize)));
+                                                                                  std::vector<Histogram>(momentsReweighterHelper.numberOfObservablesGivenAsInput,Histogram(momentsReweighterHelper.probabilityDistributionBinsize)));
     }
 }
 

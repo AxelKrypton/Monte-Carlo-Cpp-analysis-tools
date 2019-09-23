@@ -64,7 +64,7 @@ private:
 	ErrorCalculationMethod errorMethod;
 	std::shared_ptr<int> bootstrapNumber;
     bool deactivateReweightingProbabilityDistribution;
-    double histoBinsize;
+    double probabilityDistributionBinsize;
 
 
 };
