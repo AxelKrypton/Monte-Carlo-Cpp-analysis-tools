@@ -130,13 +130,13 @@ void Histogram::shift(double delta)
 void Histogram::normalize()
 {
     double areaOfHistogram=0.0;
-    for(std::pair<const int,double>& bin : histogram)
+    for(std::pair<const int,double> bin : histogram)
     {
         areaOfHistogram+=bin.second*binsize;
     }
     for(std::pair<const int,double>& bin : histogram)
     {
-        bin.second=bin.second/areaOfHistogram;
+        bin.second/=areaOfHistogram;
     }
 }
 
