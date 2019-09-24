@@ -208,14 +208,13 @@ static std::vector<ReweightingProcedure> getReweightingProceduresToBePerformedBa
 			}
 		}
 		bool isMeanCalculated=false;
-		for(size_t i=0; i<reweightingProcedure.quantitiesConsidered.size(); i++){
-			if(reweightingProcedure.quantitiesConsidered.at(i) == Mean::observableName)
-				isMeanCalculated=true;
-		}
-		if(isMeanCalculated)
-			reweightingProcedure.reweightProbabilityDistributions=true;
-		else
-			reweightingProcedure.reweightProbabilityDistributions=false;
+        for(std::string quantity : reweightingProcedure.quantitiesConsidered){
+            if(quantity == Mean::observableName){
+                isMeanCalculated = true;
+                break;
+            }
+        }
+		reweightingProcedure.reweightProbabilityDistributions = isMeanCalculated;
 		reweightingProcedures.push_back(reweightingProcedure);
 		binsizesPerQuantity.erase(binsizesPerQuantity.begin());
 	}
