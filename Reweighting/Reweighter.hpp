@@ -25,7 +25,7 @@ struct RawDataForReweightingAndMetainformation {
     unsigned int maximumMomentNeededOverall; //this could not coincide with the max_element of the vector momentsToBeReweighted in the case of multiple columns per observable!!
     std::vector<unsigned int> momentsToBeReweighted;
     std::vector<int> binsizesToBeUsedForBinning;
-	bool deactivateReweightingProbabilityDistributions;
+	bool reweightProbabilityDistributions;
 	realFloat binsizeForProbabilityDistribution;
 };
 
@@ -33,7 +33,7 @@ struct ReweightingProcedure {
 	std::vector<unsigned int> momentsToBeReweighted;
 	std::vector<int> binsizesToBeUsed;
 	std::vector<std::string> quantitiesConsidered;
-	bool deactivateReweightingProbabilityDistributions;
+	bool reweightProbabilityDistributions;
 };
 
 

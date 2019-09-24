@@ -74,8 +74,10 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 		std::cout << "\n";
 
 		for(auto rewProc: reweightingProceduresToBePerformed){
+			if(reweighterIO.deactivateReweightingForProbabilityDistribution)
+				rewProc.reweightProbabilityDistributions=false;
 			printInformationAboutReweightingProcedure(rewProc);
-			MomentsReweighter momentsReweighter(getRawDataForReweightingAndMetainformation(rewProc.momentsToBeReweighted, rewProc.binsizesToBeUsed, rewProc.deactivateReweightingProbabilityDistributions));
+			MomentsReweighter momentsReweighter(getRawDataForReweightingAndMetainformation(rewProc.momentsToBeReweighted, rewProc.binsizesToBeUsed, rewProc.reweightProbabilityDistributions));
 			if(valuesOfNewParameters.empty()) valuesOfNewParameters = momentsReweighter.getValuesOfNewParameters();
 			std::vector<std::vector<Moments> > momentsAtNewPoints = momentsReweighter.getMomentsAtNewPoints();
 			std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints = momentsReweighter.getMomentsEstimatorsAtNewPoints();
@@ -205,6 +207,15 @@ static std::vector<ReweightingProcedure> getReweightingProceduresToBePerformedBa
 				it--; //necessary since erase return an iterator to the following element in the map.
 			}
 		}
+		bool isMeanCalculated=false;
+		for(size_t i=0; i<reweightingProcedure.quantitiesConsidered.size(); i++){
+			if(reweightingProcedure.quantitiesConsidered.at(i) == Mean::observableName)
+				isMeanCalculated=true;
+		}
+		if(isMeanCalculated)
+			reweightingProcedure.reweightProbabilityDistributions=true;
+		else
+			reweightingProcedure.reweightProbabilityDistributions=false;
 		reweightingProcedures.push_back(reweightingProcedure);
 		binsizesPerQuantity.erase(binsizesPerQuantity.begin());
 	}

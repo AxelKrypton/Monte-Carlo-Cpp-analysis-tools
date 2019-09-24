@@ -230,7 +230,7 @@ void MomentsReweighterAbstract::calculateNewPoints(){
     momentsAtNewPoints = std::vector<std::vector<Moments> >(valuesOfNewParameters.size(), std::vector<Moments>(momentsReweighterHelper.numberOfObservablesGivenAsInput, Moments()));
     momentsEstimatorsAtNewPoints = std::vector<std::vector<MomentsEstimators> >(valuesOfNewParameters.size(),
     																			std::vector<MomentsEstimators>(momentsReweighterHelper.numberOfObservablesGivenAsInput, MomentsEstimators()));
-    if(!momentsReweighterHelper.deactivateReweightingProbabilityDistribution){
+    if(momentsReweighterHelper.reweightProbabilityDistribution){
         probabilityDistributionsAtNewBetas = std::vector<std::vector<Histogram> >(valuesOfNewParameters.size(), 
                                                                                   std::vector<Histogram>(momentsReweighterHelper.numberOfObservablesGivenAsInput,Histogram(momentsReweighterHelper.probabilityDistributionBinsize)));
     }
@@ -463,7 +463,7 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
     std::vector<std::vector<realFloat> > outputValuesOfObservables(numberOfNewPoints, std::vector<realFloat>(momentsReweighterHelper.numberOfObservablesToBeReweighted));
     realFloat logarithmOfDenominator = std::numeric_limits<double>::quiet_NaN(); //meaningless initial value, since variable will be initialized later.
     std::vector<int> columnsInputObservables;
-    if(!momentsReweighterHelper.deactivateReweightingProbabilityDistribution)
+    if(momentsReweighterHelper.reweightProbabilityDistribution)
         columnsInputObservables=getColumnsToBeConsideredReweightingProbabilityDistribution();
     for(size_t indexNewPoint = 0; indexNewPoint < numberOfNewPoints; indexNewPoint++){
         bool firstValue = true;
@@ -504,7 +504,7 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
                 * create a new entry of the map which is empty. But that is not a problem because 
                 * immediately after checking a bin it will get filled.
                 */
-                if(!momentsReweighterHelper.deactivateReweightingProbabilityDistribution){
+                if(momentsReweighterHelper.reweightProbabilityDistribution){
                     for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
                         realFloat newHistoTerm = -logarithmOfDenominator;
                         realFloat tempRestoredObs=exp(simDataCont[indexSimulation1][columnsInputObservables[indexInputObservable]][indexConfiguration]);
@@ -523,7 +523,7 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
         }
         for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++)
             outputValuesOfObservables[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
-        if(!momentsReweighterHelper.deactivateReweightingProbabilityDistribution){
+        if(momentsReweighterHelper.reweightProbabilityDistribution){
             for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
                 probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
             }
@@ -609,7 +609,7 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
 
     //Restoring Histograms by exponentiating the heights and also - if nessecary - reshifting the whole distribution
     std::vector<int> columnsInputObservables;
-    if(!momentsReweighterHelper.deactivateReweightingProbabilityDistribution){
+    if(momentsReweighterHelper.reweightProbabilityDistribution){
         columnsInputObservables=getColumnsToBeConsideredReweightingProbabilityDistribution();
         for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
             for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){

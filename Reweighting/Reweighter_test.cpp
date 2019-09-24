@@ -18,6 +18,7 @@ static void compareReweightingProcedures(ReweightingProcedure& reference, Reweig
         BOOST_REQUIRE_EQUAL(reference.momentsToBeReweighted.at(i), calculated.momentsToBeReweighted.at(i));
     for(size_t i=0; i<reference.quantitiesConsidered.size(); i++)
         BOOST_CHECK(reference.quantitiesConsidered.at(i) == calculated.quantitiesConsidered.at(i));
+    BOOST_CHECK(reference.reweightProbabilityDistributions==calculated.reweightProbabilityDistributions);
 }
 
 
@@ -52,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
                                                       "--deactivateReweightingForSkewness", "--deactivateReweightingForKurtosis"};
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
-        reference.push_back({{1}, {150, 100, 100}, {Mean::observableName}});
+        reference.push_back({{1}, {150, 100, 100}, {Mean::observableName}, true});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -65,7 +66,7 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
                                                       "--deactivateReweightingForSkewness", "--deactivateReweightingForKurtosis"};
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
-        reference.push_back({{1, 2}, {150, 200, 100}, {Variance::observableName}});
+        reference.push_back({{1, 2}, {150, 200, 100}, {Variance::observableName}, false});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -78,7 +79,7 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
                                                       "--deactivateReweightingForVariance", "--deactivateReweightingForKurtosis"};
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
-        reference.push_back({{1, 2, 3}, {280, 200, 175}, {Skewness::observableName}});
+        reference.push_back({{1, 2, 3}, {280, 200, 175}, {Skewness::observableName}, false});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -91,7 +92,7 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
                                                       "--deactivateReweightingForVariance", "--deactivateReweightingForSkewness"};
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
-        reference.push_back({{1, 2, 3, 4}, {280, 200, 175}, {Kurtosis::observableName}});
+        reference.push_back({{1, 2, 3, 4}, {280, 200, 175}, {Kurtosis::observableName}, false});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -104,7 +105,7 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
                                                       "--deactivateReweightingForVariance"};
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
-        reference.push_back({{1, 2, 3, 4}, {280, 200, 175}, {Skewness::observableName, Kurtosis::observableName}});
+        reference.push_back({{1, 2, 3, 4}, {280, 200, 175}, {Skewness::observableName, Kurtosis::observableName}, false});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -117,8 +118,8 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
         //Here the order is alphabetic in observables, since we use std::map
-        reference.push_back({{1, 2, 3, 4}, {280, 200, 175}, {Skewness::observableName, Kurtosis::observableName}});
-        reference.push_back({{1, 2}, {150, 200, 100}, {Variance::observableName}});
+        reference.push_back({{1, 2, 3, 4}, {280, 200, 175}, {Skewness::observableName, Kurtosis::observableName}, false});
+        reference.push_back({{1, 2}, {150, 200, 100}, {Variance::observableName}, false});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -131,9 +132,9 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
         //Here the order is alphabetic in observables, since we use std::map
-        reference.push_back({{1, 2, 3, 4}, {280, 200, 175}, {Skewness::observableName, Kurtosis::observableName}});
-        reference.push_back({{1}, {150, 100, 100}, {Mean::observableName}});
-        reference.push_back({{1, 2}, {150, 200, 100}, {Variance::observableName}});
+        reference.push_back({{1, 2, 3, 4}, {280, 200, 175}, {Skewness::observableName, Kurtosis::observableName}, false});
+        reference.push_back({{1}, {150, 100, 100}, {Mean::observableName}, true});
+        reference.push_back({{1, 2}, {150, 200, 100}, {Variance::observableName}, false});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -145,7 +146,7 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
         std::initializer_list<std::string> options = {"-f./RealTestData/configfile_6", "--useBootstrapAsErrorMethod"};
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
-        reference.push_back({{1, 2, 3, 4}, {100, 100, 100}, {Mean::observableName, Variance::observableName, Skewness::observableName, Kurtosis::observableName}});
+        reference.push_back({{1, 2, 3, 4}, {100, 100, 100}, {Mean::observableName, Variance::observableName, Skewness::observableName, Kurtosis::observableName}, true});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -170,7 +171,7 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
                                                       "--deactivateReweightingForSkewness", "--deactivateReweightingForKurtosis", "--isMeanKnownToBeZero"};
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
-        reference.push_back({{2}, {100, 200, 100}, {Variance::observableName}});
+        reference.push_back({{2}, {100, 200, 100}, {Variance::observableName}, false});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -183,7 +184,7 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
                                                       "--deactivateReweightingForVariance", "--deactivateReweightingForKurtosis", "--isMeanKnownToBeZero"};
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
-        reference.push_back({{2, 3}, {280, 200, 175}, {Skewness::observableName}});
+        reference.push_back({{2, 3}, {280, 200, 175}, {Skewness::observableName}, false});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -196,7 +197,7 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
                                                       "--deactivateReweightingForVariance", "--deactivateReweightingForSkewness", "--isMeanKnownToBeZero"};
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
-        reference.push_back({{2, 4}, {100, 200, 160}, {Kurtosis::observableName}});
+        reference.push_back({{2, 4}, {100, 200, 160}, {Kurtosis::observableName}, false});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -208,9 +209,9 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
         std::initializer_list<std::string> options = {"-f./RealTestData/configfile_7", "--useBootstrapAsErrorMethod", "--isMeanKnownToBeZero"};
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
-        reference.push_back({{2, 4}, {100, 200, 160}, {Kurtosis::observableName}});
-        reference.push_back({{2, 3}, {280, 200, 175}, {Skewness::observableName}});
-        reference.push_back({{2}, {100, 200, 100}, {Variance::observableName}});
+        reference.push_back({{2, 4}, {100, 200, 160}, {Kurtosis::observableName}, false});
+        reference.push_back({{2, 3}, {280, 200, 175}, {Skewness::observableName}, false});
+        reference.push_back({{2}, {100, 200, 100}, {Variance::observableName}, false});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)
@@ -222,7 +223,7 @@ BOOST_AUTO_TEST_SUITE(privateFunctions)
         std::initializer_list<std::string> options = {"-f./RealTestData/configfile_6", "--useBootstrapAsErrorMethod", "--isMeanKnownToBeZero"};
         ReweighterTester reweighterTester(options);
         std::vector<ReweightingProcedure> reference;
-        reference.push_back({{2, 3, 4}, {100, 100, 100}, {Variance::observableName, Skewness::observableName, Kurtosis::observableName}});
+        reference.push_back({{2, 3, 4}, {100, 100, 100}, {Variance::observableName, Skewness::observableName, Kurtosis::observableName}, false});
         std::vector<ReweightingProcedure> gotten = reweighterTester.getReweightingProceduresToBePerformed();
         BOOST_REQUIRE_EQUAL(reference.size(), gotten.size());
         for(size_t i=0; i<reference.size(); i++)

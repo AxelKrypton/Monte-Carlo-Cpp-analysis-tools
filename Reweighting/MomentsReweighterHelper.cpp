@@ -35,7 +35,7 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
 	  momentsToBeReweighted(rawDataForReweightingAndMetainformation.momentsToBeReweighted),
 	  maximumMomentNeededOverall(rawDataForReweightingAndMetainformation.maximumMomentNeededOverall),
 	  errorMethod(rawDataForReweightingAndMetainformation.errorMethod), bootstrapNumber(rawDataForReweightingAndMetainformation.bootstrapNumber),
-	  deactivateReweightingProbabilityDistribution(rawDataForReweightingAndMetainformation.deactivateReweightingProbabilityDistributions),
+	  reweightProbabilityDistribution(rawDataForReweightingAndMetainformation.reweightProbabilityDistributions),
 	  probabilityDistributionBinsize(rawDataForReweightingAndMetainformation.binsizeForProbabilityDistribution)
 {
 	std::vector<int> entriesToBeCutFromRawData;

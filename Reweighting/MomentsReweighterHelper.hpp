@@ -63,7 +63,7 @@ private:
     unsigned int maximumMomentNeededOverall;
 	ErrorCalculationMethod errorMethod;
 	std::shared_ptr<int> bootstrapNumber;
-    bool deactivateReweightingProbabilityDistribution;
+    bool reweightProbabilityDistribution;
     double probabilityDistributionBinsize;
 
 
