@@ -38,4 +38,21 @@ private:
     std::map<int,double> histogram;
 };
 
+
+class HistogramEstimator
+{
+public:
+    HistogramEstimator() = delete;
+    HistogramEstimator(double, double = 0.0);
+    std::vector<std::vector<double> > getMultipleHeightsOfBins(bool = false) const;
+
+    void insert(int, std::vector<double>);
+    //double& operator[](double);
+
+private:
+    double anchor;
+    double binsize;
+    std::multimap<int,double> histogramEstimators;
+};
+
 #endif /* HISTOGRAM_HPP_ */

@@ -105,11 +105,13 @@ protected:
     void prepareObservablesBeforeReweighting(std::vector<realFloat> &);
     void restoreObservablesAfterReweighting(std::vector<realFloat> minimumOfEachObservable,
                                             std::vector<std::vector<realFloat> > *reweightedObservablesFromRawData,
-                                            std::valarray<std::vector<std::vector<realFloat> > > *jackknifePartialPred);
+                                            std::valarray<std::vector<std::vector<realFloat> > > *jackknifePartialPred,
+											std::valarray<std::vector<std::vector<Histogram> > > *reweightedHistogramEstimators);
     std::vector<std::vector<realFloat> > calculateReweightedObservableValues(bool useUncorrData = false,
                                                                           const int entryToBeLeftOut = -1,
                                                                           std::vector<realFloat> *logZAtSimulationPointToBeUsed = NULL,
-                                                                          std::vector<realFloat> *logZAtNewPointsToBeUsed = NULL);
+                                                                          std::vector<realFloat> *logZAtNewPointsToBeUsed = NULL,
+																		  std::vector<std::vector<Histogram> > *histoToBeFilled = NULL);
     std::vector<realFloat> calculateLogZAtSimulatedPoints(bool useUncorrData, const int entryToBeLeftOut,
                                                        std::vector<realFloat> *logZAtSimulationPointToStartFrom = NULL, bool printUserInfo = false);
     std::vector<realFloat> calculateLogZAtNewPoints(std::vector<std::vector<realFloat> > valuesOfParametersAtWhichLogZIsCalculated,
@@ -163,6 +165,7 @@ private:
 	std::vector<std::vector<Moments> > momentsAtNewPoints;
 	std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints;
     std::vector<std::vector<Histogram> > probabilityDistributionsAtNewBetas;
+	std::vector<std::vector<HistogramEstimator> > probabilityDistributionEstimatorsAtNewBetas;
 
 	/*
 	 * The new points are so far WITHIN the given range without counting the boundaries.

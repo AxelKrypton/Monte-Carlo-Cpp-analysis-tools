@@ -60,8 +60,9 @@ public:
 
     void testRestoreObservablesAfterReweighting(std::vector<realFloat>& minima,\
                                                 std::vector<std::vector<realFloat> > *rewObsFromRawData,
-                                                std::valarray<std::vector<std::vector<realFloat> > >* jack){
-        restoreObservablesAfterReweighting(minima, rewObsFromRawData, jack);
+                                                std::valarray<std::vector<std::vector<realFloat> > >* jack,
+                                                std::valarray<std::vector<std::vector<Histogram> > >* histoJack){
+        restoreObservablesAfterReweighting(minima, rewObsFromRawData, jack, histoJack);
     }
 
     std::vector<std::vector<realFloat> > testCalculateReweightedObservableValues(bool useBinnedData = false,
@@ -501,7 +502,7 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
         reweighter.testPrepareObservablesBeforeReweighting(minimumOfObservables);
         std::vector<std::vector<realFloat> > preparedRawObservables = reweighter.getObservablesFromSimulationData(true, numberOfObservablesInFiles);
         std::vector<std::vector<realFloat> > preparedBinnedObservables = reweighter.getObservablesFromSimulationData(false, numberOfObservablesInFiles);
-        reweighter.testRestoreObservablesAfterReweighting(minimumOfObservables, NULL, NULL);
+        reweighter.testRestoreObservablesAfterReweighting(minimumOfObservables, NULL, NULL, NULL);
         std::vector<std::vector<realFloat> > restoredRawObservables = reweighter.getObservablesFromSimulationData(true, numberOfObservablesInFiles);
         std::vector<std::vector<realFloat> > restoredBinnedObservables = reweighter.getObservablesFromSimulationData(false, numberOfObservablesInFiles);
         BOOST_REQUIRE_EQUAL(referenceMinimumOfObservables, minimumOfObservables[0]);
@@ -625,7 +626,7 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)
         reweighter.testCalculateLogZAtSimulatedPoints();
         reweighter.testCalculateLogZAtNewPoints();
         reweighter.testCalculateReweightedObservableValues();
-        reweighter.testRestoreObservablesAfterReweighting(minimumOfObservables,NULL,NULL);
+        reweighter.testRestoreObservablesAfterReweighting(minimumOfObservables,NULL,NULL, NULL);
         std::vector<std::vector<Histogram> > reweightedProbabilityDistribution=reweighter.testGetReweightedProbabilityDistributions();
         reweighter.testPrintProbabilityDistribution(reweightedProbabilityDistribution);
     }
@@ -642,7 +643,7 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)
         reweighter.testCalculateLogZAtSimulatedPoints();
         reweighter.testCalculateLogZAtNewPoints();
         reweighter.testCalculateReweightedObservableValues();
-        reweighter.testRestoreObservablesAfterReweighting(minimumOfObservables,NULL,NULL);
+        reweighter.testRestoreObservablesAfterReweighting(minimumOfObservables,NULL,NULL,NULL);
         std::vector<std::vector<Histogram> > reweightedProbabilityDistribution=reweighter.testGetReweightedProbabilityDistributions();
         for(size_t indexNewPoint=0; indexNewPoint<reweightedProbabilityDistribution.size(); indexNewPoint++){
             for(size_t indexInputObservable=0; indexInputObservable<reweightedProbabilityDistribution[indexNewPoint].size(); indexInputObservable++){

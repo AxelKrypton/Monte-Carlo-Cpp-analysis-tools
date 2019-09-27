@@ -369,3 +369,65 @@ BOOST_AUTO_TEST_SUITE(Operator)
     }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+/******************************************************
+***********Tests For histogramEstimators***************
+*******************************************************/
+
+
+BOOST_AUTO_TEST_SUITE(buildEstimator)
+
+    BOOST_AUTO_TEST_CASE(buildEstimator1)
+    {
+        BOOST_REQUIRE_NO_THROW(HistogramEstimator histEstimator{1.5});
+    }
+
+    BOOST_AUTO_TEST_CASE(buildEstimator2)
+    {
+        double wrongbinsize=0.0;
+        BOOST_REQUIRE_THROW(HistogramEstimator histEstimator(wrongbinsize), std::logic_error);
+        wrongbinsize=-2.6;
+        BOOST_REQUIRE_THROW(HistogramEstimator histEstimator(wrongbinsize), std::logic_error);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(gettersEstimator)
+
+    BOOST_AUTO_TEST_CASE(getMultipleHeightsOfBins1)
+    {
+        double binsize=2.0;
+        HistogramEstimator histEstimator(binsize);
+        std::vector<std::vector<double> > heights, manualHeights, manualHeightsWithZeroBins;
+        histEstimator.insert(4,{15,27});
+        histEstimator.insert(1,{23,13});
+        histEstimator.insert(5,{33});
+        histEstimator.insert(2,{24});
+        heights=histEstimator.getMultipleHeightsOfBins();
+        manualHeights.push_back({23,13});
+        manualHeights.push_back({24});
+        manualHeights.push_back({15,27});
+        manualHeights.push_back({33});
+        BOOST_REQUIRE_EQUAL(heights.size(), manualHeights.size());
+        for(unsigned int i=0; i<heights.size(); i++){
+            BOOST_REQUIRE_EQUAL(heights[i].size(), manualHeights[i].size());
+            for(unsigned int j=0; j<heights[i].size(); j++)
+                BOOST_REQUIRE_CLOSE(heights[i][j], manualHeights[i][j], realFloatPrecisionInPercent);
+        }
+        heights=histEstimator.getMultipleHeightsOfBins(true);
+        manualHeightsWithZeroBins.push_back({23,13});
+        manualHeightsWithZeroBins.push_back({24});
+        manualHeightsWithZeroBins.push_back({0});
+        manualHeightsWithZeroBins.push_back({15,27});
+        manualHeightsWithZeroBins.push_back({33});
+        BOOST_REQUIRE_EQUAL(heights.size(), manualHeightsWithZeroBins.size());
+        for(unsigned int i=0; i<heights.size(); i++){
+            BOOST_REQUIRE_EQUAL(heights[i].size(), manualHeightsWithZeroBins[i].size());
+            for(unsigned int j=0; j<heights[i].size(); j++)
+                BOOST_REQUIRE_CLOSE(heights[i][j], manualHeightsWithZeroBins[i][j], realFloatPrecisionInPercent);
+        }
+    }
+
+BOOST_AUTO_TEST_SUITE_END()

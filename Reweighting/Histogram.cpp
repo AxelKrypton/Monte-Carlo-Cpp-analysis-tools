@@ -2,8 +2,10 @@
 #include<cmath>
 #include<tgmath.h>
 #include<iostream>
+#include "../types.hpp"
 
 static std::map<int,double> insertBinsWithZeroHeight(const std::map<int,double>&);
+static std::multimap<int,double> includeBinsWithZeroHeightInMultiMap(std::multimap<int,double>);
 
 /*****************************************************************************************/
 
@@ -140,7 +142,57 @@ void Histogram::normalize()
     }
 }
 
-/**************************************************************************************/
+
+
+//In the following the constructor and memberfunctions of the class HistogramEstimators is defined
+
+HistogramEstimator::HistogramEstimator(double binsizeIn, double anchorIn) : anchor(anchorIn), binsize(binsizeIn)
+{
+    if(binsize<=0)
+    {
+        throw std::logic_error("HistogramEstimator can't be created with negative or zero binsize.");
+    }
+}
+
+/* 
+ * The following function returns the heights of the histogram estimators.
+ * Since now for every bin there are multiple heights it returns a vector of vectors.
+ * The first vector are the bins of the histogram. The second vector are the different heights from the estimators.
+ */
+std::vector<std::vector<double> > HistogramEstimator::getMultipleHeightsOfBins(bool includeZeroBins) const
+{
+    std::multimap<int, double> copyOfHisto(histogramEstimators);
+    if(includeZeroBins){
+        copyOfHisto = includeBinsWithZeroHeightInMultiMap(histogramEstimators);
+    }
+    std::vector<std::vector<double> > multipleHeightsOfBins;
+    std::multimap<int, double>::iterator it;
+    for(it=copyOfHisto.begin(); it!=copyOfHisto.end(); it++){
+        int whichbin=it->first;
+        std::vector<double> heights;
+        typedef std::multimap<int, double>::iterator copyOfHistoIt;
+        std::pair<copyOfHistoIt,copyOfHistoIt> range = copyOfHisto.equal_range(whichbin);
+        for(copyOfHistoIt histoIt=range.first; histoIt!=range.second; histoIt++)
+        {
+            heights.push_back(histoIt->second);
+        }
+        //In the multimap keys can appear multiple times. After extracting the values of one key the iterator skips the same keys and goes to the next one.
+        for(int i=0; i<std::distance(range.first,range.second)-1; i++)
+        {
+            it++;
+        }
+        multipleHeightsOfBins.push_back(heights);
+    }
+    return multipleHeightsOfBins;
+}
+
+void HistogramEstimator::insert(int whichbin, std::vector<double> heights)
+{
+    for(size_t i=0; i<heights.size(); i++)
+        histogramEstimators.insert(std::pair<int,double> (whichbin,heights[i]));
+}
+
+/********************************************************************************************************************************************************/
 
 static std::map<int,double> insertBinsWithZeroHeight(const std::map<int,double>& histoWithoutZeroBins)
 {
@@ -148,6 +200,18 @@ static std::map<int,double> insertBinsWithZeroHeight(const std::map<int,double>&
     for(int i=filledHistogram.begin()->first; i<=filledHistogram.rbegin()->first; i++)
     {
         filledHistogram[i]; //I just want to fill with zero not existing bins and I use the map's access-operator feature of adding not existing elements
+    }
+    return filledHistogram;
+}
+
+static std::multimap<int,double> includeBinsWithZeroHeightInMultiMap(std::multimap<int,double> histoWithoutZeroBins){
+    std::multimap<int,double> filledHistogram(histoWithoutZeroBins);
+    std::multimap<int,double>::iterator it;
+    for(int i=filledHistogram.begin()->first; i<=filledHistogram.rbegin()->first; i++)
+    {
+        it=histoWithoutZeroBins.find(i);
+        if(it==histoWithoutZeroBins.end())
+            filledHistogram.insert(std::pair<int, double> (i,0)); //Inserting bins with zero height
     }
     return filledHistogram;
 }

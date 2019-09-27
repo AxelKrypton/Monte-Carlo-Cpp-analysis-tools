@@ -140,6 +140,7 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
     std::cout << " Starting reweighting of observables...\n";
     size_t numberOfNewPoints = valuesOfNewParameters.size();
     size_t numberOfObservablesToBeReweighted = momentsReweighterHelper.numberOfObservablesToBeReweighted;
+    size_t numberOfObservablesGivenAsInput = momentsReweighterHelper.numberOfObservablesGivenAsInput;
     std::vector<realFloat> minimumOfEachObservable(numberOfObservablesToBeReweighted, std::numeric_limits<realFloat>::max());
     prepareObservablesBeforeReweighting(minimumOfEachObservable);
     std::cout << "   Calculating the moments of observables at new points... \n";
@@ -155,6 +156,10 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
     	            jackknifeEstimators(std::vector<std::vector<realFloat> >(numberOfNewPoints,
     	                                                                  std::vector<realFloat>(numberOfObservablesToBeReweighted)),
     	                                numberOfBinsUsedToBinData);
+        std::valarray<std::vector<std::vector<Histogram> > >
+                    histogramJackknifeEstimators(std::vector<std::vector<Histogram> >(numberOfNewPoints,
+                                                                                std::vector<Histogram>(numberOfObservablesGivenAsInput, Histogram(momentsReweighterHelper.probabilityDistributionBinsize))),
+                                                numberOfBinsUsedToBinData);
 		std::cout << "   Calculating the Jackknife estimators... \n";
 		for(size_t i=0; i<numberOfBinsUsedToBinData; i++){
 			std::vector<realFloat> logZAtSimulatedPointsUsingUncorrDataLeavingOutOneEntry =
@@ -162,11 +167,11 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
 			std::vector<realFloat> logZAtNewPointsUsingUncorrDataLeavingOutOneEntry =
 					calculateLogZAtNewPoints(valuesOfNewParameters, true, i, &logZAtSimulatedPointsUsingUncorrDataLeavingOutOneEntry);
 			jackknifeEstimators[i] =
-					calculateReweightedObservableValues(true, i, &logZAtSimulatedPointsUsingUncorrDataLeavingOutOneEntry, &logZAtNewPointsUsingUncorrDataLeavingOutOneEntry);
+					calculateReweightedObservableValues(true, i, &logZAtSimulatedPointsUsingUncorrDataLeavingOutOneEntry, &logZAtNewPointsUsingUncorrDataLeavingOutOneEntry, &histogramJackknifeEstimators[i]);
 			smartGuessForLogZ = logZAtSimulatedPointsUsingUncorrDataLeavingOutOneEntry;
 		}
 		std::cout << "   ...done!\n";
-		restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &jackknifeEstimators);
+		restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &jackknifeEstimators, &histogramJackknifeEstimators);
 		extractAndSetReweightedMomentsAndMomentsEstimators(reweightedObservablesFromRawData, jackknifeEstimators);
     }else if(momentsReweighterHelper.errorMethod == bootstrap){
     	if(momentsReweighterHelper.bootstrapNumber == NULL)
@@ -175,7 +180,11 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
     	        	            bootstrapEstimators(std::vector<std::vector<realFloat> >(numberOfNewPoints,
     	        	                                                                  std::vector<realFloat>(numberOfObservablesToBeReweighted)),
     	        	            				    *(momentsReweighterHelper.bootstrapNumber));
-    	std::cout << "   Calculating the Bootstrap estimators... \n";
+    	std::valarray<std::vector<std::vector<Histogram> > >
+                    histogramBootstrapEstimators(std::vector<std::vector<Histogram> >(numberOfNewPoints,
+                                                                                std::vector<Histogram>(numberOfObservablesGivenAsInput, Histogram(momentsReweighterHelper.probabilityDistributionBinsize))),
+                                                *(momentsReweighterHelper.bootstrapNumber));
+        std::cout << "   Calculating the Bootstrap estimators... \n";
 		// construct a trivial random generator engine from a time-based seed:
 		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 		std::default_random_engine generator(seed);
@@ -189,11 +198,11 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
     				momentsReweighterHelper.simulationRawDataContainer.getUncorrelatedSimulationDataSet(momentsReweighterHelper.numberOfBinsToBeUsed, bootstrap, &generator);
     		std::vector<realFloat> logZAtSimulatedPointsUsingUncorrData = calculateLogZAtSimulatedPoints(true, -1, &smartGuessForLogZ);
     		std::vector<realFloat> logZAtNewPointsUsingUncorrData = calculateLogZAtNewPoints(valuesOfNewParameters, true, -1, &logZAtSimulatedPointsUsingUncorrData);
-    		bootstrapEstimators[iBoot] = calculateReweightedObservableValues(true, -1, &logZAtSimulatedPointsUsingUncorrData, &logZAtNewPointsUsingUncorrData);
+    		bootstrapEstimators[iBoot] = calculateReweightedObservableValues(true, -1, &logZAtSimulatedPointsUsingUncorrData, &logZAtNewPointsUsingUncorrData, &histogramBootstrapEstimators[iBoot]);
     		smartGuessForLogZ = logZAtSimulatedPointsUsingUncorrData;
     	}
     	std::cout << "   ...done!\n";
-    	restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &bootstrapEstimators);
+    	restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &bootstrapEstimators, &histogramBootstrapEstimators);
     	extractAndSetReweightedMomentsAndMomentsEstimators(reweightedObservablesFromRawData, bootstrapEstimators);
     }else{
     	throw std::invalid_argument("Error method for some reason unknown! Aborting...");
@@ -233,6 +242,8 @@ void MomentsReweighterAbstract::calculateNewPoints(){
     if(momentsReweighterHelper.reweightProbabilityDistribution){
         probabilityDistributionsAtNewBetas = std::vector<std::vector<Histogram> >(valuesOfNewParameters.size(), 
                                                                                   std::vector<Histogram>(momentsReweighterHelper.numberOfObservablesGivenAsInput,Histogram(momentsReweighterHelper.probabilityDistributionBinsize)));
+        probabilityDistributionEstimatorsAtNewBetas = std::vector<std::vector<HistogramEstimator> >(valuesOfNewParameters.size(), 
+                                                                                  std::vector<HistogramEstimator>(momentsReweighterHelper.numberOfObservablesGivenAsInput,HistogramEstimator(momentsReweighterHelper.probabilityDistributionBinsize)));                                                                    
     }
 }
 
@@ -446,7 +457,8 @@ void MomentsReweighterAbstract::calculateAndSetLogZAtNewPoints(){
 std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweightedObservableValues(bool useUncorrData,
                                                                                           const int entryToBeLeftOut,
                                                                                           std::vector<realFloat> *logZAtSimulationPointToBeUsed,
-                                                                                          std::vector<realFloat> *logZAtNewPointsToBeUsed){
+                                                                                          std::vector<realFloat> *logZAtNewPointsToBeUsed,
+                                                                                          std::vector<std::vector<Histogram> > *histoToBeFilled){
 
     SimulationDataContainer& simDataCont = (useUncorrData) ? momentsReweighterHelper.simulationUncorrDataContainer
                                                            : momentsReweighterHelper.simulationRawDataContainer;
@@ -456,6 +468,8 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
         logZAtSimulationPointToBeUsed = &logZAtSimulatedPoints;
     if(logZAtNewPointsToBeUsed == NULL)
         logZAtNewPointsToBeUsed = &logZAtNewPoints;
+    if(histoToBeFilled == NULL)
+        histoToBeFilled = &probabilityDistributionsAtNewBetas;
 
     size_t numberOfReweightingParameters = reweightingParameterNames.size();
     size_t numberOfSimulationsDone = valuesOfSimulationParameters.size();
@@ -508,11 +522,11 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
                     for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
                         realFloat newHistoTerm = -logarithmOfDenominator;
                         realFloat tempRestoredObs=exp(simDataCont[indexSimulation1][columnsInputObservables[indexInputObservable]][indexConfiguration]);
-                        if(probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable][tempRestoredObs]==0)
-                            probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable][tempRestoredObs] = newHistoTerm;
+                        if((*histoToBeFilled)[indexNewPoint][indexInputObservable][tempRestoredObs]==0)
+                            (*histoToBeFilled)[indexNewPoint][indexInputObservable][tempRestoredObs] = newHistoTerm;
                         else{
-                            probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable][tempRestoredObs] =
-                            logarithmic_sum(probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable][tempRestoredObs], newHistoTerm);
+                            (*histoToBeFilled)[indexNewPoint][indexInputObservable][tempRestoredObs] =
+                            logarithmic_sum((*histoToBeFilled)[indexNewPoint][indexInputObservable][tempRestoredObs], newHistoTerm);
                         }
                     }
                     
@@ -525,7 +539,7 @@ std::vector<std::vector<realFloat> > MomentsReweighterAbstract::calculateReweigh
             outputValuesOfObservables[indexNewPoint][indexObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
         if(momentsReweighterHelper.reweightProbabilityDistribution){
             for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
-                probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
+                (*histoToBeFilled)[indexNewPoint][indexInputObservable] -= (*logZAtNewPointsToBeUsed)[indexNewPoint];
             }
         }
     }
@@ -572,7 +586,8 @@ void MomentsReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<
 
 void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<realFloat> minimumOfEachObservable,
                                      std::vector<std::vector<realFloat> > *reweightedObservablesFromRawData,
-                                     std::valarray<std::vector<std::vector<realFloat> > > *estimatorsForErrorCalculation){
+                                     std::valarray<std::vector<std::vector<realFloat> > > *estimatorsForErrorCalculation,
+									 std::valarray<std::vector<std::vector<Histogram> > > *reweightedHistogramEstimators){
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
     //Exponential and shift, if necessary, BOTH on raw/uncorr data AND on values at new points (Jackknife partial predicitions)
     for(int indexObservable=0; indexObservable<momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++){
@@ -617,6 +632,19 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
                     if(minimumOfEachObservable[columnsInputObservables[indexInputObservable]] < 0)
                         probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].shift(2*minimumOfEachObservable[columnsInputObservables[indexInputObservable]]);
                     probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].normalize();
+            }
+        }
+    
+        if(reweightedHistogramEstimators != NULL){
+            for(size_t indexBin=0; indexBin<(*reweightedHistogramEstimators).size(); indexBin++){
+                columnsInputObservables=getColumnsToBeConsideredReweightingProbabilityDistribution();
+                for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
+                    for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
+                        (*reweightedHistogramEstimators)[indexBin][indexNewPoint][indexInputObservable].exponentiateHeights();
+                        if(minimumOfEachObservable[columnsInputObservables[indexInputObservable]] < 0)
+                            (*reweightedHistogramEstimators)[indexBin][indexNewPoint][indexInputObservable].shift(2*minimumOfEachObservable[columnsInputObservables[indexInputObservable]]);
+                    }   
+                }   
             }
         }
     }
