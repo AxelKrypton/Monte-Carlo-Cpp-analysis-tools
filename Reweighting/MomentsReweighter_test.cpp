@@ -94,6 +94,9 @@ public:
         return getReweightedProbabilityDistributions();
     }
 
+    std::vector<std::vector<HistogramEstimator> > testGetReweightedProbabilityDistributionEstimators(){
+        return getReweightedProbabilityDistributionEstimators();
+    }
     
     void testPrintProbabilityDistribution(std::vector<std::vector<Histogram> > distributions){
         for(unsigned int indexNewPoint=0; indexNewPoint<distributions.size(); indexNewPoint++){
@@ -112,6 +115,31 @@ public:
                 }
             }
         }
+    }
+
+    void testPrintProbabilityDistributionEstimator(std::vector<std::vector<HistogramEstimator> > distributionEstimators, std::vector<std::vector<Histogram> > distributions){
+        for(unsigned int indexNewPoint=0; indexNewPoint<distributionEstimators.size(); indexNewPoint++){
+            std::cout << "IndexNewPoint: " << indexNewPoint << " (" << distributionEstimators.size() << " new points)" << std::endl;
+            std::cout << "**********************************************" << std::endl;
+            for(unsigned int indexInputObservable=0; indexInputObservable<distributionEstimators[indexNewPoint].size(); indexInputObservable++){
+                std::cout << "IndexNewObservable: " << indexInputObservable << " (" << distributionEstimators[indexNewPoint].size() << " input observables)" << std::endl;
+                std::cout << "**********************************************" << std::endl;
+                std::vector<std::pair<double,double> > histogramBins = distributions[indexNewPoint][indexInputObservable].getBins();
+                std::vector<std::vector<double> > histogramEstimatorBinHeights = distributionEstimators[indexNewPoint][indexInputObservable].getMultipleHeightsOfBins();
+                for(unsigned int i=0; i<histogramEstimatorBinHeights.size(); i++){
+                    double binStart  = histogramBins[i].first;
+                    double binEnd    = histogramBins[i].second;
+                    double binMiddle = (binEnd + binStart)/2;
+                    std::cout << i << "\t" << binStart << "\t\t" << binMiddle << "\t\t" << binEnd << std::endl;
+                    for(size_t j=0; j<histogramEstimatorBinHeights[i].size() ;j++){
+                        std::cout << histogramEstimatorBinHeights[i][j] << std::endl;
+                    }
+                }
+            }
+        }
+        std::cout << "**************************" << std::endl;
+        std::cout << "Done!" << std::endl;
+        std::cout << "**************************" << std::endl;
     }
 
     double testGetBinsize(Histogram histogram){
@@ -655,6 +683,18 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)
                 BOOST_REQUIRE_CLOSE(sumOfHeights, 1/binsize, 1e-8);
             }
         }
+    }
+
+    BOOST_AUTO_TEST_CASE(probabilityDistributionReweighting3)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_1";
+    	std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
+    												  "--newBetaRange_high=5.3509", "--numberOfNewBetaPoints=30"};
+        MomentsReweighterTest reweighter(options, {1}, {1,1,1});
+        reweighter.testCalculateAndSetReweightedMomentsAndMomentsEstimators();
+        std::vector<std::vector<Histogram> > reweightedProbabilityDistribution=reweighter.testGetReweightedProbabilityDistributions();
+        std::vector<std::vector<HistogramEstimator> > reweightedProbabilityDistributionEstimator=reweighter.testGetReweightedProbabilityDistributionEstimators();
+        reweighter.testPrintProbabilityDistributionEstimator(reweightedProbabilityDistributionEstimator, reweightedProbabilityDistribution);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

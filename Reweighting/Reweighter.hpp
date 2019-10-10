@@ -3,6 +3,7 @@
 
 #include "SimulationDataContainer.hpp"
 #include "ReweighterIO.hpp"
+#include "Histogram.hpp"
 #include "../Parameters/LqcdReweightingParameters.hpp"
 #include "../dataAnalysisUtilities/Observables.hpp"
 
@@ -50,6 +51,7 @@ public:
 	std::vector<std::vector<realFloat> > getValuesOfNewParameters();
 	std::vector<std::vector<Observables> > getReweightedObservables();
 	std::vector<std::vector<std::map<std::string, DataSample> > > getReweightedObservablesEstimators();
+	std::vector<std::vector<ProbabilityDistribution> > getReweightedProbabilityDistributions();
 private:
 	ReweighterIO reweighterIO;
 	std::vector<std::string> quantitiesToBeReweighted;
@@ -61,6 +63,7 @@ private:
 	realFloat precisionOfIterativeProcedureToCalculateLogZ;
 	std::vector<std::vector<Observables> > observablesAtNewPoints;
 	std::unique_ptr<std::vector<std::vector<std::map<std::string, DataSample> > > > observablesEstimatorsAtNewPoints; //e.g. [newPoint][obsInFile][Skewness::observableName]
+	std::vector<std::vector<ProbabilityDistribution> > probabilityDistributionsAtNewPoints;
 	//The following methods are here in order to be tested one by one (in principle they could be static function in the .cpp file)
 	Reweighter(std::initializer_list<std::string>);
 	static LqcdReweightingParameters createLqcdParameters(std::initializer_list<std::string>);

@@ -88,6 +88,7 @@ public:
 	std::vector<std::vector<Moments> > getMomentsAtNewPoints();
 	std::vector<std::vector<MomentsEstimators> > getMomentsEstimatorsAtNewPoints();
 	std::vector<std::vector<Histogram> > getProbabilityDistributionsAtNewPoints();
+	std::vector<std::vector<HistogramEstimator> > getProbabilityDistributionEstimatorsAtNewPoints();
 	//Setters
     virtual void setPrecisionToCalculateLogZ(realFloat precisionToCalculateLogZ) = 0;
     virtual void setNewRangesOfParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn) = 0;
@@ -121,9 +122,11 @@ protected:
     SimulationDataContainer getSimulationDataContainer(bool raw = true);
     std::vector<int> getColumnsToBeConsideredReweightingProbabilityDistribution();
 	std::vector<std::vector<Histogram> > getReweightedProbabilityDistributions();
+	std::vector<std::vector<HistogramEstimator> > getReweightedProbabilityDistributionEstimators();
     //Method used in calculateAndGetReweightedObservables to select data to calculate observables and errors and to set them
 	void extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<realFloat> >& reweightedObservablesFromRawData,
 															const std::valarray<std::vector<std::vector<realFloat> > >& estimatorsForErrorsCalculation);
+	void extractAndSetReweightedHistogramEstimators(const std::valarray<std::vector<std::vector<Histogram> > >& histogramEstimatorsForErrorCalculation);														
 
 private:
     void calculateNewPoints(); //Method in which "valuesOfNewParameters" is filled and some checks are done

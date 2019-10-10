@@ -85,6 +85,9 @@ std::vector<std::vector<Histogram> > MomentsReweighterAbstract::getProbabilityDi
     return probabilityDistributionsAtNewBetas;
 }
 
+std::vector<std::vector<HistogramEstimator> > MomentsReweighterAbstract::getProbabilityDistributionEstimatorsAtNewPoints(){
+    return probabilityDistributionEstimatorsAtNewBetas;
+}
 
 void MomentsReweighterAbstract::setNewRangesOfParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn){
 	if(useSimulatedPointsAsNewPoints)
@@ -156,7 +159,7 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
     	            jackknifeEstimators(std::vector<std::vector<realFloat> >(numberOfNewPoints,
     	                                                                  std::vector<realFloat>(numberOfObservablesToBeReweighted)),
     	                                numberOfBinsUsedToBinData);
-        std::valarray<std::vector<std::vector<Histogram> > >
+        std::valarray<std::vector<std::vector<Histogram> > > //For the case reweightProbabilityDistribution=false it is a small waste of memory
                     histogramJackknifeEstimators(std::vector<std::vector<Histogram> >(numberOfNewPoints,
                                                                                 std::vector<Histogram>(numberOfObservablesGivenAsInput, Histogram(momentsReweighterHelper.probabilityDistributionBinsize))),
                                                 numberOfBinsUsedToBinData);
@@ -173,6 +176,8 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
 		std::cout << "   ...done!\n";
 		restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &jackknifeEstimators, &histogramJackknifeEstimators);
 		extractAndSetReweightedMomentsAndMomentsEstimators(reweightedObservablesFromRawData, jackknifeEstimators);
+        if(momentsReweighterHelper.reweightProbabilityDistribution)
+            extractAndSetReweightedHistogramEstimators(histogramJackknifeEstimators);
     }else if(momentsReweighterHelper.errorMethod == bootstrap){
     	if(momentsReweighterHelper.bootstrapNumber == NULL)
     		throw std::logic_error("In \"calculateAndGetReweightedObservables\" bootstrapNumber unset in the bootstrap case!! Aborting...");
@@ -180,7 +185,7 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
     	        	            bootstrapEstimators(std::vector<std::vector<realFloat> >(numberOfNewPoints,
     	        	                                                                  std::vector<realFloat>(numberOfObservablesToBeReweighted)),
     	        	            				    *(momentsReweighterHelper.bootstrapNumber));
-    	std::valarray<std::vector<std::vector<Histogram> > >
+    	std::valarray<std::vector<std::vector<Histogram> > > //For the case reweightProbabilityDistribution=false it is a small waste of memory
                     histogramBootstrapEstimators(std::vector<std::vector<Histogram> >(numberOfNewPoints,
                                                                                 std::vector<Histogram>(numberOfObservablesGivenAsInput, Histogram(momentsReweighterHelper.probabilityDistributionBinsize))),
                                                 *(momentsReweighterHelper.bootstrapNumber));
@@ -204,6 +209,8 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
     	std::cout << "   ...done!\n";
     	restoreObservablesAfterReweighting(minimumOfEachObservable, &reweightedObservablesFromRawData, &bootstrapEstimators, &histogramBootstrapEstimators);
     	extractAndSetReweightedMomentsAndMomentsEstimators(reweightedObservablesFromRawData, bootstrapEstimators);
+        if(momentsReweighterHelper.reweightProbabilityDistribution)
+            extractAndSetReweightedHistogramEstimators(histogramBootstrapEstimators);
     }else{
     	throw std::invalid_argument("Error method for some reason unknown! Aborting...");
     }
@@ -643,6 +650,7 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
                         (*reweightedHistogramEstimators)[indexBin][indexNewPoint][indexInputObservable].exponentiateHeights();
                         if(minimumOfEachObservable[columnsInputObservables[indexInputObservable]] < 0)
                             (*reweightedHistogramEstimators)[indexBin][indexNewPoint][indexInputObservable].shift(2*minimumOfEachObservable[columnsInputObservables[indexInputObservable]]);
+                        (*reweightedHistogramEstimators)[indexBin][indexNewPoint][indexInputObservable].normalize();
                     }   
                 }   
             }
@@ -687,6 +695,10 @@ std::vector<std::vector<Histogram> > MomentsReweighterAbstract::getReweightedPro
     return probabilityDistributionsAtNewBetas;
 }
 
+std::vector<std::vector<HistogramEstimator> > MomentsReweighterAbstract::getReweightedProbabilityDistributionEstimators(){
+    return probabilityDistributionEstimatorsAtNewBetas;
+}
+
 void MomentsReweighterAbstract::extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<realFloat> >& reweightedObservablesFromRawData,
 																				   const std::valarray<std::vector<std::vector<realFloat> > >& estimatorsForErrorsCalculation)
 {
@@ -722,6 +734,27 @@ void MomentsReweighterAbstract::extractAndSetReweightedMomentsAndMomentsEstimato
 			}
 		}
 	}
+}
+
+void MomentsReweighterAbstract::extractAndSetReweightedHistogramEstimators(const std::valarray<std::vector<std::vector<Histogram> > >& histogramEstimatorsForErrorCalculation){
+    const size_t numberOfNewPoints=valuesOfNewParameters.size();
+    const size_t numberOfObservablesGivenAsInput=momentsReweighterHelper.numberOfObservablesGivenAsInput;
+    size_t numberOfHeightsPerBins=histogramEstimatorsForErrorCalculation.size();
+    double binsize=momentsReweighterHelper.probabilityDistributionBinsize;
+    for(size_t indexNewPoint=0; indexNewPoint<numberOfNewPoints; indexNewPoint++){
+        for(size_t indexInputObservable=0; indexInputObservable<numberOfObservablesGivenAsInput; indexInputObservable++){  
+            size_t numberOfHistoBins=probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getNumberOfBins();  
+            for(size_t indexHistoBin=0; indexHistoBin<numberOfHistoBins; indexHistoBin++){  
+                int whichbin=static_cast<int>(probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getBins().at(indexHistoBin).first/binsize + 0.5);
+                std::vector<double> heightsOfOneBin;
+                for(size_t indexEstimator=0; indexEstimator<numberOfHeightsPerBins; indexEstimator++){
+                    double height=histogramEstimatorsForErrorCalculation[indexEstimator][indexNewPoint][indexInputObservable].getHeightOfSpecificBin(whichbin);
+                    heightsOfOneBin.push_back(height);
+                }
+                probabilityDistributionEstimatorsAtNewBetas[indexNewPoint][indexInputObservable].insert(whichbin,heightsOfOneBin);
+            }
+        }
+    }
 }
 
 /*****************************************************************************************/
