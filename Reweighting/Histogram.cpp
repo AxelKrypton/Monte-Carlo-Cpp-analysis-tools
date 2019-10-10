@@ -2,9 +2,9 @@
 #include<cmath>
 #include<tgmath.h>
 #include<iostream>
-#include "../types.hpp"
 
 static std::map<int,double> insertBinsWithZeroHeight(const std::map<int,double>&);
+static std::map<int,EstimateAndError> insertBinsWithZeroEstimateAndError(const std::map<int,EstimateAndError>&);
 static std::multimap<int,double> includeBinsWithZeroHeightInMultiMap(std::multimap<int,double>);
 
 /*****************************************************************************************/
@@ -50,6 +50,13 @@ std::vector<double> Histogram::getHeightsOfBins(bool includeZeroBins) const
         heights.push_back(bin.second);
     }
     return heights;
+}
+
+double Histogram::getHeightOfSpecificBin(int whichbin) const
+{
+    std::map<int, double> copyOfHisto(histogram);
+    double height=copyOfHisto[whichbin];
+    return height;
 }
 
 double Histogram::getMaxXvalue() const
@@ -143,10 +150,10 @@ void Histogram::normalize()
 }
 
 
-
-//In the following the constructor and memberfunctions of the class HistogramEstimators is defined
-
-HistogramEstimator::HistogramEstimator(double binsizeIn, double anchorIn) : anchor(anchorIn), binsize(binsizeIn)
+/***********************************************
+ *Histogram Estimator class members get defined*
+ ***********************************************/
+HistogramEstimator::HistogramEstimator(double binsizeIn) : binsize(binsizeIn)
 {
     if(binsize<=0)
     {
@@ -192,7 +199,113 @@ void HistogramEstimator::insert(int whichbin, std::vector<double> heights)
         histogramEstimators.insert(std::pair<int,double> (whichbin,heights[i]));
 }
 
-/********************************************************************************************************************************************************/
+
+/****************************************************
+ *Probability Distribution class members get defined*
+ ****************************************************/
+ProbabilityDistribution::ProbabilityDistribution(double binsizeIn, double anchorIn) : anchor(anchorIn), binsize(binsizeIn)
+{
+    if(binsize<=0)
+    {
+        throw std::logic_error("Probability Distribution can't be created with negative or zero binsize.");
+    }
+}
+
+int ProbabilityDistribution::getNumberOfBins(bool includeZeroBins)
+{
+    if(probabilityDistribution.empty())
+        return 0;
+    else
+        return includeZeroBins ? static_cast<int>((getMaxXvalue()-getMinXvalue())/binsize) : probabilityDistribution.size();
+}
+
+double ProbabilityDistribution::getBinsize()
+{
+    return binsize;
+}
+
+std::vector<EstimateAndError> ProbabilityDistribution::getHeightsOfBins(bool includeZeroBins) const
+{
+    std::map<int, EstimateAndError> copyOfProbabilityDistribution(probabilityDistribution);
+    if(includeZeroBins){
+        copyOfProbabilityDistribution = insertBinsWithZeroEstimateAndError(probabilityDistribution);
+    }
+
+    std::vector<EstimateAndError> heights;
+    for(std::pair<const int, EstimateAndError> bin : copyOfProbabilityDistribution)
+    {
+        heights.push_back(bin.second);
+    }
+    return heights;
+}
+
+EstimateAndError ProbabilityDistribution::getHeightOfSpecificBin(int whichbin) const
+{
+    std::map<int, EstimateAndError> copyOfProbabilityDistribution(probabilityDistribution);
+    EstimateAndError height=copyOfProbabilityDistribution[whichbin];
+    return height;
+}
+
+double ProbabilityDistribution::getMaxXvalue() const
+{
+    std::map<int, EstimateAndError>::const_reverse_iterator it = probabilityDistribution.rbegin();
+    return (it->first+0.5)*binsize + anchor;
+}
+
+double ProbabilityDistribution::getMinXvalue() const
+{
+    std::map<int, EstimateAndError>::const_iterator it = probabilityDistribution.begin();
+    return (it->first-0.5)*binsize + anchor;
+}
+
+
+std::vector<std::pair<double,double> > ProbabilityDistribution::getBins(bool includeZeroBins) const
+{
+    std::map<int, EstimateAndError> copyOfProbabilityDistribution(probabilityDistribution);
+    if(includeZeroBins)
+    {
+        copyOfProbabilityDistribution=insertBinsWithZeroEstimateAndError(probabilityDistribution);
+    }
+
+    std::vector<std::pair<double,double> > bins;
+    for(std::pair<const int, EstimateAndError> bin : copyOfProbabilityDistribution)
+    {
+        bins.push_back(std::pair<double, double>((bin.first - 0.5)*binsize+anchor,(bin.first + 0.5)*binsize+anchor));
+    }
+    return bins;
+} 
+
+std::string ProbabilityDistribution::getHeightAsString(int index)
+	{
+		std::stringstream values;
+		values.precision(12);
+		values << std::scientific;
+		values << probabilityDistribution[index].estimate << "\t" << probabilityDistribution[index].error<< "\t" ;
+		return values.str();
+	}
+
+
+/* 
+ * The following operator allows us to fill the histogram by writing
+ * 'histo[obsvalue]+=term'. What happens there is that the operator looks for
+ * the bin where the value of 'obsvalue' is in. 
+ * The height of that bin is then increased by 'term'.
+ */
+
+EstimateAndError& ProbabilityDistribution::operator[](double obsvalue)
+{
+    /*
+     * To understand which bin the obs is in, we subtract half binsize (because
+     * by definition the anchor is in the middle of the bin) then we subract
+     * the anchor and we finally divide by binsize (taking the integer after the
+     * result):
+     *              ceil(obsvalue-0.5*binsize-anchor)/binsize
+     */
+    int whichbin=ceil((obsvalue-anchor)/binsize-0.5);
+    return probabilityDistribution[whichbin]; 
+}
+
+/*****************************************STATIC FUNCTIONS*********************************************************************************************/
 
 static std::map<int,double> insertBinsWithZeroHeight(const std::map<int,double>& histoWithoutZeroBins)
 {
@@ -202,6 +315,16 @@ static std::map<int,double> insertBinsWithZeroHeight(const std::map<int,double>&
         filledHistogram[i]; //I just want to fill with zero not existing bins and I use the map's access-operator feature of adding not existing elements
     }
     return filledHistogram;
+}
+
+static std::map<int,EstimateAndError> insertBinsWithZeroEstimateAndError(const std::map<int,EstimateAndError>& probDistributionWithoutZeroBins)
+{
+    std::map<int,EstimateAndError> filledProbDistribution(probDistributionWithoutZeroBins);
+    for(int i=filledProbDistribution.begin()->first; i<=filledProbDistribution.rbegin()->first; i++)
+    {
+        filledProbDistribution[i]; 
+    }
+    return filledProbDistribution;
 }
 
 static std::multimap<int,double> includeBinsWithZeroHeightInMultiMap(std::multimap<int,double> histoWithoutZeroBins){

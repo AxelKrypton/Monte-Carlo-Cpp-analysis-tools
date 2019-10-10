@@ -1,5 +1,8 @@
 #ifndef HISTOGRAM_HPP_
 #define HISTOGRAM_HPP_
+#include "../dataAnalysisUtilities/EstimateAndError.hpp"
+#include "../dataAnalysisUtilities/DataSample.hpp"
+#include "../types.hpp"
 #include<vector>
 #include<math.h>
 #include<map>
@@ -22,6 +25,7 @@ public:
     int getNumberOfBins(bool = false);
     double getBinsize();
     std::vector<double> getHeightsOfBins(bool = false) const;
+    double getHeightOfSpecificBin(int) const;
     double getMaxXvalue() const;
     double getMinXvalue() const;
     std::vector<std::pair<double,double> > getBins(bool = false) const;
@@ -43,16 +47,37 @@ class HistogramEstimator
 {
 public:
     HistogramEstimator() = delete;
-    HistogramEstimator(double, double = 0.0);
+    HistogramEstimator(double);
     std::vector<std::vector<double> > getMultipleHeightsOfBins(bool = false) const;
 
     void insert(int, std::vector<double>);
-    //double& operator[](double);
+
+private:
+    double binsize;
+    std::multimap<int,double> histogramEstimators;
+};
+
+class ProbabilityDistribution
+{
+public:
+    ProbabilityDistribution() = delete;
+    ProbabilityDistribution(double, double = 0.0);
+    //Getters
+    int getNumberOfBins(bool = false);
+    double getBinsize();
+    std::vector<EstimateAndError> getHeightsOfBins(bool = false) const;
+    EstimateAndError getHeightOfSpecificBin(int) const;
+    double getMaxXvalue() const;
+    double getMinXvalue() const;
+    std::vector<std::pair<double,double> > getBins(bool = false) const;
+    std::string getHeightAsString(int);
+
+    EstimateAndError& operator[](double);
 
 private:
     double anchor;
     double binsize;
-    std::multimap<int,double> histogramEstimators;
+    std::map<int,EstimateAndError> probabilityDistribution;
 };
 
 #endif /* HISTOGRAM_HPP_ */

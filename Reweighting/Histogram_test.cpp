@@ -82,6 +82,32 @@ BOOST_AUTO_TEST_SUITE(getters)
             BOOST_REQUIRE_CLOSE(heightsWithZeroBins[i], manualHeightsWithZeroBins[i], realFloatPrecisionInPercent);
     }
 
+    BOOST_AUTO_TEST_CASE(getHeightOfSpecificBin1)
+    {
+        const double binsize=2.0;
+        double manualHeight, height;
+        Histogram hist(binsize);
+        hist[0.3]=1.0;
+        hist[1.3]=3.0;
+        hist[6.3]=4.0;
+        height=hist.getHeightOfSpecificBin(1);
+        manualHeight=3.0;
+        BOOST_REQUIRE_CLOSE(height, manualHeight, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(getHeightOfSpecificBin2)
+    {
+        const double binsize=2.0;
+        double manualHeight, height;
+        Histogram hist(binsize);
+        hist[0.3]=1.0;
+        hist[1.3]=3.0;
+        hist[6.3]=4.0;
+        height=hist.getHeightOfSpecificBin(2);
+        manualHeight=0.0;
+        BOOST_REQUIRE_CLOSE(height, manualHeight, realFloatPrecisionInPercent);
+    }
+
     BOOST_AUTO_TEST_CASE(getMaxXvalue1)
         {
             const double binsize=2.0;
@@ -428,6 +454,272 @@ BOOST_AUTO_TEST_SUITE(gettersEstimator)
             for(unsigned int j=0; j<heights[i].size(); j++)
                 BOOST_REQUIRE_CLOSE(heights[i][j], manualHeightsWithZeroBins[i][j], realFloatPrecisionInPercent);
         }
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+/******************************************************
+**********Tests For Probability Distribution***********
+*******************************************************/
+
+BOOST_AUTO_TEST_SUITE(buildProbDist)
+
+    BOOST_AUTO_TEST_CASE(buildProbDist1)
+    {
+        BOOST_REQUIRE_NO_THROW(ProbabilityDistribution probDist{1.5});
+    }
+
+    BOOST_AUTO_TEST_CASE(buildProbDist)
+    {
+        double wrongbinsize=0.0;
+        BOOST_REQUIRE_THROW(ProbabilityDistribution probDist(wrongbinsize), std::logic_error);
+        wrongbinsize=-2.6;
+        BOOST_REQUIRE_THROW(ProbabilityDistribution probDist(wrongbinsize), std::logic_error);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
+
+    BOOST_AUTO_TEST_CASE(getNumberOfBinsProbDist1)
+    {
+        const double binsize=2.0;
+        bool dontIncludeZeroBins=false;
+        bool includeZeroBins=true;
+        ProbabilityDistribution probDist(binsize);
+        BOOST_REQUIRE_EQUAL(probDist.getNumberOfBins(dontIncludeZeroBins), 0);
+        BOOST_REQUIRE_EQUAL(probDist.getNumberOfBins(includeZeroBins), 0);
+    }
+
+    BOOST_AUTO_TEST_CASE(getNumberOfBinsProbDist2)
+    {
+        const double binsize=2.0;
+        bool dontIncludeZeroBins=false;
+        bool includeZeroBins=true;
+        ProbabilityDistribution probDist(binsize);
+        probDist[0.3]=EstimateAndError(1.0, 0.1);
+        probDist[1.3]=EstimateAndError(1.0, 0.1);
+        probDist[6.3]=EstimateAndError(1.0, 0.1);
+        BOOST_REQUIRE_EQUAL(probDist.getNumberOfBins(dontIncludeZeroBins), 3);
+        BOOST_REQUIRE_EQUAL(probDist.getNumberOfBins(includeZeroBins), 4);
+    }
+
+    BOOST_AUTO_TEST_CASE(getBinsizeProbDist)
+    {
+        const double binsize=2.0;
+        ProbabilityDistribution probDist(binsize);
+        BOOST_REQUIRE_CLOSE(probDist.getBinsize(), 2.0, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(getHeightsOfBinsProbDist)
+    {
+        const double binsize=2.0;
+        std::vector<EstimateAndError> manualHeights, heights;
+        std::vector<EstimateAndError> manualHeightsWithZeroBins, heightsWithZeroBins;
+        bool includeZeroBins=true;
+        ProbabilityDistribution probDist(binsize);
+        probDist[0.3]=EstimateAndError(1.0, 0.1);
+        probDist[1.3]=EstimateAndError(3.0, 0.1);
+        probDist[6.3]=EstimateAndError(4.0, 0.1);
+        heights=probDist.getHeightsOfBins();
+        heightsWithZeroBins=probDist.getHeightsOfBins(includeZeroBins);
+        manualHeights.push_back(EstimateAndError(1.0, 0.1));
+        manualHeights.push_back(EstimateAndError(3.0, 0.1));
+        manualHeights.push_back(EstimateAndError(4.0, 0.1));
+        BOOST_REQUIRE_EQUAL(heights.size(), manualHeights.size());
+        for(unsigned int i=0; i<heights.size(); i++){
+            BOOST_REQUIRE_CLOSE(heights[i].estimate, manualHeights[i].estimate, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(heights[i].error, manualHeights[i].error, realFloatPrecisionInPercent);
+        }
+        manualHeightsWithZeroBins.push_back(EstimateAndError(1.0, 0.1));
+        manualHeightsWithZeroBins.push_back(EstimateAndError(3.0, 0.1));
+        manualHeightsWithZeroBins.push_back(EstimateAndError(0.0, 0.0));
+        manualHeightsWithZeroBins.push_back(EstimateAndError(4.0, 0.1));
+        BOOST_REQUIRE_EQUAL(heightsWithZeroBins.size(), manualHeightsWithZeroBins.size());
+        for(unsigned int i=0; i<heightsWithZeroBins.size(); i++){
+            BOOST_REQUIRE_CLOSE(heightsWithZeroBins[i].estimate, manualHeightsWithZeroBins[i].estimate, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(heightsWithZeroBins[i].error, manualHeightsWithZeroBins[i].error, realFloatPrecisionInPercent);
+        }
+    }
+
+    BOOST_AUTO_TEST_CASE(getHeightOfSpecificBinProbDist1)
+    {
+        const double binsize=2.0;
+        EstimateAndError estAndErr, height;
+        ProbabilityDistribution probDist(binsize);
+        probDist[0.3]=EstimateAndError(2.2, 0.1);
+        probDist[1.3]=EstimateAndError(1.2, 0.1);
+        probDist[6.3]=EstimateAndError(4.2, 0.1);
+        height=probDist.getHeightOfSpecificBin(0);
+        estAndErr=EstimateAndError(2.2, 0.1);
+        BOOST_REQUIRE_CLOSE(height.estimate, estAndErr.estimate, realFloatPrecisionInPercent);
+        BOOST_REQUIRE_CLOSE(height.error, estAndErr.error, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(getHeightOfSpecificBinProbDist2)
+    {
+        const double binsize=2.0;
+        EstimateAndError estAndErr, height;
+        ProbabilityDistribution probDist(binsize);
+        probDist[0.3]=EstimateAndError(2.2, 0.1);
+        probDist[1.3]=EstimateAndError(1.2, 0.1);
+        probDist[6.3]=EstimateAndError(4.2, 0.1);
+        height=probDist.getHeightOfSpecificBin(2);
+        estAndErr=EstimateAndError(0.0, 0.0);
+        BOOST_REQUIRE_CLOSE(height.estimate, estAndErr.estimate, realFloatPrecisionInPercent);
+        BOOST_REQUIRE_CLOSE(height.error, estAndErr.error, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(getMaxXvalueProbDist1)
+        {
+            const double binsize=2.0;
+            double upperedge;
+            ProbabilityDistribution probDist(binsize);
+            probDist[0.3]=EstimateAndError(1.0,0.1);
+            upperedge=1.0;
+            BOOST_REQUIRE_CLOSE(probDist.getMaxXvalue(), upperedge, realFloatPrecisionInPercent);
+        }
+
+    BOOST_AUTO_TEST_CASE(getMaxXvalueProbDist2)
+        {
+            const double binsize=2.0;
+            const double anchor=-3.5;
+            const double upperedge=1.5;
+            ProbabilityDistribution probDist(binsize, anchor);
+            probDist[0.3]=EstimateAndError(1.0,0.1);
+            BOOST_REQUIRE_CLOSE(probDist.getMaxXvalue(), upperedge, realFloatPrecisionInPercent);
+        }
+
+    BOOST_AUTO_TEST_CASE(getMinXvalueProbDist1)
+    {
+        const double binsize=2.0;
+        double loweredge;
+        ProbabilityDistribution probDist(binsize);
+        probDist[0.3]=EstimateAndError(1.0,0.1);
+        loweredge=-1;
+        BOOST_REQUIRE_EQUAL(probDist.getMinXvalue(), loweredge);
+    }
+
+    BOOST_AUTO_TEST_CASE(getMinXvalueProbDist2)
+    {
+        const double binsize=2.0;
+        const double anchor=13.5;
+        const double loweredge=-1.5;
+        ProbabilityDistribution probDist(binsize, anchor);
+        probDist[0.3]=EstimateAndError(1.0,0.1);
+        BOOST_REQUIRE_EQUAL(probDist.getMinXvalue(), loweredge);
+    }
+
+    BOOST_AUTO_TEST_CASE(getBinsProbDist1)
+    {
+        const double binsize=2.0;
+        std::vector<std::pair<double, double> > bins, manualBins;
+        std::vector<std::pair<double, double> > binsWithZeroBins, manualBinsWithZeroBins;
+        bool includeZeroBins=true;
+        ProbabilityDistribution probDist(binsize);
+        probDist[0.3]=EstimateAndError(1.0,0.1);
+        probDist[1.3]=EstimateAndError(3.0,0.1);
+        probDist[6.3]=EstimateAndError(4.0,0.1);
+        bins=probDist.getBins();
+        binsWithZeroBins=probDist.getBins(includeZeroBins);
+        manualBins.push_back(std::pair<double,double> (-1.0,1.0));
+        manualBins.push_back(std::pair<double,double> ( 1.0,3.0));
+        manualBins.push_back(std::pair<double,double> ( 5.0,7.0));
+        BOOST_REQUIRE_EQUAL(bins.size(), manualBins.size());
+        for(unsigned int i=0; i<bins.size(); i++){
+            BOOST_REQUIRE_CLOSE(bins[i].first, manualBins[i].first, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(bins[i].second, manualBins[i].second, realFloatPrecisionInPercent);
+        }
+
+        manualBinsWithZeroBins.push_back(std::pair<double,double> (-1.0,1.0));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 1.0,3.0));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 3.0,5.0));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 5.0,7.0));
+        BOOST_REQUIRE_EQUAL(binsWithZeroBins.size(), manualBinsWithZeroBins.size());
+        for(unsigned int i=0; i<binsWithZeroBins.size(); i++){
+            BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].first, manualBinsWithZeroBins[i].first, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].second, manualBinsWithZeroBins[i].second, realFloatPrecisionInPercent);
+        }
+    }
+
+    BOOST_AUTO_TEST_CASE(getBinsProbDist2)
+    {
+        const double binsize=2.0, anchor=5.5;
+        std::vector<std::pair<double, double> > bins, manualBins;
+        std::vector<std::pair<double, double> > binsWithZeroBins, manualBinsWithZeroBins;
+        bool includeZeroBins=true;
+        ProbabilityDistribution probDist(binsize, anchor);
+        probDist[0.3]=EstimateAndError(1.0,0.1);
+        probDist[1.3]=EstimateAndError(3.0,0.1);
+        probDist[6.3]=EstimateAndError(4.0,0.1);
+        bins=probDist.getBins();
+        binsWithZeroBins=probDist.getBins(includeZeroBins);
+        manualBins.push_back(std::pair<double,double> (-1.5,0.5));
+        manualBins.push_back(std::pair<double,double> ( 0.5,2.5));
+        manualBins.push_back(std::pair<double,double> ( 4.5,6.5));
+        BOOST_REQUIRE_EQUAL(bins.size(), manualBins.size());
+        for(unsigned int i=0; i<bins.size(); i++){
+            BOOST_REQUIRE_CLOSE(bins[i].first, manualBins[i].first, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(bins[i].second, manualBins[i].second, realFloatPrecisionInPercent);
+        }
+
+        manualBinsWithZeroBins.push_back(std::pair<double,double> (-1.5,0.5));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 0.5,2.5));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 2.5,4.5));
+        manualBinsWithZeroBins.push_back(std::pair<double,double> ( 4.5,6.5));
+        BOOST_REQUIRE_EQUAL(binsWithZeroBins.size(), manualBinsWithZeroBins.size());
+        for(unsigned int i=0; i<binsWithZeroBins.size(); i++){
+            BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].first, manualBinsWithZeroBins[i].first, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].second, manualBinsWithZeroBins[i].second, realFloatPrecisionInPercent);
+        }
+    }
+
+    BOOST_AUTO_TEST_CASE(getHeightAsString)
+    {
+        const double binsize=2.0;
+        ProbabilityDistribution probDist(binsize);
+        probDist[0.3]=EstimateAndError(1.0,0.1);
+        probDist[1.3]=EstimateAndError(3.0,0.1);
+        probDist[6.3]=EstimateAndError(4.0,0.1);
+        std::string print=probDist.getHeightAsString(0), manualPrint;
+        manualPrint="1.000000000000e+00\t1.000000000000e-01\t";
+        BOOST_REQUIRE_EQUAL(print, manualPrint);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(OperatorProbDist)
+
+    BOOST_AUTO_TEST_CASE(AccessOperatorProbDist1)
+    {
+        const double binsize=2.0, anchor=1.23;
+        ProbabilityDistribution probDist(binsize);
+        double arbitraryDouble=4.3;
+        BOOST_REQUIRE_NO_THROW(probDist[arbitraryDouble]);
+        ProbabilityDistribution probDist2(binsize, anchor);
+        BOOST_REQUIRE_NO_THROW(probDist2[arbitraryDouble]);
+    }
+
+    BOOST_AUTO_TEST_CASE(AccessOperatorProbDist2)
+    {
+        const double binsize=2.0;
+        ProbabilityDistribution probDist(binsize);
+        double arbitraryDouble=4.3;
+        EstimateAndError estAndErr=EstimateAndError(2.0, 0.2);
+        probDist[arbitraryDouble]=estAndErr;
+        BOOST_REQUIRE_CLOSE(probDist[arbitraryDouble].estimate, estAndErr.estimate, realFloatPrecisionInPercent);
+        BOOST_REQUIRE_CLOSE(probDist[arbitraryDouble].error, estAndErr.error, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(AccessOperatorProbDist3)
+    {
+        const double binsize=1.0, anchor=-5.5;
+        ProbabilityDistribution probDist(binsize, anchor);
+        double arbitraryDouble=4.3;
+        EstimateAndError estAndErr=EstimateAndError(2.0, 0.2);
+        probDist[arbitraryDouble]=estAndErr;
+        BOOST_REQUIRE_CLOSE(probDist[arbitraryDouble].estimate, estAndErr.estimate, realFloatPrecisionInPercent);
+        BOOST_REQUIRE_CLOSE(probDist[arbitraryDouble].error, estAndErr.error, realFloatPrecisionInPercent);
     }
 
 BOOST_AUTO_TEST_SUITE_END()
