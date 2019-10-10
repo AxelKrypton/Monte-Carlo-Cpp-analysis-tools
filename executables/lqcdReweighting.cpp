@@ -19,6 +19,8 @@ int main(int argc, const char ** argv)
 	        std::vector<std::vector<std::map<std::string,DataSample> > > reweightedObservablesEstimators = reweighter.getReweightedObservablesEstimators();
 	        writeLqcdReweightedObservablesEstimatorsToFile(newBetaValues, reweightedObservablesEstimators, parameters.getOutputfilePrefix());
 	    }
+		std::vector<std::vector<ProbabilityDistribution> > reweightedProbabilityDistributions = reweighter.getReweightedProbabilityDistributions();
+		writeLqcdReweightedProbabilityDistributionsToFile(newBetaValues, reweightedProbabilityDistributions, parameters.getOutputfilePrefix());
 	    std::cout << std::endl;
 	}
 	//todo: move catch block into own function?
