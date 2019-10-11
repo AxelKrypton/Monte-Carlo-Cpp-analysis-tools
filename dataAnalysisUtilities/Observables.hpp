@@ -12,6 +12,7 @@
 class Parameters;
 
 enum ErrorCalculationMethod { bootstrap = 1, jackknife };
+realFloat evaluateErrorBasedOnMethod(DataSample, ErrorCalculationMethod);
 
 /*
  * NOTE: In order to handle the possibility to have several estimates per moment in the Moment class

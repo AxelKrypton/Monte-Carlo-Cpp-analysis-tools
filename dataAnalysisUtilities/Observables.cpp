@@ -3,10 +3,20 @@
 #include "jackknifeAnalysis.hpp"
 #include "bootstrapAnalysis.hpp"
 
+/*****************************************************************************************/
+realFloat evaluateErrorBasedOnMethod(DataSample dataSample, ErrorCalculationMethod errorMethod){
+    if(errorMethod == jackknife)
+        return calculateJacknifeError(dataSample);
+    else if (errorMethod == bootstrap)
+        return calculateBootstrapError(dataSample);
+    else
+        throw std::logic_error("Unknown error method in \"evaluateErrorBasedOnMethod\"! Aborting...");
+}
+/*****************************************************************************************/
+
 static std::vector<DataSample> getMomentsPerDataPoint(DataSample&, std::initializer_list<unsigned int>, bool);
 static Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters&, std::string);
 static void printBinningInformation(const Parameters&, std::string);
-static realFloat evaluateErrorBasedOnMethod(DataSample, ErrorCalculationMethod);
 template<typename T> static T getPowerOfFirstMomentUsingSeveralEstimate(const std::vector<T>&, const int);
 //Use here an anonymous namespace because I am not sure about use of static keyword in template specialization
 namespace {
@@ -417,15 +427,6 @@ static std::vector<DataSample> getMomentsPerDataPoint(DataSample& sampleIn, std:
 	for(auto i: whichMoments)
 		returnVec.push_back(isMeanZero ? sampleIn.getNthMomentPerDataPoint(i) : sampleIn.getNthCentralMomentPerDataPoint(i));
 	return returnVec;
-}
-
-static realFloat evaluateErrorBasedOnMethod(DataSample dataSample, ErrorCalculationMethod errorMethod){
-	if(errorMethod == jackknife)
-		return calculateJacknifeError(dataSample);
-	else if (errorMethod == bootstrap)
-		return calculateBootstrapError(dataSample);
-	else
-		throw std::logic_error("Unknown error method in \"evaluateErrorBasedOnMethod\"! Aborting...");
 }
 
 static Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable){
