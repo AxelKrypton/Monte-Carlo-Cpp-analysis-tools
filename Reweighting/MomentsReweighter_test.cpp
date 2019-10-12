@@ -97,7 +97,13 @@ public:
     std::vector<std::vector<HistogramEstimator> > testGetReweightedProbabilityDistributionEstimators(){
         return getReweightedProbabilityDistributionEstimators();
     }
+
+    void testExtractAndSetReweightedHistogramEstimators(const std::valarray<std::vector<std::vector<Histogram> > >& histogramEstimatorsForErrorCalculation){
+        return extractAndSetReweightedHistogramEstimators(histogramEstimatorsForErrorCalculation);
+    }
     
+//The following two print functions are only temporarily for testing reasons.
+
     void testPrintProbabilityDistribution(std::vector<std::vector<Histogram> > distributions){
         for(unsigned int indexNewPoint=0; indexNewPoint<distributions.size(); indexNewPoint++){
             std::cout << "IndexNewPoint: " << indexNewPoint << " (" << distributions.size() << " new points)" << std::endl;
@@ -684,7 +690,7 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)
             }
         }
     }
-
+    /*
     BOOST_AUTO_TEST_CASE(probabilityDistributionReweighting3)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_1";
@@ -696,6 +702,11 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)
         std::vector<std::vector<HistogramEstimator> > reweightedProbabilityDistributionEstimator=reweighter.testGetReweightedProbabilityDistributionEstimators();
         reweighter.testPrintProbabilityDistributionEstimator(reweightedProbabilityDistributionEstimator, reweightedProbabilityDistribution);
     }
+    
+    BOOST_AUTO_TEST_CASE(probabilityDistributionReweighting4)
+    {
+        const std::valarray<std::vector<std::vector<Histogram> > >& histogramEstimatorsForErrorCalculation
+    }*/
 
 BOOST_AUTO_TEST_SUITE_END()
 

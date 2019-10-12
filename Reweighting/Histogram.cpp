@@ -1,5 +1,6 @@
 #include "Histogram.hpp"
 #include<cmath>
+#include<valarray>
 #include<tgmath.h>
 #include<iostream>
 
@@ -37,6 +38,11 @@ double Histogram::getBinsize()
     return binsize;
 }
 
+double Histogram::getAnchor()
+{
+    return anchor;
+}
+
 std::vector<double> Histogram::getHeightsOfBins(bool includeZeroBins) const
 {
     std::map<int, double> copyOfHisto(histogram);
@@ -52,8 +58,9 @@ std::vector<double> Histogram::getHeightsOfBins(bool includeZeroBins) const
     return heights;
 }
 
-double Histogram::getHeightOfSpecificBin(int whichbin) const
+double Histogram::getHeightOfSpecificBin(double middleOfBin) const
 {
+    int whichbin=static_cast<int>(middleOfBin/binsize);
     std::map<int, double> copyOfHisto(histogram);
     double height=copyOfHisto[whichbin];
     return height;
@@ -86,6 +93,22 @@ std::vector<std::pair<double,double> > Histogram::getBins(bool includeZeroBins) 
         bins.push_back(std::pair<double, double>((bin.first - 0.5)*binsize+anchor,(bin.first + 0.5)*binsize+anchor));
     }
     return bins;
+} 
+
+std::vector<double> Histogram::getMiddleOfBins(bool includeZeroBins) const
+{
+    std::map<int, double> copyOfHisto(histogram);
+    if(includeZeroBins)
+    {
+        copyOfHisto=insertBinsWithZeroHeight(histogram);
+    }
+
+    std::vector<double> middleOfBins;
+    for(std::pair<const int, double> bin : copyOfHisto)
+    {
+        middleOfBins.push_back(bin.first*binsize+anchor);
+    }
+    return middleOfBins;
 } 
 
 
@@ -193,22 +216,36 @@ std::vector<std::vector<double> > HistogramEstimator::getMultipleHeightsOfBins(b
     return multipleHeightsOfBins;
 }
 
-void HistogramEstimator::insert(int whichbin, std::vector<double> heights)
+void HistogramEstimator::insert(double middleOfBin, std::vector<double> heights)
 {
+    if(heights.empty())
+        throw std::logic_error("Estimator can't be filled with an empty vector of heights!");
+    int whichbin=static_cast<int>(middleOfBin/binsize);
     for(size_t i=0; i<heights.size(); i++)
         histogramEstimators.insert(std::pair<int,double> (whichbin,heights[i]));
 }
 
 
-/****************************************************
- *Probability Distribution class members get defined*
- ****************************************************/
-ProbabilityDistribution::ProbabilityDistribution(double binsizeIn, double anchorIn) : anchor(anchorIn), binsize(binsizeIn)
+/******************************************************
+ **Probability Distribution class members get defined**
+ ******************************************************/
+ProbabilityDistribution::ProbabilityDistribution() : anchor(NAN), binsize(NAN) {}
+
+ProbabilityDistribution::ProbabilityDistribution(Histogram reweightedHistogram, HistogramEstimator reweightedHistogramEstimator,
+                                                 ErrorCalculationMethod errorMethod)
 {
-    if(binsize<=0)
-    {
-        throw std::logic_error("Probability Distribution can't be created with negative or zero binsize.");
-    }
+    binsize=reweightedHistogram.getBinsize();
+    anchor=reweightedHistogram.getAnchor();
+	for(int indexHistoBin=0; indexHistoBin<reweightedHistogram.getNumberOfBins(); indexHistoBin++){
+		int whichbin=static_cast<int>(reweightedHistogram.getBins().at(indexHistoBin).first/binsize + 0.5);
+		std::vector<double> tmpHeightsOfOneBin=reweightedHistogramEstimator.getMultipleHeightsOfBins().at(indexHistoBin);
+		std::valarray<double> heightsOfOneBin(tmpHeightsOfOneBin.data(),tmpHeightsOfOneBin.size());
+        DataSample heightDataOfOneBin(heightsOfOneBin);
+        realFloat estimate=0.0, error=0.0;
+		estimate=reweightedHistogram.getHeightsOfBins().at(indexHistoBin);
+		error=evaluateErrorBasedOnMethod(heightDataOfOneBin, errorMethod);
+	    probabilityDistribution[whichbin]=EstimateAndError(estimate, error);
+	}
 }
 
 int ProbabilityDistribution::getNumberOfBins(bool includeZeroBins)
@@ -239,8 +276,9 @@ std::vector<EstimateAndError> ProbabilityDistribution::getHeightsOfBins(bool inc
     return heights;
 }
 
-EstimateAndError ProbabilityDistribution::getHeightOfSpecificBin(int whichbin) const
+EstimateAndError ProbabilityDistribution::getHeightOfSpecificBin(double middleOfBin) const
 {
+    int whichbin=static_cast<int>(middleOfBin/binsize);
     std::map<int, EstimateAndError> copyOfProbabilityDistribution(probabilityDistribution);
     EstimateAndError height=copyOfProbabilityDistribution[whichbin];
     return height;

@@ -740,18 +740,17 @@ void MomentsReweighterAbstract::extractAndSetReweightedHistogramEstimators(const
     const size_t numberOfNewPoints=valuesOfNewParameters.size();
     const size_t numberOfObservablesGivenAsInput=momentsReweighterHelper.numberOfObservablesGivenAsInput;
     size_t numberOfHeightsPerBins=histogramEstimatorsForErrorCalculation.size();
-    double binsize=momentsReweighterHelper.probabilityDistributionBinsize;
     for(size_t indexNewPoint=0; indexNewPoint<numberOfNewPoints; indexNewPoint++){
         for(size_t indexInputObservable=0; indexInputObservable<numberOfObservablesGivenAsInput; indexInputObservable++){  
             size_t numberOfHistoBins=probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getNumberOfBins();  
             for(size_t indexHistoBin=0; indexHistoBin<numberOfHistoBins; indexHistoBin++){  
-                int whichbin=static_cast<int>(probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getBins().at(indexHistoBin).first/binsize + 0.5);
+                double middleOfBin=probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getMiddleOfBins().at(indexHistoBin);
                 std::vector<double> heightsOfOneBin;
                 for(size_t indexEstimator=0; indexEstimator<numberOfHeightsPerBins; indexEstimator++){
-                    double height=histogramEstimatorsForErrorCalculation[indexEstimator][indexNewPoint][indexInputObservable].getHeightOfSpecificBin(whichbin);
+                    double height=histogramEstimatorsForErrorCalculation[indexEstimator][indexNewPoint][indexInputObservable].getHeightOfSpecificBin(middleOfBin);
                     heightsOfOneBin.push_back(height);
                 }
-                probabilityDistributionEstimatorsAtNewBetas[indexNewPoint][indexInputObservable].insert(whichbin,heightsOfOneBin);
+                probabilityDistributionEstimatorsAtNewBetas[indexNewPoint][indexInputObservable].insert(middleOfBin,heightsOfOneBin);
             }
         }
     }

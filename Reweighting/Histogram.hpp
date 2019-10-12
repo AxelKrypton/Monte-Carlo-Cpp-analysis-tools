@@ -2,6 +2,7 @@
 #define HISTOGRAM_HPP_
 #include "../dataAnalysisUtilities/EstimateAndError.hpp"
 #include "../dataAnalysisUtilities/DataSample.hpp"
+#include "../dataAnalysisUtilities/Observables.hpp"
 #include "../types.hpp"
 #include<vector>
 #include<math.h>
@@ -13,6 +14,7 @@
  * map<int,double> and works as a container that stores
  * the bin-number as the first and the height as the second entry.
  * The zero-th bin is that having the anchor as middle point.
+ * The lower edge of a bin is part of that bin while the upper edge is part of the next bin.
  * The map gets a new entry when it gets filled.
  */
 
@@ -24,11 +26,13 @@ public:
     //Getters
     int getNumberOfBins(bool = false);
     double getBinsize();
+    double getAnchor();
     std::vector<double> getHeightsOfBins(bool = false) const;
-    double getHeightOfSpecificBin(int) const;
+    double getHeightOfSpecificBin(double) const;
     double getMaxXvalue() const;
     double getMinXvalue() const;
     std::vector<std::pair<double,double> > getBins(bool = false) const;
+    std::vector<double> getMiddleOfBins(bool = false) const;
     
     double& operator[](double);
     std::map<int,double>& operator-=(double);
@@ -50,7 +54,7 @@ public:
     HistogramEstimator(double);
     std::vector<std::vector<double> > getMultipleHeightsOfBins(bool = false) const;
 
-    void insert(int, std::vector<double>);
+    void insert(double, std::vector<double>);
 
 private:
     double binsize;
@@ -60,13 +64,13 @@ private:
 class ProbabilityDistribution
 {
 public:
-    ProbabilityDistribution() = delete;
-    ProbabilityDistribution(double, double = 0.0);
+    ProbabilityDistribution();
+    ProbabilityDistribution(Histogram, HistogramEstimator, ErrorCalculationMethod);
     //Getters
     int getNumberOfBins(bool = false);
     double getBinsize();
     std::vector<EstimateAndError> getHeightsOfBins(bool = false) const;
-    EstimateAndError getHeightOfSpecificBin(int) const;
+    EstimateAndError getHeightOfSpecificBin(double) const;
     double getMaxXvalue() const;
     double getMinXvalue() const;
     std::vector<std::pair<double,double> > getBins(bool = false) const;

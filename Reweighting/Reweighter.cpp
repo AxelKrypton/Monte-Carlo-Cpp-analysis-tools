@@ -12,8 +12,8 @@ static void checkSizesOfMomentsAndMomentsEstimators(std::vector<std::vector<Mome
 static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<std::vector<Observables> >&, bool, ErrorCalculationMethod, std::vector<std::vector<Moments> >,
 																	std::vector<std::vector<MomentsEstimators> >, std::vector<std::string>, const std::vector<unsigned int>&,
 																	const unsigned int, const unsigned int);
-static void checkSizesOfHistogramsAndHistogramEstimators(std::vector<std::vector<Histogram> >, std::vector<std::vector<HistogramEstimator> >);
-static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(std::vector<std::vector<ProbabilityDistribution> >, bool, ErrorCalculationMethod,
+static void checkSizesOfHistogramsAndHistogramEstimators(std::vector<std::vector<Histogram> >, std::vector<std::vector<HistogramEstimator> >, size_t, size_t);
+static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(std::vector<std::vector<ProbabilityDistribution> >, ErrorCalculationMethod,
 																					 std::vector<std::vector<Histogram> >, std::vector<std::vector<HistogramEstimator> >);																	
 static void setObservablesEstimatorsAtNewPointsFromMomentsEstimators(std::vector<std::vector<std::map<std::string,DataSample> > >&, bool,
                                                                      std::vector<std::vector<MomentsEstimators> >, std::vector<std::string>, const std::vector<unsigned int>&,
@@ -67,7 +67,7 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 		    observablesEstimatorsAtNewPoints = std::unique_ptr<std::vector<std::vector<std::map<std::string,DataSample>>>>(new std::vector<std::vector<std::map<std::string,DataSample>>>(numberOfNewPoints, std::vector<std::map<std::string,DataSample>>(numberOfObservablesInFiles, std::map<std::string,DataSample>())));
 		else
 		    observablesEstimatorsAtNewPoints = nullptr;
-
+		probabilityDistributionsAtNewPoints = std::vector<std::vector<ProbabilityDistribution> >(numberOfNewPoints, std::vector<ProbabilityDistribution>(numberOfObservablesInFiles,ProbabilityDistribution()));
 		std::cout << "maximumMomentNeededOverall = " << maximumMomentNeededOverall << "\n";
 		std::cout << "numberOfNewPoints = " << numberOfNewPoints << "\n";
 		std::cout << "numberOfObservablesInFiles = " << numberOfObservablesInFiles << "\n";
@@ -96,9 +96,8 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 			if(rewProc.reweightProbabilityDistributions){
 				std::vector<std::vector<Histogram> > histogramsAtNewPoints = momentsReweighter.getProbabilityDistributionsAtNewPoints();
 				std::vector<std::vector<HistogramEstimator> > histogramEstimatorsAtNewPoints = momentsReweighter.getProbabilityDistributionEstimatorsAtNewPoints();
-				probabilityDistributionsAtNewPoints = std::vector<std::vector<ProbabilityDistribution> >(histogramsAtNewPoints.size(), std::vector<ProbabilityDistribution>(histogramsAtNewPoints[0].size(),ProbabilityDistribution(histogramsAtNewPoints[0][0].getBinsize())));
-				checkSizesOfHistogramsAndHistogramEstimators(histogramsAtNewPoints, histogramEstimatorsAtNewPoints);
-				setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(probabilityDistributionsAtNewPoints, reweighterIO.isMeanKnownToBeZero, reweighterIO.errorMethod, 
+				checkSizesOfHistogramsAndHistogramEstimators(histogramsAtNewPoints, histogramEstimatorsAtNewPoints, numberOfNewPoints, numberOfObservablesInFiles);
+				setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(probabilityDistributionsAtNewPoints, reweighterIO.errorMethod, 
 																						 histogramsAtNewPoints, histogramEstimatorsAtNewPoints);
 			}
 		}
@@ -325,58 +324,31 @@ static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<
 	}
 }
 
-static void checkSizesOfHistogramsAndHistogramEstimators(std::vector<std::vector<Histogram> > histogram, std::vector<std::vector<HistogramEstimator> > histogramEstimator)
+static void checkSizesOfHistogramsAndHistogramEstimators(std::vector<std::vector<Histogram> > histogram, std::vector<std::vector<HistogramEstimator> > histogramEstimator,
+														 size_t numberOfPoints, size_t numberOfObservablesInFiles)
 {
-	size_t numberOfInputObservables = histogram[0].size(); //Initialized histo with right numberOfInputObs and therefore can use first vector.size() as numberOfInputObservables
-	size_t numberOfNewPoints = histogram.size();
+	if(histogram.size() != numberOfPoints)
+		throw std::runtime_error("Resulting size of histograms after Reweighting is different from the expected one (wrong numberOfPoints)!");
 	for(size_t i=0; i<histogram.size(); i++){
-		if(histogram[i].size() != numberOfInputObservables)
+		if(histogram[i].size() != numberOfObservablesInFiles)
 			throw std::runtime_error("Resulting size of histograms after Reweighting is different from the expected one (wrong numberOfInputObservables)!");
 	}
 
-	if(histogramEstimator.size() != numberOfNewPoints)
+	if(histogramEstimator.size() != numberOfPoints)
 		throw std::runtime_error("Resulting size of histogramEstimator after Reweighting is different from the expected one (wrong numberOfPoints)!");
 	for(size_t i=0; i<histogramEstimator.size(); i++){
-		if(histogramEstimator[i].size() != numberOfInputObservables)
+		if(histogramEstimator[i].size() != numberOfObservablesInFiles)
 			throw std::runtime_error("Resulting size of histogramEstimator after Reweighting is different from the expected one (wrong numberOfInputObservables)!");
 	}
 }
 
-static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(std::vector<std::vector<ProbabilityDistribution> > probabilityDistributions, bool isMeanZero, ErrorCalculationMethod errorMethod,
+static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(std::vector<std::vector<ProbabilityDistribution> > probabilityDistributions, ErrorCalculationMethod errorMethod,
 																					 std::vector<std::vector<Histogram> > histograms, std::vector<std::vector<HistogramEstimator> > histogramEstimators)
 {
-	realFloat binsize=histograms[0][0].getBinsize();
 	for(size_t indexNewPoint=0; indexNewPoint<histograms.size(); indexNewPoint++){
 		for(size_t indexInputObservable=0; indexInputObservable<histograms[indexNewPoint].size(); indexInputObservable++){
-			for(int indexHistoBin=0; indexHistoBin<histograms[indexNewPoint][indexInputObservable].getNumberOfBins(); indexHistoBin++){
-				realFloat middleOfBin=histograms[indexNewPoint][indexInputObservable].getBins().at(indexHistoBin).first + 0.5*binsize;
-				std::vector<double> heightsOfOneBin=histogramEstimators[indexNewPoint][indexInputObservable].getMultipleHeightsOfBins().at(indexHistoBin);
-				realFloat estimate=0.0, error=0.0;
-				if(errorMethod == jackknife){
-					estimate=histograms[indexNewPoint][indexInputObservable].getHeightsOfBins().at(indexHistoBin);
-					realFloat sum=0.0;
-					for(size_t i=0; i<heightsOfOneBin.size(); i++){
-						sum+=pow(heightsOfOneBin[i]-estimate,2);
-					}
-					error=sqrt(sum);
-				}else if(errorMethod == bootstrap){
-					realFloat mean, meanOfSquare, sum=0.0, sumOfSquare=0.0;
-					if(!isMeanZero){
-						for(size_t i=0; i<heightsOfOneBin.size(); i++){
-							sum+=heightsOfOneBin[i];
-						}
-					}
-					for(size_t i=0; i<heightsOfOneBin.size(); i++){
-						sumOfSquare+=pow(heightsOfOneBin[i],2);
-					}
-					mean=sum/heightsOfOneBin.size();
-					meanOfSquare=sumOfSquare/heightsOfOneBin.size();
-					estimate=histograms[indexNewPoint][indexInputObservable].getHeightsOfBins().at(indexHistoBin);
-					error=sqrt(meanOfSquare - mean);
-				}else
-					throw std::runtime_error("Unknown error method in function argument!");
-			probabilityDistributions[indexNewPoint][indexInputObservable][middleOfBin]=EstimateAndError(estimate, error);
-			}
+			ProbabilityDistribution tmpProbabilityDistribution(histograms[indexNewPoint][indexInputObservable], histogramEstimators[indexNewPoint][indexInputObservable], errorMethod);
+			probabilityDistributions[indexNewPoint][indexInputObservable]=tmpProbabilityDistribution;
 		}
 	}
 }																					 

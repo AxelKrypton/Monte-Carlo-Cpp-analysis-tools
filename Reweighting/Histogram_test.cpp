@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_SUITE(getters)
         hist[0.3]=1.0;
         hist[1.3]=3.0;
         hist[6.3]=4.0;
-        height=hist.getHeightOfSpecificBin(1);
+        height=hist.getHeightOfSpecificBin(2.0);
         manualHeight=3.0;
         BOOST_REQUIRE_CLOSE(height, manualHeight, realFloatPrecisionInPercent);
     }
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_SUITE(getters)
         hist[0.3]=1.0;
         hist[1.3]=3.0;
         hist[6.3]=4.0;
-        height=hist.getHeightOfSpecificBin(2);
+        height=hist.getHeightOfSpecificBin(4.0);
         manualHeight=0.0;
         BOOST_REQUIRE_CLOSE(height, manualHeight, realFloatPrecisionInPercent);
     }
@@ -427,10 +427,10 @@ BOOST_AUTO_TEST_SUITE(gettersEstimator)
         double binsize=2.0;
         HistogramEstimator histEstimator(binsize);
         std::vector<std::vector<double> > heights, manualHeights, manualHeightsWithZeroBins;
-        histEstimator.insert(4,{15,27});
-        histEstimator.insert(1,{23,13});
-        histEstimator.insert(5,{33});
-        histEstimator.insert(2,{24});
+        histEstimator.insert(8.0,{15,27});
+        histEstimator.insert(2.0,{23,13});
+        histEstimator.insert(10.0,{33});
+        histEstimator.insert(4.0,{24});
         heights=histEstimator.getMultipleHeightsOfBins();
         manualHeights.push_back({23,13});
         manualHeights.push_back({24});
@@ -466,15 +466,30 @@ BOOST_AUTO_TEST_SUITE(buildProbDist)
 
     BOOST_AUTO_TEST_CASE(buildProbDist1)
     {
-        BOOST_REQUIRE_NO_THROW(ProbabilityDistribution probDist{1.5});
+        Histogram hist(2);
+        HistogramEstimator histEst(2);
+        ErrorCalculationMethod errormethod{};
+        BOOST_REQUIRE_NO_THROW(ProbabilityDistribution probDist(hist, histEst, errormethod));
     }
 
-    BOOST_AUTO_TEST_CASE(buildProbDist)
+    BOOST_AUTO_TEST_CASE(buildProbDist2)//Only temporarily to see if it works
     {
-        double wrongbinsize=0.0;
-        BOOST_REQUIRE_THROW(ProbabilityDistribution probDist(wrongbinsize), std::logic_error);
-        wrongbinsize=-2.6;
-        BOOST_REQUIRE_THROW(ProbabilityDistribution probDist(wrongbinsize), std::logic_error);
+        double binsize=2;
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        hist[0.3]=3.0;
+        hist[2.3]=4.2;
+        hist[6.3]=1.8;
+        histEst.insert(0.0,{2.9, 3.1, 2.8});
+        histEst.insert(2.0,{4.1, 4.0, 4.4});
+        histEst.insert(6.0,{1.7, 1.5, 2.1});
+        ErrorCalculationMethod errormethod{bootstrap};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
+        for(int i=0; i<probDist.getNumberOfBins(); i++){
+            double middleOfBin=probDist.getBins().at(i).first + 0.5*binsize;
+            EstimateAndError estErr=probDist.getHeightsOfBins().at(i);
+            std::cout << middleOfBin << " : " << estErr.estimate << " +/-" << estErr.error << std::endl;
+        }
     }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -484,9 +499,12 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
     BOOST_AUTO_TEST_CASE(getNumberOfBinsProbDist1)
     {
         const double binsize=2.0;
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         bool dontIncludeZeroBins=false;
         bool includeZeroBins=true;
-        ProbabilityDistribution probDist(binsize);
         BOOST_REQUIRE_EQUAL(probDist.getNumberOfBins(dontIncludeZeroBins), 0);
         BOOST_REQUIRE_EQUAL(probDist.getNumberOfBins(includeZeroBins), 0);
     }
@@ -494,9 +512,12 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
     BOOST_AUTO_TEST_CASE(getNumberOfBinsProbDist2)
     {
         const double binsize=2.0;
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         bool dontIncludeZeroBins=false;
         bool includeZeroBins=true;
-        ProbabilityDistribution probDist(binsize);
         probDist[0.3]=EstimateAndError(1.0, 0.1);
         probDist[1.3]=EstimateAndError(1.0, 0.1);
         probDist[6.3]=EstimateAndError(1.0, 0.1);
@@ -507,17 +528,23 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
     BOOST_AUTO_TEST_CASE(getBinsizeProbDist)
     {
         const double binsize=2.0;
-        ProbabilityDistribution probDist(binsize);
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         BOOST_REQUIRE_CLOSE(probDist.getBinsize(), 2.0, realFloatPrecisionInPercent);
     }
 
     BOOST_AUTO_TEST_CASE(getHeightsOfBinsProbDist)
     {
         const double binsize=2.0;
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         std::vector<EstimateAndError> manualHeights, heights;
         std::vector<EstimateAndError> manualHeightsWithZeroBins, heightsWithZeroBins;
         bool includeZeroBins=true;
-        ProbabilityDistribution probDist(binsize);
         probDist[0.3]=EstimateAndError(1.0, 0.1);
         probDist[1.3]=EstimateAndError(3.0, 0.1);
         probDist[6.3]=EstimateAndError(4.0, 0.1);
@@ -545,8 +572,11 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
     BOOST_AUTO_TEST_CASE(getHeightOfSpecificBinProbDist1)
     {
         const double binsize=2.0;
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         EstimateAndError estAndErr, height;
-        ProbabilityDistribution probDist(binsize);
         probDist[0.3]=EstimateAndError(2.2, 0.1);
         probDist[1.3]=EstimateAndError(1.2, 0.1);
         probDist[6.3]=EstimateAndError(4.2, 0.1);
@@ -559,12 +589,15 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
     BOOST_AUTO_TEST_CASE(getHeightOfSpecificBinProbDist2)
     {
         const double binsize=2.0;
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         EstimateAndError estAndErr, height;
-        ProbabilityDistribution probDist(binsize);
         probDist[0.3]=EstimateAndError(2.2, 0.1);
         probDist[1.3]=EstimateAndError(1.2, 0.1);
         probDist[6.3]=EstimateAndError(4.2, 0.1);
-        height=probDist.getHeightOfSpecificBin(2);
+        height=probDist.getHeightOfSpecificBin(4);
         estAndErr=EstimateAndError(0.0, 0.0);
         BOOST_REQUIRE_CLOSE(height.estimate, estAndErr.estimate, realFloatPrecisionInPercent);
         BOOST_REQUIRE_CLOSE(height.error, estAndErr.error, realFloatPrecisionInPercent);
@@ -573,8 +606,11 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
     BOOST_AUTO_TEST_CASE(getMaxXvalueProbDist1)
         {
             const double binsize=2.0;
+            Histogram hist(binsize);
+            HistogramEstimator histEst(binsize);
+            ErrorCalculationMethod errormethod{};
+            ProbabilityDistribution probDist(hist, histEst, errormethod);
             double upperedge;
-            ProbabilityDistribution probDist(binsize);
             probDist[0.3]=EstimateAndError(1.0,0.1);
             upperedge=1.0;
             BOOST_REQUIRE_CLOSE(probDist.getMaxXvalue(), upperedge, realFloatPrecisionInPercent);
@@ -584,8 +620,11 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
         {
             const double binsize=2.0;
             const double anchor=-3.5;
+            Histogram hist(binsize, anchor);
+            HistogramEstimator histEst(binsize);
+            ErrorCalculationMethod errormethod{};
+            ProbabilityDistribution probDist(hist, histEst, errormethod);
             const double upperedge=1.5;
-            ProbabilityDistribution probDist(binsize, anchor);
             probDist[0.3]=EstimateAndError(1.0,0.1);
             BOOST_REQUIRE_CLOSE(probDist.getMaxXvalue(), upperedge, realFloatPrecisionInPercent);
         }
@@ -593,8 +632,11 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
     BOOST_AUTO_TEST_CASE(getMinXvalueProbDist1)
     {
         const double binsize=2.0;
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         double loweredge;
-        ProbabilityDistribution probDist(binsize);
         probDist[0.3]=EstimateAndError(1.0,0.1);
         loweredge=-1;
         BOOST_REQUIRE_EQUAL(probDist.getMinXvalue(), loweredge);
@@ -604,8 +646,11 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
     {
         const double binsize=2.0;
         const double anchor=13.5;
+        Histogram hist(binsize, anchor);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         const double loweredge=-1.5;
-        ProbabilityDistribution probDist(binsize, anchor);
         probDist[0.3]=EstimateAndError(1.0,0.1);
         BOOST_REQUIRE_EQUAL(probDist.getMinXvalue(), loweredge);
     }
@@ -613,10 +658,13 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
     BOOST_AUTO_TEST_CASE(getBinsProbDist1)
     {
         const double binsize=2.0;
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         std::vector<std::pair<double, double> > bins, manualBins;
         std::vector<std::pair<double, double> > binsWithZeroBins, manualBinsWithZeroBins;
         bool includeZeroBins=true;
-        ProbabilityDistribution probDist(binsize);
         probDist[0.3]=EstimateAndError(1.0,0.1);
         probDist[1.3]=EstimateAndError(3.0,0.1);
         probDist[6.3]=EstimateAndError(4.0,0.1);
@@ -645,10 +693,13 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
     BOOST_AUTO_TEST_CASE(getBinsProbDist2)
     {
         const double binsize=2.0, anchor=5.5;
+        Histogram hist(binsize, anchor);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         std::vector<std::pair<double, double> > bins, manualBins;
         std::vector<std::pair<double, double> > binsWithZeroBins, manualBinsWithZeroBins;
         bool includeZeroBins=true;
-        ProbabilityDistribution probDist(binsize, anchor);
         probDist[0.3]=EstimateAndError(1.0,0.1);
         probDist[1.3]=EstimateAndError(3.0,0.1);
         probDist[6.3]=EstimateAndError(4.0,0.1);
@@ -677,7 +728,10 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
     BOOST_AUTO_TEST_CASE(getHeightAsString)
     {
         const double binsize=2.0;
-        ProbabilityDistribution probDist(binsize);
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         probDist[0.3]=EstimateAndError(1.0,0.1);
         probDist[1.3]=EstimateAndError(3.0,0.1);
         probDist[6.3]=EstimateAndError(4.0,0.1);
@@ -693,17 +747,24 @@ BOOST_AUTO_TEST_SUITE(OperatorProbDist)
     BOOST_AUTO_TEST_CASE(AccessOperatorProbDist1)
     {
         const double binsize=2.0, anchor=1.23;
-        ProbabilityDistribution probDist(binsize);
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         double arbitraryDouble=4.3;
         BOOST_REQUIRE_NO_THROW(probDist[arbitraryDouble]);
-        ProbabilityDistribution probDist2(binsize, anchor);
+        Histogram hist2(binsize, anchor);
+        ProbabilityDistribution probDist2(hist2, histEst, errormethod);
         BOOST_REQUIRE_NO_THROW(probDist2[arbitraryDouble]);
     }
 
     BOOST_AUTO_TEST_CASE(AccessOperatorProbDist2)
     {
         const double binsize=2.0;
-        ProbabilityDistribution probDist(binsize);
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         double arbitraryDouble=4.3;
         EstimateAndError estAndErr=EstimateAndError(2.0, 0.2);
         probDist[arbitraryDouble]=estAndErr;
@@ -714,7 +775,10 @@ BOOST_AUTO_TEST_SUITE(OperatorProbDist)
     BOOST_AUTO_TEST_CASE(AccessOperatorProbDist3)
     {
         const double binsize=1.0, anchor=-5.5;
-        ProbabilityDistribution probDist(binsize, anchor);
+        Histogram hist(binsize, anchor);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
         double arbitraryDouble=4.3;
         EstimateAndError estAndErr=EstimateAndError(2.0, 0.2);
         probDist[arbitraryDouble]=estAndErr;

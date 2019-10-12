@@ -17,12 +17,6 @@ public:
 		values.push_back( tmpPair );
 	}
 
-	void appendHistoData(realFloat betaValue, ProbabilityDistribution probabilityDistribution)
-	{
-		std::pair<realFloat, ProbabilityDistribution> tmpPair(betaValue, probabilityDistribution);
-		histoValues.push_back( tmpPair );
-	}
-
 	void printToFile(const unsigned int* estimatorNumber = nullptr)
 	{
 		if(estimatorNumber==nullptr){
@@ -62,28 +56,11 @@ public:
 		}
 	}
 
-	void printHistoToFile()
-	{
-		for(unsigned int index = 0; index<histoValues.size(); index++)
-		{
-			std::ofstream outputstream;
-			outputstream.open(filename.c_str(), std::ios::app);
-			if(outputstream.is_open()){
-				unsigned int numberOfHistoBins = histoValues[index].second.getNumberOfBins();
-				realFloat binsize = histoValues[index].second.getBinsize();
-				realFloat middleOfBin= histoValues[index].second.getBins().at(index).first + 0.5*binsize;
-				for(unsigned int histoIndex = 0; histoIndex<numberOfHistoBins; histoIndex++)
-					outputstream << std::scientific << middleOfBin << "\t" << histoValues[index].second.getHeightAsString(histoIndex) << std::endl;
-			}
-			outputstream.close();
-		}
-	}
 
 private:
 	std::string quantityName;
 	std::string filename;
 	std::vector < std::pair<realFloat, Observables> > values;
-	std::vector < std::pair<realFloat, ProbabilityDistribution> > histoValues;
 };
 
 
@@ -145,44 +122,6 @@ void writeLqcdReweightedObservablesToFile(std::vector<std::vector<realFloat> > &
 		reweightedQuantities[quantityIndex].printToFile();
 	}
 }
-
-void writeLqcdReweightedProbabilityDistributionsToFile(std::vector<std::vector<realFloat> > & newBetaValues, std::vector<std::vector<ProbabilityDistribution> > & reweightedProbabilityDistributions, std::string outputfilePrefix)
-{
-	try{
-		checkInputSizes(newBetaValues, reweightedProbabilityDistributions);
-	}catch(std::invalid_argument& e){
-		throw e;
-	}catch(std::exception& e){
-		std::cout << "\n   No reweighting procedure has been performed, probably because none was asked. No file will be created.\n" << std::endl;
-		return;
-	}
-
-	std::vector<std::vector<LqcdReweightedData> > reweightedQuantities;
-	unsigned int numberOfNewPoints = reweightedProbabilityDistributions.size();
-	unsigned int numberOfQuantities = reweightedProbabilityDistributions[0].size();
-
-	for (unsigned int quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)
-	{
-		std::vector<LqcdReweightedData> reweightedQuantitiesPerBin;
-		for (unsigned int iteration=0; iteration < numberOfNewPoints; iteration ++)
-		{
-			LqcdReweightedData reweightedQuantity( "quantity" + boost::lexical_cast<std::string>(quantityIndex + 1) + "_" + "newBeta" + boost::lexical_cast<std::string>(newBetaValues[iteration][0]), outputfilePrefix );
-			reweightedQuantity.appendHistoData( newBetaValues[iteration][0], reweightedProbabilityDistributions[iteration][quantityIndex] );
-			reweightedQuantitiesPerBin.push_back(reweightedQuantity);
-		}
-
-		reweightedQuantities.push_back (reweightedQuantitiesPerBin);
-	}
-
-	for (unsigned int quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)
-	{
-		for (unsigned int iteration=0; iteration < numberOfNewPoints; iteration ++)
-		{
-			reweightedQuantities[quantityIndex][iteration].printHistoToFile();
-		}
-	}
-}
-
 
 
 static std::vector<Observables> convertMapOfObservableNameAndDataSampleToVectorOfObservables(std::map<std::string, DataSample> inputMap){
@@ -247,4 +186,45 @@ void writeLqcdReweightedObservablesEstimatorsToFile(std::vector<std::vector<real
         }
     }
 
+}
+
+static void printHistoToFile(realFloat betaValue, int numberOfQuantity, ProbabilityDistribution reweightedProbabilityDistribution, std::string outputfilePrefix)
+{
+	std::ofstream outputstream;
+	std::string filename=outputfilePrefix + "_" + "ProbabilityDistribution" + boost::lexical_cast<std::string>(numberOfQuantity + 1) + "_" + boost::lexical_cast<std::string>(betaValue); 
+	outputstream.open(filename.c_str(), std::ios::app);
+	if(outputstream.is_open()){
+		unsigned int numberOfHistoBins = reweightedProbabilityDistribution.getNumberOfBins();
+		realFloat binsize = reweightedProbabilityDistribution.getBinsize();
+		for(unsigned int histoIndex = 0; histoIndex<numberOfHistoBins; histoIndex++){
+			realFloat lowerBinEdge = reweightedProbabilityDistribution.getBins().at(histoIndex).first;
+			realFloat upperBinEdge = reweightedProbabilityDistribution.getBins().at(histoIndex).second;
+			realFloat middleOfBin = reweightedProbabilityDistribution.getBins().at(histoIndex).first + 0.5*binsize;
+			outputstream << std::scientific << lowerBinEdge << "\t" << middleOfBin << "\t" << upperBinEdge << "\t\t" << reweightedProbabilityDistribution.getHeightAsString(histoIndex) << std::endl;
+		}
+	outputstream.close();
+	}
+}
+
+void writeLqcdReweightedProbabilityDistributionsToFile(std::vector<std::vector<realFloat> > & newBetaValues, std::vector<std::vector<ProbabilityDistribution> > & reweightedProbabilityDistributions, std::string outputfilePrefix)
+{
+	try{
+		checkInputSizes(newBetaValues, reweightedProbabilityDistributions);
+	}catch(std::invalid_argument& e){
+		throw e;
+	}catch(std::exception& e){
+		std::cout << "\n   No reweighting procedure has been performed, probably because none was asked. No file will be created.\n" << std::endl;
+		return;
+	}
+
+	unsigned int numberOfNewPoints = reweightedProbabilityDistributions.size();
+	unsigned int numberOfQuantities = reweightedProbabilityDistributions[0].size();
+
+	for (unsigned int quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)
+	{
+		for (unsigned int iteration=0; iteration < numberOfNewPoints; iteration ++)
+		{
+			printHistoToFile(newBetaValues[iteration][0], quantityIndex, reweightedProbabilityDistributions[iteration][quantityIndex], outputfilePrefix);
+		}
+	}
 }
