@@ -188,19 +188,21 @@ void writeLqcdReweightedObservablesEstimatorsToFile(std::vector<std::vector<real
 
 }
 
-static void printHistoToFile(realFloat betaValue, int numberOfQuantity, ProbabilityDistribution reweightedProbabilityDistribution, std::string outputfilePrefix)
+static void printHistoToFile(realFloat betaValue, int numberOfQuantity, ProbabilityDistribution& reweightedProbabilityDistribution, std::string outputfilePrefix)
 {
 	std::ofstream outputstream;
 	std::string filename=outputfilePrefix + "_" + "ProbabilityDistribution" + boost::lexical_cast<std::string>(numberOfQuantity + 1) + "_" + boost::lexical_cast<std::string>(betaValue); 
 	outputstream.open(filename.c_str(), std::ios::app);
 	if(outputstream.is_open()){
 		unsigned int numberOfHistoBins = reweightedProbabilityDistribution.getNumberOfBins();
-		realFloat binsize = reweightedProbabilityDistribution.getBinsize();
+		double binsize=reweightedProbabilityDistribution.getBinsize();
+		outputstream << "numOfBin" << "  " << "LowerEdgeOfBin   MiddleOfBin\tUpperEdgeOfBin" << "\t\t" << "Estimate\tError" << std::endl;
 		for(unsigned int histoIndex = 0; histoIndex<numberOfHistoBins; histoIndex++){
 			realFloat lowerBinEdge = reweightedProbabilityDistribution.getBins().at(histoIndex).first;
 			realFloat upperBinEdge = reweightedProbabilityDistribution.getBins().at(histoIndex).second;
 			realFloat middleOfBin = reweightedProbabilityDistribution.getBins().at(histoIndex).first + 0.5*binsize;
-			outputstream << std::scientific << lowerBinEdge << "\t" << middleOfBin << "\t" << upperBinEdge << "\t\t" << reweightedProbabilityDistribution.getHeightAsString(histoIndex) << std::endl;
+			EstimateAndError estErr=reweightedProbabilityDistribution.getHeightsOfBins().at(histoIndex);
+			outputstream << std::scientific << histoIndex << ":\t   " << lowerBinEdge << "\t   " << middleOfBin << "\t " << upperBinEdge << "\t\t" << estErr.estimate << "\t" << estErr.error << std::endl;
 		}
 	outputstream.close();
 	}

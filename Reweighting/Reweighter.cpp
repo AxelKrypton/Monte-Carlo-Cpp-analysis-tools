@@ -13,7 +13,7 @@ static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<
 																	std::vector<std::vector<MomentsEstimators> >, std::vector<std::string>, const std::vector<unsigned int>&,
 																	const unsigned int, const unsigned int);
 static void checkSizesOfHistogramsAndHistogramEstimators(std::vector<std::vector<Histogram> >, std::vector<std::vector<HistogramEstimator> >, size_t, size_t);
-static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(std::vector<std::vector<ProbabilityDistribution> >, ErrorCalculationMethod,
+static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(std::vector<std::vector<ProbabilityDistribution> >&, ErrorCalculationMethod,
 																					 std::vector<std::vector<Histogram> >, std::vector<std::vector<HistogramEstimator> >);																	
 static void setObservablesEstimatorsAtNewPointsFromMomentsEstimators(std::vector<std::vector<std::map<std::string,DataSample> > >&, bool,
                                                                      std::vector<std::vector<MomentsEstimators> >, std::vector<std::string>, const std::vector<unsigned int>&,
@@ -94,9 +94,12 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 			                                                             rewProc.quantitiesConsidered, reweighterIO.columnsToBeReweightedUsingMultipleColumns,
 			                                                             reweighterIO.namesOfParametersIgnoringMetaParameters.size(), maximumMomentNeededOverall);
 			if(rewProc.reweightProbabilityDistributions){
+				std::cout << "***************************************" << std::endl;
+				std::cout << "Reweighting probability distribution..." << std::endl;
 				std::vector<std::vector<Histogram> > histogramsAtNewPoints = momentsReweighter.getProbabilityDistributionsAtNewPoints();
 				std::vector<std::vector<HistogramEstimator> > histogramEstimatorsAtNewPoints = momentsReweighter.getProbabilityDistributionEstimatorsAtNewPoints();
 				checkSizesOfHistogramsAndHistogramEstimators(histogramsAtNewPoints, histogramEstimatorsAtNewPoints, numberOfNewPoints, numberOfObservablesInFiles);
+				std::cout << "Set probability distribution from histo and estimators..." << std::endl;
 				setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(probabilityDistributionsAtNewPoints, reweighterIO.errorMethod, 
 																						 histogramsAtNewPoints, histogramEstimatorsAtNewPoints);
 			}
@@ -342,7 +345,7 @@ static void checkSizesOfHistogramsAndHistogramEstimators(std::vector<std::vector
 	}
 }
 
-static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(std::vector<std::vector<ProbabilityDistribution> > probabilityDistributions, ErrorCalculationMethod errorMethod,
+static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(std::vector<std::vector<ProbabilityDistribution> >& probabilityDistributions, ErrorCalculationMethod errorMethod,
 																					 std::vector<std::vector<Histogram> > histograms, std::vector<std::vector<HistogramEstimator> > histogramEstimators)
 {
 	for(size_t indexNewPoint=0; indexNewPoint<histograms.size(); indexNewPoint++){

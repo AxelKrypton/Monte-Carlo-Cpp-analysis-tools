@@ -701,6 +701,13 @@ BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)
         std::vector<std::vector<Histogram> > reweightedProbabilityDistribution=reweighter.testGetReweightedProbabilityDistributions();
         std::vector<std::vector<HistogramEstimator> > reweightedProbabilityDistributionEstimator=reweighter.testGetReweightedProbabilityDistributionEstimators();
         reweighter.testPrintProbabilityDistributionEstimator(reweightedProbabilityDistributionEstimator, reweightedProbabilityDistribution);
+        ErrorCalculationMethod errormethod{bootstrap};
+        ProbabilityDistribution probDist(reweightedProbabilityDistribution[0][0], reweightedProbabilityDistributionEstimator[0][0], errormethod);
+        std::cout << "**********************************" << std::endl;
+        for(int i=0; i<probDist.getNumberOfBins(); i++){
+            EstimateAndError est=probDist.getHeightsOfBins().at(i);
+            std::cout << probDist.getBins().at(i).first << " " << est.estimate << " " << est.error << std::endl;
+        }
     }
     
     BOOST_AUTO_TEST_CASE(probabilityDistributionReweighting4)

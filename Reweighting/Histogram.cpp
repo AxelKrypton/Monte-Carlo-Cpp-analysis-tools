@@ -313,16 +313,6 @@ std::vector<std::pair<double,double> > ProbabilityDistribution::getBins(bool inc
     return bins;
 } 
 
-std::string ProbabilityDistribution::getHeightAsString(int index)
-	{
-		std::stringstream values;
-		values.precision(12);
-		values << std::scientific;
-		values << probabilityDistribution[index].estimate << "\t" << probabilityDistribution[index].error<< "\t" ;
-		return values.str();
-	}
-
-
 /* 
  * The following operator allows us to fill the histogram by writing
  * 'histo[obsvalue]+=term'. What happens there is that the operator looks for

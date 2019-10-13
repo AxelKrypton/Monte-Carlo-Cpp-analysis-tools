@@ -725,21 +725,6 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
         }
     }
 
-    BOOST_AUTO_TEST_CASE(getHeightAsString)
-    {
-        const double binsize=2.0;
-        Histogram hist(binsize);
-        HistogramEstimator histEst(binsize);
-        ErrorCalculationMethod errormethod{};
-        ProbabilityDistribution probDist(hist, histEst, errormethod);
-        probDist[0.3]=EstimateAndError(1.0,0.1);
-        probDist[1.3]=EstimateAndError(3.0,0.1);
-        probDist[6.3]=EstimateAndError(4.0,0.1);
-        std::string print=probDist.getHeightAsString(0), manualPrint;
-        manualPrint="1.000000000000e+00\t1.000000000000e-01\t";
-        BOOST_REQUIRE_EQUAL(print, manualPrint);
-    }
-
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(OperatorProbDist)

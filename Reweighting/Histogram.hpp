@@ -74,7 +74,6 @@ public:
     double getMaxXvalue() const;
     double getMinXvalue() const;
     std::vector<std::pair<double,double> > getBins(bool = false) const;
-    std::string getHeightAsString(int);
 
     EstimateAndError& operator[](double);
 
