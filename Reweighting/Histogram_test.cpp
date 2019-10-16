@@ -108,6 +108,21 @@ BOOST_AUTO_TEST_SUITE(getters)
         BOOST_REQUIRE_CLOSE(height, manualHeight, realFloatPrecisionInPercent);
     }
 
+    BOOST_AUTO_TEST_CASE(getHeightOfSpecificBin3)
+    {
+        const double binsize=2.0, delta=-3.0;
+        double manualHeight, height;
+        Histogram hist(binsize);
+        hist[0.3]=1.0;
+        hist[1.3]=3.0;
+        hist[6.3]=4.0;
+        hist.shift(delta);
+        height=hist.getHeightOfSpecificBin(4.0);
+        manualHeight=4.0;
+        BOOST_REQUIRE_CLOSE(height, manualHeight, realFloatPrecisionInPercent);
+    }
+
+
     BOOST_AUTO_TEST_CASE(getMaxXvalue1)
         {
             const double binsize=2.0;
@@ -209,6 +224,24 @@ BOOST_AUTO_TEST_SUITE(getters)
         for(unsigned int i=0; i<binsWithZeroBins.size(); i++){
             BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].first, manualBinsWithZeroBins[i].first, realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].second, manualBinsWithZeroBins[i].second, realFloatPrecisionInPercent);
+        }
+    }
+
+    BOOST_AUTO_TEST_CASE(getMiddleOfBins)
+    {
+        const double binsize=2.0;
+        std::vector<double> middleOfBins, manualMiddleOfBins;
+        Histogram hist(binsize);
+        hist[0.3]=1.0;
+        hist[1.3]=3.0;
+        hist[6.3]=4.0;
+        middleOfBins=hist.getMiddleOfBins();
+        manualMiddleOfBins.push_back(0);
+        manualMiddleOfBins.push_back(2);
+        manualMiddleOfBins.push_back(6);
+        BOOST_REQUIRE_EQUAL(middleOfBins.size(), manualMiddleOfBins.size());
+        for(unsigned int i=0; i<middleOfBins.size(); i++){
+            BOOST_REQUIRE_CLOSE(middleOfBins[i], manualMiddleOfBins[i], realFloatPrecisionInPercent);
         }
     }
 
@@ -422,7 +455,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(gettersEstimator)
 
-    BOOST_AUTO_TEST_CASE(getMultipleHeightsOfBins1)
+    BOOST_AUTO_TEST_CASE(getMultipleHeightsOfBins)
     {
         double binsize=2.0;
         HistogramEstimator histEstimator(binsize);
@@ -453,6 +486,24 @@ BOOST_AUTO_TEST_SUITE(gettersEstimator)
             BOOST_REQUIRE_EQUAL(heights[i].size(), manualHeightsWithZeroBins[i].size());
             for(unsigned int j=0; j<heights[i].size(); j++)
                 BOOST_REQUIRE_CLOSE(heights[i][j], manualHeightsWithZeroBins[i][j], realFloatPrecisionInPercent);
+        }
+    }
+
+    BOOST_AUTO_TEST_CASE(getHeightsOfBin)
+    {
+        double binsize=2.0;
+        HistogramEstimator histEstimator(binsize);
+        std::vector<double> heights, manualHeights;
+        histEstimator.insert(8.0,{15.0,27.0});
+        histEstimator.insert(2.0,{23.0,13.0});
+        histEstimator.insert(10.0,{33.0});
+        histEstimator.insert(4.0,{24.0});
+        heights=histEstimator.getHeightsOfBin(8.0);
+        manualHeights.push_back(15.0);
+        manualHeights.push_back(27.0);
+        BOOST_REQUIRE_EQUAL(heights.size(), manualHeights.size());
+        for(unsigned int i=0; i<heights.size(); i++){
+            BOOST_REQUIRE_CLOSE(heights[i], manualHeights[i], realFloatPrecisionInPercent);
         }
     }
 
@@ -722,6 +773,27 @@ BOOST_AUTO_TEST_SUITE(gettersProbabilityDistribution)
         for(unsigned int i=0; i<binsWithZeroBins.size(); i++){
             BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].first, manualBinsWithZeroBins[i].first, realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(binsWithZeroBins[i].second, manualBinsWithZeroBins[i].second, realFloatPrecisionInPercent);
+        }
+    }
+
+    BOOST_AUTO_TEST_CASE(getMiddleOfBinsProbDist)
+    {
+        const double binsize=2.0;
+        Histogram hist(binsize);
+        HistogramEstimator histEst(binsize);
+        ErrorCalculationMethod errormethod{};
+        ProbabilityDistribution probDist(hist, histEst, errormethod);
+        std::vector<double> middleOfBins, manualMiddleOfBins;
+        probDist[0.3]=EstimateAndError(1.0,0.1);
+        probDist[1.3]=EstimateAndError(3.0,0.1);
+        probDist[6.3]=EstimateAndError(4.0,0.1);
+        middleOfBins=probDist.getMiddleOfBins();
+        manualMiddleOfBins.push_back(0);
+        manualMiddleOfBins.push_back(2);
+        manualMiddleOfBins.push_back(6);
+        BOOST_REQUIRE_EQUAL(middleOfBins.size(), manualMiddleOfBins.size());
+        for(unsigned int i=0; i<middleOfBins.size(); i++){
+            BOOST_REQUIRE_CLOSE(middleOfBins[i], manualMiddleOfBins[i], realFloatPrecisionInPercent);
         }
     }
 

@@ -636,20 +636,19 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(std::vector<r
         for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
             for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
                     probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].exponentiateHeights();
-                    if(minimumOfEachObservable[columnsInputObservables[indexInputObservable]] < 0)
-                        probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].shift(2*minimumOfEachObservable[columnsInputObservables[indexInputObservable]]);
+                    if(minimumOfEachObservable[columnsInputObservables[indexInputObservable]-1] < 0)
+                        probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].shift(2*minimumOfEachObservable[columnsInputObservables[indexInputObservable]-1]);
                     probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].normalize();
             }
         }
     
         if(reweightedHistogramEstimators != NULL){
             for(size_t indexBin=0; indexBin<(*reweightedHistogramEstimators).size(); indexBin++){
-                columnsInputObservables=getColumnsToBeConsideredReweightingProbabilityDistribution();
                 for(size_t indexNewPoint=0; indexNewPoint<valuesOfNewParameters.size(); indexNewPoint++){
                     for(int indexInputObservable=0; indexInputObservable<momentsReweighterHelper.numberOfObservablesGivenAsInput; indexInputObservable++){
                         (*reweightedHistogramEstimators)[indexBin][indexNewPoint][indexInputObservable].exponentiateHeights();
-                        if(minimumOfEachObservable[columnsInputObservables[indexInputObservable]] < 0)
-                            (*reweightedHistogramEstimators)[indexBin][indexNewPoint][indexInputObservable].shift(2*minimumOfEachObservable[columnsInputObservables[indexInputObservable]]);
+                        if(minimumOfEachObservable[columnsInputObservables[indexInputObservable]-1] < 0)
+                            (*reweightedHistogramEstimators)[indexBin][indexNewPoint][indexInputObservable].shift(2*minimumOfEachObservable[columnsInputObservables[indexInputObservable]-1]);
                         (*reweightedHistogramEstimators)[indexBin][indexNewPoint][indexInputObservable].normalize();
                     }   
                 }   
@@ -736,15 +735,14 @@ void MomentsReweighterAbstract::extractAndSetReweightedMomentsAndMomentsEstimato
 	}
 }
 
-void MomentsReweighterAbstract::extractAndSetReweightedHistogramEstimators(const std::valarray<std::vector<std::vector<Histogram> > >& histogramEstimatorsForErrorCalculation){
+void MomentsReweighterAbstract::extractAndSetReweightedHistogramEstimators(const std::valarray<std::vector<std::vector<Histogram> > >& histogramEstimatorsForErrorCalculation){ 
     const size_t numberOfNewPoints=valuesOfNewParameters.size();
     const size_t numberOfObservablesGivenAsInput=momentsReweighterHelper.numberOfObservablesGivenAsInput;
     size_t numberOfHeightsPerBins=histogramEstimatorsForErrorCalculation.size();
     for(size_t indexNewPoint=0; indexNewPoint<numberOfNewPoints; indexNewPoint++){
         for(size_t indexInputObservable=0; indexInputObservable<numberOfObservablesGivenAsInput; indexInputObservable++){  
-            size_t numberOfHistoBins=probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getNumberOfBins();  
-            for(size_t indexHistoBin=0; indexHistoBin<numberOfHistoBins; indexHistoBin++){  
-                double middleOfBin=probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getMiddleOfBins().at(indexHistoBin);
+            std::vector<double> middleOfBins=probabilityDistributionsAtNewBetas[indexNewPoint][indexInputObservable].getMiddleOfBins();
+            for(double middleOfBin : middleOfBins){
                 std::vector<double> heightsOfOneBin;
                 for(size_t indexEstimator=0; indexEstimator<numberOfHeightsPerBins; indexEstimator++){
                     double height=histogramEstimatorsForErrorCalculation[indexEstimator][indexNewPoint][indexInputObservable].getHeightOfSpecificBin(middleOfBin);

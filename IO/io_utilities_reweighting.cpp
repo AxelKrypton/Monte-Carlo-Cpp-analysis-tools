@@ -190,19 +190,20 @@ void writeLqcdReweightedObservablesEstimatorsToFile(const std::vector<std::vecto
 
 static void printHistoToFile(realFloat betaValue, int numberOfQuantity, const ProbabilityDistribution& reweightedProbabilityDistribution, std::string outputfilePrefix)
 {
+	std::vector<double> middleOfBins=reweightedProbabilityDistribution.getMiddleOfBins();
 	std::ofstream outputstream;
 	std::string filename=outputfilePrefix + "_" + "ProbabilityDistribution" + boost::lexical_cast<std::string>(numberOfQuantity + 1) + "_" + std::to_string(betaValue);
 	outputstream.open(filename.c_str(), std::ios::app);
 	if(outputstream.is_open()){
-		unsigned int numberOfHistoBins = reweightedProbabilityDistribution.getNumberOfBins();
 		double binsize=reweightedProbabilityDistribution.getBinsize();
 		outputstream << "#numOfBin" << "  " << "LowerEdgeOfBin   MiddleOfBin\tUpperEdgeOfBin" << "\t\t" << "Estimate\tError" << std::endl;
-		for(unsigned int histoIndex = 0; histoIndex<numberOfHistoBins; histoIndex++){
-			realFloat lowerBinEdge = reweightedProbabilityDistribution.getBins().at(histoIndex).first;
-			realFloat upperBinEdge = reweightedProbabilityDistribution.getBins().at(histoIndex).second;
-			realFloat middleOfBin = reweightedProbabilityDistribution.getBins().at(histoIndex).first + 0.5*binsize;
-			EstimateAndError estErr=reweightedProbabilityDistribution.getHeightsOfBins().at(histoIndex);
-			outputstream << std::scientific << histoIndex << "\t   " << lowerBinEdge << "\t   " << middleOfBin << "\t " << upperBinEdge << "\t\t" << estErr.estimate << "\t" << estErr.error << std::endl;
+		int i=0;
+		for(double middleOfBin : middleOfBins){
+			realFloat lowerBinEdge = middleOfBin - 0.5*binsize;
+			realFloat upperBinEdge = middleOfBin + 0.5*binsize;
+			EstimateAndError estErr=reweightedProbabilityDistribution.getHeightOfSpecificBin(middleOfBin);
+			outputstream << std::scientific << i << "\t   " << lowerBinEdge << "\t   " << middleOfBin << "\t " << upperBinEdge << "\t\t" << estErr.estimate << "\t" << estErr.error << std::endl;
+			i++;
 		}
 	outputstream.close();
 	}

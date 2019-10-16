@@ -60,7 +60,7 @@ std::vector<double> Histogram::getHeightsOfBins(bool includeZeroBins) const
 
 double Histogram::getHeightOfSpecificBin(double middleOfBin) const
 {
-    int whichbin=static_cast<int>(middleOfBin/binsize);
+    int whichbin=static_cast<int>((middleOfBin-anchor)/binsize);
     std::map<int, double> copyOfHisto(histogram);
     double height=copyOfHisto[whichbin];
     return height;
@@ -216,6 +216,20 @@ std::vector<std::vector<double> > HistogramEstimator::getMultipleHeightsOfBins(b
     return multipleHeightsOfBins;
 }
 
+std::vector<double> HistogramEstimator::getHeightsOfBin(double middleOfBin)
+{
+    int whichbin=static_cast<int>(middleOfBin/binsize);
+        std::vector<double> heights;
+        typedef std::multimap<int, double>::iterator histogramEstimatorsIt;
+        std::pair<histogramEstimatorsIt,histogramEstimatorsIt> range = histogramEstimators.equal_range(whichbin);
+        for(histogramEstimatorsIt histoIt=range.first; histoIt!=range.second; histoIt++)
+        {
+            heights.push_back(histoIt->second);
+        }
+    return heights;
+}
+
+
 void HistogramEstimator::insert(double middleOfBin, std::vector<double> heights)
 {
     if(heights.empty())
@@ -236,15 +250,15 @@ ProbabilityDistribution::ProbabilityDistribution(Histogram reweightedHistogram, 
 {
     binsize=reweightedHistogram.getBinsize();
     anchor=reweightedHistogram.getAnchor();
-	for(int indexHistoBin=0; indexHistoBin<reweightedHistogram.getNumberOfBins(); indexHistoBin++){
-		int whichbin=static_cast<int>(reweightedHistogram.getBins().at(indexHistoBin).first/binsize + 0.5);
-		std::vector<double> tmpHeightsOfOneBin=reweightedHistogramEstimator.getMultipleHeightsOfBins().at(indexHistoBin);
+    std::vector<double> middleOfBins=reweightedHistogram.getMiddleOfBins();
+	for(double middleOfBin : middleOfBins){
+		std::vector<double> tmpHeightsOfOneBin=reweightedHistogramEstimator.getHeightsOfBin(middleOfBin);
 		std::valarray<double> heightsOfOneBin(tmpHeightsOfOneBin.data(),tmpHeightsOfOneBin.size());
         DataSample heightDataOfOneBin(heightsOfOneBin);
         realFloat estimate=0.0, error=0.0;
-		estimate=reweightedHistogram.getHeightsOfBins().at(indexHistoBin);
+		estimate=reweightedHistogram[middleOfBin];
 		error=evaluateErrorBasedOnMethod(heightDataOfOneBin, errorMethod);
-	    probabilityDistribution[whichbin]=EstimateAndError(estimate, error);
+	    this->operator[](middleOfBin)=EstimateAndError(estimate, error);
 	}
 }
 
@@ -278,7 +292,7 @@ std::vector<EstimateAndError> ProbabilityDistribution::getHeightsOfBins(bool inc
 
 EstimateAndError ProbabilityDistribution::getHeightOfSpecificBin(double middleOfBin) const
 {
-    int whichbin=static_cast<int>(middleOfBin/binsize);
+    int whichbin=static_cast<int>((middleOfBin-anchor)/binsize);
     std::map<int, EstimateAndError> copyOfProbabilityDistribution(probabilityDistribution);
     EstimateAndError height=copyOfProbabilityDistribution[whichbin];
     return height;
@@ -312,6 +326,22 @@ std::vector<std::pair<double,double> > ProbabilityDistribution::getBins(bool inc
     }
     return bins;
 } 
+
+std::vector<double> ProbabilityDistribution::getMiddleOfBins(bool includeZeroBins) const
+{
+    std::map<int, EstimateAndError> copyOfProbabilityDistribution(probabilityDistribution);
+    if(includeZeroBins)
+    {
+        copyOfProbabilityDistribution=insertBinsWithZeroEstimateAndError(probabilityDistribution);
+    }
+
+    std::vector<double> middleOfBins;
+    for(std::pair<const int, EstimateAndError> bin : copyOfProbabilityDistribution)
+    {
+        middleOfBins.push_back(bin.first*binsize+anchor);
+    }
+    return middleOfBins;
+}
 
 /* 
  * The following operator allows us to fill the histogram by writing

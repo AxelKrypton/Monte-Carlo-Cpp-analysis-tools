@@ -53,10 +53,15 @@ public:
     HistogramEstimator() = delete;
     HistogramEstimator(double);
     std::vector<std::vector<double> > getMultipleHeightsOfBins(bool = false) const;
+    std::vector<double> getHeightsOfBin(double);
 
     void insert(double, std::vector<double>);
 
 private:
+    /*The Estimator doesn't need an anchor since in the MomentsReweighter class a valarray
+     *of Histograms get filled, restored and then used to fill the Estimators. So the Estimators
+     *are already the "restored" ones.
+     */
     double binsize;
     std::multimap<int,double> histogramEstimators;
 };
@@ -74,6 +79,7 @@ public:
     double getMaxXvalue() const;
     double getMinXvalue() const;
     std::vector<std::pair<double,double> > getBins(bool = false) const;
+    std::vector<double> getMiddleOfBins(bool = false) const;
 
     EstimateAndError& operator[](double);
 

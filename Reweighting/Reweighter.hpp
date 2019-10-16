@@ -52,6 +52,8 @@ public:
 	std::vector<std::vector<Observables> > getReweightedObservables();
 	std::vector<std::vector<std::map<std::string, DataSample> > > getReweightedObservablesEstimators();
 	std::vector<std::vector<ProbabilityDistribution> > getReweightedProbabilityDistributions();
+	bool getPrintProbabilityDistributionToFile();
+
 private:
 	ReweighterIO reweighterIO;
 	std::vector<std::string> quantitiesToBeReweighted;
@@ -64,6 +66,7 @@ private:
 	std::vector<std::vector<Observables> > observablesAtNewPoints;
 	std::unique_ptr<std::vector<std::vector<std::map<std::string, DataSample> > > > observablesEstimatorsAtNewPoints; //e.g. [newPoint][obsInFile][Skewness::observableName]
 	std::vector<std::vector<ProbabilityDistribution> > probabilityDistributionsAtNewPoints;
+	bool printProbabilityDistributionToFile;
 	//The following methods are here in order to be tested one by one (in principle they could be static function in the .cpp file)
 	Reweighter(std::initializer_list<std::string>);
 	static LqcdReweightingParameters createLqcdParameters(std::initializer_list<std::string>);
