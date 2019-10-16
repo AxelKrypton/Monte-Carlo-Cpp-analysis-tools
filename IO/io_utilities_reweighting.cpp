@@ -191,18 +191,18 @@ void writeLqcdReweightedObservablesEstimatorsToFile(std::vector<std::vector<real
 static void printHistoToFile(realFloat betaValue, int numberOfQuantity, ProbabilityDistribution& reweightedProbabilityDistribution, std::string outputfilePrefix)
 {
 	std::ofstream outputstream;
-	std::string filename=outputfilePrefix + "_" + "ProbabilityDistribution" + boost::lexical_cast<std::string>(numberOfQuantity + 1) + "_" + boost::lexical_cast<std::string>(betaValue); 
+	std::string filename=outputfilePrefix + "_" + "ProbabilityDistribution" + boost::lexical_cast<std::string>(numberOfQuantity + 1) + "_" + std::to_string(betaValue);
 	outputstream.open(filename.c_str(), std::ios::app);
 	if(outputstream.is_open()){
 		unsigned int numberOfHistoBins = reweightedProbabilityDistribution.getNumberOfBins();
 		double binsize=reweightedProbabilityDistribution.getBinsize();
-		outputstream << "numOfBin" << "  " << "LowerEdgeOfBin   MiddleOfBin\tUpperEdgeOfBin" << "\t\t" << "Estimate\tError" << std::endl;
+		outputstream << "#numOfBin" << "  " << "LowerEdgeOfBin   MiddleOfBin\tUpperEdgeOfBin" << "\t\t" << "Estimate\tError" << std::endl;
 		for(unsigned int histoIndex = 0; histoIndex<numberOfHistoBins; histoIndex++){
 			realFloat lowerBinEdge = reweightedProbabilityDistribution.getBins().at(histoIndex).first;
 			realFloat upperBinEdge = reweightedProbabilityDistribution.getBins().at(histoIndex).second;
 			realFloat middleOfBin = reweightedProbabilityDistribution.getBins().at(histoIndex).first + 0.5*binsize;
 			EstimateAndError estErr=reweightedProbabilityDistribution.getHeightsOfBins().at(histoIndex);
-			outputstream << std::scientific << histoIndex << ":\t   " << lowerBinEdge << "\t   " << middleOfBin << "\t " << upperBinEdge << "\t\t" << estErr.estimate << "\t" << estErr.error << std::endl;
+			outputstream << std::scientific << histoIndex << "\t   " << lowerBinEdge << "\t   " << middleOfBin << "\t " << upperBinEdge << "\t\t" << estErr.estimate << "\t" << estErr.error << std::endl;
 		}
 	outputstream.close();
 	}
@@ -224,7 +224,7 @@ void writeLqcdReweightedProbabilityDistributionsToFile(std::vector<std::vector<r
 
 	for (unsigned int quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)
 	{
-		for (unsigned int iteration=0; iteration < numberOfNewPoints; iteration ++)
+		for (unsigned int iteration=0; iteration < numberOfNewPoints; iteration++)
 		{
 			printHistoToFile(newBetaValues[iteration][0], quantityIndex, reweightedProbabilityDistributions[iteration][quantityIndex], outputfilePrefix);
 		}
