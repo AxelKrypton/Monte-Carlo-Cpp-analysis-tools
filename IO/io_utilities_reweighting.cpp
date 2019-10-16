@@ -64,7 +64,7 @@ private:
 };
 
 
-template<typename T> static void checkInputSizes(std::vector<std::vector<realFloat> > & newBetaValues, std::vector<std::vector<T> > & reweightedData)
+template<typename T> static void checkInputSizes(const std::vector<std::vector<realFloat> > & newBetaValues, const std::vector<std::vector<T> > & reweightedData)
 {
 	if ( reweightedData.size() == 0 )
 	{
@@ -90,7 +90,7 @@ template<typename T> static void checkInputSizes(std::vector<std::vector<realFlo
 }
 
 
-void writeLqcdReweightedObservablesToFile(std::vector<std::vector<realFloat> > & newBetaValues, std::vector<std::vector<Observables> > & reweightedData, std::string outputfilePrefix)
+void writeLqcdReweightedObservablesToFile(const std::vector<std::vector<realFloat> >& newBetaValues,  const std::vector<std::vector<Observables> >& reweightedData, std::string outputfilePrefix)
 {
 	try{
 		checkInputSizes(newBetaValues, reweightedData);
@@ -152,8 +152,8 @@ static std::vector<Observables> convertMapOfObservableNameAndDataSampleToVectorO
     return returnValue;
 }
 
-void writeLqcdReweightedObservablesEstimatorsToFile(std::vector<std::vector<realFloat> >& newBetaValues,
-                                                    std::vector<std::vector<std::map<std::string,DataSample> > >& reweightedEstimators, std::string outputfilePrefix)
+void writeLqcdReweightedObservablesEstimatorsToFile(const std::vector<std::vector<realFloat> >& newBetaValues,
+                                                    const std::vector<std::vector<std::map<std::string,DataSample> > >& reweightedEstimators, std::string outputfilePrefix)
 {
     try{
         std::cout << std::endl;
@@ -188,7 +188,7 @@ void writeLqcdReweightedObservablesEstimatorsToFile(std::vector<std::vector<real
 
 }
 
-static void printHistoToFile(realFloat betaValue, int numberOfQuantity, ProbabilityDistribution& reweightedProbabilityDistribution, std::string outputfilePrefix)
+static void printHistoToFile(realFloat betaValue, int numberOfQuantity, const ProbabilityDistribution& reweightedProbabilityDistribution, std::string outputfilePrefix)
 {
 	std::ofstream outputstream;
 	std::string filename=outputfilePrefix + "_" + "ProbabilityDistribution" + boost::lexical_cast<std::string>(numberOfQuantity + 1) + "_" + std::to_string(betaValue);
@@ -208,7 +208,7 @@ static void printHistoToFile(realFloat betaValue, int numberOfQuantity, Probabil
 	}
 }
 
-void writeLqcdReweightedProbabilityDistributionsToFile(std::vector<std::vector<realFloat> > & newBetaValues, std::vector<std::vector<ProbabilityDistribution> > & reweightedProbabilityDistributions, std::string outputfilePrefix)
+void writeLqcdReweightedProbabilityDistributionsToFile(const std::vector<std::vector<realFloat> > & newBetaValues, const std::vector<std::vector<ProbabilityDistribution> >& reweightedProbabilityDistributions, std::string outputfilePrefix)
 {
 	try{
 		checkInputSizes(newBetaValues, reweightedProbabilityDistributions);

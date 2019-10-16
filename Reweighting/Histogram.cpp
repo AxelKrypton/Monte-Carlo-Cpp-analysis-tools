@@ -25,7 +25,7 @@ Histogram::Histogram(double binsizeIn, double anchorIn) : anchor(anchorIn), bins
     }
 }
 
-int Histogram::getNumberOfBins(bool includeZeroBins)
+int Histogram::getNumberOfBins(bool includeZeroBins) const
 {
     if(histogram.empty())
         return 0;
@@ -33,12 +33,12 @@ int Histogram::getNumberOfBins(bool includeZeroBins)
         return includeZeroBins ? static_cast<int>((getMaxXvalue()-getMinXvalue())/binsize) : histogram.size();
 }
 
-double Histogram::getBinsize()
+double Histogram::getBinsize() const
 {
     return binsize;
 }
 
-double Histogram::getAnchor()
+double Histogram::getAnchor() const
 {
     return anchor;
 }
@@ -248,7 +248,7 @@ ProbabilityDistribution::ProbabilityDistribution(Histogram reweightedHistogram, 
 	}
 }
 
-int ProbabilityDistribution::getNumberOfBins(bool includeZeroBins)
+int ProbabilityDistribution::getNumberOfBins(bool includeZeroBins) const
 {
     if(probabilityDistribution.empty())
         return 0;
@@ -256,7 +256,7 @@ int ProbabilityDistribution::getNumberOfBins(bool includeZeroBins)
         return includeZeroBins ? static_cast<int>((getMaxXvalue()-getMinXvalue())/binsize) : probabilityDistribution.size();
 }
 
-double ProbabilityDistribution::getBinsize()
+double ProbabilityDistribution::getBinsize() const
 {
     return binsize;
 }

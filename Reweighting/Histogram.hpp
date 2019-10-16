@@ -24,9 +24,9 @@ public:
     Histogram() = delete;
     Histogram(double, double = 0.0);
     //Getters
-    int getNumberOfBins(bool = false);
-    double getBinsize();
-    double getAnchor();
+    int getNumberOfBins(bool = false) const;
+    double getBinsize() const;
+    double getAnchor() const;
     std::vector<double> getHeightsOfBins(bool = false) const;
     double getHeightOfSpecificBin(double) const;
     double getMaxXvalue() const;
@@ -67,8 +67,8 @@ public:
     ProbabilityDistribution();
     ProbabilityDistribution(Histogram, HistogramEstimator, ErrorCalculationMethod);
     //Getters
-    int getNumberOfBins(bool = false);
-    double getBinsize();
+    int getNumberOfBins(bool = false) const;
+    double getBinsize() const;
     std::vector<EstimateAndError> getHeightsOfBins(bool = false) const;
     EstimateAndError getHeightOfSpecificBin(double) const;
     double getMaxXvalue() const;
