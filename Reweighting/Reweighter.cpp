@@ -95,15 +95,17 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 			                                                             reweighterIO.namesOfParametersIgnoringMetaParameters.size(), maximumMomentNeededOverall);
 			if(rewProc.reweightProbabilityDistributions){
 				printProbabilityDistributionToFile=rewProc.reweightProbabilityDistributions;
-				std::cout << "***************************************" << std::endl;
-				std::cout << "Reweighting probability distribution..." << std::endl;
+				std::cout << "==========================================================" << std::endl;
+				std::cout << " Set probability distributions from estimators..." << std::endl;
 				std::vector<std::vector<Histogram> > histogramsAtNewPoints = momentsReweighter.getProbabilityDistributionsAtNewPoints();
 				std::vector<std::vector<HistogramEstimator> > histogramEstimatorsAtNewPoints = momentsReweighter.getProbabilityDistributionEstimatorsAtNewPoints();
 				checkSizesOfHistogramsAndHistogramEstimators(histogramsAtNewPoints, histogramEstimatorsAtNewPoints, numberOfNewPoints, numberOfObservablesInFiles);
 				setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(probabilityDistributionsAtNewPoints, reweighterIO.errorMethod, 
 																						 histogramsAtNewPoints, histogramEstimatorsAtNewPoints);
-				std::cout << "...done!" << std::endl;
-				std::cout << "***************************************" << std::endl;
+				std::cout << "  ...done!" << std::endl;
+				std::cout << " Reweighting of probability distributions done!" << std::endl;
+				std::cout << "==========================================================" << std::endl;
+				std::cout << std::endl;
 			}
 		}
 
