@@ -58,12 +58,11 @@ std::vector<double> Histogram::getHeightsOfBins(bool includeZeroBins) const
     return heights;
 }
 
-double Histogram::getHeightOfSpecificBin(double middleOfBin) const
+double Histogram::getHeightOfSpecificBin(double obsvalue) const
 {
-    int whichbin=static_cast<int>((middleOfBin-anchor)/binsize);
+    int whichbin=static_cast<int>(ceil((obsvalue-anchor)/binsize-0.5));
     std::map<int, double> copyOfHisto(histogram);
-    double height=copyOfHisto[whichbin];
-    return height;
+    return copyOfHisto[whichbin];
 }
 
 double Histogram::getMaxXvalue() const
@@ -128,8 +127,8 @@ double& Histogram::operator[](double obsvalue)
      * result):
      *              ceil(obsvalue-0.5*binsize-anchor)/binsize
      */
-    int whichbin=ceil((obsvalue-anchor)/binsize-0.5);
-    return histogram[whichbin]; 
+    int whichbin=static_cast<int>(ceil((obsvalue-anchor)/binsize-0.5));
+    return histogram[whichbin];
 }
 
 std::map<int,double>& Histogram::operator-=(double shiftTerm)

@@ -93,32 +93,20 @@ BOOST_AUTO_TEST_SUITE(getters)
         height=hist.getHeightOfSpecificBin(2.0);
         manualHeight=3.0;
         BOOST_REQUIRE_CLOSE(height, manualHeight, realFloatPrecisionInPercent);
-    }
-
-    BOOST_AUTO_TEST_CASE(getHeightOfSpecificBin2)
-    {
-        const double binsize=2.0;
-        double manualHeight, height;
-        Histogram hist(binsize);
-        hist[0.3]=1.0;
-        hist[1.3]=3.0;
-        hist[6.3]=4.0;
         height=hist.getHeightOfSpecificBin(4.0);
         manualHeight=0.0;
         BOOST_REQUIRE_CLOSE(height, manualHeight, realFloatPrecisionInPercent);
     }
 
-    BOOST_AUTO_TEST_CASE(getHeightOfSpecificBin3)
+    BOOST_AUTO_TEST_CASE(getHeightOfSpecificBin2)
     {
-        const double binsize=2.0, delta=-3.0;
+        const double binsize=2.0, anchor=-3.0;
         double manualHeight, height;
-        Histogram hist(binsize);
-        hist[0.3]=1.0;
+        Histogram hist(binsize, anchor);
         hist[1.3]=3.0;
         hist[6.3]=4.0;
-        hist.shift(delta);
         height=hist.getHeightOfSpecificBin(4.0);
-        manualHeight=4.0;
+        manualHeight=0.0;
         BOOST_REQUIRE_CLOSE(height, manualHeight, realFloatPrecisionInPercent);
     }
 
