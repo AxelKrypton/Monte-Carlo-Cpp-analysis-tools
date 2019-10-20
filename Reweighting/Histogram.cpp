@@ -215,9 +215,9 @@ std::vector<std::vector<double> > HistogramEstimator::getMultipleHeightsOfBins(b
     return multipleHeightsOfBins;
 }
 
-std::vector<double> HistogramEstimator::getHeightsOfBin(double middleOfBin)
+std::vector<double> HistogramEstimator::getHeightsOfBin(double obsvalue)
 {
-    int whichbin=static_cast<int>(middleOfBin/binsize);
+    int whichbin=static_cast<int>(ceil(obsvalue/binsize - 0.5));
         std::vector<double> heights;
         typedef std::multimap<int, double>::iterator histogramEstimatorsIt;
         std::pair<histogramEstimatorsIt,histogramEstimatorsIt> range = histogramEstimators.equal_range(whichbin);
@@ -229,11 +229,11 @@ std::vector<double> HistogramEstimator::getHeightsOfBin(double middleOfBin)
 }
 
 
-void HistogramEstimator::insert(double middleOfBin, std::vector<double> heights)
+void HistogramEstimator::insert(double obsvalue, std::vector<double> heights)
 {
     if(heights.empty())
         throw std::logic_error("Estimator can't be filled with an empty vector of heights!");
-    int whichbin=static_cast<int>(middleOfBin/binsize);
+    int whichbin=static_cast<int>(ceil(obsvalue/binsize - 0.5));
     for(size_t i=0; i<heights.size(); i++)
         histogramEstimators.insert(std::pair<int,double> (whichbin,heights[i]));
 }
@@ -289,9 +289,9 @@ std::vector<EstimateAndError> ProbabilityDistribution::getHeightsOfBins(bool inc
     return heights;
 }
 
-EstimateAndError ProbabilityDistribution::getHeightOfSpecificBin(double middleOfBin) const
+EstimateAndError ProbabilityDistribution::getHeightOfSpecificBin(double obsvalue) const
 {
-    int whichbin=static_cast<int>((middleOfBin-anchor)/binsize);
+    int whichbin=static_cast<int>(ceil((obsvalue-anchor)/binsize - 0.5));
     std::map<int, EstimateAndError> copyOfProbabilityDistribution(probabilityDistribution);
     EstimateAndError height=copyOfProbabilityDistribution[whichbin];
     return height;
@@ -358,7 +358,7 @@ EstimateAndError& ProbabilityDistribution::operator[](double obsvalue)
      * result):
      *              ceil(obsvalue-0.5*binsize-anchor)/binsize
      */
-    int whichbin=ceil((obsvalue-anchor)/binsize-0.5);
+    int whichbin=static_cast<int>(ceil((obsvalue-anchor)/binsize-0.5));
     return probabilityDistribution[whichbin]; 
 }
 

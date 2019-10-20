@@ -14,7 +14,7 @@
  * map<int,double> and works as a container that stores
  * the bin-number as the first and the height as the second entry.
  * The zero-th bin is that having the anchor as middle point.
- * The lower edge of a bin is part of that bin while the upper edge is part of the next bin.
+ * The upper edge of a bin is part of that bin while the lower edge is part of the lower next bin.
  * The map gets a new entry when it gets filled.
  */
 
