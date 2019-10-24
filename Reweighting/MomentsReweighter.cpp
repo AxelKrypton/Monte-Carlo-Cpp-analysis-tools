@@ -754,7 +754,7 @@ void MomentsReweighterAbstract::extractAndSetReweightedHistogramEstimators(const
                 std::vector<double> heightsOfOneBin(numberOfHeightsPerBins);
                 for(size_t indexEstimator=0; indexEstimator<numberOfHeightsPerBins; indexEstimator++){
                     double height=histogramEstimatorsForErrorCalculation[indexEstimator][indexNewPoint][indexInputObservable].getHeightOfSpecificBin(middleOfBin);
-                    heightsOfOneBin.push_back(height);
+                    heightsOfOneBin[indexEstimator]=height;
                 }
                 probabilityDistributionEstimatorsAtNewBetas[indexNewPoint][indexInputObservable].insert(middleOfBin,heightsOfOneBin);
             }
