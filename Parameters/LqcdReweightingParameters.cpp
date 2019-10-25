@@ -20,7 +20,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
         ("numberOfNewBetaPoints", po::value<unsigned int>(&numberOfNewBetaPoints)->default_value(2), "Number of new points to produce with reweighting.")
         ("newBetaRange_high", po::value<realFloat>(&newBetaRange_high)->default_value(2), "Upper limit of new beta range of to cover with reweighting.")
         ("newBetaRange_low", po::value<realFloat>(&newBetaRange_low)->default_value(1), "Lower limit of new beta range of to cover with reweighting.")
-        ("deactivateReweightingForMean", po::value<bool>(&deactivateReweightingForMean)->default_value(false)->implicit_value(true), "Do not perform reweighting for the mean of the data. (This will automatically deactivate the reweighting of probability distributions.)")
+        ("deactivateReweightingForMean", po::value<bool>(&deactivateReweightingForMean)->default_value(false)->implicit_value(true), "Do not perform reweighting for the mean of the data (this implies --deactivateReweightingForProbabilityDistribution).")
         ("deactivateReweightingForVariance", po::value<bool>(&deactivateReweightingForVariance)->default_value(false)->implicit_value(true), "Do not perform reweighting for the variance of the data.")
         ("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false)->implicit_value(true), "Do not perform reweighting for the skewness of the data.")
         ("deactivateReweightingForKurtosis", po::value<bool>(&deactivateReweightingForKurtosis)->default_value(false)->implicit_value(true), "Do not perform reweighting for the kurtosis of the data.")
@@ -70,6 +70,11 @@ void LqcdReweightingParameters::checkParsedArguments(po::variables_map & vm, po:
     if ( !vm["useJackknifeAsErrorMethod"].defaulted() && !vm["useBootstrapAsErrorMethod"].defaulted() )
     {
         throw std::invalid_argument("More than one error method specified. Aborting!");
+    }
+
+    if( !vm["deactivateReweightingForMean"].defaulted() )
+    {
+        deactivateReweightingForProbabilityDistribution=deactivateReweightingForMean;
     }
 }
 

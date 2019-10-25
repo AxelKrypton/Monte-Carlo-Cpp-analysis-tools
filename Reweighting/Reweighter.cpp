@@ -94,7 +94,6 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters) : reweighterIO(para
 			                                                             rewProc.quantitiesConsidered, reweighterIO.columnsToBeReweightedUsingMultipleColumns,
 			                                                             reweighterIO.namesOfParametersIgnoringMetaParameters.size(), maximumMomentNeededOverall);
 			if(rewProc.reweightProbabilityDistributions){
-				printProbabilityDistributionToFile=rewProc.reweightProbabilityDistributions;
 				std::cout << "==========================================================" << std::endl;
 				std::cout << " Set probability distributions from estimators..." << std::endl;
 				std::vector<std::vector<Histogram> > histogramsAtNewPoints = momentsReweighter.getProbabilityDistributionsAtNewPoints();
@@ -133,10 +132,6 @@ std::vector<std::vector<std::map<std::string, DataSample> > > Reweighter::getRew
 
 std::vector<std::vector<ProbabilityDistribution> > Reweighter::getReweightedProbabilityDistributions(){
 	return probabilityDistributionsAtNewPoints;
-}
-
-bool Reweighter::getPrintProbabilityDistributionToFile(){
-	return printProbabilityDistributionToFile;
 }
 
 /******************************************** PRIVATE METHODS *************************************************/

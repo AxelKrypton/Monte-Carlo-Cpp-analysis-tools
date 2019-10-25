@@ -19,7 +19,7 @@ int main(int argc, const char ** argv)
 	        std::vector<std::vector<std::map<std::string,DataSample> > > reweightedObservablesEstimators = reweighter.getReweightedObservablesEstimators();
 	        writeLqcdReweightedObservablesEstimatorsToFile(newBetaValues, reweightedObservablesEstimators, parameters.getOutputfilePrefix());
 	    }
-		if(reweighter.getPrintProbabilityDistributionToFile()){
+		if(!parameters.getDeactivateReweightingForProbabilityDistribution()){
 			std::vector<std::vector<ProbabilityDistribution> > reweightedProbabilityDistributions = reweighter.getReweightedProbabilityDistributions();
 			writeLqcdReweightedProbabilityDistributionsToFile(newBetaValues, reweightedProbabilityDistributions, parameters.getOutputfilePrefix());
 		}
