@@ -231,11 +231,15 @@ void MomentsReweighterAbstract::calculateNewPoints(){
 			throw std::invalid_argument("Size of the vectors of new point parameters incorrect!");
 		std::vector<std::vector<realFloat> > newPointValuesForSingleParameter(newRangesOfParameters.size());
 		for(size_t i=0; i<newRangesOfParameters.size(); i++){
-			if(newNumberOfPointsOfParameters[i] < 2)
-				throw std::invalid_argument("Number of new points must be at least 2, since boundaries are included!");
-			realFloat deltaPar = fabs(newRangesOfParameters[i].first - newRangesOfParameters[i].second)/(newNumberOfPointsOfParameters[i]-1);
-			for(unsigned int j=0; j<newNumberOfPointsOfParameters[i]; j++)
-				newPointValuesForSingleParameter[i].push_back(std::min(newRangesOfParameters[i].first, newRangesOfParameters[i].second) + j*deltaPar);
+		    if(newRangesOfParameters[i].first == newRangesOfParameters[i].second)
+		        newPointValuesForSingleParameter[i].push_back(newRangesOfParameters[i].first);
+		    else {
+		        if(newNumberOfPointsOfParameters[i] < 2)
+		            throw std::invalid_argument("Number of new points must be at least 2, since boundaries are included!");
+		        realFloat deltaPar = fabs(newRangesOfParameters[i].first - newRangesOfParameters[i].second)/(newNumberOfPointsOfParameters[i]-1);
+		        for(unsigned int j=0; j<newNumberOfPointsOfParameters[i]; j++)
+		            newPointValuesForSingleParameter[i].push_back(std::min(newRangesOfParameters[i].first, newRangesOfParameters[i].second) + j*deltaPar);
+		    }
 		}
 		std::vector<realFloat> auxiliaryVector;
 		valuesOfNewParameters.clear();
