@@ -18,7 +18,7 @@ enable_testing()
 include(CTest)
 
 # Compiler settings (https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     message(STATUS "Compiling with ${CMAKE_CXX_COMPILER_ID}")
     add_compile_options(
