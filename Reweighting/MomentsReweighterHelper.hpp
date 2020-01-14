@@ -1,6 +1,8 @@
 /*
  *
- *  Copyright (c)
+ *  Copyright (c) 2014-2015,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2015 Christopher Pinke
+ *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

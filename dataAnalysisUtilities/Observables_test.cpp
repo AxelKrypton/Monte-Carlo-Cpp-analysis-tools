@@ -1,6 +1,7 @@
 /*
  *
- *  Copyright (c)
+ *  Copyright (c) 2015 Christopher Pinke
+ *  Copyright (c) 2015-2016,2018,2020 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
