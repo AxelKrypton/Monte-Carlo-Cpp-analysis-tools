@@ -47,10 +47,18 @@ if( USE_REW_MULTI_PRECISION )
 		
 endif( USE_REW_MULTI_PRECISION )
 
-#This is to copy all test files to the correct build directory
-add_custom_target(SampleDataFiles ALL
-				  COMMAND ${CMAKE_COMMAND} -E copy_directory
-                  ${CMAKE_SOURCE_DIR}/dataAnalysisUtilities/SampleDatafiles $<TARGET_FILE_DIR:dataAnalysisUtilities>/SampleDatafiles)
+#Extract test files directly to the build correct folder
+set(TEST_DATAFILES_ARCHIVE_PATH ${CMAKE_SOURCE_DIR}/dataAnalysisUtilities/SampleDatafiles/testAuxiliaryDataFiles.tar.xz)
+set(TEST_DATAFILES_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/SampleDatafiles)
+file(MAKE_DIRECTORY ${TEST_DATAFILES_BUILD_PATH})
+execute_process(COMMAND tar -xf ${TEST_DATAFILES_ARCHIVE_PATH}
+                WORKING_DIRECTORY ${TEST_DATAFILES_BUILD_PATH}
+                RESULT_VARIABLE EXTRACTION_EXIT_CODE)
+if(EXTRACTION_EXIT_CODE EQUAL 0)
+  message(STATUS "Extraction of tests auxiliary files successfully completed.")
+else()
+  message(FATAL_ERROR "Failed extracting files from ${CMAKE_SOURCE_DIR}/sampleDatafiles/testAuxiliaryDataFiles.tar.xz archive!")
+endif(EXTRACTION_EXIT_CODE EQUAL 0)
 
 add_unit_test(dataSampleBasic DataSampleBasic_test dataAnalysisUtilities)
 add_unit_test(dataSample DataSample_test dataAnalysisUtilities)
