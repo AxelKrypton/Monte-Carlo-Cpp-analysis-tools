@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
 	}
 
 	//This file has 1005 entries, from which 5 are discarded when binning with binsize 100
-	std::string fileThatDoesExist = "datafile.example";
+	std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 	realFloat precisionOfDataInFileInPercent = 1e-10;
 	
 	BOOST_AUTO_TEST_CASE(error1)
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
 
 	//This file has 1005 entries, from which 5 are discarded when binning with number of bins 10
-	std::string fileThatDoesExist = "datafile.example";
+	std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 	realFloat precisionOfDataInFileInPercent = 1e-10;
 	int numberOfBins = 10;
 
@@ -355,7 +355,7 @@ BOOST_AUTO_TEST_SUITE(varianceAndError)
 
 	BOOST_AUTO_TEST_CASE(withBinning)
 	{
-		std::string gaussianData = "gaussianNumbers_0_1_0_3.dat";
+		std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_0_3.dat";
 		
 		realFloat expectedVariance = 1.;
 		realFloat expectedError = 5e-3;
@@ -379,7 +379,7 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 
 	BOOST_AUTO_TEST_CASE(withBinning1)
 	{
-		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
+		std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_1_3.dat";
 		
 		realFloat expectedSkewness = 1.;
 
@@ -398,7 +398,7 @@ BOOST_AUTO_TEST_SUITE(skewnessAndError)
 	
 	BOOST_AUTO_TEST_CASE(withBinning2)
 	{
-		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
+		std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_1_3.dat";
 
 		realFloat expectedSkewness = 1.;
 
@@ -422,7 +422,7 @@ BOOST_AUTO_TEST_SUITE(kurtosisAndError)
 
 BOOST_AUTO_TEST_CASE(withBinning1)
 	{
-		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
+		std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_1_3.dat";
 		
 		realFloat expectedKurtosis = 3.;
 
@@ -441,7 +441,7 @@ BOOST_AUTO_TEST_CASE(withBinning1)
 
 	BOOST_AUTO_TEST_CASE(withBinning2)
 	{
-		std::string gaussianData = "gaussianNumbers_0_1_1_3.dat";
+		std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_1_3.dat";
 
 		realFloat expectedKurtosis = 3.;
 
@@ -464,11 +464,11 @@ BOOST_AUTO_TEST_SUITE(autocorrelation)
 
 	BOOST_AUTO_TEST_CASE(corrFuncTestVsBerg)
 	{
-		const char * arguments[] = {"foo", "--file=gaussianNumbers_Berg.dat", "-a", "--timeMaxAutocorrelationFunction=128", "--numberOfBinsForAutocorrelation=32"};
+		const char * arguments[] = {"foo", "--file=SampleDatafiles/gaussianNumbers_Berg.dat", "-a", "--timeMaxAutocorrelationFunction=128", "--numberOfBinsForAutocorrelation=32"};
 		Parameters parameters(5, arguments);
 		DataSample gaussianCorrelatedBergData(parameters.file, 2);
-		DataSample referenceCorrFuncValues("autFuncBergRefResult32bins.dat", 2);
-		DataSample referenceCorrFuncErrors("autFuncBergRefResult32bins.dat", 3);
+		DataSample referenceCorrFuncValues("SampleDatafiles/autFuncBergRefResult32bins.dat", 2);
+		DataSample referenceCorrFuncErrors("SampleDatafiles/autFuncBergRefResult32bins.dat", 3);
 
 		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationFunctionsAndErrorEstimatesOfDataSample(gaussianCorrelatedBergData, parameters);
 
@@ -496,11 +496,11 @@ BOOST_AUTO_TEST_SUITE(autocorrelation)
 
 	BOOST_AUTO_TEST_CASE(tauTestVsBerg)
 	{
-		const char * arguments[] = {"foo", "--file=gaussianNumbers_Berg.dat", "-a", "--timeMaxAutocorrelationFunction=128", "--numberOfBinsForAutocorrelation=32"};
+		const char * arguments[] = {"foo", "--file=SampleDatafiles/gaussianNumbers_Berg.dat", "-a", "--timeMaxAutocorrelationFunction=128", "--numberOfBinsForAutocorrelation=32"};
 		Parameters parameters(5, arguments);
 		DataSample gaussianCorrelatedBergData(parameters.file, 2);
-		DataSample referenceTauValues("intTauBergRefResult32bins.dat", 2);
-		DataSample referenceTauErrors("intTauBergRefResult32bins.dat", 3);
+		DataSample referenceTauValues("SampleDatafiles/intTauBergRefResult32bins.dat", 2);
+		DataSample referenceTauErrors("SampleDatafiles/intTauBergRefResult32bins.dat", 3);
 
 		std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(gaussianCorrelatedBergData, parameters);
 

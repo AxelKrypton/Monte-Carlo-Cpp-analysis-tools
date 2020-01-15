@@ -78,55 +78,55 @@ BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(build3)
 	{
-		std::string fileThatDoesNotExist = "theFileThatShouldNotBe";
+		std::string fileThatDoesNotExist = "SampleDatafiles/theFileThatShouldNotBe";
 		BOOST_REQUIRE_THROW( DataSampleBasic dataSample(fileThatDoesNotExist), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(build4)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		BOOST_CHECK_NO_THROW( DataSampleBasic dataSample(fileThatDoesExist));
 	}
 
 	BOOST_AUTO_TEST_CASE(build5)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		BOOST_REQUIRE_THROW( DataSampleBasic dataSample(fileThatDoesExist, 0), std::invalid_argument);
 	}
 
 	BOOST_AUTO_TEST_CASE(build6)
 	{
-		std::string fileThatHasOnlyOneColumn = "datafile.example";
+		std::string fileThatHasOnlyOneColumn = "SampleDatafiles/datafile.example";
 		BOOST_REQUIRE_THROW( DataSampleBasic dataSample(fileThatHasOnlyOneColumn, 2), std::logic_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build7)
 	{
-		std::string fileThatHasTwoColumns = "datafileWithTwoColumns.example";
+		std::string fileThatHasTwoColumns = "SampleDatafiles/datafileWithTwoColumns.example";
 		BOOST_CHECK_NO_THROW( DataSampleBasic dataSample(fileThatHasTwoColumns, 2));
 	}
 
 	BOOST_AUTO_TEST_CASE(build_emptyFile1)
 	{
-		std::string emptyFile = "emptyFile.example";
+		std::string emptyFile = "SampleDatafiles/emptyFile.example";
 		BOOST_REQUIRE_THROW( DataSampleBasic dataSample(emptyFile), std::logic_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build_emptyFile2)
 	{
-		std::string fileThatHasEmptyLine = "fileWithEmptyLine.example";
+		std::string fileThatHasEmptyLine = "SampleDatafiles/fileWithEmptyLine.example";
 		BOOST_REQUIRE_THROW( DataSampleBasic dataSample(fileThatHasEmptyLine), std::logic_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build_commentFile)
 	{
-		std::string fileThatHasOnlyComment = "fileWithComment.example";
+		std::string fileThatHasOnlyComment = "SampleDatafiles/fileWithComment.example";
 		BOOST_REQUIRE_THROW( DataSampleBasic dataSample(fileThatHasOnlyComment), std::logic_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(build_invalidFile)
 	{
-		std::string fileThatHasInvalidLine = "fileWithBrokenLine.example";
+		std::string fileThatHasInvalidLine = "SampleDatafiles/fileWithBrokenLine.example";
 		int validElementsInFile = 3;
 		DataSampleBasic dataSample(fileThatHasInvalidLine);
 		BOOST_REQUIRE_EQUAL( dataSample.getNumberOfElements(), validElementsInFile);
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(elements3)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int linesInFile = 1005;
 		DataSampleBasic dataSample(fileThatDoesExist);
 		int numberOfElementsInDataSample = dataSample.getNumberOfElements();
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(fileWithOffset_invalidArg)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int negativeOffset = -1;
 		BOOST_REQUIRE_THROW(DataSampleBasic dataSample(fileThatDoesExist, 1, negativeOffset), std::invalid_argument);
 	}
@@ -171,14 +171,14 @@ BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(offset_emptyFile1)
 	{
-		std::string emptyFile = "emptyFile.example";
+		std::string emptyFile = "SampleDatafiles/emptyFile.example";
 		int tooLargeOffset = 1;
 		BOOST_REQUIRE_THROW( DataSampleBasic dataSample(emptyFile, 1, tooLargeOffset), std::logic_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(offset_tooLarge)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int linesInFile = 1005;
 		int tooLargeOffset = linesInFile;
 		BOOST_REQUIRE_THROW(DataSampleBasic dataSample(fileThatDoesExist, 1, tooLargeOffset), std::logic_error);
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(offset1)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int linesInFile = 1005;
 		int offset = 456;
 		DataSampleBasic dataSample(fileThatDoesExist, 1, offset);
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_SUITE(build)
 
 	BOOST_AUTO_TEST_CASE(offset2)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int linesInFile = 1005;
 		int offset = 0;
 		DataSampleBasic dataSample(fileThatDoesExist, 1, offset);

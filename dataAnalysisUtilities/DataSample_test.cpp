@@ -103,21 +103,21 @@ BOOST_AUTO_TEST_SUITE(firstMoment)
 
 	BOOST_AUTO_TEST_CASE(firstMoment5)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		realFloat referenceValue = 0.56130529942755358;
 		TestDataSampleNthMoment tester(1, fileThatDoesExist, referenceValue);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment6)
 	{
-		std::string fileThatDoesExist = "datafileWithTwoColumns.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafileWithTwoColumns.example";
 		realFloat referenceValue = 0.56130529942755358;
 		TestDataSampleNthMoment tester(1, fileThatDoesExist, referenceValue, 2);
 	}
 
 	BOOST_AUTO_TEST_CASE(firstMoment7)
 	{
-		std::string fileThatDoesExist = "datafileWithTwoColumns.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafileWithTwoColumns.example";
 		realFloat referenceValue = 1.;
 		TestDataSampleNthMoment tester(1, fileThatDoesExist, referenceValue, 1);
 	}

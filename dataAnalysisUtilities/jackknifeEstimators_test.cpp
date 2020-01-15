@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 
 	BOOST_AUTO_TEST_CASE(withNumberOfBins_varianceError1)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int numberOfBins = 1005;
 		realFloat precisionOfDataInFileInPercent = 1e-10;
 		realFloat expectedValue = 4.98147373492720661E-006;
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinnedDataSample)
 
 	BOOST_AUTO_TEST_CASE(withNumberOfBins_varianceError2)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int numberOfBins = 10;
 		realFloat precisionOfDataInFileInPercent = 1e-10;
 		realFloat expectedValue = 1.0424604327986017e-05;
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithNumberOfBins)
 
 	BOOST_AUTO_TEST_CASE(meanError1)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int numberOfBins = 1005;
 		realFloat precisionOfDataInFileInPercent = 1e-10;
 		realFloat expectedValue = 3.44121381077520906E-004;
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithNumberOfBins)
 
 	BOOST_AUTO_TEST_CASE(meanError2)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int numberOfBins = 10;
 		realFloat precisionOfDataInFileInPercent = 1e-10;
 		realFloat expectedValue = 1.1564370727055974e-03;
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithNumberOfBins)
 
 	BOOST_AUTO_TEST_CASE(meanError3)
 	{
-		std::string fileThatDoesExist = "datafile2.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile2.example";
 		int numberOfBins = 10;
 		realFloat precisionOfDataInFileInPercent = 1e-10;
 		realFloat expectedValue = 1.14688734781786292E-003;
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithNumberOfBins)
 
 	BOOST_AUTO_TEST_CASE(varianceError1)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int numberOfBins = 10;
 		realFloat expectedValue = 1.0424604327986017e-05;
 
@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithNumberOfBins)
 
 	BOOST_AUTO_TEST_CASE(varianceError2)
 	{
-		std::string fileThatDoesExist = "datafile2.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile2.example";
 		int numberOfBins = 10;
 		realFloat expectedValue = 1.19735074528675533E-005;
 
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithBinsize)
 
 	BOOST_AUTO_TEST_CASE(meanError1)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int binsize = 1;
 		realFloat precisionOfDataInFileInPercent = 1e-10;
 		realFloat expectedValue = 3.44121381077520906E-004;
@@ -347,7 +347,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithBinsize)
 
 	BOOST_AUTO_TEST_CASE(meanError2)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int binsize = 100;
 		realFloat precisionOfDataInFileInPercent = 1e-10;
 		realFloat expectedValue = 1.1564370727055974e-03;
@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithBinsize)
 
 	BOOST_AUTO_TEST_CASE(meanError3)
 	{
-		std::string fileThatDoesExist = "datafile2.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile2.example";
 		int binsize = 100;
 		realFloat precisionOfDataInFileInPercent = 1e-10;
 		realFloat expectedValue = 1.14688734781786292E-003;
@@ -374,7 +374,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithBinsize)
 
 	BOOST_AUTO_TEST_CASE(varianceError1)
 	{
-		std::string fileThatDoesExist = "datafile.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 		int binsize = 100;
 		realFloat expectedValue = 1.0424604327986017e-05;
 
@@ -383,7 +383,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsFromBinningWithBinsize)
 
 	BOOST_AUTO_TEST_CASE(varianceError2)
 	{
-		std::string fileThatDoesExist = "datafile2.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile2.example";
 		int binsize = 100;
 		realFloat expectedValue = 1.19735074528675533E-005;
 
@@ -396,7 +396,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsExplicitAgainstCombinedMethod)
 
 	BOOST_AUTO_TEST_CASE(jackknifeEstimatorsFromBinningWithNumberOfBins_varianceError2)
 	{
-		std::string fileThatDoesExist = "datafile2.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile2.example";
 		int numberOfBins = 50;
 
 		DataSample sample(fileThatDoesExist);
@@ -413,7 +413,7 @@ BOOST_AUTO_TEST_SUITE(jackknifeEstimatorsExplicitAgainstCombinedMethod)
 
 	BOOST_AUTO_TEST_CASE(jackknifeEstimatorsFromBinningWithBinsize_varianceError2)
 	{
-		std::string fileThatDoesExist = "datafile2.example";
+		std::string fileThatDoesExist = "SampleDatafiles/datafile2.example";
 		int binsize = 20;
 
 		DataSample sample(fileThatDoesExist);

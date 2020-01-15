@@ -47,22 +47,10 @@ if( USE_REW_MULTI_PRECISION )
 		
 endif( USE_REW_MULTI_PRECISION )
 
-
-configure_file(datafile.example datafile.example COPYONLY)
-configure_file(datafile2.example datafile2.example COPYONLY)
-configure_file(datafile3.example datafile3.example COPYONLY)
-configure_file(datafileWithTwoColumns.example datafileWithTwoColumns.example)
-
-configure_file(gaussianNumbers_0_1_0_3.dat gaussianNumbers_0_1_0_3.dat COPYONLY)
-configure_file(gaussianNumbers_0_1_1_3.dat gaussianNumbers_0_1_1_3.dat COPYONLY)
-
-configure_file(emptyFile.example emptyFile.example COPYONLY)
-configure_file(fileWithBrokenLine.example fileWithBrokenLine.example COPYONLY)
-configure_file(fileWithComment.example fileWithComment.example COPYONLY)
-configure_file(fileWithEmptyLine.example fileWithEmptyLine.example COPYONLY)
-configure_file(../sampleDatafiles/gaussianNumbers_Berg.dat gaussianNumbers_Berg.dat COPYONLY)
-configure_file(../sampleDatafiles/intTauBergRefResult32bins.dat intTauBergRefResult32bins.dat COPYONLY)
-configure_file(../sampleDatafiles/autFuncBergRefResult32bins.dat autFuncBergRefResult32bins.dat COPYONLY)
+#This is to copy all test files to the correct build directory
+add_custom_target(SampleDataFiles ALL
+				  COMMAND ${CMAKE_COMMAND} -E copy_directory
+                  ${CMAKE_SOURCE_DIR}/dataAnalysisUtilities/SampleDatafiles $<TARGET_FILE_DIR:dataAnalysisUtilities>/SampleDatafiles)
 
 add_unit_test(dataSampleBasic DataSampleBasic_test dataAnalysisUtilities)
 add_unit_test(dataSample DataSample_test dataAnalysisUtilities)

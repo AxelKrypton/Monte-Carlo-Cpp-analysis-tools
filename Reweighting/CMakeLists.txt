@@ -46,7 +46,7 @@ add_library(Reweighting
 )
 target_link_libraries(Reweighting dataAnalysisUtilities)
 
-#This is to copy a files to the build directory
+#This is to copy all test files to the correct build directory
 add_custom_target(ReweightingFiles ALL
 				  COMMAND ${CMAKE_COMMAND} -E copy_directory
                   ${CMAKE_SOURCE_DIR}/Reweighting/GeneralTestFiles $<TARGET_FILE_DIR:Reweighting>/GeneralTestFiles

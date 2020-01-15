@@ -315,7 +315,7 @@ BOOST_AUTO_TEST_SUITE(binningWithBinsizeAndNumberOfBins)
 		//file has 21 entries, first 20 are 1, last one is zero
 		int binsize = 10;
 		int numberOfBins = 2;
-		std::string filename = "datafile3.example";
+		std::string filename = "SampleDatafiles/datafile3.example";
 
 		DataSampleBasic tmp (filename);
 		BinnedDataSampleFromBinsize binnedSample(tmp, binsize);
@@ -338,7 +338,7 @@ BOOST_AUTO_TEST_SUITE(binningWithBinsizeAndNumberOfBins)
 		//file has 1000 non-trivial entries
 		int desiredBinsize = 100;
 		int desiredNumberOfBins = 10;
-		std::string filename = "datafile2.example";
+		std::string filename = "SampleDatafiles/datafile2.example";
 
 		testBinningWithBinsizeAndNumberOfBins(filename, desiredBinsize, desiredNumberOfBins);
 	}
@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_SUITE(binningWithBinsizeAndNumberOfBins)
 		//file has 1000 non-trivial entries
 		int desiredBinsize = 10;
 		int desiredNumberOfBins = 100;
-		std::string filename = "datafile2.example";
+		std::string filename = "SampleDatafiles/datafile2.example";
 
 		testBinningWithBinsizeAndNumberOfBins(filename, desiredBinsize, desiredNumberOfBins);
 	}
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(resizeRawDataDuringBinning)
 
 	//file has 21 entries, first 20 are 1, last one is zero
-	std::string filename = "datafile3.example";
+	std::string filename = "SampleDatafiles/datafile3.example";
 	
 	BOOST_AUTO_TEST_CASE(test1)
 	{

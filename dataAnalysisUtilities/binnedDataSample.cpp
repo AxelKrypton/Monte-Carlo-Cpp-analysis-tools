@@ -46,8 +46,8 @@ void BinnedDataSample::checkDiscardedElements(int valueIn, std::string descripti
 	if (discardedElements != 0)
 	{
 		if(warningOutput){
-			std::cout << "# \033[0;33m\033[1mWarning:\033[21m " << descriptionIn << " is not a multiple of \033[1m"<< elementsOfSample << "\033[21m: \033[1m";
-			std::cout << discardedElements << "\033[21m elements are \033[1mdiscarded!\033[0m" << std::endl;
+			std::cout << "# \033[0;33m\033[1mWarning:\033[22m " << descriptionIn << " is not a multiple of \033[1m"<< elementsOfSample << "\033[22m: \033[1m";
+			std::cout << discardedElements << "\033[22m elements are \033[1mdiscarded!\033[0m" << std::endl;
 		}
 		binningFitsBinsize = false;
 		if ( binningMustFitSize )
