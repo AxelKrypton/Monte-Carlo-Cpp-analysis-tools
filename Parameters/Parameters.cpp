@@ -35,6 +35,7 @@ Parameters::Parameters(int argc, const char ** argv)
      * Apparently, when using short options with int one has to do "-n99"
      * because otherwise the empty space causes an error.
      */
+    // clang-format off
     desc.add_options()
         ("help,h", "Produce this help message")
         ("file,f", po::value<std::string>(&file), "File containing data")
@@ -60,6 +61,7 @@ Parameters::Parameters(int argc, const char ** argv)
         ("numberOfBinsForAutocorrelation", po::value<int>(&numberOfBinsForAutocorrelation), "Number of bins for the estimate of the autocorrelation time (default: 10)")
         ("timeMaxAutocorrelationFunction", po::value<int>(&timeMaxAutocorrelationFunction), "Maximum data distance for the estimate of the autocorrelation function (needed parameter).")
         ;
+    // clang-format on
 
     //option "file" can be given without option description
     positionalOptions.add("file", 1);

@@ -34,6 +34,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
     po::variables_map vm;
     po::positional_options_description positionalOptions;
 
+    // clang-format off
     desc.add_options()
         ("help,h", "Produce this help message")
         ("file,f", po::value<std::string>(&inputfile), "Inputfile containing metainformation for reweighting procedure.")
@@ -56,6 +57,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
         ("weightPrecision", po::value<realFloat>(&weightPrecision)->default_value(1.e-7), "Precision for iterative finding of optimal weights.")
         ("deactivateReweightingForProbabilityDistribution", po::value<bool>(&deactivateReweightingForProbabilityDistribution)->default_value(false)->implicit_value(true), "Do not perform reweighting for the probability distribution of the observables.")
         ("binsizeProbabilityDistribution", po::value<realFloat>(&binsizeProbabilityDistribution)->default_value(1.e-3), "Size of the bins of the probability distribution.");
+    // clang-format on
 
     //option "file" can be given without option description
     positionalOptions.add("file", 1);
