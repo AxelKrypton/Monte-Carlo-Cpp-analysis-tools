@@ -22,11 +22,11 @@
 #ifndef MOMENTSREWEIGHTER_H_
 #define MOMENTSREWEIGHTER_H_
 
-#include "SimulationDataContainer.hpp"
-#include "MomentsReweighterHelper.hpp"
-#include "Histogram.hpp"
-#include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 #include "../dataAnalysisUtilities/Observables.hpp"
+#include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
+#include "Histogram.hpp"
+#include "MomentsReweighterHelper.hpp"
+#include "SimulationDataContainer.hpp"
 
 /*
  * The idea underlying the implementation of the MomentsReweighter class is that the user construct a
@@ -94,157 +94,163 @@
  *       ReweighterAbstract class to have access to private member for testing purposes.
  */
 
-
 class MomentsReweighterAbstract {
     friend class MomentsReweighterHelper;
-public:
+
+  public:
     virtual ~MomentsReweighterAbstract() {}
-	//Getters
-	std::vector<std::vector<realFloat> > getValuesOfSimulationParameters();
-	std::vector<std::vector<realFloat> > getValuesOfNewParameters();
-	int getNumberOfNewPoints();
-	std::vector<realFloat> getLogZAtSimulatedPoints();
-	std::vector<realFloat> getLogZAtNewPoints();
-	realFloat getPrecisionToCalculateLogZ();
-	std::vector<std::vector<Moments> > getMomentsAtNewPoints();
-	std::vector<std::vector<MomentsEstimators> > getMomentsEstimatorsAtNewPoints();
-	std::vector<std::vector<Histogram> > getProbabilityDistributionsAtNewPoints();
-	std::vector<std::vector<HistogramEstimator> > getProbabilityDistributionEstimatorsAtNewPoints();
-	//Setters
+    // Getters
+    std::vector<std::vector<realFloat>> getValuesOfSimulationParameters();
+    std::vector<std::vector<realFloat>> getValuesOfNewParameters();
+    int getNumberOfNewPoints();
+    std::vector<realFloat> getLogZAtSimulatedPoints();
+    std::vector<realFloat> getLogZAtNewPoints();
+    realFloat getPrecisionToCalculateLogZ();
+    std::vector<std::vector<Moments>> getMomentsAtNewPoints();
+    std::vector<std::vector<MomentsEstimators>> getMomentsEstimatorsAtNewPoints();
+    std::vector<std::vector<Histogram>> getProbabilityDistributionsAtNewPoints();
+    std::vector<std::vector<HistogramEstimator>> getProbabilityDistributionEstimatorsAtNewPoints();
+    // Setters
     virtual void setPrecisionToCalculateLogZ(realFloat precisionToCalculateLogZ) = 0;
-    virtual void setNewRangesOfParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn) = 0;
+    virtual void setNewRangesOfParameters(std::vector<std::pair<realFloat, realFloat>> newRangesOfParametersIn) = 0;
     virtual void setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn) = 0;
-    virtual void setNewParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn,
+    // clang-format off
+    virtual void setNewParameters(std::vector<std::pair<realFloat, realFloat>> newRangesOfParametersIn,
                                   std::vector<unsigned int> newNumberOfPointsOfParametersIn) = 0;
-protected:
+    // clang-format on
+
+  protected:
     MomentsReweighterAbstract() = delete;
     MomentsReweighterAbstract(RawDataForReweightingAndMetainformation rawDataForReweightingAndMetainformationIn);
 
-    //Some of the following method could be static functions in the .cpp file but are here for testing purposes
+    // Some of the following method could be static functions in the .cpp file but are here for testing purposes
     void calculateAndSetLogZAtSimulatedPoints();
     void calculateAndSetLogZAtNewPoints();
     void calculateAndSetReweightedMomentsAndMomentsEstimators();
-    void prepareObservablesBeforeReweighting(std::vector<realFloat> &);
+    void prepareObservablesBeforeReweighting(std::vector<realFloat>&);
     void restoreObservablesAfterReweighting(std::vector<realFloat> minimumOfEachObservable,
-                                            std::vector<std::vector<realFloat> > *reweightedObservablesFromRawData,
-                                            std::valarray<std::vector<std::vector<realFloat> > > *jackknifePartialPred,
-											std::valarray<std::vector<std::vector<Histogram> > > *reweightedHistogramEstimators);
-    std::vector<std::vector<realFloat> > calculateReweightedObservableValues(bool useUncorrData = false,
-                                                                          const int entryToBeLeftOut = -1,
-                                                                          std::vector<realFloat> *logZAtSimulationPointToBeUsed = NULL,
-                                                                          std::vector<realFloat> *logZAtNewPointsToBeUsed = NULL,
-																		  std::vector<std::vector<Histogram> > *histoToBeFilled = NULL);
+                                            std::vector<std::vector<realFloat>>* reweightedObservablesFromRawData,
+                                            std::valarray<std::vector<std::vector<realFloat>>>* jackknifePartialPred,
+                                            std::valarray<std::vector<std::vector<Histogram>>>* reweightedHistogramEstimators);
+    std::vector<std::vector<realFloat>> calculateReweightedObservableValues(bool useUncorrData = false, const int entryToBeLeftOut = -1,
+                                                                            std::vector<realFloat>* logZAtSimulationPointToBeUsed = NULL,
+                                                                            std::vector<realFloat>* logZAtNewPointsToBeUsed = NULL,
+                                                                            std::vector<std::vector<Histogram>>* histoToBeFilled = NULL);
     std::vector<realFloat> calculateLogZAtSimulatedPoints(bool useUncorrData, const int entryToBeLeftOut,
-                                                       std::vector<realFloat> *logZAtSimulationPointToStartFrom = NULL, bool printUserInfo = false);
-    std::vector<realFloat> calculateLogZAtNewPoints(std::vector<std::vector<realFloat> > valuesOfParametersAtWhichLogZIsCalculated,
-                                                 bool useUncorrData = false, const int entryToBeLeftOut = -1,
-                                                 std::vector<realFloat> *logZAtSimulationPointToBeUsed = NULL);
-    //This getter again only for testing reason
+                                                          std::vector<realFloat>* logZAtSimulationPointToStartFrom = NULL,
+                                                          bool printUserInfo = false);
+    std::vector<realFloat> calculateLogZAtNewPoints(std::vector<std::vector<realFloat>> valuesOfParametersAtWhichLogZIsCalculated,
+                                                    bool useUncorrData = false, const int entryToBeLeftOut = -1,
+                                                    std::vector<realFloat>* logZAtSimulationPointToBeUsed = NULL);
+    // This getter again only for testing reason
     SimulationDataContainer getSimulationDataContainer(bool raw = true);
     std::vector<int> getColumnsToBeConsideredReweightingProbabilityDistribution();
-	std::vector<std::vector<Histogram> > getReweightedProbabilityDistributions();
-	std::vector<std::vector<HistogramEstimator> > getReweightedProbabilityDistributionEstimators();
-    //Method used in calculateAndGetReweightedObservables to select data to calculate observables and errors and to set them
-	void extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<realFloat> >& reweightedObservablesFromRawData,
-															const std::valarray<std::vector<std::vector<realFloat> > >& estimatorsForErrorsCalculation);
-	void extractAndSetReweightedHistogramEstimators(const std::valarray<std::vector<std::vector<Histogram> > >& histogramEstimatorsForErrorCalculation);														
+    std::vector<std::vector<Histogram>> getReweightedProbabilityDistributions();
+    std::vector<std::vector<HistogramEstimator>> getReweightedProbabilityDistributionEstimators();
+    // Method used in calculateAndGetReweightedObservables to select data to calculate observables and errors and to set them
+    void
+    extractAndSetReweightedMomentsAndMomentsEstimators(const std::vector<std::vector<realFloat>>& reweightedObservablesFromRawData,
+                                                       const std::valarray<std::vector<std::vector<realFloat>>>& estimatorsForErrorsCalculation);
+    void
+    extractAndSetReweightedHistogramEstimators(const std::valarray<std::vector<std::vector<Histogram>>>& histogramEstimatorsForErrorCalculation);
 
-private:
-    void calculateNewPoints(); //Method in which "valuesOfNewParameters" is filled and some checks are done
+  private:
+    void calculateNewPoints();  // Method in which "valuesOfNewParameters" is filled and some checks are done
 
-    //Members
+    // Members
     MomentsReweighterHelper momentsReweighterHelper;
     std::vector<std::string> reweightingParameterNames;
 
-	/*
-	 * Here in the following objects the order depending on which parameters are
-	 * considered ordered is ALPHABETICAL! This means for example that if in the
-	 * configuration file there is in the first line
-	 *   input_filename    chem_pot 0.5 beta 4.3 magnetic_field 8.7
-	 * then we will have
-	 *  -    reweightingParameterNames[3] = {"beta", "chem_pot", "magnetic_field"};
-	 *  - valuesOfSimulationParameters[0] = {4.3, 0.5, 8.7};
-	 *
-	 * Furthermore, the order of points in logZAtSimulatedPoints and in logZAtNewPoints
-	 * is the same of that in the outermost vector in valuesOfSimulationParameters and
-	 * valuesOfNewParameters, respectively. The order of simulated points is that given
-	 * in the configuration file, while that of new points is determined varying more
-	 * quickly the last parameter. For example, if we have "beta" and "chem_pot" as
-	 * parameters and the new ranges are between 4 and 5 for beta and between 1 and 2
-	 * for chemical potential (boundary included), each with 3 new points, thus:
-	 *     beta 4.0   chem_pot 1.0
-	 *     beta 4.0   chem_pot 1.5
-	 *     beta 4.0   chem_pot 2.0
-	 *     beta 4.5   chem_pot 1.0
-	 *     beta 4.5   chem_pot 1.5
-	 *     beta 4.5   chem_pot 2.0
-	 *     beta 5.0   chem_pot 1.0
-	 *     beta 5.0   chem_pot 1.5
-	 *     beta 5.0   chem_pot 2.0
-	 */
-	std::vector<std::vector<realFloat> >  valuesOfSimulationParameters;
-	std::vector<std::vector<realFloat> >  valuesOfNewParameters;
-	std::vector<realFloat> logZAtSimulatedPoints;
-	std::vector<realFloat> logZAtNewPoints;
-	std::vector<std::vector<Moments> > momentsAtNewPoints;
-	std::vector<std::vector<MomentsEstimators> > momentsEstimatorsAtNewPoints;
-    std::vector<std::vector<Histogram> > probabilityDistributionsAtNewBetas;
-	std::vector<std::vector<HistogramEstimator> > probabilityDistributionEstimatorsAtNewBetas;
+    /*
+     * Here in the following objects the order depending on which parameters are
+     * considered ordered is ALPHABETICAL! This means for example that if in the
+     * configuration file there is in the first line
+     *   input_filename    chem_pot 0.5 beta 4.3 magnetic_field 8.7
+     * then we will have
+     *  -    reweightingParameterNames[3] = {"beta", "chem_pot", "magnetic_field"};
+     *  - valuesOfSimulationParameters[0] = {4.3, 0.5, 8.7};
+     *
+     * Furthermore, the order of points in logZAtSimulatedPoints and in logZAtNewPoints
+     * is the same of that in the outermost vector in valuesOfSimulationParameters and
+     * valuesOfNewParameters, respectively. The order of simulated points is that given
+     * in the configuration file, while that of new points is determined varying more
+     * quickly the last parameter. For example, if we have "beta" and "chem_pot" as
+     * parameters and the new ranges are between 4 and 5 for beta and between 1 and 2
+     * for chemical potential (boundary included), each with 3 new points, thus:
+     *     beta 4.0   chem_pot 1.0
+     *     beta 4.0   chem_pot 1.5
+     *     beta 4.0   chem_pot 2.0
+     *     beta 4.5   chem_pot 1.0
+     *     beta 4.5   chem_pot 1.5
+     *     beta 4.5   chem_pot 2.0
+     *     beta 5.0   chem_pot 1.0
+     *     beta 5.0   chem_pot 1.5
+     *     beta 5.0   chem_pot 2.0
+     */
+    std::vector<std::vector<realFloat>> valuesOfSimulationParameters;
+    std::vector<std::vector<realFloat>> valuesOfNewParameters;
+    std::vector<realFloat> logZAtSimulatedPoints;
+    std::vector<realFloat> logZAtNewPoints;
+    std::vector<std::vector<Moments>> momentsAtNewPoints;
+    std::vector<std::vector<MomentsEstimators>> momentsEstimatorsAtNewPoints;
+    std::vector<std::vector<Histogram>> probabilityDistributionsAtNewBetas;
+    std::vector<std::vector<HistogramEstimator>> probabilityDistributionEstimatorsAtNewBetas;
 
-	/*
-	 * The new points are so far WITHIN the given range without counting the boundaries.
-	 * They are at the same distance one from each other.
-	 *
-	 * NOTE: the following two elements could be unified in c++11 with std::tuple
-	 */
-	std::vector<std::pair<realFloat, realFloat> >  newRangesOfParameters;
-	std::vector<unsigned int>  newNumberOfPointsOfParameters;
-	bool useSimulatedPointsAsNewPoints;
+    /*
+     * The new points are so far WITHIN the given range without counting the boundaries.
+     * They are at the same distance one from each other.
+     *
+     * NOTE: the following two elements could be unified in c++11 with std::tuple
+     */
+    std::vector<std::pair<realFloat, realFloat>> newRangesOfParameters;
+    std::vector<unsigned int> newNumberOfPointsOfParameters;
+    bool useSimulatedPointsAsNewPoints;
 
-	realFloat precisionOfIterativeProcedureToCalculateLogZ;
+    realFloat precisionOfIterativeProcedureToCalculateLogZ;
 };
 
-
-class MomentsReweighter : public MomentsReweighterAbstract{
-public:
+class MomentsReweighter : public MomentsReweighterAbstract {
+  public:
     MomentsReweighter() = delete;
 
     explicit MomentsReweighter(RawDataForReweightingAndMetainformation rawDataForReweightingAndMetainformationIn)
-    	: MomentsReweighterAbstract(rawDataForReweightingAndMetainformationIn)
+        : MomentsReweighterAbstract(rawDataForReweightingAndMetainformationIn)
     {
-		calculateAndSetLogZAtSimulatedPoints();
-		calculateAndSetLogZAtNewPoints();
-		calculateAndSetReweightedMomentsAndMomentsEstimators();
+        calculateAndSetLogZAtSimulatedPoints();
+        calculateAndSetLogZAtNewPoints();
+        calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
 
-    //Setters
-    void setNewRangesOfParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn){
+    // Setters
+    void setNewRangesOfParameters(std::vector<std::pair<realFloat, realFloat>> newRangesOfParametersIn)
+    {
         MomentsReweighterAbstract::setNewRangesOfParameters(newRangesOfParametersIn);
         calculateAndSetLogZAtNewPoints();
         calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
 
-    void setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn){
+    void setNewNumberOfPointsOfParameters(std::vector<unsigned int> newNumberOfPointsOfParametersIn)
+    {
         MomentsReweighterAbstract::setNewNumberOfPointsOfParameters(newNumberOfPointsOfParametersIn);
         calculateAndSetLogZAtNewPoints();
         calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
 
-    void setNewParameters(std::vector<std::pair<realFloat, realFloat> >  newRangesOfParametersIn,
-                          std::vector<unsigned int> newNumberOfPointsOfParametersIn){
+    void setNewParameters(std::vector<std::pair<realFloat, realFloat>> newRangesOfParametersIn,
+                          std::vector<unsigned int> newNumberOfPointsOfParametersIn)
+    {
         MomentsReweighterAbstract::setNewParameters(newRangesOfParametersIn, newNumberOfPointsOfParametersIn);
         calculateAndSetLogZAtNewPoints();
         calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
 
-    void setPrecisionToCalculateLogZ(realFloat precisionToCalculateLogZ){
-    	MomentsReweighterAbstract::setPrecisionToCalculateLogZ(precisionToCalculateLogZ);
-		calculateAndSetLogZAtSimulatedPoints();
-		calculateAndSetLogZAtNewPoints();
-		calculateAndSetReweightedMomentsAndMomentsEstimators();
+    void setPrecisionToCalculateLogZ(realFloat precisionToCalculateLogZ)
+    {
+        MomentsReweighterAbstract::setPrecisionToCalculateLogZ(precisionToCalculateLogZ);
+        calculateAndSetLogZAtSimulatedPoints();
+        calculateAndSetLogZAtNewPoints();
+        calculateAndSetReweightedMomentsAndMomentsEstimators();
     }
 };
-
-
 
 #endif /* MOMENTSREWEIGHTER_H_ */

@@ -22,359 +22,382 @@
 // use the boost test framework
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE LqcdReweightingParameters
-#include <boost/test/unit_test.hpp>
-#include <boost/lexical_cast.hpp>
-
 #include "LqcdReweightingParameters.hpp"
+
+#include <boost/lexical_cast.hpp>
+#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(LqcdReweightingParameters_build)
 
-	BOOST_AUTO_TEST_CASE(invalidArgument)
-	{
-		int numberOfArguments = 1;
-		const char * argumentWithoutFile[] = {"foo"};
-		BOOST_REQUIRE_THROW(LqcdReweightingParameters parameters(numberOfArguments, argumentWithoutFile), std::invalid_argument );
-	}
-	
-	BOOST_AUTO_TEST_CASE(build1)
-	{
-		int numberOfArguments = 3;
-		const char * argumentWithFile[] = {"foo", "someFilename", "--useJackknifeAsErrorMethod"};
-		BOOST_CHECK_NO_THROW(LqcdReweightingParameters parameters(numberOfArguments, argumentWithFile));
-	}
-	
-	BOOST_AUTO_TEST_CASE(help1)
-	{
-		int numberOfArguments = 2;
-		const char * argumentsWithHelp[] = {"foo", "-h"};
-		BOOST_REQUIRE_THROW(LqcdReweightingParameters parameters(numberOfArguments, argumentsWithHelp), LqcdReweightingParameters::parse_aborted );
-	}
+    BOOST_AUTO_TEST_CASE(invalidArgument)
+    {
+        int numberOfArguments = 1;
+        const char* argumentWithoutFile[] = {"foo"};
+        BOOST_REQUIRE_THROW(LqcdReweightingParameters parameters(numberOfArguments, argumentWithoutFile), std::invalid_argument);
+    }
 
-	BOOST_AUTO_TEST_CASE(help2)
-	{
-		int numberOfArguments = 2;
-		const char * argumentsWithHelp[] = {"foo", "--help"};
-		BOOST_REQUIRE_THROW(LqcdReweightingParameters parameters(numberOfArguments, argumentsWithHelp), LqcdReweightingParameters::parse_aborted );
-	}
-	
+    BOOST_AUTO_TEST_CASE(build1)
+    {
+        int numberOfArguments = 3;
+        const char* argumentWithFile[] = {"foo", "someFilename", "--useJackknifeAsErrorMethod"};
+        BOOST_CHECK_NO_THROW(LqcdReweightingParameters parameters(numberOfArguments, argumentWithFile));
+    }
+
+    BOOST_AUTO_TEST_CASE(help1)
+    {
+        int numberOfArguments = 2;
+        const char* argumentsWithHelp[] = {"foo", "-h"};
+        BOOST_REQUIRE_THROW(
+            LqcdReweightingParameters parameters(numberOfArguments, argumentsWithHelp), LqcdReweightingParameters::parse_aborted);
+    }
+
+    BOOST_AUTO_TEST_CASE(help2)
+    {
+        int numberOfArguments = 2;
+        const char* argumentsWithHelp[] = {"foo", "--help"};
+        BOOST_REQUIRE_THROW(
+            LqcdReweightingParameters parameters(numberOfArguments, argumentsWithHelp), LqcdReweightingParameters::parse_aborted);
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(defaults)
 
-	static LqcdReweightingParameters createParametersForDefaultCheck()
-	{
-		int numberOfArguments = 3;
-		const char * arguments[] = {"foo", "-f dummyFile", "--useJackknifeAsErrorMethod"};
-		return LqcdReweightingParameters(numberOfArguments, arguments);
-	}
-
-	BOOST_AUTO_TEST_CASE(numberOfNewPoints)
-	{
-		unsigned int defaultValue = 2;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfNewBetaPoints() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(newRange_high)
-	{
-		realFloat defaultValue = 2.;
-		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue), boost::lexical_cast<std::string>(createParametersForDefaultCheck().getNewBetaRange_high()) );
-	}
-	
-	BOOST_AUTO_TEST_CASE(newRange_low)
-	{
-		realFloat defaultValue = 1.;
-		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue), boost::lexical_cast<std::string>(createParametersForDefaultCheck().getNewBetaRange_low()) );
-	}
-	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForMean)
-	{
-		bool defaultValue = false;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForMean() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForVariance)
-	{
-		bool defaultValue = false;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForVariance() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForSkewness)
-	{
-		bool defaultValue = false;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForSkewness() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForKurtosis)
-	{
-		bool defaultValue = false;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForKurtosis() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero)
-	{
-		bool defaultValue = false;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getIsMeanKnownToBeZero() );
-	}
-
-	BOOST_AUTO_TEST_CASE(outputfilePrefix)
-	{
-		std::string defaultValue = "reweightedData";
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getOutputfilePrefix() );
-	}
-
-	BOOST_AUTO_TEST_CASE(useJackk)
-	{
-		int numberOfArguments = 3;
-		const char * arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod"};
-		LqcdReweightingParameters paramObj(numberOfArguments, arguments);
-		bool defaultValue = false;
-		BOOST_REQUIRE_EQUAL(defaultValue, paramObj.getUseJackknifeAsErrorMethod() );
-	}
-
-	BOOST_AUTO_TEST_CASE(useBoot)
-	{
-		bool defaultValue = false;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getUseBootstrapAsErrorMethod() );
-	}
-
-	BOOST_AUTO_TEST_CASE(numberBoot)
-	{
-		int defaultValue = 100;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfBootstrapResample() );
-	}
-
-	BOOST_AUTO_TEST_CASE(WeightPrecision)
-	{
-		realFloat defaultValue = 1.e-7;
-		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue), boost::lexical_cast<std::string>(createParametersForDefaultCheck().getWeightPrecision()) );
-	}
-
-	BOOST_AUTO_TEST_CASE(useSimAsNewPoints)
-	{
-		bool defaultValue = false;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getUseSimulatedPointsAsNewPoints() );
-	}
-
-	BOOST_AUTO_TEST_CASE(printEstimatorsToFile)
+    static LqcdReweightingParameters createParametersForDefaultCheck()
     {
-        bool defaultValue = false;
-        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getPrintEstimatorsToFile() );
+        int numberOfArguments = 3;
+        const char* arguments[] = {"foo", "-f dummyFile", "--useJackknifeAsErrorMethod"};
+        return LqcdReweightingParameters(numberOfArguments, arguments);
     }
 
-	BOOST_AUTO_TEST_CASE(numColsForSingleObs)
-	{
-		unsigned int defaultValue = 0;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfMultipleColumnsForSingleObservable() );
-	}
+    BOOST_AUTO_TEST_CASE(numberOfNewPoints)
+    {
+        unsigned int defaultValue = 2;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfNewBetaPoints());
+    }
 
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForProbabilityDistribution)
-	{
-		bool defaultValue=false;
-		BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForProbabilityDistribution() );
-	}
+    BOOST_AUTO_TEST_CASE(newRange_high)
+    {
+        realFloat defaultValue = 2.;
+        BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue),
+                            boost::lexical_cast<std::string>(createParametersForDefaultCheck().getNewBetaRange_high()));
+    }
 
-	BOOST_AUTO_TEST_CASE(binsizeProbabilityDistribution)
-	{
-		realFloat defaultValue = 1.e-3;
-		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue), boost::lexical_cast<std::string>(createParametersForDefaultCheck().getBinsizeProbabilityDistribution()) );
-	}
+    BOOST_AUTO_TEST_CASE(newRange_low)
+    {
+        realFloat defaultValue = 1.;
+        BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue),
+                            boost::lexical_cast<std::string>(createParametersForDefaultCheck().getNewBetaRange_low()));
+    }
+
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForMean)
+    {
+        bool defaultValue = false;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForMean());
+    }
+
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForVariance)
+    {
+        bool defaultValue = false;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForVariance());
+    }
+
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForSkewness)
+    {
+        bool defaultValue = false;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForSkewness());
+    }
+
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForKurtosis)
+    {
+        bool defaultValue = false;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForKurtosis());
+    }
+
+    BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero)
+    {
+        bool defaultValue = false;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getIsMeanKnownToBeZero());
+    }
+
+    BOOST_AUTO_TEST_CASE(outputfilePrefix)
+    {
+        std::string defaultValue = "reweightedData";
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getOutputfilePrefix());
+    }
+
+    BOOST_AUTO_TEST_CASE(useJackk)
+    {
+        int numberOfArguments = 3;
+        const char* arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod"};
+        LqcdReweightingParameters paramObj(numberOfArguments, arguments);
+        bool defaultValue = false;
+        BOOST_REQUIRE_EQUAL(defaultValue, paramObj.getUseJackknifeAsErrorMethod());
+    }
+
+    BOOST_AUTO_TEST_CASE(useBoot)
+    {
+        bool defaultValue = false;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getUseBootstrapAsErrorMethod());
+    }
+
+    BOOST_AUTO_TEST_CASE(numberBoot)
+    {
+        int defaultValue = 100;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfBootstrapResample());
+    }
+
+    BOOST_AUTO_TEST_CASE(WeightPrecision)
+    {
+        realFloat defaultValue = 1.e-7;
+        BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue),
+                            boost::lexical_cast<std::string>(createParametersForDefaultCheck().getWeightPrecision()));
+    }
+
+    BOOST_AUTO_TEST_CASE(useSimAsNewPoints)
+    {
+        bool defaultValue = false;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getUseSimulatedPointsAsNewPoints());
+    }
+
+    BOOST_AUTO_TEST_CASE(printEstimatorsToFile)
+    {
+        bool defaultValue = false;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getPrintEstimatorsToFile());
+    }
+
+    BOOST_AUTO_TEST_CASE(numColsForSingleObs)
+    {
+        unsigned int defaultValue = 0;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getNumberOfMultipleColumnsForSingleObservable());
+    }
+
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForProbabilityDistribution)
+    {
+        bool defaultValue = false;
+        BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getDeactivateReweightingForProbabilityDistribution());
+    }
+
+    BOOST_AUTO_TEST_CASE(binsizeProbabilityDistribution)
+    {
+        realFloat defaultValue = 1.e-3;
+        BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(defaultValue),
+                            boost::lexical_cast<std::string>(createParametersForDefaultCheck().getBinsizeProbabilityDistribution()));
+    }
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(setArguments)
 
-	BOOST_AUTO_TEST_CASE(filename1)
-	{
-		int numberOfArguments = 3;
-		std::string filename = "someName";
-		std::string filenameArgument = "-f" + filename;
-		const char * arguments[] = {"foo", filenameArgument.c_str(), "--useJackknifeAsErrorMethod"};
-		LqcdReweightingParameters parameters(numberOfArguments, arguments);
+    BOOST_AUTO_TEST_CASE(filename1)
+    {
+        int numberOfArguments = 3;
+        std::string filename = "someName";
+        std::string filenameArgument = "-f" + filename;
+        const char* arguments[] = {"foo", filenameArgument.c_str(), "--useJackknifeAsErrorMethod"};
+        LqcdReweightingParameters parameters(numberOfArguments, arguments);
 
-		BOOST_CHECK(filename == parameters.getInputfile());
-	}
+        BOOST_CHECK(filename == parameters.getInputfile());
+    }
 
-	BOOST_AUTO_TEST_CASE(filename2)
-	{
-		int numberOfArguments = 3;
-		std::string filename = "someName";
-		std::string filenameArgument = "--file=" + filename;
-		const char * arguments[] = {"foo", filenameArgument.c_str(), "--useJackknifeAsErrorMethod"};
-		LqcdReweightingParameters parameters(numberOfArguments, arguments);
+    BOOST_AUTO_TEST_CASE(filename2)
+    {
+        int numberOfArguments = 3;
+        std::string filename = "someName";
+        std::string filenameArgument = "--file=" + filename;
+        const char* arguments[] = {"foo", filenameArgument.c_str(), "--useJackknifeAsErrorMethod"};
+        LqcdReweightingParameters parameters(numberOfArguments, arguments);
 
-		BOOST_CHECK(filename == parameters.getInputfile());
-	}
+        BOOST_CHECK(filename == parameters.getInputfile());
+    }
 
-	static LqcdReweightingParameters createParametersForArgumentSettingCheck_longOption(std::string argumentName, realFloat newValue)
-	{
-		std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
-		int numberOfArguments = 4;
-		const char * arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod", argument.c_str()};
-		return LqcdReweightingParameters(numberOfArguments, arguments);
-	}
+    static LqcdReweightingParameters createParametersForArgumentSettingCheck_longOption(std::string argumentName, realFloat newValue)
+    {
+        std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
+        int numberOfArguments = 4;
+        const char* arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod", argument.c_str()};
+        return LqcdReweightingParameters(numberOfArguments, arguments);
+    }
 
-	BOOST_AUTO_TEST_CASE(numberOfNewPoints)
-	{
-		unsigned int newValue = 2;
-		std::string argumentName = "--numberOfNewBetaPoints";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfNewBetaPoints() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(newRange_high)
-	{
-		realFloat newValue = 65.123;
-		std::string argumentName = "--newBetaRange_high";
-		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(newValue), boost::lexical_cast<std::string>(createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_high()) );
-	}
-	
-	BOOST_AUTO_TEST_CASE(newRange_low)
-	{
-		realFloat newValue = 14.563;
-		std::string argumentName = "--newBetaRange_low";
-		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(newValue), boost::lexical_cast<std::string>(createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_low()) );
-	}
-	
-	static LqcdReweightingParameters createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(std::string argumentName)
-	{
-		std::string argument = argumentName;
-		int numberOfArguments = 4;
-		const char * arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod", argument.c_str()};
-		return LqcdReweightingParameters(numberOfArguments, arguments);
-	}
-	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForMean_implicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForMean";
-		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForMean() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForMean_explicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForMean";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForMean() );
-	}
+    BOOST_AUTO_TEST_CASE(numberOfNewPoints)
+    {
+        unsigned int newValue = 2;
+        std::string argumentName = "--numberOfNewBetaPoints";
+        BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfNewBetaPoints());
+    }
 
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForVariance_implicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForVariance";
-		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForVariance() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForVariance_explicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForVariance";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForVariance() );
-	}
+    BOOST_AUTO_TEST_CASE(newRange_high)
+    {
+        realFloat newValue = 65.123;
+        std::string argumentName = "--newBetaRange_high";
+        BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(newValue),
+                            boost::lexical_cast<std::string>(
+                                createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_high()));
+    }
 
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForSkewness_implicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForSkewness";
-		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForSkewness() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForSkewness_explicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForSkewness";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForSkewness() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForKurtosis_implicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForKurtosis";
-		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForKurtosis() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForKurtosis_explicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForKurtosis";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForKurtosis() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero_implicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--isMeanKnownToBeZero";
-		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getIsMeanKnownToBeZero() );
-	}
+    BOOST_AUTO_TEST_CASE(newRange_low)
+    {
+        realFloat newValue = 14.563;
+        std::string argumentName = "--newBetaRange_low";
+        BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(newValue),
+                            boost::lexical_cast<std::string>(
+                                createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNewBetaRange_low()));
+    }
 
-	BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero_explicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--isMeanKnownToBeZero";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getIsMeanKnownToBeZero() );
-	}
+    static LqcdReweightingParameters createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(std::string argumentName)
+    {
+        std::string argument = argumentName;
+        int numberOfArguments = 4;
+        const char* arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod", argument.c_str()};
+        return LqcdReweightingParameters(numberOfArguments, arguments);
+    }
 
-	BOOST_AUTO_TEST_CASE(useJackknife_implicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--useJackknifeAsErrorMethod";
-		int numberOfArguments = 3;
-		const char * arguments[] = {"foo", "-f dummyFile", argumentName.c_str()};
-		LqcdReweightingParameters paramObj(numberOfArguments, arguments);
-		BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseJackknifeAsErrorMethod() );
-	}
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForMean_implicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--deactivateReweightingForMean";
+        BOOST_REQUIRE_EQUAL(
+            newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForMean());
+    }
 
-	BOOST_AUTO_TEST_CASE(useJackknife_explicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--useJackknifeAsErrorMethod";
-		std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
-		int numberOfArguments = 3;
-		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
-		LqcdReweightingParameters paramObj(numberOfArguments, arguments);
-		BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseJackknifeAsErrorMethod() );
-	}
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForMean_explicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--deactivateReweightingForMean";
+        BOOST_REQUIRE_EQUAL(
+            newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForMean());
+    }
 
-	BOOST_AUTO_TEST_CASE(useBootstrap_implicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--useBootstrapAsErrorMethod";
-		int numberOfArguments = 3;
-		const char * arguments[] = {"foo", "-f dummyFile", argumentName.c_str()};
-		LqcdReweightingParameters paramObj(numberOfArguments, arguments);
-		BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseBootstrapAsErrorMethod() );
-	}
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForVariance_implicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--deactivateReweightingForVariance";
+        BOOST_REQUIRE_EQUAL(
+            newValue,
+            createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForVariance());
+    }
 
-	BOOST_AUTO_TEST_CASE(useBootstrap_explicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--useBootstrapAsErrorMethod";
-		std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
-		int numberOfArguments = 3;
-		const char * arguments[] = {"foo", "-f dummyFile", argument.c_str()};
-		LqcdReweightingParameters paramObj(numberOfArguments, arguments);
-		BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseBootstrapAsErrorMethod() );
-	}
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForVariance_explicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--deactivateReweightingForVariance";
+        BOOST_REQUIRE_EQUAL(
+            newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForVariance());
+    }
 
-	BOOST_AUTO_TEST_CASE(bootstrapResample)
-	{
-		int newValue = 140;
-		std::string argumentName = "--numberOfBootstrapResample";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfBootstrapResample() );
-	}
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForSkewness_implicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--deactivateReweightingForSkewness";
+        BOOST_REQUIRE_EQUAL(
+            newValue,
+            createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForSkewness());
+    }
 
-	static LqcdReweightingParameters createParametersForArgumentSettingCheck_string(std::string argumentName, std::string newValue)
-	{
-        std::string argument = argumentName + "=" +  newValue;
-		int numberOfArguments = 4;
-		const char * arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod", argument.c_str()};
-		return LqcdReweightingParameters(numberOfArguments, arguments);
-	}
-	
-	BOOST_AUTO_TEST_CASE(outputfilePrefix)
-	{
-		std::string newValue = "abcdefg";
-		std::string argumentName = "--outputfilePrefix";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_string(argumentName, newValue).getOutputfilePrefix() );
-	}
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForSkewness_explicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--deactivateReweightingForSkewness";
+        BOOST_REQUIRE_EQUAL(
+            newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForSkewness());
+    }
+
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForKurtosis_implicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--deactivateReweightingForKurtosis";
+        BOOST_REQUIRE_EQUAL(
+            newValue,
+            createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForKurtosis());
+    }
+
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForKurtosis_explicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--deactivateReweightingForKurtosis";
+        BOOST_REQUIRE_EQUAL(
+            newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForKurtosis());
+    }
+
+    BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero_implicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--isMeanKnownToBeZero";
+        BOOST_REQUIRE_EQUAL(
+            newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getIsMeanKnownToBeZero());
+    }
+
+    BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero_explicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--isMeanKnownToBeZero";
+        BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getIsMeanKnownToBeZero());
+    }
+
+    BOOST_AUTO_TEST_CASE(useJackknife_implicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--useJackknifeAsErrorMethod";
+        int numberOfArguments = 3;
+        const char* arguments[] = {"foo", "-f dummyFile", argumentName.c_str()};
+        LqcdReweightingParameters paramObj(numberOfArguments, arguments);
+        BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseJackknifeAsErrorMethod());
+    }
+
+    BOOST_AUTO_TEST_CASE(useJackknife_explicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--useJackknifeAsErrorMethod";
+        std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
+        int numberOfArguments = 3;
+        const char* arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+        LqcdReweightingParameters paramObj(numberOfArguments, arguments);
+        BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseJackknifeAsErrorMethod());
+    }
+
+    BOOST_AUTO_TEST_CASE(useBootstrap_implicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--useBootstrapAsErrorMethod";
+        int numberOfArguments = 3;
+        const char* arguments[] = {"foo", "-f dummyFile", argumentName.c_str()};
+        LqcdReweightingParameters paramObj(numberOfArguments, arguments);
+        BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseBootstrapAsErrorMethod());
+    }
+
+    BOOST_AUTO_TEST_CASE(useBootstrap_explicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--useBootstrapAsErrorMethod";
+        std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
+        int numberOfArguments = 3;
+        const char* arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+        LqcdReweightingParameters paramObj(numberOfArguments, arguments);
+        BOOST_REQUIRE_EQUAL(newValue, paramObj.getUseBootstrapAsErrorMethod());
+    }
+
+    BOOST_AUTO_TEST_CASE(bootstrapResample)
+    {
+        int newValue = 140;
+        std::string argumentName = "--numberOfBootstrapResample";
+        BOOST_REQUIRE_EQUAL(
+            newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfBootstrapResample());
+    }
+
+    static LqcdReweightingParameters createParametersForArgumentSettingCheck_string(std::string argumentName, std::string newValue)
+    {
+        std::string argument = argumentName + "=" + newValue;
+        int numberOfArguments = 4;
+        const char* arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod", argument.c_str()};
+        return LqcdReweightingParameters(numberOfArguments, arguments);
+    }
+
+    BOOST_AUTO_TEST_CASE(outputfilePrefix)
+    {
+        std::string newValue = "abcdefg";
+        std::string argumentName = "--outputfilePrefix";
+        BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_string(argumentName, newValue).getOutputfilePrefix());
+    }
 
     BOOST_AUTO_TEST_CASE(observablesMultipleColumns)
     {
@@ -382,70 +405,85 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         std::string argumentName = "--obsMultipleColumns";
         std::vector<unsigned int> refValues;
         refValues.push_back(5);
-        BOOST_REQUIRE(refValues == createParametersForArgumentSettingCheck_string(argumentName, newValues).getColumnsToBeReweightedUsingMultipleColumns() );
+        BOOST_REQUIRE(
+            refValues
+            == createParametersForArgumentSettingCheck_string(argumentName, newValues).getColumnsToBeReweightedUsingMultipleColumns());
     }
 
-	BOOST_AUTO_TEST_CASE(numColsForSingleObs)
-	{
-		int newValue = 4;
-		std::string argumentName = "--numberOfMultipleColumns";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfMultipleColumnsForSingleObservable() );
-	}
+    BOOST_AUTO_TEST_CASE(numColsForSingleObs)
+    {
+        int newValue = 4;
+        std::string argumentName = "--numberOfMultipleColumns";
+        BOOST_REQUIRE_EQUAL(
+            newValue,
+            createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfMultipleColumnsForSingleObservable());
+    }
 
-	BOOST_AUTO_TEST_CASE(weightPrecision)
-	{
-		realFloat newValue = 1.e-08;
-		std::string argumentName = "--weightPrecision";
-		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(newValue), boost::lexical_cast<std::string>(createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getWeightPrecision()) );
-	}
-	
-	BOOST_AUTO_TEST_CASE(useSimAsNewPoints_implicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--useSimulatedPointsAsNewPoints";
-		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getUseSimulatedPointsAsNewPoints() );
-	}
+    BOOST_AUTO_TEST_CASE(weightPrecision)
+    {
+        realFloat newValue = 1.e-08;
+        std::string argumentName = "--weightPrecision";
+        BOOST_REQUIRE_EQUAL(
+            boost::lexical_cast<std::string>(newValue),
+            boost::lexical_cast<std::string>(createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getWeightPrecision()));
+    }
 
-	BOOST_AUTO_TEST_CASE(useSimAsNewPoints_explicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--useSimulatedPointsAsNewPoints";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getUseSimulatedPointsAsNewPoints() );
-	}
+    BOOST_AUTO_TEST_CASE(useSimAsNewPoints_implicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--useSimulatedPointsAsNewPoints";
+        BOOST_REQUIRE_EQUAL(
+            newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getUseSimulatedPointsAsNewPoints());
+    }
 
-	BOOST_AUTO_TEST_CASE(printEstimatorsToFile_implicit)
+    BOOST_AUTO_TEST_CASE(useSimAsNewPoints_explicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--useSimulatedPointsAsNewPoints";
+        BOOST_REQUIRE_EQUAL(
+            newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getUseSimulatedPointsAsNewPoints());
+    }
+
+    BOOST_AUTO_TEST_CASE(printEstimatorsToFile_implicit)
     {
         bool newValue = true;
         std::string argumentName = "--printEstimatorsToFile";
-        BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getPrintEstimatorsToFile() );
+        BOOST_REQUIRE_EQUAL(
+            newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getPrintEstimatorsToFile());
     }
 
     BOOST_AUTO_TEST_CASE(printEstimatorsToFile_explicit)
     {
         bool newValue = true;
         std::string argumentName = "--printEstimatorsToFile";
-        BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getPrintEstimatorsToFile() );
+        BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getPrintEstimatorsToFile());
     }
 
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForProbabilityDistribution_implicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForProbabilityDistribution";
-		BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName).getDeactivateReweightingForProbabilityDistribution() );
-	}
-	
-	BOOST_AUTO_TEST_CASE(deactivateReweightingForProbabilityDistribution_explicit)
-	{
-		bool newValue = true;
-		std::string argumentName = "--deactivateReweightingForProbabilityDistribution";
-		BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForProbabilityDistribution() );
-	}
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForProbabilityDistribution_implicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--deactivateReweightingForProbabilityDistribution";
+        BOOST_REQUIRE_EQUAL(newValue, createLqcdReweightingParametersForArgumentSettingCheck_implicitOption(argumentName)
+                                          .getDeactivateReweightingForProbabilityDistribution());
+    }
 
-	BOOST_AUTO_TEST_CASE(binsizeProbabilityDistribution)
-	{
-		realFloat newValue = 1.e-04;
-		std::string argumentName = "--binsizeProbabilityDistribution";
-		BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(newValue), boost::lexical_cast<std::string>(createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getBinsizeProbabilityDistribution()) );
-	}
+    BOOST_AUTO_TEST_CASE(deactivateReweightingForProbabilityDistribution_explicit)
+    {
+        bool newValue = true;
+        std::string argumentName = "--deactivateReweightingForProbabilityDistribution";
+        BOOST_REQUIRE_EQUAL(
+            newValue,
+            createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getDeactivateReweightingForProbabilityDistribution());
+    }
+
+    BOOST_AUTO_TEST_CASE(binsizeProbabilityDistribution)
+    {
+        realFloat newValue = 1.e-04;
+        std::string argumentName = "--binsizeProbabilityDistribution";
+        BOOST_REQUIRE_EQUAL(
+            boost::lexical_cast<std::string>(newValue),
+            boost::lexical_cast<std::string>(
+                createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getBinsizeProbabilityDistribution()));
+    }
 
 BOOST_AUTO_TEST_SUITE_END()

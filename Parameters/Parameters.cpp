@@ -19,18 +19,21 @@
  */
 
 #include "Parameters.hpp"
+
 #include "HelperTools.hpp"
 
-Parameters::Parameters(int argc, const char ** argv)
+Parameters::Parameters(int argc, const char** argv)
 {
     po::options_description desc("\nProgram to analyze (correlated) data evaluating mean, variance, skewness and kurtosis.\n\n"
                                  "Usage: \"--<optionName>=<value>\" (or \"-<shortOptionName><value>\")\n\n"
-                                 "Note that boolean options can be changed from their default value implicitly, i.e. without giving explicitly true or false in the command line.\n"
-                                 "For example, \"--doNotUseBinning\" equals \"--doNotUseBinning=true\" (as the default value is false)", getTerminalWidth()*10/9);
+                                 "Note that boolean options can be changed from their default value implicitly, i.e. without giving "
+                                 "explicitly true or false in the command line.\n"
+                                 "For example, \"--doNotUseBinning\" equals \"--doNotUseBinning=true\" (as the default value is false)",
+                                 getTerminalWidth() * 10 / 9);
     po::variables_map vm;
     po::positional_options_description positionalOptions;
 
-    //todo: Maybe it would be nicer to put the observables into a vector
+    // todo: Maybe it would be nicer to put the observables into a vector
     /**
      * Apparently, when using short options with int one has to do "-n99"
      * because otherwise the empty space causes an error.
@@ -63,31 +66,30 @@ Parameters::Parameters(int argc, const char ** argv)
         ;
     // clang-format on
 
-    //option "file" can be given without option description
+    // option "file" can be given without option description
     positionalOptions.add("file", 1);
     po::store(po::command_line_parser(argc, argv).options(desc).positional(positionalOptions).run(), vm);
     po::notify(vm);
 
     checkParsedArguments(vm, desc);
     printParameters();
-
 }
 
-void Parameters::checkParsedArguments(po::variables_map & vm, po::options_description & desc)
+void Parameters::checkParsedArguments(po::variables_map& vm, po::options_description& desc)
 {
-    if(vm.count("help")) { // see http://stackoverflow.com/questions/5395503/required-and-optional-arguments-using-boost-library-program-options as to why this is done before po::notifiy(vm)
+    if (vm.count("help")) {  // see http://stackoverflow.com/questions/5395503/required-and-optional-arguments-using-boost-library-program-options
+                             // as to why this is done before po::notifiy(vm)
         std::cout << desc << '\n';
         throw Parameters::parse_aborted();
     }
 
-    if (! vm.count("file"))
-    {
+    if (! vm.count("file")) {
         throw std::invalid_argument("No datafile given. Aborting!");
     }
 
-    if (calcAutocorrelation && (! vm.count("timeMaxAutocorrelationFunction")))
-    {
-        throw std::invalid_argument("If calcAutocorrelation==true then the option --timeMaxAutocorrelationFunction=... must be given. Aborting!");
+    if (calcAutocorrelation && (! vm.count("timeMaxAutocorrelationFunction"))) {
+        throw std::invalid_argument(
+            "If calcAutocorrelation==true then the option --timeMaxAutocorrelationFunction=... must be given. Aborting!");
     }
 
     /**
@@ -112,9 +114,10 @@ void Parameters::checkParsedArguments(po::variables_map & vm, po::options_descri
      *       for more information.
      */
     useNumberOfBinsForBinning = false;
-    if( (vm.count("numberOfBins") || vm.count("numberOfBinsMoments") || vm.count("numberOfBinsCentralMoments")) ){
-        if( (vm.count("binsize") || vm.count("binsizeMoments") || vm.count("binsizeCentralMoments")) ){
-            throw std::invalid_argument("Not clear what binning parameter to use, both \"numberOfBins\" and \"binsize\" have been set. Aborting!");
+    if ((vm.count("numberOfBins") || vm.count("numberOfBinsMoments") || vm.count("numberOfBinsCentralMoments"))) {
+        if ((vm.count("binsize") || vm.count("binsizeMoments") || vm.count("binsizeCentralMoments"))) {
+            throw std::invalid_argument(
+                "Not clear what binning parameter to use, both \"numberOfBins\" and \"binsize\" have been set. Aborting!");
         }
         useNumberOfBinsForBinning = true;
     }
@@ -124,33 +127,32 @@ void Parameters::checkParsedArguments(po::variables_map & vm, po::options_descri
      *       and numberOfBins should always both be executed or whether
      *       only the one according to "useNumberOfBinsForBinning" should be done.
      */
-    //check if numberOfBins has been set, otherwise set them.
-    if(!vm.count("numberOfBins")) numberOfBins = 10;
-    //check structure of numberOfBins(Central)Moment and parse it
-    if ((numberOfBinsMoments.size()%2) != 0)
+    // check if numberOfBins has been set, otherwise set them.
+    if (! vm.count("numberOfBins"))
+        numberOfBins = 10;
+    // check structure of numberOfBins(Central)Moment and parse it
+    if ((numberOfBinsMoments.size() % 2) != 0)
         throw std::invalid_argument("Option --numberOfBinsMoments incomplete!");
     parseBinningInformationForMoments(numberOfBinsMoments, numberOfBins);
-    if ((numberOfBinsCentralMoments.size()%2) != 0)
+    if ((numberOfBinsCentralMoments.size() % 2) != 0)
         throw std::invalid_argument("Option --numberOfBinsCentralMoments incomplete!");
     parseBinningInformationForMoments(numberOfBinsCentralMoments, numberOfBins);
 
-    //check if binsize has been set, otherwise set them.
-    if(!vm.count("binsize")) binsize = 100;
-    //check structure of binsize(Central)Moment and parse it
-    if ((binsizeMoments.size()%2) != 0)
-            throw std::invalid_argument("Option --binsizeMoments incomplete!");
+    // check if binsize has been set, otherwise set them.
+    if (! vm.count("binsize"))
+        binsize = 100;
+    // check structure of binsize(Central)Moment and parse it
+    if ((binsizeMoments.size() % 2) != 0)
+        throw std::invalid_argument("Option --binsizeMoments incomplete!");
     parseBinningInformationForMoments(binsizeMoments, binsize);
-    if ((binsizeCentralMoments.size()%2) != 0)
-            throw std::invalid_argument("Option --binsizeCentralMoments incomplete!");
+    if ((binsizeCentralMoments.size() % 2) != 0)
+        throw std::invalid_argument("Option --binsizeCentralMoments incomplete!");
     parseBinningInformationForMoments(binsizeCentralMoments, binsize);
 
-    //check if numberOfBinsForAutocorrelation has been set, otherwise set them.
-    if(!vm.count("numberOfBinsForAutocorrelation"))
-    {
+    // check if numberOfBinsForAutocorrelation has been set, otherwise set them.
+    if (! vm.count("numberOfBinsForAutocorrelation")) {
         numberOfBinsForAutocorrelation = 10;
     }
-
-
 }
 
 void Parameters::printParameters()
@@ -159,46 +161,39 @@ void Parameters::printParameters()
     std::cout << "#------------------------------------------------------------------------------------" << std::endl;
     std::cout << "# Datafile:\t" << file << std::endl;
     std::cout << "# Use column:\t" << column;
-    if(isMeanKnownToBeZero) std::cout << "\t(mean is known to be zero)";
+    if (isMeanKnownToBeZero)
+        std::cout << "\t(mean is known to be zero)";
     std::cout << std::endl;
     std::cout << "# Offset:\t" << offset << std::endl;
-    //todo: add output of observables which are analyzed
+    // todo: add output of observables which are analyzed
     std::cout << "#------------------------------------------------------------------------------------" << std::endl;
-    if (!doNotUseBinning)
-    {
+    if (! doNotUseBinning) {
         std::cout << "# Perform binning with:" << std::endl;
-        if( useNumberOfBinsForBinning)
-        {
+        if (useNumberOfBinsForBinning) {
             std::cout << "# Number of bins:\n";
-            for(size_t i=0; i<numberOfBinsMoments.size(); i++)
+            for (size_t i = 0; i < numberOfBinsMoments.size(); i++)
                 std::cout << "#   - moment " << i << ": " << numberOfBinsMoments[i] << std::endl;
-            for(size_t i=0; i<numberOfBinsCentralMoments.size(); i++)
+            for (size_t i = 0; i < numberOfBinsCentralMoments.size(); i++)
                 std::cout << "#   - central moment " << i << ": " << numberOfBinsCentralMoments[i] << std::endl;
-        }
-        else
-        {
+        } else {
             std::cout << "# Binsize:\n";
-            for(size_t i=0; i<binsizeMoments.size(); i++)
+            for (size_t i = 0; i < binsizeMoments.size(); i++)
                 std::cout << "#   - moment " << i << ": " << binsizeMoments[i] << std::endl;
-            for(size_t i=0; i<binsizeCentralMoments.size(); i++)
+            for (size_t i = 0; i < binsizeCentralMoments.size(); i++)
                 std::cout << "#   - central moment " << i << ": " << binsizeCentralMoments[i] << std::endl;
         }
-        if( binningMustFitDataSampleSize )
-        {
+        if (binningMustFitDataSampleSize) {
             std::cout << "#------------------------------------------------------------------------------------" << std::endl;
             std::cout << "# Require binsize/numberOfBins\n#   to be multiple of number of\n#   data points" << std::endl;
         }
-        if( adjustDataSampleSizeToBinning )
-        {
+        if (adjustDataSampleSizeToBinning) {
             std::cout << "#------------------------------------------------------------------------------------" << std::endl;
             std::cout << "# Resize raw data sample in case data points are discarded during binning" << std::endl;
         }
-    }
-    else{
+    } else {
         std::cout << "# Do not perform binning!" << std::endl;
     }
-    if (calcAutocorrelation)
-    {
+    if (calcAutocorrelation) {
         std::cout << "#------------------------------------------------------------------------------------" << std::endl;
         std::cout << "# Calculate estimate of autocorrelation time:" << std::endl;
         std::cout << "#  - for \"t\" up to " << timeMaxAutocorrelationFunction << "," << std::endl;
@@ -216,22 +211,22 @@ void Parameters::printParameters()
  * as the max{x_i} and that will have all the entries set to the default binning information (either
  * binsize or numberOfbins) except the n_i entries that will be set to x_i.
  */
-void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithBinningInformations, const int defaultValue){
-    std::vector<std::vector<int> > auxVector(2);
-    for(size_t i=0; i<vectorWithBinningInformations.size(); i+=2){
+void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithBinningInformations, const int defaultValue)
+{
+    std::vector<std::vector<int>> auxVector(2);
+    for (size_t i = 0; i < vectorWithBinningInformations.size(); i += 2) {
         auxVector[0].push_back(vectorWithBinningInformations[i]);
-        auxVector[1].push_back(vectorWithBinningInformations[i+1]);
+        auxVector[1].push_back(vectorWithBinningInformations[i + 1]);
     }
     vectorWithBinningInformations.clear();
-    //Minimum 4 moments. TODO: Improve in the sense that this 4 should not be hard coded!!
-    int totalNumberOfMoments = (auxVector[0].size() == 0) ? 4 : std::max(4, *std::max_element(auxVector[0].begin(),auxVector[0].end()));
-    for(int i=0; i<=totalNumberOfMoments; i++){
+    // Minimum 4 moments. TODO: Improve in the sense that this 4 should not be hard coded!!
+    int totalNumberOfMoments = (auxVector[0].size() == 0) ? 4 : std::max(4, *std::max_element(auxVector[0].begin(), auxVector[0].end()));
+    for (int i = 0; i <= totalNumberOfMoments; i++) {
         std::vector<int>::iterator it;
         it = find(auxVector[0].begin(), auxVector[0].end(), i);
-        if(it != auxVector[0].end())
+        if (it != auxVector[0].end())
             vectorWithBinningInformations.push_back(auxVector[1][it - auxVector[0].begin()]);
         else
             vectorWithBinningInformations.push_back(defaultValue);
     }
 }
-

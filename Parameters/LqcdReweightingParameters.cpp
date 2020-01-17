@@ -20,17 +20,20 @@
  */
 
 #include "LqcdReweightingParameters.hpp"
+
 #include "HelperTools.hpp"
 
 static std::string getHelpDescription(std::string);
 
-LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** argv) 
+LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char** argv)
 {
-    po::options_description desc("\nOptions for reweighting data from LQCD simulations.\nNOTE: "
-                                 "Reweighting is currently implemented in beta only!\nUsage: \"--<optionName>=<value>\" "
-                                 "(or \"-<shortOptionName><value>\")\nNote that boolean options can be changed from their default value implicitly, "
-                                 "ie without giving explicitly true or false in the command line.\nFor example, \"--doNotUseBinning\" equals "
-                                 "\"--doNotUseBinning true\" (as the default value is false)", getTerminalWidth()/10*9);
+    po::options_description desc(
+        "\nOptions for reweighting data from LQCD simulations.\nNOTE: "
+        "Reweighting is currently implemented in beta only!\nUsage: \"--<optionName>=<value>\" "
+        "(or \"-<shortOptionName><value>\")\nNote that boolean options can be changed from their default value implicitly, "
+        "ie without giving explicitly true or false in the command line.\nFor example, \"--doNotUseBinning\" equals "
+        "\"--doNotUseBinning true\" (as the default value is false)",
+        getTerminalWidth() / 10 * 9);
     po::variables_map vm;
     po::positional_options_description positionalOptions;
 
@@ -59,7 +62,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
         ("binsizeProbabilityDistribution", po::value<realFloat>(&binsizeProbabilityDistribution)->default_value(1.e-3), "Size of the bins of the probability distribution.");
     // clang-format on
 
-    //option "file" can be given without option description
+    // option "file" can be given without option description
     positionalOptions.add("file", 1);
     po::store(po::command_line_parser(argc, argv).options(desc).positional(positionalOptions).run(), vm);
     po::notify(vm);
@@ -68,15 +71,15 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char ** arg
     printParameters();
 }
 
-void LqcdReweightingParameters::checkParsedArguments(po::variables_map & vm, po::options_description & desc)
+void LqcdReweightingParameters::checkParsedArguments(po::variables_map& vm, po::options_description& desc)
 {
-    if(vm.count("help")) { // see http://stackoverflow.com/questions/5395503/required-and-optional-arguments-using-boost-library-program-options as to why this is done before po::notifiy(vm)
+    if (vm.count("help")) {  // see http://stackoverflow.com/questions/5395503/required-and-optional-arguments-using-boost-library-program-options
+                             // as to why this is done before po::notifiy(vm)
         std::cout << desc << '\n';
         throw LqcdReweightingParameters::parse_aborted();
     }
 
-    if (! vm.count("file"))
-    {
+    if (! vm.count("file")) {
         throw std::invalid_argument("No datafile given. Aborting!");
     }
 
@@ -85,19 +88,16 @@ void LqcdReweightingParameters::checkParsedArguments(po::variables_map & vm, po:
      * a std::initializer_list<bool> in case the error method are more than 2.
      */
 
-    if ( vm["useJackknifeAsErrorMethod"].defaulted() && vm["useBootstrapAsErrorMethod"].defaulted() )
-    {
+    if (vm["useJackknifeAsErrorMethod"].defaulted() && vm["useBootstrapAsErrorMethod"].defaulted()) {
         throw std::invalid_argument("No error method specified. Aborting!");
     }
 
-    if ( !vm["useJackknifeAsErrorMethod"].defaulted() && !vm["useBootstrapAsErrorMethod"].defaulted() )
-    {
+    if (! vm["useJackknifeAsErrorMethod"].defaulted() && ! vm["useBootstrapAsErrorMethod"].defaulted()) {
         throw std::invalid_argument("More than one error method specified. Aborting!");
     }
 
-    if( !vm["deactivateReweightingForMean"].defaulted() )
-    {
-        deactivateReweightingForProbabilityDistribution=deactivateReweightingForMean;
+    if (! vm["deactivateReweightingForMean"].defaulted()) {
+        deactivateReweightingForProbabilityDistribution = deactivateReweightingForMean;
     }
 }
 
@@ -111,63 +111,50 @@ void LqcdReweightingParameters::printParameters()
     std::cout << "# Inputfile:\t\"" << inputfile << "\"" << std::endl;
     std::cout << separator << std::endl;
     std::cout << "# Reweighting parameters:" << std::endl;
-    if(useSimulatedPointsAsNewPoints)
+    if (useSimulatedPointsAsNewPoints)
         std::cout << "#   Reweight at simulated points" << std::endl;
-    else{
+    else {
         std::cout << "#   New beta range:\t[" << newBetaRange_low << ":" << newBetaRange_high << "]" << std::endl;
         std::cout << "#   New beta points:\t  " << numberOfNewBetaPoints << std::endl;
     }
-    if(isMeanKnownToBeZero)
+    if (isMeanKnownToBeZero)
         std::cout << "#   Mean of the observables known to be ZERO" << std::endl;
     std::cout << "#   Columns of obs. to be rew. with multiple columns:  ";
-    for(size_t i=0; i<columnsToBeReweightedUsingMultipleColumns.size(); i++)
+    for (size_t i = 0; i < columnsToBeReweightedUsingMultipleColumns.size(); i++)
         std::cout << columnsToBeReweightedUsingMultipleColumns[i] << " ";
     std::cout << std::endl;
     std::cout << "#   Precision to determine reweighting weights:\t" << weightPrecision << std::endl;
     std::cout << "#   Error method used:  ";
-    if(useJackknifeAsErrorMethod) std::cout << "Jackknife\n";
-    if(useBootstrapAsErrorMethod) std::cout << "Bootstrap (" << numberOfBootstrapResample << " resample)\n";
+    if (useJackknifeAsErrorMethod)
+        std::cout << "Jackknife\n";
+    if (useBootstrapAsErrorMethod)
+        std::cout << "Bootstrap (" << numberOfBootstrapResample << " resample)\n";
     std::cout << separator << std::endl;
     std::cout << "# Observables:" << std::endl;
-    if ( deactivateReweightingForMean )
-    {
+    if (deactivateReweightingForMean) {
         std::cout << "#\tDo NOT reweight mean of data" << std::endl;
-    }
-    else
-    {
+    } else {
         std::cout << "#\tMean of data" << std::endl;
     }
-    if ( deactivateReweightingForVariance )
-    {
+    if (deactivateReweightingForVariance) {
         std::cout << "#\tDo NOT reweight variance of data" << std::endl;
-    }
-    else
-    {
+    } else {
         std::cout << "#\tVariance of data" << std::endl;
     }
-    if ( deactivateReweightingForSkewness )
-    {
+    if (deactivateReweightingForSkewness) {
         std::cout << "#\tDo NOT reweight skewness of data" << std::endl;
-    }
-    else
-    {
+    } else {
         std::cout << "#\tSkewness of data" << std::endl;
     }
-    if ( deactivateReweightingForKurtosis )
-    {
+    if (deactivateReweightingForKurtosis) {
         std::cout << "#\tDo NOT reweight kurtosis of data" << std::endl;
-    }
-    else
-    {
+    } else {
         std::cout << "#\tKurtosis of data" << std::endl;
     }
     std::cout << separator << std::endl;
-    if( deactivateReweightingForProbabilityDistribution )
-    {
+    if (deactivateReweightingForProbabilityDistribution) {
         std::cout << "#\tDo NOT reweight probability distribution of observables" << std::endl;
-    }
-    else
-    {
+    } else {
         std::cout << "#\tProbability distribution of observables" << std::endl;
     }
     std::cout << "#   Binsize for reweighting probability distribution:\t" << binsizeProbabilityDistribution << std::endl;
@@ -218,7 +205,8 @@ bool LqcdReweightingParameters::getDeactivateReweightingForKurtosis()
     return deactivateReweightingForKurtosis;
 }
 
-std::vector<unsigned int> LqcdReweightingParameters::getColumnsToBeReweightedUsingMultipleColumns(){
+std::vector<unsigned int> LqcdReweightingParameters::getColumnsToBeReweightedUsingMultipleColumns()
+{
     return columnsToBeReweightedUsingMultipleColumns;
 }
 
@@ -274,16 +262,18 @@ realFloat LqcdReweightingParameters::getBinsizeProbabilityDistribution()
 
 /***************************************************************************/
 
-static std::string getHelpDescription(std::string option){
-    std::string description="";
-    if(option == "obsMultipleColumns"){
-        description += "Number of FIRST column in the file containing observable to be reweighted using several columns for higher moments. ";
-        description += "Do not forget that the first column (column 0) is reserved for the gauge action. In general the expected ";
-        description += "number of columns for the same observable is equal to the maximum moment needed in the reweighting of the ";
-        description += "required quantities (e.g. 3 if only mean and skewness are asked to be reweighted). Use the option ";
-        description += "--numberOfMultipleColumnsForSingleObservable whenever you want to force the program to consider a different ";
-        description += "number of columns for single observable. ATTENTION: Column ranges start from ZERO!";
-    }else
+static std::string getHelpDescription(std::string option)
+{
+    std::string description = "";
+    if (option == "obsMultipleColumns") {
+        description
+            += "Number of FIRST column in the file containing observable to be reweighted using several columns for higher moments. "
+               "Do not forget that the first column (column 0) is reserved for the gauge action. In general the expected "
+               "number of columns for the same observable is equal to the maximum moment needed in the reweighting of the "
+               "required quantities (e.g. 3 if only mean and skewness are asked to be reweighted). Use the option "
+               "--numberOfMultipleColumnsForSingleObservable whenever you want to force the program to consider a different "
+               "number of columns for single observable. ATTENTION: Column ranges start from ZERO!";
+    } else
         throw std::invalid_argument("Unknown option in \"getHelpDescription\" function!");
     return description;
 }

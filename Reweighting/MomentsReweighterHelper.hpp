@@ -23,6 +23,7 @@
 #define MOMENTSREWEIGHTERHELPER_H_
 
 #include "Reweighter.hpp"
+
 #include <memory>
 
 /*
@@ -56,11 +57,12 @@ class MomentsReweighterHelperTest;
 class MomentsReweighterHelper {
     friend class MomentsReweighterAbstract;
     friend class MomentsReweighterHelperTest;
-public:
+
+  public:
     MomentsReweighterHelper() = delete;
     MomentsReweighterHelper(RawDataForReweightingAndMetainformation rawDataForReweightingAndMetainformation);
 
-    //This is public temporarily for compilation!  metaParameters must be moved to ReweighterIO
+    // This is public temporarily for compilation!  metaParameters must be moved to ReweighterIO
     /*
      * These are metaparameters that must NOT be interpreted as reweighting parameters,
      * though they can be given in the configurationFile and then be stored in the
@@ -69,34 +71,23 @@ public:
      */
     static const std::vector<std::string> metaParameters;
 
-protected:
+  protected:
     std::vector<int> numberOfBinsToBeUsed;
     int numberOfObservablesGivenAsInput;
     int numberOfObservablesToBeReweighted;
 
-private:
+  private:
     SimulationDataContainer simulationRawDataContainer;
     SimulationDataContainer simulationUncorrDataContainer;
     std::vector<std::string> namesOfParametersIgnoringMetaParameters;
-    std::vector<std::vector<realFloat> > valuesOfSimulationParametersIgnoringMetaParameters;
+    std::vector<std::vector<realFloat>> valuesOfSimulationParametersIgnoringMetaParameters;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
     std::vector<unsigned int> momentsToBeReweighted;
     unsigned int maximumMomentNeededOverall;
-	ErrorCalculationMethod errorMethod;
-	std::shared_ptr<int> bootstrapNumber;
+    ErrorCalculationMethod errorMethod;
+    std::shared_ptr<int> bootstrapNumber;
     bool reweightProbabilityDistribution;
     double probabilityDistributionBinsize;
-
-
 };
-
-
-
-
-
-
-
-
-
 
 #endif /* MOMENTSREWEIGHTERHELPER_H_ */

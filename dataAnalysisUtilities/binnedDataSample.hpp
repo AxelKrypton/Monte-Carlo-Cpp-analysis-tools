@@ -23,50 +23,48 @@
 
 #include "DataSample.hpp"
 
-class BinnedDataSample : public DataSample
-{
-public:
-	bool doesBinningFitBinsize(){ return binningFitsBinsize; }
-	int getNumberOfDiscardedElements() { return discardedElements; }
-protected:
+class BinnedDataSample : public DataSample {
+  public:
+    bool doesBinningFitBinsize() { return binningFitsBinsize; }
+    int getNumberOfDiscardedElements() { return discardedElements; }
 
-	/**
-	 * Binning.
-	 * Following B.A. Berg,
-	 * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
-	 * p.52.
-	 */
-	DataSampleBasic performBinning(DataSampleBasic sampleIn);
-	void checkDiscardedElements(int valueIn, std::string descriptionIn, int elementsOfSample);
+  protected:
+    /**
+     * Binning.
+     * Following B.A. Berg,
+     * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis",
+     * p.52.
+     */
+    DataSampleBasic performBinning(DataSampleBasic sampleIn);
+    void checkDiscardedElements(int valueIn, std::string descriptionIn, int elementsOfSample);
 
-	int numberOfBins;
-	int binsize;
-	int discardedElements;
-	bool binningMustFitSize;
-	bool binningFitsBinsize;
-	bool warningOutput;
+    int numberOfBins;
+    int binsize;
+    int discardedElements;
+    bool binningMustFitSize;
+    bool binningFitsBinsize;
+    bool warningOutput;
 };
 
-class BinnedDataSampleFromNumberOfBins : public BinnedDataSample
-{
-public:
-	BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn, bool requireBinningToMatchSize = false, bool warningOutputIn = true);
+class BinnedDataSampleFromNumberOfBins : public BinnedDataSample {
+  public:
+    BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn, bool requireBinningToMatchSize = false,
+                                     bool warningOutputIn = true);
 
-protected:
-	void checkIfNumberOfBinsIsValid(int elementsOfSample);
-	void calcBinsize(int elementsOfSample);
+  protected:
+    void checkIfNumberOfBinsIsValid(int elementsOfSample);
+    void calcBinsize(int elementsOfSample);
 };
 
-class BinnedDataSampleFromBinsize : public BinnedDataSample
-{
-public:
-	BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsize, bool requireBinningToMatchSize = false, bool warningOutputIn = true);
+class BinnedDataSampleFromBinsize : public BinnedDataSample {
+  public:
+    BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsize, bool requireBinningToMatchSize = false, bool warningOutputIn = true);
 
-protected:
-	void checkIfBinsizeIsValid(int elementsOfSample);
-	void calcNumberOfBins(int elementsOfSample);
+  protected:
+    void checkIfBinsizeIsValid(int elementsOfSample);
+    void calcNumberOfBins(int elementsOfSample);
 };
 
-void resizeRawDataSample(DataSample & rawData, BinnedDataSample & binnedData, bool adjustDataSampleSizeToBinning);
+void resizeRawDataSample(DataSample& rawData, BinnedDataSample& binnedData, bool adjustDataSampleSizeToBinning);
 
 #endif /* BINNEDDATASAMPLE_HPP_ */

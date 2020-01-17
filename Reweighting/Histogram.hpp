@@ -20,15 +20,16 @@
 
 #ifndef HISTOGRAM_HPP_
 #define HISTOGRAM_HPP_
-#include "../dataAnalysisUtilities/EstimateAndError.hpp"
 #include "../dataAnalysisUtilities/DataSample.hpp"
+#include "../dataAnalysisUtilities/EstimateAndError.hpp"
 #include "../dataAnalysisUtilities/Observables.hpp"
 #include "../types.hpp"
-#include<vector>
-#include<math.h>
-#include<map>
 
-/* 
+#include <map>
+#include <math.h>
+#include <vector>
+
+/*
  * This class creates an object which is constructed specifying binsize
  * and an anchor point. The histogram is internally stored as
  * map<int,double> and works as a container that stores
@@ -38,12 +39,11 @@
  * The map gets a new entry when it gets filled.
  */
 
-class Histogram
-{
-public:
+class Histogram {
+  public:
     Histogram() = delete;
     Histogram(double, double = 0.0);
-    //Getters
+    // Getters
     int getNumberOfBins(bool = false) const;
     double getBinsize() const;
     double getAnchor() const;
@@ -51,62 +51,59 @@ public:
     double getHeightOfSpecificBin(double) const;
     double getMaxXvalue() const;
     double getMinXvalue() const;
-    std::vector<std::pair<double,double> > getBins(bool = false) const;
+    std::vector<std::pair<double, double>> getBins(bool = false) const;
     std::vector<double> getMiddleOfBins(bool = false) const;
-    
+
     double& operator[](double);
-    std::map<int,double>& operator-=(double);
+    std::map<int, double>& operator-=(double);
     void exponentiateHeights();
     void shift(double);
     void normalize();
 
-private:
+  private:
     double anchor;
     double binsize;
-    std::map<int,double> histogram;
+    std::map<int, double> histogram;
 };
 
-
-class HistogramEstimator
-{
-public:
+class HistogramEstimator {
+  public:
     HistogramEstimator() = delete;
     HistogramEstimator(double);
-    std::vector<std::vector<double> > getMultipleHeightsOfBins(bool = false) const;
+    std::vector<std::vector<double>> getMultipleHeightsOfBins(bool = false) const;
     std::vector<double> getHeightsOfBin(double);
 
     void insert(double, std::vector<double>);
 
-private:
+  private:
     /*The Estimator doesn't need an anchor since in the MomentsReweighter class a valarray
      *of Histograms get filled, restored and then used to fill the Estimators. So the Estimators
      *are already the "restored" ones.
      */
     double binsize;
-    std::multimap<int,double> histogramEstimators;
+    std::multimap<int, double> histogramEstimators;
 };
 
-class ProbabilityDistribution
-{
-public:
+class ProbabilityDistribution {
+  public:
     ProbabilityDistribution();
     ProbabilityDistribution(Histogram, HistogramEstimator, ErrorCalculationMethod);
-    //Getters
+    // Getters
     int getNumberOfBins(bool = false) const;
     double getBinsize() const;
     std::vector<EstimateAndError> getHeightsOfBins(bool = false) const;
     EstimateAndError getHeightOfSpecificBin(double) const;
     double getMaxXvalue() const;
     double getMinXvalue() const;
-    std::vector<std::pair<double,double> > getBins(bool = false) const;
+    std::vector<std::pair<double, double>> getBins(bool = false) const;
     std::vector<double> getMiddleOfBins(bool = false) const;
 
     EstimateAndError& operator[](double);
 
-private:
+  private:
     double anchor;
     double binsize;
-    std::map<int,EstimateAndError> probabilityDistribution;
+    std::map<int, EstimateAndError> probabilityDistribution;
 };
 
 #endif /* HISTOGRAM_HPP_ */

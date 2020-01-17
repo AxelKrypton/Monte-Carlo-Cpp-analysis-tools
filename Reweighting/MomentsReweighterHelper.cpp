@@ -18,14 +18,17 @@
  *
  */
 
-#include <fstream>
-#include <boost/filesystem.hpp>
 #include "MomentsReweighterHelper.hpp"
+
+#include "../dataAnalysisUtilities/binnedDataSample.hpp"
 #include "MomentsReweighter.hpp"
 #include "SimulationData.hpp"
-#include "../dataAnalysisUtilities/binnedDataSample.hpp"
 
-static void setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(SimulationDataContainer, std::vector<int>, ErrorCalculationMethod, std::vector<int>&, std::vector<int>&);
+#include <boost/filesystem.hpp>
+#include <fstream>
+
+static void setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(SimulationDataContainer, std::vector<int>, ErrorCalculationMethod,
+                                                         std::vector<int>&, std::vector<int>&);
 static void printBinsizesActuallyUsed(SimulationDataContainer, std::vector<int>);
 
 /*****************************************************************************************/
@@ -34,8 +37,7 @@ static void printBinsizesActuallyUsed(SimulationDataContainer, std::vector<int>)
  * Initialization of the const static member of ReweighterAbstract class.
  */
 std::string tmp[2] = {"logZ", "binsize"};
-const std::vector<std::string> MomentsReweighterHelper::metaParameters(tmp, tmp+2);
-
+const std::vector<std::string> MomentsReweighterHelper::metaParameters(tmp, tmp + 2);
 
 /*
  * Here in this constructor we cannot initialize properly the simulationUncorrDataContainer object,
@@ -48,69 +50,75 @@ const std::vector<std::string> MomentsReweighterHelper::metaParameters(tmp, tmp+
  * TODO: Refactor this ctor that grow more and more in time...
  */
 MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainformation rawDataForReweightingAndMetainformation)
-	: simulationRawDataContainer(rawDataForReweightingAndMetainformation.rawData), simulationUncorrDataContainer(rawDataForReweightingAndMetainformation.rawData),
-	  namesOfParametersIgnoringMetaParameters(rawDataForReweightingAndMetainformation.namesOfParametersIgnoringMetaParameters),
-	  valuesOfSimulationParametersIgnoringMetaParameters(rawDataForReweightingAndMetainformation.valuesOfSimulationParametersIgnoringMetaParameters),
-	  columnsToBeReweightedUsingMultipleColumns(rawDataForReweightingAndMetainformation.columnsToBeReweightedUsingMultipleColumns),
-	  momentsToBeReweighted(rawDataForReweightingAndMetainformation.momentsToBeReweighted),
-	  maximumMomentNeededOverall(rawDataForReweightingAndMetainformation.maximumMomentNeededOverall),
-	  errorMethod(rawDataForReweightingAndMetainformation.errorMethod), bootstrapNumber(rawDataForReweightingAndMetainformation.bootstrapNumber),
-	  reweightProbabilityDistribution(rawDataForReweightingAndMetainformation.reweightProbabilityDistributions),
-	  probabilityDistributionBinsize(rawDataForReweightingAndMetainformation.binsizeForProbabilityDistribution)
+    : simulationRawDataContainer(rawDataForReweightingAndMetainformation.rawData)
+    , simulationUncorrDataContainer(rawDataForReweightingAndMetainformation.rawData)
+    , namesOfParametersIgnoringMetaParameters(rawDataForReweightingAndMetainformation.namesOfParametersIgnoringMetaParameters)
+    , valuesOfSimulationParametersIgnoringMetaParameters(
+          rawDataForReweightingAndMetainformation.valuesOfSimulationParametersIgnoringMetaParameters)
+    , columnsToBeReweightedUsingMultipleColumns(rawDataForReweightingAndMetainformation.columnsToBeReweightedUsingMultipleColumns)
+    , momentsToBeReweighted(rawDataForReweightingAndMetainformation.momentsToBeReweighted)
+    , maximumMomentNeededOverall(rawDataForReweightingAndMetainformation.maximumMomentNeededOverall)
+    , errorMethod(rawDataForReweightingAndMetainformation.errorMethod)
+    , bootstrapNumber(rawDataForReweightingAndMetainformation.bootstrapNumber)
+    , reweightProbabilityDistribution(rawDataForReweightingAndMetainformation.reweightProbabilityDistributions)
+    , probabilityDistributionBinsize(rawDataForReweightingAndMetainformation.binsizeForProbabilityDistribution)
 {
-	std::vector<int> entriesToBeCutFromRawData;
-	setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, rawDataForReweightingAndMetainformation.binsizesToBeUsedForBinning, errorMethod,
-												 numberOfBinsToBeUsed, entriesToBeCutFromRawData);
-	//Evaluate central moments per data and append them to the raw data container
-	if(momentsToBeReweighted.empty())
-		throw std::logic_error("MomentsReweighterHelper asked to be built without any moment to be reweighted! Aborting...");
-	if(!columnsToBeReweightedUsingMultipleColumns.empty()){
-		std::sort(columnsToBeReweightedUsingMultipleColumns.begin(), columnsToBeReweightedUsingMultipleColumns.end());
-		for(size_t i=1; i<columnsToBeReweightedUsingMultipleColumns.size(); i++){
-			if(columnsToBeReweightedUsingMultipleColumns[i]-columnsToBeReweightedUsingMultipleColumns[i-1] < maximumMomentNeededOverall)
-				throw std::invalid_argument("obsToBeRewUsingMultipleColumns contains columns too close (distance<" + std::to_string(maximumMomentNeededOverall) + ")!");
-		}
-		unsigned int numberOfColumnsWithObservables = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
-		if(numberOfColumnsWithObservables - columnsToBeReweightedUsingMultipleColumns.back() + 1 < maximumMomentNeededOverall)
-			throw std::invalid_argument("Not enough columns to be used for single observable (in col. " + std::to_string(columnsToBeReweightedUsingMultipleColumns.back()) + ")!");
-	}
+    std::vector<int> entriesToBeCutFromRawData;
+    setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, rawDataForReweightingAndMetainformation.binsizesToBeUsedForBinning,
+                                                 errorMethod, numberOfBinsToBeUsed, entriesToBeCutFromRawData);
+    // Evaluate central moments per data and append them to the raw data container
+    if (momentsToBeReweighted.empty())
+        throw std::logic_error("MomentsReweighterHelper asked to be built without any moment to be reweighted! Aborting...");
+    if (! columnsToBeReweightedUsingMultipleColumns.empty()) {
+        std::sort(columnsToBeReweightedUsingMultipleColumns.begin(), columnsToBeReweightedUsingMultipleColumns.end());
+        for (size_t i = 1; i < columnsToBeReweightedUsingMultipleColumns.size(); i++) {
+            if (columnsToBeReweightedUsingMultipleColumns[i] - columnsToBeReweightedUsingMultipleColumns[i - 1] < maximumMomentNeededOverall)
+                throw std::invalid_argument("obsToBeRewUsingMultipleColumns contains columns too close (distance<"
+                                            + std::to_string(maximumMomentNeededOverall) + ")!");
+        }
+        unsigned int numberOfColumnsWithObservables
+            = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
+        if (numberOfColumnsWithObservables - columnsToBeReweightedUsingMultipleColumns.back() + 1 < maximumMomentNeededOverall)
+            throw std::invalid_argument("Not enough columns to be used for single observable (in col. "
+                                        + std::to_string(columnsToBeReweightedUsingMultipleColumns.back()) + ")!");
+    }
 
-	//Here I set the number of "real" observables given as input (neglecting the multiple columns)
-	numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
-	std::cout << "Obs. given as input counting multiple = " << numberOfObservablesGivenAsInput << "\n";
-	numberOfObservablesGivenAsInput -= columnsToBeReweightedUsingMultipleColumns.size()*(maximumMomentNeededOverall-1); //neglect multiple columns (count one column only)
-	std::cout << "Obs. given as input NOT counting multiple = " << numberOfObservablesGivenAsInput << "\n";
+    // Here I set the number of "real" observables given as input (neglecting the multiple columns)
+    numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
+    std::cout << "Obs. given as input counting multiple = " << numberOfObservablesGivenAsInput << "\n";
+    numberOfObservablesGivenAsInput -= columnsToBeReweightedUsingMultipleColumns.size()
+                                       * (maximumMomentNeededOverall - 1);  // neglect multiple columns (count one column only)
+    std::cout << "Obs. given as input NOT counting multiple = " << numberOfObservablesGivenAsInput << "\n";
 
-	if(numberOfObservablesGivenAsInput == 0)
-	    throw std::logic_error("MomentsReweighterHelper asked to be built without any observable as input! Aborting...");
+    if (numberOfObservablesGivenAsInput == 0)
+        throw std::logic_error("MomentsReweighterHelper asked to be built without any observable as input! Aborting...");
 
-	simulationRawDataContainer = simulationRawDataContainer.buildAndGetMomentsPerData(momentsToBeReweighted, namesOfParametersIgnoringMetaParameters.size(),
-																					  columnsToBeReweightedUsingMultipleColumns, maximumMomentNeededOverall);
-	numberOfObservablesToBeReweighted = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
+    simulationRawDataContainer
+        = simulationRawDataContainer.buildAndGetMomentsPerData(momentsToBeReweighted, namesOfParametersIgnoringMetaParameters.size(),
+                                                               columnsToBeReweightedUsingMultipleColumns, maximumMomentNeededOverall);
+    numberOfObservablesToBeReweighted = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
 
-	std::cout << "numberOfObservablesGivenAsInput = " << numberOfObservablesGivenAsInput << "\n";
-	std::cout << "numberOfObservablesToBeReweighted = " << numberOfObservablesToBeReweighted << "\n";
+    std::cout << "numberOfObservablesGivenAsInput = " << numberOfObservablesGivenAsInput << "\n";
+    std::cout << "numberOfObservablesToBeReweighted = " << numberOfObservablesToBeReweighted << "\n";
 
-	if(errorMethod == jackknife)
-		simulationUncorrDataContainer = simulationRawDataContainer.getUncorrelatedSimulationDataSet(numberOfBinsToBeUsed, jackknife);
-	else
-		simulationUncorrDataContainer = simulationRawDataContainer;
+    if (errorMethod == jackknife)
+        simulationUncorrDataContainer = simulationRawDataContainer.getUncorrelatedSimulationDataSet(numberOfBinsToBeUsed, jackknife);
+    else
+        simulationUncorrDataContainer = simulationRawDataContainer;
 
-	//Refining on the raw data
-	for(int i=0; i<simulationRawDataContainer.getNumberOfDatafiles(); i++){
-		for(int j=0; j<simulationRawDataContainer[i].getNumberOfDataSample(); j++){
-			simulationRawDataContainer[i][j] = simulationRawDataContainer[i][j].removeLastNElements(entriesToBeCutFromRawData[i]);
-		}
-	}
-	//This has to be done after having cut the data in order to print the right information
-	printBinsizesActuallyUsed(simulationRawDataContainer, numberOfBinsToBeUsed);
+    // Refining on the raw data
+    for (int i = 0; i < simulationRawDataContainer.getNumberOfDatafiles(); i++) {
+        for (int j = 0; j < simulationRawDataContainer[i].getNumberOfDataSample(); j++) {
+            simulationRawDataContainer[i][j] = simulationRawDataContainer[i][j].removeLastNElements(entriesToBeCutFromRawData[i]);
+        }
+    }
+    // This has to be done after having cut the data in order to print the right information
+    printBinsizesActuallyUsed(simulationRawDataContainer, numberOfBinsToBeUsed);
 }
-
 
 /*****************************************************************************************/
 /******************************* STATIC FUNCTIONS ****************************************/
 /*****************************************************************************************/
-
 
 /*
  * NOTE: In the function getNumberOfBinsToBeUsed we calculate the number
@@ -120,26 +128,28 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
  *       but [1653/16]=103 as binsize! That's why we behave differently
  *       in Jackknife and bootstrap.
  */
-static void setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(SimulationDataContainer simDataCont, std::vector<int> binsizesToBeUsed, ErrorCalculationMethod errorMethod,
-		 	          	  	  	  	  	  	  	  	  	 std::vector<int>& valuesOfNumberOfBins, std::vector<int>& entriesToBeLeftOut)
+static void setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(SimulationDataContainer simDataCont, std::vector<int> binsizesToBeUsed,
+                                                         ErrorCalculationMethod errorMethod, std::vector<int>& valuesOfNumberOfBins,
+                                                         std::vector<int>& entriesToBeLeftOut)
 {
-	valuesOfNumberOfBins.clear();
+    valuesOfNumberOfBins.clear();
 
-	if(binsizesToBeUsed.size() != (size_t)simDataCont.getNumberOfDatafiles())
-        throw std::invalid_argument("Invalid size of binsizesToBeUsed vector in \"setNumberOfBinsToBeUsedAndEntriesToBeLeftOut\" function!");
+    if (binsizesToBeUsed.size() != (size_t)simDataCont.getNumberOfDatafiles())
+        throw std::invalid_argument(
+            "Invalid size of binsizesToBeUsed vector in \"setNumberOfBinsToBeUsedAndEntriesToBeLeftOut\" function!");
 
-    for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++)
-    	valuesOfNumberOfBins.push_back(simDataCont[i][0].getNumberOfElements()/binsizesToBeUsed[i]);
+    for (int i = 0; i < simDataCont.getNumberOfDatafiles(); i++)
+        valuesOfNumberOfBins.push_back(simDataCont[i][0].getNumberOfElements() / binsizesToBeUsed[i]);
 
-    if(errorMethod == jackknife){
-    	valuesOfNumberOfBins = std::vector<int>(simDataCont.getNumberOfDatafiles(), *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end()));
-    	entriesToBeLeftOut = simDataCont.getNumberOfEntriesLeftOut(valuesOfNumberOfBins);
-    }else if(errorMethod == bootstrap){
-    	entriesToBeLeftOut = simDataCont.getNumberOfEntriesLeftOut(binsizesToBeUsed);
-    }else
-    	throw std::runtime_error("Unknown errorMethod in \"setNumberOfBinsToBeUsedAndEntriesToBeLeftOut\" function!");
+    if (errorMethod == jackknife) {
+        valuesOfNumberOfBins
+            = std::vector<int>(simDataCont.getNumberOfDatafiles(), *min_element(valuesOfNumberOfBins.begin(), valuesOfNumberOfBins.end()));
+        entriesToBeLeftOut = simDataCont.getNumberOfEntriesLeftOut(valuesOfNumberOfBins);
+    } else if (errorMethod == bootstrap) {
+        entriesToBeLeftOut = simDataCont.getNumberOfEntriesLeftOut(binsizesToBeUsed);
+    } else
+        throw std::runtime_error("Unknown errorMethod in \"setNumberOfBinsToBeUsedAndEntriesToBeLeftOut\" function!");
 }
-
 
 /*
  * ATTENTION: The access operator [] of map, even if used only to retrieve the value, modifies the
@@ -150,31 +160,31 @@ static void setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(SimulationDataContainer
  *            here we pass ON PURPOSE simDataCont by value and it has NOT to be changed to a const
  *            reference or worse to a reference.
  */
-static void printBinsizesActuallyUsed(SimulationDataContainer simDataCont, std::vector<int> numberOfBinsToBeUsed){
+static void printBinsizesActuallyUsed(SimulationDataContainer simDataCont, std::vector<int> numberOfBinsToBeUsed)
+{
     size_t maxLengthDataFilename = simDataCont[0].getDatafileName().length();
-    for(int i=1; i<simDataCont.getNumberOfDatafiles(); i++){
-        if(simDataCont[i].getDatafileName().length() > maxLengthDataFilename)
+    for (int i = 1; i < simDataCont.getNumberOfDatafiles(); i++) {
+        if (simDataCont[i].getDatafileName().length() > maxLengthDataFilename)
             maxLengthDataFilename = simDataCont[1].getDatafileName().length();
     }
     std::cout << "\n";
-    for(size_t i=0; i<maxLengthDataFilename+60; i++)
+    for (size_t i = 0; i < maxLengthDataFilename + 60; i++)
         std::cout << "=";
     std::cout << "\n";
 
-    for(int i=0; i<simDataCont.getNumberOfDatafiles(); i++){
-    	std::ostringstream givenBinsizes;
-    	givenBinsizes << "{";
-    	for(int j=1; j<=4; j++)
-    		givenBinsizes << simDataCont[i].getSimulationParameters()["binsize" + std::to_string(j)] << ",";
-    	givenBinsizes.seekp((long)(givenBinsizes.tellp()) - long(1));
-    	givenBinsizes << "}";
+    for (int i = 0; i < simDataCont.getNumberOfDatafiles(); i++) {
+        std::ostringstream givenBinsizes;
+        givenBinsizes << "{";
+        for (int j = 1; j <= 4; j++)
+            givenBinsizes << simDataCont[i].getSimulationParameters()["binsize" + std::to_string(j)] << ",";
+        givenBinsizes.seekp((long)(givenBinsizes.tellp()) - long(1));
+        givenBinsizes << "}";
         std::cout << simDataCont[i].getDatafileName();
         std::cout << "   Given binsize = " << givenBinsizes.str();
-        std::cout << "    Used binsize = " << simDataCont[i][0].getNumberOfElements()/numberOfBinsToBeUsed[i] << "\n";
+        std::cout << "    Used binsize = " << simDataCont[i][0].getNumberOfElements() / numberOfBinsToBeUsed[i] << "\n";
     }
 
-    for(size_t i=0; i<maxLengthDataFilename+60; i++)
+    for (size_t i = 0; i < maxLengthDataFilename + 60; i++)
         std::cout << "=";
     std::cout << "\n\n";
 }
-

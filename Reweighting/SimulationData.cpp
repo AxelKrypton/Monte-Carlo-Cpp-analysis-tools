@@ -18,11 +18,10 @@
  *
  */
 
-#include <fstream>
-#include <sstream>
-
 #include "SimulationData.hpp"
 
+#include <fstream>
+#include <sstream>
 
 static void checkIfDatafileExists(std::string);
 static void throwInvalidColumnOfFile(std::string, const int);
@@ -32,107 +31,107 @@ static void checkIfDatafileWasGood(std::vector<DataSampleBasic>, std::string);
 
 SimulationData::SimulationData()
 {
-	throw std::invalid_argument("SimulationData needs input file for construction!");
+    throw std::invalid_argument("SimulationData needs input file for construction!");
 }
 
-SimulationData::SimulationData(std::map<std::string, realFloat> simulationParametersIn, std::string filenameIn, const int offset) :
-	simulationParameters(simulationParametersIn), datafileName(filenameIn)
+SimulationData::SimulationData(std::map<std::string, realFloat> simulationParametersIn, std::string filenameIn, const int offset)
+    : simulationParameters(simulationParametersIn)
+    , datafileName(filenameIn)
 {
-	if(simulationParametersIn.size() == 0)
-		throw std::logic_error("SimulationData object built without any simulation parameter!");
-	else{
-		checkIfDatafileExists(filenameIn);
-		for(int i=0; ; i++){
-			bool charInLine;
-			try{
-				simulationRawData.push_back(DataSampleBasic(filenameIn, i+1, offset, &charInLine));
-				/*
-				 * Note: if in a column are present only invalid data, the above push_back throw an exception
-				 *       and the rest of the try is skipped. Furthermore one cannot rely on the value of charInLine
-				 *       because the DataSample constructor throw an exception before setting it. Nevertheless FileReader
-				 *       distinguish between a column of only invalid data (std::invalid_argument thrown) or a column of
-				 *       empty data, i.e. a not existing column (std::out_of_range thrown). We use this in the two catch blocks.
-				 */
-				if(charInLine)
-					throwInvalidColumnOfFile(filenameIn, i+1);
-			}catch (std::out_of_range exceptionThrown){
-				break;
-			}catch(std::invalid_argument exceptionThrown){
-				throwInvalidColumnOfFile(filenameIn, i+1);
-			}
-		}
-	}
+    if (simulationParametersIn.size() == 0)
+        throw std::logic_error("SimulationData object built without any simulation parameter!");
+    else {
+        checkIfDatafileExists(filenameIn);
+        for (int i = 0;; i++) {
+            bool charInLine;
+            try {
+                simulationRawData.push_back(DataSampleBasic(filenameIn, i + 1, offset, &charInLine));
+                /*
+                 * Note: if in a column are present only invalid data, the above push_back throw an exception
+                 *       and the rest of the try is skipped. Furthermore one cannot rely on the value of charInLine
+                 *       because the DataSample constructor throw an exception before setting it. Nevertheless FileReader
+                 *       distinguish between a column of only invalid data (std::invalid_argument thrown) or a column of
+                 *       empty data, i.e. a not existing column (std::out_of_range thrown). We use this in the two catch blocks.
+                 */
+                if (charInLine)
+                    throwInvalidColumnOfFile(filenameIn, i + 1);
+            } catch (std::out_of_range exceptionThrown) {
+                break;
+            } catch (std::invalid_argument exceptionThrown) {
+                throwInvalidColumnOfFile(filenameIn, i + 1);
+            }
+        }
+    }
 
-    //TODO: This call limits the use of this class to the Reweighting case
-	checkIfDatafileWasGood(simulationRawData, filenameIn);
+    // TODO: This call limits the use of this class to the Reweighting case
+    checkIfDatafileWasGood(simulationRawData, filenameIn);
 }
 
-
-int SimulationData::getNumberOfSimulationParameters() {
-	return simulationParameters.size();
+int SimulationData::getNumberOfSimulationParameters()
+{
+    return simulationParameters.size();
 }
 
-
-int SimulationData::getNumberOfDataSample(){
-	return simulationRawData.size();
+int SimulationData::getNumberOfDataSample()
+{
+    return simulationRawData.size();
 }
 
-
-std::map<std::string, realFloat> SimulationData::getSimulationParameters(){
-	return simulationParameters;
+std::map<std::string, realFloat> SimulationData::getSimulationParameters()
+{
+    return simulationParameters;
 }
-
 
 realFloat SimulationData::getParameterValue(std::string parameterName)
 {
-	//This would be one line with c++11 with .at()
-	if(simulationParameters.find(parameterName) == simulationParameters.end())
-		throw std::out_of_range("The given parameter \"" + parameterName + "\" has not been found!");
-	return simulationParameters[parameterName];
+    // This would be one line with c++11 with .at()
+    if (simulationParameters.find(parameterName) == simulationParameters.end())
+        throw std::out_of_range("The given parameter \"" + parameterName + "\" has not been found!");
+    return simulationParameters[parameterName];
 }
 
-
-std::string SimulationData::getDatafileName(){
+std::string SimulationData::getDatafileName()
+{
     return datafileName;
 }
 
-
 DataSampleBasic& SimulationData::operator[](int index)
 {
-	return simulationRawData.at(index);
+    return simulationRawData.at(index);
 }
-
 
 void SimulationData::appendNewColumnOfData(DataSampleBasic sampleIn)
 {
-    if(simulationRawData[0].getNumberOfElements() != sampleIn.getNumberOfElements())
+    if (simulationRawData[0].getNumberOfElements() != sampleIn.getNumberOfElements())
         throw std::invalid_argument("Column of data has the wrong number of entries and cannot be appended!");
     simulationRawData.push_back(sampleIn);
 }
 
-
-void SimulationData::deleteColumnOfData(const int whichColumn){
-    if(whichColumn >= getNumberOfDataSample())
+void SimulationData::deleteColumnOfData(const int whichColumn)
+{
+    if (whichColumn >= getNumberOfDataSample())
         throw std::out_of_range("Invalid specified column to be deleted!");
-    //TODO: Make this efficient without using erase
+    // TODO: Make this efficient without using erase
     simulationRawData.erase(simulationRawData.begin() + whichColumn);
 }
 
 /*****************************************************************************************/
 
-//todo: use stat of sys/stat.h to check existence and access to the file
-void checkIfDatafileExists(std::string filename){
-	std::ifstream file;
-	file.open(filename.c_str());
-	if ( !file.is_open() )
-		throw std::invalid_argument("Given file \"" + filename + "\" does not exist!");
-	file.close();
+// todo: use stat of sys/stat.h to check existence and access to the file
+void checkIfDatafileExists(std::string filename)
+{
+    std::ifstream file;
+    file.open(filename.c_str());
+    if (! file.is_open())
+        throw std::invalid_argument("Given file \"" + filename + "\" does not exist!");
+    file.close();
 }
 
-static void throwInvalidColumnOfFile(std::string filenameIn, const int columnNumber){
-	std::ostringstream tmp;
-	tmp << "Invalid column of data encountered in file \"" + filenameIn + "\" at column " << columnNumber << ".";
-	throw std::invalid_argument(tmp.str());
+static void throwInvalidColumnOfFile(std::string filenameIn, const int columnNumber)
+{
+    std::ostringstream tmp;
+    tmp << "Invalid column of data encountered in file \"" + filenameIn + "\" at column " << columnNumber << ".";
+    throw std::invalid_argument(tmp.str());
 }
 
 /*
@@ -140,12 +139,12 @@ static void throwInvalidColumnOfFile(std::string filenameIn, const int columnNum
  * that all lines must have had the same amount of columns, namely each created DataSample should
  * have the same amount of elements.
  */
-static void checkIfDatafileWasGood(std::vector<DataSampleBasic> rawData, std::string fileIn){
-	if(rawData.size() == 0)
-		throw std::invalid_argument("Datafile \"" + fileIn + "\" contains only lines to be ignored or not numeric data!!");
-	for(size_t i=1; i< rawData.size(); i++){
-		if(rawData[i].getNumberOfElements() != rawData[0].getNumberOfElements())
-			throw std::logic_error("Datafile \"" + fileIn + "\" had not the right structure for reweighting!");
-	}
+static void checkIfDatafileWasGood(std::vector<DataSampleBasic> rawData, std::string fileIn)
+{
+    if (rawData.size() == 0)
+        throw std::invalid_argument("Datafile \"" + fileIn + "\" contains only lines to be ignored or not numeric data!!");
+    for (size_t i = 1; i < rawData.size(); i++) {
+        if (rawData[i].getNumberOfElements() != rawData[0].getNumberOfElements())
+            throw std::logic_error("Datafile \"" + fileIn + "\" had not the right structure for reweighting!");
+    }
 }
-

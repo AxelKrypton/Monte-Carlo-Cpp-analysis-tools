@@ -21,8 +21,9 @@
 #ifndef DATASAMPLETESTUTITLITIES_HPP_
 #define DATASAMPLETESTUTITLITIES_HPP_
 
-#include <valarray>
 #include "../types.hpp"
+
+#include <valarray>
 
 /**
  * realFloat should be correct up to 15 digits (at least)
@@ -38,75 +39,76 @@ realFloat realFloatPrecisionInPercent = 1e-12;
  */
 std::valarray<realFloat> makeValarrayWithOnes(int length)
 {
-	return std::valarray<realFloat>(1., length);
+    return std::valarray<realFloat>(1., length);
 }
 
 std::valarray<realFloat> makeValarrayWithOnesAndMinusOnes(int length)
 {
-	std::valarray<realFloat> returnValarray(1., length);
-	for (int iteration = 0; iteration < (int) returnValarray.size(); iteration ++)
-	{
-		returnValarray[iteration] = pow(-1.,iteration);
-	}
-	return returnValarray;
+    std::valarray<realFloat> returnValarray(1., length);
+    for (int iteration = 0; iteration < (int)returnValarray.size(); iteration++) {
+        returnValarray[iteration] = pow(-1., iteration);
+    }
+    return returnValarray;
 }
 
 std::valarray<realFloat> makeValarrayWithArrayPosition(int length)
 {
-	std::valarray<realFloat> returnValarray(length);
-	for (int iteration = 0; iteration < (int) returnValarray.size(); iteration ++)
-	{
-		returnValarray[iteration] = iteration;
-	}
-	return returnValarray;
+    std::valarray<realFloat> returnValarray(length);
+    for (int iteration = 0; iteration < (int)returnValarray.size(); iteration++) {
+        returnValarray[iteration] = iteration;
+    }
+    return returnValarray;
 }
 
 std::valarray<realFloat> makeValarrayWithSquaredArrayPosition(int length)
 {
-	std::valarray<realFloat> returnValarray(length);
-	for (int iteration = 0; iteration < (int) returnValarray.size(); iteration ++)
-	{
-		returnValarray[iteration] = iteration*iteration;
-	}
-	return returnValarray;
+    std::valarray<realFloat> returnValarray(length);
+    for (int iteration = 0; iteration < (int)returnValarray.size(); iteration++) {
+        returnValarray[iteration] = iteration * iteration;
+    }
+    return returnValarray;
 }
 
 std::valarray<realFloat> makeValarrayWithEntriesBetweenZeroAndOne(int length)
 {
-	std::valarray<realFloat> returnValarray(length);
-	for (int iteration = 0; iteration <  (int) returnValarray.size(); iteration ++)
-	{
-		returnValarray[iteration] = (realFloat(iteration)) / (returnValarray.size() - 1);
-	}
-	return returnValarray;
+    std::valarray<realFloat> returnValarray(length);
+    for (int iteration = 0; iteration < (int)returnValarray.size(); iteration++) {
+        returnValarray[iteration] = (realFloat(iteration)) / (returnValarray.size() - 1);
+    }
+    return returnValarray;
 }
 
 std::valarray<realFloat> makeValarrayWithBigAndSmallEntries(int length)
 {
-	std::valarray<realFloat> returnValarray(length*2);
-	for (int iteration = 0; iteration < length; iteration ++)
-	{
-		returnValarray[iteration*2] = (realFloat(iteration)) / (length - 1) * 5e6;
-		returnValarray[iteration*2+1] = (realFloat(iteration)) / (length - 1) * 5e-6;
-	}
-	return returnValarray;
+    std::valarray<realFloat> returnValarray(length * 2);
+    for (int iteration = 0; iteration < length; iteration++) {
+        returnValarray[iteration * 2] = (realFloat(iteration)) / (length - 1) * 5e6;
+        returnValarray[iteration * 2 + 1] = (realFloat(iteration)) / (length - 1) * 5e-6;
+    }
+    return returnValarray;
 }
 
 std::valarray<realFloat> makeValarrayWithEntriesBetweenOneAndEight(int length)
 {
-	if (length % 8 != 0)
-		throw std::invalid_argument("length must be multiple of 8!");
-	std::valarray<realFloat> returnValarray(length);
-	for (int iteration = 0; iteration < 8; iteration ++)
-	{
-		for (int iteration2 = 0; iteration2 < length/8; iteration2 ++)
-		{
-			returnValarray[iteration + 8*iteration2] = (realFloat(iteration+1));
-		}
-	}
-	return returnValarray;
+    if (length % 8 != 0)
+        throw std::invalid_argument("length must be multiple of 8!");
+    std::valarray<realFloat> returnValarray(length);
+    for (int iteration = 0; iteration < 8; iteration++) {
+        for (int iteration2 = 0; iteration2 < length / 8; iteration2++) {
+            returnValarray[iteration + 8 * iteration2] = (realFloat(iteration + 1));
+        }
+    }
+    return returnValarray;
 }
 
-enum FillType { zeros, ones, onesMinusOnes, arrayPosition, entriesSymmetricBetweenZeroAndOne, entriesBetweenOneAndEight, bigAndSmallEntries };
+enum FillType {
+    zeros,
+    ones,
+    onesMinusOnes,
+    arrayPosition,
+    entriesSymmetricBetweenZeroAndOne,
+    entriesBetweenOneAndEight,
+    bigAndSmallEntries
+};
 
 #endif /* DATASAMPLETESTUTITLITIES_HPP_ */

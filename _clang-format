@@ -5,13 +5,13 @@ Language:        Cpp
 AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
 AlignConsecutiveMacros: true
-AlignConsecutiveAssignments: true
+AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AlignEscapedNewlines: Left
 AlignOperands:   true
 AlignTrailingComments: true
 AllowAllArgumentsOnNextLine: false
-AllowAllConstructorInitializersOnNextLine: true
+AllowAllConstructorInitializersOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: false
@@ -47,7 +47,7 @@ BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma
 BreakInheritanceList: BeforeComma
 BreakStringLiterals: true
-ColumnLimit:     120
+ColumnLimit: 140
 CommentPragmas:  '^ KAT pragma:' # Keep As Text
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
@@ -80,13 +80,13 @@ MacroBlockEnd: "^BOOST_AUTO_TEST_SUITE_END$"
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
 NamespaceMacros: ['TESTSUITE']
-PenaltyBreakAssignment: 1000000
-PenaltyBreakBeforeFirstCallParameter: 1000000000
+PenaltyBreakAssignment: 10
+PenaltyBreakBeforeFirstCallParameter: 4294967295 # Max unsigned 4 bytes
 PenaltyBreakComment: 100
-PenaltyBreakFirstLessLess: 1000000
+PenaltyBreakFirstLessLess: 1
 PenaltyBreakString: 100
 PenaltyBreakTemplateDeclaration: 100
-PenaltyExcessCharacter: 100
+PenaltyExcessCharacter: 5
 PenaltyReturnTypeOnItsOwnLine: 10
 PointerAlignment: Left
 ReflowComments:  true

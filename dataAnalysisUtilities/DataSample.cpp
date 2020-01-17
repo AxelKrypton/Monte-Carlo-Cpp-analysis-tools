@@ -18,196 +18,167 @@
  *
  */
 
-#include <iostream>
-#include <sstream>
 #include "DataSample.hpp"
 
-static realFloat calcNthMomentExplicit(DataSample & sampleIn, int n);
-static realFloat calcFirstMomentExplicit(DataSample & sampleIn);
-static realFloat calcNthCentralMomentExplicit(DataSample & sampleIn, int n);
-static DataSampleBasic calcNthMomentPerDataPointExplicit(DataSample & sampleIn, int n);
-static DataSampleBasic calcFirstMomentPerDataPointExplicit(DataSample & sampleIn);
-static DataSampleBasic calcNthCentralMomentPerDataPointExplicit(DataSample & sampleIn, int n);
+#include <iostream>
+#include <sstream>
+
+static realFloat calcNthMomentExplicit(DataSample& sampleIn, int n);
+static realFloat calcFirstMomentExplicit(DataSample& sampleIn);
+static realFloat calcNthCentralMomentExplicit(DataSample& sampleIn, int n);
+static DataSampleBasic calcNthMomentPerDataPointExplicit(DataSample& sampleIn, int n);
+static DataSampleBasic calcFirstMomentPerDataPointExplicit(DataSample& sampleIn);
+static DataSampleBasic calcNthCentralMomentPerDataPointExplicit(DataSample& sampleIn, int n);
 static void checkIfNIsValid(int n, int upperLimit, int lowerLimit);
 
 void DataSample::initMoments()
 {
-	int numberOfMoments = getNumberOfMoments();
-	moments = std::vector<Moment>(numberOfMoments);
-	centralMoments = std::vector<Moment>(numberOfMoments);
-	momentsPerDataPoint = std::vector<MomentPerDataPoint>(numberOfMoments);
-	centralMomentsPerDataPoint = std::vector<MomentPerDataPoint>(numberOfMoments);
+    int numberOfMoments = getNumberOfMoments();
+    moments = std::vector<Moment>(numberOfMoments);
+    centralMoments = std::vector<Moment>(numberOfMoments);
+    momentsPerDataPoint = std::vector<MomentPerDataPoint>(numberOfMoments);
+    centralMomentsPerDataPoint = std::vector<MomentPerDataPoint>(numberOfMoments);
 }
 
 realFloat DataSample::getNthMoment(int n)
 {
-	checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
-	if (!moments[n].calculated)
-	{
-		moments[n].set(calcNthMoment(n));
-	}
-	return moments[n].value;
+    checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
+    if (! moments[n].calculated) {
+        moments[n].set(calcNthMoment(n));
+    }
+    return moments[n].value;
 }
 
 realFloat DataSample::calcNthMoment(int n)
 {
-	if ( n == 0 )
-	{
-		return 1.;
-	}
-	else if ( n == 1)
-	{
-		return calcFirstMomentExplicit(*this);
-	}
-	else
-	{
-		return calcNthMomentExplicit(*this, n);
-	}
+    if (n == 0) {
+        return 1.;
+    } else if (n == 1) {
+        return calcFirstMomentExplicit(*this);
+    } else {
+        return calcNthMomentExplicit(*this, n);
+    }
 }
 
 realFloat DataSample::getNthCentralMoment(int n)
 {
-	checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
-	if (!centralMoments[n].calculated)
-	{
-		centralMoments[n].set(calcNthCentralMoment(n));
-	}
-	return centralMoments[n].value;
+    checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
+    if (! centralMoments[n].calculated) {
+        centralMoments[n].set(calcNthCentralMoment(n));
+    }
+    return centralMoments[n].value;
 }
 
 realFloat DataSample::calcNthCentralMoment(int n)
 {
-	if ( n == 0 )
-	{
-		return 1.;
-	}
-	else if (n == 1)
-	{
-		return 0.;
-	}
-	else
-	{
-		return calcNthCentralMomentExplicit(*this, n);
-	}
+    if (n == 0) {
+        return 1.;
+    } else if (n == 1) {
+        return 0.;
+    } else {
+        return calcNthCentralMomentExplicit(*this, n);
+    }
 }
 
 DataSampleBasic DataSample::getNthMomentPerDataPoint(int n)
 {
-	checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
-	if (!momentsPerDataPoint[n].calculated)
-	{
-		momentsPerDataPoint[n].set(calcNthMomentPerDataPoint(n));
-	}
-	return momentsPerDataPoint[n].value;
+    checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
+    if (! momentsPerDataPoint[n].calculated) {
+        momentsPerDataPoint[n].set(calcNthMomentPerDataPoint(n));
+    }
+    return momentsPerDataPoint[n].value;
 }
 
 DataSampleBasic DataSample::calcNthMomentPerDataPoint(int n)
 {
-	if ( n == 0 )
-	{
-		return DataSampleBasic(std::valarray<realFloat>(1.0, this->getNumberOfElements()));
-	}
-	else if ( n == 1)
-	{
-		return calcFirstMomentPerDataPointExplicit(*this);
-	}
-	else
-	{
-		return calcNthMomentPerDataPointExplicit(*this, n);
-	}
+    if (n == 0) {
+        return DataSampleBasic(std::valarray<realFloat>(1.0, this->getNumberOfElements()));
+    } else if (n == 1) {
+        return calcFirstMomentPerDataPointExplicit(*this);
+    } else {
+        return calcNthMomentPerDataPointExplicit(*this, n);
+    }
 }
 
 DataSampleBasic DataSample::getNthCentralMomentPerDataPoint(int n)
 {
-	checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
-	if (!centralMomentsPerDataPoint[n].calculated)
-	{
-		centralMomentsPerDataPoint[n].set(calcNthCentralMomentPerDataPoint(n));
-	}
-	return centralMomentsPerDataPoint[n].value;
+    checkIfNIsValid(n, upperLimitForNthMoment, lowerLimitForNthMoment);
+    if (! centralMomentsPerDataPoint[n].calculated) {
+        centralMomentsPerDataPoint[n].set(calcNthCentralMomentPerDataPoint(n));
+    }
+    return centralMomentsPerDataPoint[n].value;
 }
 
 DataSampleBasic DataSample::calcNthCentralMomentPerDataPoint(int n)
 {
-	if ( n == 0 )
-	{
-		return DataSampleBasic(std::valarray<realFloat>(1.0, this->getNumberOfElements()));
-	}
-	else if (n == 1)
-	{
-		return DataSampleBasic(std::valarray<realFloat>(0.0, this->getNumberOfElements()));
-	}
-	else
-	{
-		return calcNthCentralMomentPerDataPointExplicit(*this, n);
-	}
+    if (n == 0) {
+        return DataSampleBasic(std::valarray<realFloat>(1.0, this->getNumberOfElements()));
+    } else if (n == 1) {
+        return DataSampleBasic(std::valarray<realFloat>(0.0, this->getNumberOfElements()));
+    } else {
+        return calcNthCentralMomentPerDataPointExplicit(*this, n);
+    }
 }
-
-
 
 int DataSample::getNumberOfMoments()
 {
-	return upperLimitForNthMoment - lowerLimitForNthMoment + 1;
+    return upperLimitForNthMoment - lowerLimitForNthMoment + 1;
 }
 
 int DataSample::getUpperLimitForNthMoment()
 {
-	return upperLimitForNthMoment;
+    return upperLimitForNthMoment;
 }
 
 int DataSample::getLowerLimitForNthMoment()
 {
-	return lowerLimitForNthMoment;
+    return lowerLimitForNthMoment;
 }
 
 DataSample removeNElementsFromDataSample(DataSample sampleIn, int n)
 {
-	int numberOfElements = sampleIn.getNumberOfElements();
-	DataSampleBasic tmp = sampleIn;
-	for (int iteration = numberOfElements - 1; iteration >= numberOfElements - n; iteration --)
-	{
-		tmp = tmp.removeIthElement(iteration);
-	}
-	return DataSample(tmp);
+    int numberOfElements = sampleIn.getNumberOfElements();
+    DataSampleBasic tmp = sampleIn;
+    for (int iteration = numberOfElements - 1; iteration >= numberOfElements - n; iteration--) {
+        tmp = tmp.removeIthElement(iteration);
+    }
+    return DataSample(tmp);
 }
-
 
 /**************************** STATIC FUNCTIONS ****************************/
 
-
 static void checkIfNIsValid(int n, int upperLimit, int lowerLimit)
 {
-	if(n < lowerLimit || n > upperLimit)
-		throw std::invalid_argument("The requested moment is not implemented yet!");
+    if (n < lowerLimit || n > upperLimit)
+        throw std::invalid_argument("The requested moment is not implemented yet!");
 }
 
-static realFloat calcNthMomentExplicit(DataSample & sampleIn, int n)
+static realFloat calcNthMomentExplicit(DataSample& sampleIn, int n)
 {
-	return (sampleIn^n).sum() / (realFloat) sampleIn.getNumberOfElements();
+    return (sampleIn ^ n).sum() / (realFloat)sampleIn.getNumberOfElements();
 }
 
-static realFloat calcFirstMomentExplicit(DataSample & sampleIn)
+static realFloat calcFirstMomentExplicit(DataSample& sampleIn)
 {
-	return sampleIn.sum() / sampleIn.getNumberOfElements();
+    return sampleIn.sum() / sampleIn.getNumberOfElements();
 }
 
-static realFloat calcNthCentralMomentExplicit(DataSample & sampleIn, int n)
+static realFloat calcNthCentralMomentExplicit(DataSample& sampleIn, int n)
 {
-	return ( (sampleIn - sampleIn.getNthMoment(1) )^n ).sum()  / sampleIn.getNumberOfElements();
+    return ((sampleIn - sampleIn.getNthMoment(1)) ^ n).sum() / sampleIn.getNumberOfElements();
 }
 
-static DataSampleBasic calcNthMomentPerDataPointExplicit(DataSample & sampleIn, int n)
+static DataSampleBasic calcNthMomentPerDataPointExplicit(DataSample& sampleIn, int n)
 {
-	return (sampleIn^n);
+    return (sampleIn ^ n);
 }
 
-static DataSampleBasic calcFirstMomentPerDataPointExplicit(DataSample & sampleIn)
+static DataSampleBasic calcFirstMomentPerDataPointExplicit(DataSample& sampleIn)
 {
-	return sampleIn;
+    return sampleIn;
 }
 
-static DataSampleBasic calcNthCentralMomentPerDataPointExplicit(DataSample & sampleIn, int n)
+static DataSampleBasic calcNthCentralMomentPerDataPointExplicit(DataSample& sampleIn, int n)
 {
-	return ((sampleIn - sampleIn.getNthMoment(1))^n);
+    return ((sampleIn - sampleIn.getNthMoment(1)) ^ n);
 }
-

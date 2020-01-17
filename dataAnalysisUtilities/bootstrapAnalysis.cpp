@@ -36,6 +36,6 @@
  */
 realFloat calculateBootstrapError(DataSample& sampleWithBootstrapEstimators)
 {
-	using std::abs;
-	return sqrt(abs(sampleWithBootstrapEstimators.getNthMoment(2) - pow(sampleWithBootstrapEstimators.getNthMoment(1), 2.)));
+    using std::abs;
+    return sqrt(abs(sampleWithBootstrapEstimators.getNthMoment(2) - pow(sampleWithBootstrapEstimators.getNthMoment(1), 2.)));
 }
