@@ -16,7 +16,8 @@ Clearly, you could use the code as external library for another project, but thi
 Unfortunately, at the moment, no documentation is available and you need to explore the repository to understand what has been done how.
 However, as far as building the code is concerned, the procedure is quite standard via CMake.
 
-*  After having cloned the repository, create a build folder in it and move into it.
+*  After having cloned the repository, checkout to [the latest release](https://gitlab.itp.uni-frankfurt.de/ag-philipsen/lqcd-cpp-analysis-tools/-/releases) (always recommended).
+*  Create a build folder in it and move into it.
 *  Here, you can simply run `cmake ..` in order to run a default setup or you can use the `ccmake ..` command to have access to configuration options.
 *  If no error occurs (in case have a look to the error and act accordingly), you can run `make`
 *  At this stage there should be no compilation error and a couple of executable should be created (also tests executable are built, so that you can run the code base tests using ctest).
@@ -27,3 +28,8 @@ Use
 *  `lqcdReweighting` to reweight Monte Carlo observables and/or their moments.
 
 Every executable accepts command line options and you can get some documentation running the executables with the `-h` or `--help` option.
+
+## Working on the repository
+
+If you plan to extend or improve some functionality of this codebase, it would be really appreciated if you follow [the provided guidelines](CONTRIBUTING.md).
+This will make future work easier for every developer.
