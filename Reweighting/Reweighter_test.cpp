@@ -612,7 +612,7 @@ BOOST_AUTO_TEST_SUITE(skewReweighting)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(bindReweighting)
+BOOST_AUTO_TEST_SUITE(kurtReweighting)
 
     /*
      * Same tests as the suite suscReweighting, but on the kurtosis. Read the comments
@@ -622,13 +622,21 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
      * Indeed, having the four moments discrepancies below 1.e-12, the kurtosis can be different on the
      * sixth digit like the following example shows:
      *
-     *   x1 = 0.512078816369961    x2 = 0.262237401564598    x3 = 0.134299237823898    x4 = 0.0687818157251345     ->   Kurtosis
-     * = 3.74781141215248 x1 = 0.512078816369975    x2 = 0.26223740156461    x3 = 0.134299237823896    x4 = 0.0687818157251355     ->
-     * Kurtosis = 3.74790400766947
+     *   x1 = 0.512078816369961
+     *   x2 = 0.262237401564598
+     *   x3 = 0.134299237823898
+     *   x4 = 0.0687818157251345
+     *   -> Kurtosis = 3.74781141215248
+     *
+     *   x1 = 0.512078816369975
+     *   x2 = 0.26223740156461
+     *   x3 = 0.134299237823896
+     *   x4 = 0.0687818157251355
+     *   -> Kurtosis = 3.74790400766947
      *
      * where x1,x2,x3,x4 are the four moments and Kurtosis=(x4-4*x3*x1+6*x2*x1*x1-3*x1*x1*x1*x1)/(pow(x2-x1*x1, 2.0)).
      */
-    BOOST_AUTO_TEST_CASE(bindReweighting1)
+    BOOST_AUTO_TEST_CASE(kurtReweighting1)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_4";
         std::initializer_list<std::string> options = {"-f" + fileThatDoesExist,
@@ -654,20 +662,12 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
                                                     2.6677822776443, 2.6426871106605, 2.6179747425739, 2.5940106172587, 2.5708020671102};
         std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            if (i == 9 || i == 20 || i == 24 || i == 28) {
-                BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.003);
-                BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].kurtosis.estimate, 0.003);
-            } else {
-                BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 1.e-8);
-                if (i == 29)
-                    BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].kurtosis.estimate, 0.0005);
-                else
-                    BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].kurtosis.estimate, 1.e-8);
-            }
+            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.003);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].kurtosis.estimate, 0.003);
         }
     }
 
-    BOOST_AUTO_TEST_CASE(bindReweighting2)
+    BOOST_AUTO_TEST_CASE(kurtReweighting2)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_5";
         std::initializer_list<std::string> options = {"-f" + fileThatDoesExist,
@@ -689,14 +689,11 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
             3.073140076998, 3.169952202463, 3.267167961059};
         std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            if (i == 3 || i == 22 || i == 27 || i == 36 || i == 41)
-                BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.0025);
-            else
-                BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 1.e-8);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.003);
         }
     }
 
-    BOOST_AUTO_TEST_CASE(bindReweighting3)
+    BOOST_AUTO_TEST_CASE(kurtReweighting3)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_5";
         std::initializer_list<std::string> options = {"-f" + fileThatDoesExist,
@@ -718,15 +715,12 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
             3.073140076998, 3.169952202463, 3.267167961059};
         std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            if (i == 3 || i == 22 || i == 27 || i == 36 || i == 41)
-                BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.0025);
-            else
-                BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 1.e-8);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.003);
             BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].kurtosis.error, (realFloat)1.e-6);
         }
     }
 
-    BOOST_AUTO_TEST_CASE(bindReweighting4)
+    BOOST_AUTO_TEST_CASE(kurtReweighting4)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_5";
         std::initializer_list<std::string> options1 = {"-f" + fileThatDoesExist,
@@ -758,10 +752,10 @@ BOOST_AUTO_TEST_SUITE(bindReweighting)
     }
 
     /*
-     * The following test is the same as bindReweighting1
+     * The following test is the same as kurtReweighting1
      * but imposing the mean of the observable zero a priori
      */
-    BOOST_AUTO_TEST_CASE(bindReweighting5)
+    BOOST_AUTO_TEST_CASE(kurtReweighting5)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_4";
         std::initializer_list<std::string> options = {"-f" + fileThatDoesExist,
