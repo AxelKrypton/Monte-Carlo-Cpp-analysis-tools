@@ -46,7 +46,7 @@ performBinningFromNumberOfBins(DataSample& rawData, int numberOfBins, bool adjus
 
     resizeRawDataSample(rawData, binnedData, adjustDataSampleSizeToBinning);
 
-    return binnedData;
+    return std::move(binnedData);  // https://stackoverflow.com/a/55924926
 }
 
 DataSample performBinningFromBinsize(DataSample& rawData, int binsize, bool adjustDataSampleSizeToBinning, bool binningMustFitDataSampleSize)
@@ -56,5 +56,5 @@ DataSample performBinningFromBinsize(DataSample& rawData, int binsize, bool adju
 
     resizeRawDataSample(rawData, binnedData, adjustDataSampleSizeToBinning);
 
-    return binnedData;
+    return std::move(binnedData);  // https://stackoverflow.com/a/55924926
 }

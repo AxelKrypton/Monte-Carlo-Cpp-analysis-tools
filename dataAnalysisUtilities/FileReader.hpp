@@ -142,7 +142,6 @@ class FileReader {
     std::string line;
     std::string filename;
     std::vector<realFloat> data;
-    realFloat currentNumber;
     int column;
     int offset;
     int lineCounter;
