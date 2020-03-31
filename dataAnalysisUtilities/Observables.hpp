@@ -218,8 +218,8 @@ class Variance : public ObservableAbstract {
     Variance(DataSample& dataSample, Parameters parameters);
     Variance(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
-    static constexpr std::initializer_list<unsigned int> neededMoments = {1, 2};
-    static constexpr std::initializer_list<unsigned int> neededMomentsWithZeroMean = {{2}};
+    static const std::initializer_list<unsigned int> neededMoments;
+    static const std::initializer_list<unsigned int> neededMomentsWithZeroMean;
     static const std::string observableName;
     static const functionForObservable functionToCalculateOservableWithZeroMean;
     static const functionForObservable functionToCalculateOservableWithNonZeroMean;
@@ -245,8 +245,8 @@ class Skewness : public ObservableAbstract {
     Skewness(DataSample& dataSample, Parameters parameters);
     Skewness(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
-    static constexpr std::initializer_list<unsigned int> neededMoments = {1, 2, 3};
-    static constexpr std::initializer_list<unsigned int> neededMomentsWithZeroMean = {2, 3};
+    static const std::initializer_list<unsigned int> neededMoments;
+    static const std::initializer_list<unsigned int> neededMomentsWithZeroMean;
     static const std::string observableName;
     static const functionForObservable functionToCalculateOservableWithZeroMean;
     static const functionForObservable functionToCalculateOservableWithNonZeroMean;
@@ -272,8 +272,8 @@ class Kurtosis : public ObservableAbstract {
     Kurtosis(DataSample& dataSample, Parameters parameters);
     Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
-    static constexpr std::initializer_list<unsigned int> neededMoments = {1, 2, 3, 4};
-    static constexpr std::initializer_list<unsigned int> neededMomentsWithZeroMean = {2, 4};
+    static const std::initializer_list<unsigned int> neededMoments;
+    static const std::initializer_list<unsigned int> neededMomentsWithZeroMean;
     static const std::string observableName;
     static const functionForObservable functionToCalculateOservableWithZeroMean;
     static const functionForObservable functionToCalculateOservableWithNonZeroMean;

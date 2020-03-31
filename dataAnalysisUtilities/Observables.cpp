@@ -220,8 +220,8 @@ std::initializer_list<unsigned int> Mean::getNeededMoments()
 /***********************************************************************************************************************************/
 
 // Definition of the static member for the linker
-constexpr std::initializer_list<unsigned int> Variance::neededMoments;
-constexpr std::initializer_list<unsigned int> Variance::neededMomentsWithZeroMean;
+const std::initializer_list<unsigned int> Variance::neededMoments = {1, 2};
+const std::initializer_list<unsigned int> Variance::neededMomentsWithZeroMean = {2};
 const std::string Variance::observableName = "VARIANCE";
 const functionForObservable Variance::functionToCalculateOservableWithZeroMean = [](Moments in) -> realFloat { return in[2]; };
 const functionForObservable Variance::functionToCalculateOservableWithNonZeroMean
@@ -302,8 +302,8 @@ std::initializer_list<unsigned int> Variance::getNeededMoments()
 /***********************************************************************************************************************************/
 
 // Definition of the static member for the linker
-constexpr std::initializer_list<unsigned int> Skewness::neededMoments;
-constexpr std::initializer_list<unsigned int> Skewness::neededMomentsWithZeroMean;
+const std::initializer_list<unsigned int> Skewness::neededMoments = {1, 2, 3};
+const std::initializer_list<unsigned int> Skewness::neededMomentsWithZeroMean = {2, 3};
 const std::string Skewness::observableName = "SKEWNESS";
 const functionForObservable Skewness::functionToCalculateOservableWithZeroMean
     = [](Moments in) -> realFloat { return in[3] / pow(in[2], 1.5); };
@@ -395,8 +395,8 @@ std::initializer_list<unsigned int> Skewness::getNeededMoments()
 /***********************************************************************************************************************************/
 
 // Definition of the static member for the linker
-constexpr std::initializer_list<unsigned int> Kurtosis::neededMoments;
-constexpr std::initializer_list<unsigned int> Kurtosis::neededMomentsWithZeroMean;
+const std::initializer_list<unsigned int> Kurtosis::neededMoments = {1, 2, 3, 4};
+const std::initializer_list<unsigned int> Kurtosis::neededMomentsWithZeroMean = {2, 4};
 const std::string Kurtosis::observableName = "KURTOSIS";
 const functionForObservable Kurtosis::functionToCalculateOservableWithZeroMean
     = [](Moments in) -> realFloat { return in[4] / pow(in[2], 2.0); };
