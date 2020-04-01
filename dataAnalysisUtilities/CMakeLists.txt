@@ -26,6 +26,7 @@ add_library(dataAnalysisUtilities
 	jackknifeAnalysis.cpp
 	bootstrapAnalysis.cpp
 	binning.cpp
+	Moments.cpp
 	Observables.cpp
 )
 target_link_libraries(dataAnalysisUtilities IO Parameters)
@@ -40,11 +41,12 @@ if( USE_REW_MULTI_PRECISION )
 		jackknifeAnalysis.cpp
 		bootstrapAnalysis.cpp
 		binning.cpp
+		Moments.cpp
 		Observables.cpp
 	)
 	target_compile_definitions(supportSourceForMultiprecisionReweighting PUBLIC -D_USE_BIG_FLOAT_)
 	target_link_libraries(supportSourceForMultiprecisionReweighting IO Parameters ${MPFR_LIBRARIES})
-		
+
 endif( USE_REW_MULTI_PRECISION )
 
 #Extract test files directly to the build correct folder
@@ -65,4 +67,5 @@ add_unit_test(dataSample DataSample_test dataAnalysisUtilities)
 add_unit_test(binnedDataSample binnedDataSample_test dataAnalysisUtilities)
 add_unit_test(jackknifeEstimators jackknifeEstimators_test dataAnalysisUtilities)
 add_unit_test(dataAnalysisUtilities dataAnalysisUtilities_test dataAnalysisUtilities Parameters)
+add_unit_test(moments Moments_test dataAnalysisUtilities)
 add_unit_test(observables Observables_test dataAnalysisUtilities)

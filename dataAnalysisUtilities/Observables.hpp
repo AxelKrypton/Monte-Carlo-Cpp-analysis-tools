@@ -25,120 +25,15 @@
 #include "../types.hpp"
 #include "DataSample.hpp"
 #include "EstimateAndError.hpp"
+#include "Moments.hpp"
 
-#include <array>
 #include <functional>
-#include <map>
 #include <sstream>
 
 class Parameters;
 
 enum ErrorCalculationMethod { bootstrap = 1, jackknife };
 realFloat evaluateErrorBasedOnMethod(DataSample, ErrorCalculationMethod);
-
-/*
- * NOTE: In order to handle the possibility to have several estimates per moment in the Moment class
- *       and several sets of estimators per moment in the MomentsEstimators class, we use a std::multimap
- *       member. Then we cannot use the access operator[] in the standard way, i.e. both to get and to set
- *       an entry. This is related to the fact that multimap has no operator[] defined. Another thing it
- *       would be cool to have is a method that get the number of the moment and returns either a single
- *       object or a set of object (in the case several were set). Nevertheless overload based on return
- *       value is not allowed in c++. So we decided to do in this way. We have an insert method to set
- *       elements. Then we use the operator[] to get a single value (checking for this case) and we use
- *       the operator() to get a set of values (checking for this case).
- *       TODO: In the functions getFunctionTo[...] we should do a try and catch block when asking the Moments
- *             or the MomentsEstimators with the operator() in the useMultipleEstimate case. This is because,
- *             in general, it could happen the (stupid) case in which the reweighting using multiple columns
- *             is done but there is one only multiple column. Then one only value is set and the operator()
- *             throws an exception.
- */
-class Moments {
-  public:
-    Moments(){};
-    void insert(const unsigned int& whichMoment, const realFloat& momentValue)
-    {
-        moments.insert(std::pair<unsigned int, realFloat>(whichMoment, momentValue));
-    }
-    realFloat operator[](const unsigned int& whichMoment)
-    {
-        std::multimap<unsigned int, realFloat>::iterator itWhichMoment = moments.find(whichMoment);
-        if (itWhichMoment == moments.end())
-            throw std::out_of_range("Moments::[] accessed an invalid moment! Aborting...");
-        else if (moments.count(itWhichMoment->first) > 1)
-            throw std::invalid_argument("Moments::[] accessed a moment for which several values are set, NOT ALLOWED! Aborting...");
-        else
-            return itWhichMoment->second;
-    }
-    std::vector<realFloat> operator()(const unsigned int& whichMoment)
-    {
-        std::multimap<unsigned int, realFloat>::iterator itWhichMoment = moments.find(whichMoment);
-        if (itWhichMoment == moments.end())
-            throw std::out_of_range("Moments::() accessed an invalid moment! Aborting...");
-        else if (moments.count(itWhichMoment->first) == 1)
-            throw std::invalid_argument("Moments::() accessed a moment for which only one value is set, NOT ALLOWED! Aborting...");
-        else {
-            std::vector<realFloat> returnVec;
-            std::multimap<unsigned int, realFloat>::iterator itRangeWhichMoment;
-            for (itRangeWhichMoment = moments.equal_range(itWhichMoment->first).first;
-                 itRangeWhichMoment != moments.equal_range(itWhichMoment->first).second; ++itRangeWhichMoment)
-                returnVec.push_back(itRangeWhichMoment->second);
-            return returnVec;
-        }
-    }
-
-  private:
-    std::multimap<unsigned int, realFloat> moments;
-};
-
-class MomentsEstimators {
-  public:
-    MomentsEstimators(){};
-    void insert(const unsigned int& whichMoment, const DataSample& momentEstValues)
-    {
-        momentsEstimators.insert(std::pair<unsigned int, DataSample>(whichMoment, momentEstValues));
-    }
-    DataSample operator[](const unsigned int& whichMoment)
-    {
-        std::multimap<unsigned int, DataSample>::iterator itWhichMoment = momentsEstimators.find(whichMoment);
-        if (itWhichMoment == momentsEstimators.end())
-            throw std::out_of_range("MomentsEstimators::[] accessed an invalid moment! Aborting...");
-        else if (momentsEstimators.count(itWhichMoment->first) > 1)
-            throw std::invalid_argument(
-                "MomentsEstimators::[] accessed a moment for which several values are set, NOT ALLOWED! Aborting...");
-        else
-            return itWhichMoment->second;
-    }
-    std::vector<DataSample> operator[](const std::initializer_list<unsigned int>& whichMoments)
-    {
-        std::vector<DataSample> selectedMoments;
-        for (unsigned int i : whichMoments) {
-            DataSample tmp = (*this)[i];
-            selectedMoments.push_back(tmp);
-        }
-        return selectedMoments;
-    }
-
-    std::vector<DataSample> operator()(const unsigned int& whichMoment)
-    {
-        std::multimap<unsigned int, DataSample>::iterator itWhichMoment = momentsEstimators.find(whichMoment);
-        if (itWhichMoment == momentsEstimators.end())
-            throw std::out_of_range("MomentsEstimators::() accessed an invalid moment! Aborting...");
-        else if (momentsEstimators.count(itWhichMoment->first) == 1)
-            throw std::invalid_argument(
-                "MomentsEstimators::() accessed a moment for which only one value is set, NOT ALLOWED! Aborting...");
-        else {
-            std::vector<DataSample> returnVec;
-            std::multimap<unsigned int, DataSample>::iterator itRangeWhichMoment;
-            for (itRangeWhichMoment = momentsEstimators.equal_range(itWhichMoment->first).first;
-                 itRangeWhichMoment != momentsEstimators.equal_range(itWhichMoment->first).second; ++itRangeWhichMoment)
-                returnVec.push_back(itRangeWhichMoment->second);
-            return returnVec;
-        }
-    }
-
-  private:
-    std::multimap<unsigned int, DataSample> momentsEstimators;
-};
 
 /*
  * TODO: So far the error method is not a private member of the class, since for the raw data only Jackknife is used!
