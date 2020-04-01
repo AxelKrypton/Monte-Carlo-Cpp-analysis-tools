@@ -21,6 +21,11 @@
 
 #include "Reweighter.hpp"
 
+#include "../dataAnalysisUtilities/Quantities/Kurtosis.hpp"
+#include "../dataAnalysisUtilities/Quantities/Mean.hpp"
+#include "../dataAnalysisUtilities/Quantities/Moments.hpp"
+#include "../dataAnalysisUtilities/Quantities/Skewness.hpp"
+#include "../dataAnalysisUtilities/Quantities/Variance.hpp"
 #include "MomentsReweighter.hpp"
 
 static std::vector<std::string> getQuantitiesToBeReweighted(LqcdReweightingParameters);

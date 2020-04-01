@@ -28,6 +28,11 @@ add_library(dataAnalysisUtilities
 	binning.cpp
 	Quantities/Moments.cpp
 	Quantities/Observables.cpp
+	Quantities/Mean.cpp
+	Quantities/Variance.cpp
+	Quantities/Skewness.cpp
+	Quantities/Kurtosis.cpp
+	Quantities/Tools.cpp
 )
 target_link_libraries(dataAnalysisUtilities IO Parameters)
 
@@ -43,6 +48,11 @@ if( USE_REW_MULTI_PRECISION )
 		binning.cpp
 		Quantities/Moments.cpp
 		Quantities/Observables.cpp
+		Quantities/Mean.cpp
+		Quantities/Variance.cpp
+		Quantities/Skewness.cpp
+		Quantities/Kurtosis.cpp
+		Quantities/Tools.cpp
 	)
 	target_compile_definitions(supportSourceForMultiprecisionReweighting PUBLIC -D_USE_BIG_FLOAT_)
 	target_link_libraries(supportSourceForMultiprecisionReweighting IO Parameters ${MPFR_LIBRARIES})

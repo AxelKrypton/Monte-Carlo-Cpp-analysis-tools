@@ -22,6 +22,7 @@
 
 #include "MomentsReweighter.hpp"
 
+#include "../dataAnalysisUtilities/Quantities/Moments.hpp"
 #include "../dataAnalysisUtilities/bootstrapAnalysis.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 #include "../dataAnalysisUtilities/jackknifeAnalysis.hpp"

@@ -25,12 +25,13 @@
 #include "../../types.hpp"
 #include "../DataSample.hpp"
 #include "EstimateAndError.hpp"
-#include "Moments.hpp"
 
 #include <functional>
 #include <sstream>
 
 class Parameters;
+class Moments;
+class MomentsEstimators;
 
 enum ErrorCalculationMethod { bootstrap = 1, jackknife };
 realFloat evaluateErrorBasedOnMethod(DataSample, ErrorCalculationMethod);
@@ -80,112 +81,6 @@ class ObservableAbstract {
     virtual functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false) = 0;
     virtual functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false) = 0;
     virtual std::initializer_list<unsigned int> getNeededMoments() = 0;
-};
-
-class Mean : public ObservableAbstract {
-  public:
-    Mean() = delete;
-    Mean(DataSample& dataSample, Parameters parameters);
-    Mean(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
-         bool useMultipleEstimate = false);
-    static const std::initializer_list<unsigned int> neededMoments;
-    static const std::initializer_list<unsigned int> neededMomentsWithZeroMean;
-    static const std::string observableName;
-    static const functionForObservable functionToCalculateOservableWithNonZeroMean;
-    static const functionForObservable functionToCalculateOservableWithMultipleEstimates;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates;
-    static DataSample
-    evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
-
-  private:
-    Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
-    void printCorrectBinningInformation(const Parameters& parameters);
-    functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
-    functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
-    functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);
-    std::initializer_list<unsigned int> getNeededMoments();
-};
-
-class Variance : public ObservableAbstract {
-  public:
-    Variance() = delete;
-    Variance(DataSample& dataSample, Parameters parameters);
-    Variance(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
-             bool useMultipleEstimate = false);
-    static const std::initializer_list<unsigned int> neededMoments;
-    static const std::initializer_list<unsigned int> neededMomentsWithZeroMean;
-    static const std::string observableName;
-    static const functionForObservable functionToCalculateOservableWithZeroMean;
-    static const functionForObservable functionToCalculateOservableWithNonZeroMean;
-    static const functionForObservable functionToCalculateOservableWithMultipleEstimates;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithZeroMean;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates;
-    static DataSample
-    evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
-
-  private:
-    Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
-    void printCorrectBinningInformation(const Parameters& parameters);
-    functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
-    functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
-    functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);
-    std::initializer_list<unsigned int> getNeededMoments();
-};
-
-class Skewness : public ObservableAbstract {
-  public:
-    Skewness() = delete;
-    Skewness(DataSample& dataSample, Parameters parameters);
-    Skewness(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
-             bool useMultipleEstimate = false);
-    static const std::initializer_list<unsigned int> neededMoments;
-    static const std::initializer_list<unsigned int> neededMomentsWithZeroMean;
-    static const std::string observableName;
-    static const functionForObservable functionToCalculateOservableWithZeroMean;
-    static const functionForObservable functionToCalculateOservableWithNonZeroMean;
-    static const functionForObservable functionToCalculateOservableWithMultipleEstimates;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithZeroMean;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates;
-    static DataSample
-    evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
-
-  private:
-    Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
-    void printCorrectBinningInformation(const Parameters& parameters);
-    functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
-    functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
-    functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);
-    std::initializer_list<unsigned int> getNeededMoments();
-};
-
-class Kurtosis : public ObservableAbstract {
-  public:
-    Kurtosis() = delete;
-    Kurtosis(DataSample& dataSample, Parameters parameters);
-    Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
-             bool useMultipleEstimate = false);
-    static const std::initializer_list<unsigned int> neededMoments;
-    static const std::initializer_list<unsigned int> neededMomentsWithZeroMean;
-    static const std::string observableName;
-    static const functionForObservable functionToCalculateOservableWithZeroMean;
-    static const functionForObservable functionToCalculateOservableWithNonZeroMean;
-    static const functionForObservable functionToCalculateOservableWithMultipleEstimates;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithZeroMean;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates;
-    static DataSample
-    evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
-
-  private:
-    Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
-    void printCorrectBinningInformation(const Parameters& parameters);
-    functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
-    functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
-    functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);
-    std::initializer_list<unsigned int> getNeededMoments();
 };
 
 /*

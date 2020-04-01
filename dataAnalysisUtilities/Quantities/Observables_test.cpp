@@ -23,6 +23,10 @@
 #include "Observables.hpp"
 
 #include "../dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
+#include "Kurtosis.hpp"
+#include "Mean.hpp"
+#include "Skewness.hpp"
+#include "Variance.hpp"
 
 #include <boost/test/unit_test.hpp>
 

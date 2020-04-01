@@ -20,6 +20,7 @@
 
 #include "MomentsReweighterHelper.hpp"
 
+#include "../dataAnalysisUtilities/Quantities/Moments.hpp"
 #include "../dataAnalysisUtilities/binnedDataSample.hpp"
 #include "MomentsReweighter.hpp"
 #include "SimulationData.hpp"
