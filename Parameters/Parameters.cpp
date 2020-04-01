@@ -171,15 +171,15 @@ void Parameters::printParameters()
         std::cout << "# Perform binning with:" << std::endl;
         if (useNumberOfBinsForBinning) {
             std::cout << "# Number of bins:\n";
-            for (size_t i = 0; i < numberOfBinsMoments.size(); i++)
+            for (size_t i = 1; i < numberOfBinsMoments.size(); i++)
                 std::cout << "#   - moment " << i << ": " << numberOfBinsMoments[i] << std::endl;
-            for (size_t i = 0; i < numberOfBinsCentralMoments.size(); i++)
+            for (size_t i = 1; i < numberOfBinsCentralMoments.size(); i++)
                 std::cout << "#   - central moment " << i << ": " << numberOfBinsCentralMoments[i] << std::endl;
         } else {
             std::cout << "# Binsize:\n";
-            for (size_t i = 0; i < binsizeMoments.size(); i++)
+            for (size_t i = 1; i < binsizeMoments.size(); i++)
                 std::cout << "#   - moment " << i << ": " << binsizeMoments[i] << std::endl;
-            for (size_t i = 0; i < binsizeCentralMoments.size(); i++)
+            for (size_t i = 1; i < binsizeCentralMoments.size(); i++)
                 std::cout << "#   - central moment " << i << ": " << binsizeCentralMoments[i] << std::endl;
         }
         if (binningMustFitDataSampleSize) {
@@ -219,7 +219,13 @@ void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithB
         auxVector[1].push_back(vectorWithBinningInformations[i + 1]);
     }
     vectorWithBinningInformations.clear();
-    // Minimum 4 moments. TODO: Improve in the sense that this 4 should not be hard coded!!
+    /*
+     * Minimum 4 moments.
+     * NOTE: Entry 0 is meaningless but we keep it to have the index
+     *       referring exactly to the number of the moment without a
+     *       a shift by one (make rest of code more readable).
+     * TODO: Improve in the sense that this 4 should not be hard coded!!
+     */
     int totalNumberOfMoments = (auxVector[0].size() == 0) ? 4 : std::max(4, *std::max_element(auxVector[0].begin(), auxVector[0].end()));
     for (int i = 0; i <= totalNumberOfMoments; i++) {
         std::vector<int>::iterator it;
