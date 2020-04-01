@@ -23,7 +23,7 @@
 #define REWEIGHTER_HPP_
 
 #include "../Parameters/LqcdReweightingParameters.hpp"
-#include "../dataAnalysisUtilities/Observables.hpp"
+#include "../dataAnalysisUtilities/Quantities/Observables.hpp"
 #include "Histogram.hpp"
 #include "ReweighterIO.hpp"
 #include "SimulationDataContainer.hpp"

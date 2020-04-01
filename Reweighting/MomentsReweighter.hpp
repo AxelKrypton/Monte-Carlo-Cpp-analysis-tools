@@ -22,7 +22,7 @@
 #ifndef MOMENTSREWEIGHTER_H_
 #define MOMENTSREWEIGHTER_H_
 
-#include "../dataAnalysisUtilities/Observables.hpp"
+#include "../dataAnalysisUtilities/Quantities/Observables.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 #include "Histogram.hpp"
 #include "MomentsReweighterHelper.hpp"

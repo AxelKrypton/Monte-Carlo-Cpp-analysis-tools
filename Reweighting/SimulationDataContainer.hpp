@@ -20,7 +20,7 @@
 #ifndef SIMULATIONCONTAINERDATA_HPP_
 #define SIMULATIONCONTAINERDATA_HPP_
 
-#include "../dataAnalysisUtilities/Observables.hpp"
+#include "../dataAnalysisUtilities/Quantities/Observables.hpp"
 #include "SimulationData.hpp"
 
 #include <random>

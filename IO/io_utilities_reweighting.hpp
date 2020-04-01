@@ -22,7 +22,7 @@
 #define IO_UTILITIES_REWEIGHTING_HPP_
 
 #include "../Reweighting/Histogram.hpp"
-#include "../dataAnalysisUtilities/Observables.hpp"
+#include "../dataAnalysisUtilities/Quantities/Observables.hpp"
 #include "../types.hpp"
 
 #include <iostream>

@@ -23,7 +23,7 @@
 
 #include "../Parameters/Parameters.hpp"
 #include "DataSample.hpp"
-#include "EstimateAndError.hpp"
+#include "Quantities/EstimateAndError.hpp"
 
 /*
  * In all the quantities calculation, it is taken into account whether the mean is known to be zero or not.

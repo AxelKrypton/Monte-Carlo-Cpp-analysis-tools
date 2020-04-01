@@ -20,9 +20,9 @@
 
 #include "Observables.hpp"
 
-#include "binning.hpp"
-#include "bootstrapAnalysis.hpp"
-#include "jackknifeAnalysis.hpp"
+#include "../binning.hpp"
+#include "../bootstrapAnalysis.hpp"
+#include "../jackknifeAnalysis.hpp"
 
 /*****************************************************************************************/
 realFloat evaluateErrorBasedOnMethod(DataSample dataSample, ErrorCalculationMethod errorMethod)

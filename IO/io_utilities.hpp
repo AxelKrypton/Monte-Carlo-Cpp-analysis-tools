@@ -22,7 +22,7 @@
 #define IO_UTILITIES_HPP_
 
 #include "../Parameters/Parameters.hpp"
-#include "../dataAnalysisUtilities/Observables.hpp"
+#include "../dataAnalysisUtilities/Quantities/Observables.hpp"
 
 #include <iostream>
 

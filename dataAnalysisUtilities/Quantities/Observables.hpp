@@ -22,8 +22,8 @@
 #ifndef OBSERVABLES_HPP_
 #define OBSERVABLES_HPP_
 
-#include "../types.hpp"
-#include "DataSample.hpp"
+#include "../../types.hpp"
+#include "../DataSample.hpp"
 #include "EstimateAndError.hpp"
 #include "Moments.hpp"
 
@@ -49,7 +49,7 @@ typedef DataSample (*functionForEstimatorsForJackknife)(std::vector<DataSample>)
  *       Actually it could be possible that this can be completely removed and only the std::function<DataSample(MomentsEstimators)>
  *       can be used. The thing that one should think of is that in jackknifeAnalysis the functions take as second argument a function that
  *       has in input a vector of DataSample and there the MomentsEstimators are not used. It should be possible to use there the
- * MomentsEstimators and one could have here just one single functionForEstimators.
+ *       MomentsEstimators and one could have here just one single functionForEstimators.
  *
  *       This is also the reason why for the moment there are no static members with this function that is hard coded in the getter.
  */

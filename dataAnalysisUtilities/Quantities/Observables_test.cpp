@@ -22,7 +22,7 @@
 #define BOOST_TEST_MODULE Observables
 #include "Observables.hpp"
 
-#include "dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
+#include "../dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
 
 #include <boost/test/unit_test.hpp>
 

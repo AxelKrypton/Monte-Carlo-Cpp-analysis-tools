@@ -21,8 +21,8 @@
 #ifndef HISTOGRAM_HPP_
 #define HISTOGRAM_HPP_
 #include "../dataAnalysisUtilities/DataSample.hpp"
-#include "../dataAnalysisUtilities/EstimateAndError.hpp"
-#include "../dataAnalysisUtilities/Observables.hpp"
+#include "../dataAnalysisUtilities/Quantities/EstimateAndError.hpp"
+#include "../dataAnalysisUtilities/Quantities/Observables.hpp"
 #include "../types.hpp"
 
 #include <map>
