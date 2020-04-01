@@ -26,7 +26,7 @@
 class EstimateAndError {
   public:
     EstimateAndError() : estimate(0.), error(0.) {}
-    EstimateAndError(realFloat mean, realFloat error) : estimate(mean), error(error) {}
+    EstimateAndError(realFloat value, realFloat error) : estimate(value), error(error) {}
 
     realFloat estimate;
     realFloat error;
