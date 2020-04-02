@@ -25,7 +25,8 @@
 
 class EstimateAndError {
   public:
-    EstimateAndError() : estimate(0.), error(0.) {}
+    // Here default initialisation to 0.0 is crucial, because Histogram classes rely on it!
+    EstimateAndError() : estimate(0.0), error(0.0) {}
     EstimateAndError(realFloat value, realFloat error) : estimate(value), error(error) {}
 
     realFloat estimate;
