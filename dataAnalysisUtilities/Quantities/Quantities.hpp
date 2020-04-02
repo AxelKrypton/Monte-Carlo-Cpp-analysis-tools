@@ -25,6 +25,7 @@
 #include "../../types.hpp"
 #include "../DataSample.hpp"
 #include "EstimateAndError.hpp"
+#include "Mean.hpp"
 
 #include <functional>
 #include <sstream>

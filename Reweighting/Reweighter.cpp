@@ -403,21 +403,21 @@ static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(
                 obsInFile, columnsToBeReweightedUsingMultipleColumns, numberOfReweightingParameters, mximumMomentNeeded);
             for (auto quantity : quantitiesToBeSet) {
                 if (quantity == Mean::observableName) {
-                    Mean tmpMean(
-                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
-                    observables[newPoint][obsInFile].mean = EstimateAndError(tmpMean.estimate, tmpMean.error);
+                    observables[newPoint][obsInFile].mean = Mean(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
+                                                                 isMeanZero, errorMethod, useMultipleEstimate)
+                                                                .value;
                 } else if (quantity == Variance::observableName) {
-                    Variance tmpVariance(
-                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
-                    observables[newPoint][obsInFile].variance = EstimateAndError(tmpVariance.estimate, tmpVariance.error);
+                    observables[newPoint][obsInFile].variance = Variance(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
+                                                                         isMeanZero, errorMethod, useMultipleEstimate)
+                                                                    .value;
                 } else if (quantity == Skewness::observableName) {
-                    Skewness tmpSkewness(
-                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
-                    observables[newPoint][obsInFile].skewness = EstimateAndError(tmpSkewness.estimate, tmpSkewness.error);
+                    observables[newPoint][obsInFile].skewness = Skewness(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
+                                                                         isMeanZero, errorMethod, useMultipleEstimate)
+                                                                    .value;
                 } else if (quantity == Kurtosis::observableName) {
-                    Kurtosis tmpKurtosis(
-                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
-                    observables[newPoint][obsInFile].kurtosis = EstimateAndError(tmpKurtosis.estimate, tmpKurtosis.error);
+                    observables[newPoint][obsInFile].kurtosis = Kurtosis(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
+                                                                         isMeanZero, errorMethod, useMultipleEstimate)
+                                                                    .value;
                 } else
                     throw std::invalid_argument(
                         "Unknown observable in \"setObservablesAtNewPointsFromMomentsAndMomentEstimators\" function!");

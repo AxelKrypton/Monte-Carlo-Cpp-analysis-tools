@@ -34,24 +34,24 @@ BOOST_AUTO_TEST_SUITE(KurtosisTest)
     {
         EstimateAndError referenceValue(1.000194288875983, 0.0);
         Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
-        BOOST_CHECK_CLOSE(kurtosis.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(kurtosis.error, 1.e-7);
+        BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(kurtosis.value.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
     {
         EstimateAndError referenceValue(3.7478114121524830, 0.0);
         Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
-        BOOST_CHECK_CLOSE(kurtosis.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(kurtosis.error, 3.e-7);
+        BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(kurtosis.value.error, 3.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
     {
         EstimateAndError referenceValue(3.7478114121524830, 7.2132403917648602e-01);
         Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
-        BOOST_CHECK_CLOSE(kurtosis.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_CLOSE(kurtosis.error, referenceValue.error, realFloatPrecisionInPercent);
+        BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_CLOSE(kurtosis.value.error, referenceValue.error, realFloatPrecisionInPercent);
     }
 
     // TODO: Test for Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
@@ -60,8 +60,8 @@ BOOST_AUTO_TEST_SUITE(KurtosisTest)
     {
         EstimateAndError referenceValue(1.000194288875983, 0.0);
         Kurtosis kurtosis(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
-        BOOST_CHECK_CLOSE(kurtosis.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(kurtosis.error, 1.e-7);
+        BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(kurtosis.value.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
@@ -69,8 +69,8 @@ BOOST_AUTO_TEST_SUITE(KurtosisTest)
         EstimateAndError referenceValue(3.7478114121524830, 0.0);
         Kurtosis kurtosis(
             buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
-        BOOST_CHECK_CLOSE(kurtosis.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(kurtosis.error, 3.e-7);
+        BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(kurtosis.value.error, 3.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)

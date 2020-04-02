@@ -51,8 +51,7 @@ class QuantityAbstract {
   public:
     QuantityAbstract(bool isMeanKnownToBeZero);
     virtual ~QuantityAbstract(){};
-    const realFloat& estimate;
-    const realFloat& error;
+    EstimateAndError value;
 
   protected:
     // Calculation from raw data
@@ -61,7 +60,6 @@ class QuantityAbstract {
     void calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
                                       bool useMultipleEstimate);
     bool isMeanZero;
-    EstimateAndError observableEstimateAndError;
 
   private:
     std::vector<DataSample> getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const Parameters& parameters);

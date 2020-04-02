@@ -34,48 +34,48 @@ BOOST_AUTO_TEST_SUITE(MeanTest)
     {
         EstimateAndError referenceValue(0.0, 0.0);
         Mean mean(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
-        BOOST_CHECK_CLOSE(mean.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(mean.error, 1.e-7);
+        BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(mean.value.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
     {
         EstimateAndError referenceValue(0.5120788163699608, 0.0);
         Mean mean(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
-        BOOST_CHECK_CLOSE(mean.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(mean.error, 1.e-7);
+        BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(mean.value.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
     {
         EstimateAndError referenceValue(0.5120788163699608, 1.1520239122276158e-03);
         Mean mean(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
-        BOOST_CHECK_CLOSE(mean.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_CLOSE(mean.error, referenceValue.error, realFloatPrecisionInPercent);
+        BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_CLOSE(mean.value.error, referenceValue.error, realFloatPrecisionInPercent);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
     {
         EstimateAndError referenceValue(0.0, 0.0);
         Mean mean(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
-        BOOST_CHECK_CLOSE(mean.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_CLOSE(mean.error, referenceValue.error, realFloatPrecisionInPercent);
+        BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_CLOSE(mean.value.error, referenceValue.error, realFloatPrecisionInPercent);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
     {
         EstimateAndError referenceValue(0.0, 0.0);
         Mean mean(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
-        BOOST_CHECK_CLOSE(mean.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(mean.error, 1.e-7);
+        BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(mean.value.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator6)
     {
         EstimateAndError referenceValue(0.5120788163699608, 0.0);
         Mean mean(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
-        BOOST_CHECK_CLOSE(mean.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(mean.error, 1.e-7);
+        BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(mean.value.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)

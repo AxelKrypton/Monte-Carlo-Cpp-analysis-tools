@@ -41,7 +41,7 @@ Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, Error
     : QuantityAbstract(isMeanZero)
 {
     if (isMeanZero)
-        observableEstimateAndError = EstimateAndError(0.0, 0.0);
+        value = EstimateAndError(0.0, 0.0);
     else
         calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }

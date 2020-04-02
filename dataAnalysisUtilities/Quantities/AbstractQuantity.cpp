@@ -24,13 +24,7 @@
 #include "../jackknifeAnalysis.hpp"
 #include "Tools.hpp"
 
-QuantityAbstract::QuantityAbstract(bool isMeanKnownToBeZero)
-    : estimate(observableEstimateAndError.estimate)
-    , error(observableEstimateAndError.error)
-    , isMeanZero(isMeanKnownToBeZero)
-    , observableEstimateAndError(NAN, NAN)
-{
-}
+QuantityAbstract::QuantityAbstract(bool isMeanKnownToBeZero) : value(NAN, NAN), isMeanZero(isMeanKnownToBeZero) {}
 
 void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, Parameters parameters)
 {
@@ -38,15 +32,15 @@ void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, Para
     Parameters binningParameters = getLocalParametersWithCorrectBinningInformation(parameters);
     printCorrectBinningInformation(binningParameters);
     std::vector<DataSample> binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, binningParameters);
-    observableEstimateAndError = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
+    value = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
 }
 
 void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
                                                     bool useMultipleEstimate)
 {
-    observableEstimateAndError.estimate = getFunctionToCalculateObservable(useMultipleEstimate)(moments);
+    value.estimate = getFunctionToCalculateObservable(useMultipleEstimate)(moments);
     DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators(useMultipleEstimate)(estimators);
-    observableEstimateAndError.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
+    value.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 }
 
 std::vector<DataSample> QuantityAbstract::calculateNeededMomentsPerDataPoint(DataSample& dataSample)
