@@ -26,7 +26,6 @@
 
 class Mean : public QuantityAbstract {
   public:
-    Mean() = delete;
     Mean(DataSample& dataSample, Parameters parameters);
     Mean(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
          bool useMultipleEstimate = false);
@@ -41,10 +40,12 @@ class Mean : public QuantityAbstract {
     evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 
   private:
+    Mean();
     Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
     void printCorrectBinningInformation(const Parameters& parameters);
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
     functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
     functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);
     std::initializer_list<unsigned int> getNeededMoments();
+    friend class Quantities;
 };

@@ -23,7 +23,6 @@
 
 class Kurtosis : public QuantityAbstract {
   public:
-    Kurtosis() = delete;
     Kurtosis(DataSample& dataSample, Parameters parameters);
     Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
@@ -40,10 +39,12 @@ class Kurtosis : public QuantityAbstract {
     evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 
   private:
+    Kurtosis();
     Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
     void printCorrectBinningInformation(const Parameters& parameters);
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
     functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
     functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);
     std::initializer_list<unsigned int> getNeededMoments();
+    friend class Quantities;
 };

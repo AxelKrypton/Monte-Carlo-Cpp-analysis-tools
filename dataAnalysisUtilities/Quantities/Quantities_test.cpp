@@ -34,14 +34,14 @@ BOOST_AUTO_TEST_SUITE(QuantitiesTest)
         BOOST_REQUIRE_NO_THROW(Quantities observables);
         Quantities observables;
         // All entry NAN by default
-        BOOST_REQUIRE_NE(observables.mean.estimate, observables.mean.estimate);
-        BOOST_REQUIRE_NE(observables.mean.error, observables.mean.error);
-        BOOST_REQUIRE_NE(observables.variance.estimate, observables.variance.estimate);
-        BOOST_REQUIRE_NE(observables.variance.error, observables.variance.error);
-        BOOST_REQUIRE_NE(observables.skewness.estimate, observables.skewness.estimate);
-        BOOST_REQUIRE_NE(observables.skewness.error, observables.skewness.error);
-        BOOST_REQUIRE_NE(observables.kurtosis.estimate, observables.kurtosis.estimate);
-        BOOST_REQUIRE_NE(observables.kurtosis.error, observables.kurtosis.error);
+        BOOST_REQUIRE_NE(observables.mean.value.estimate, observables.mean.value.estimate);
+        BOOST_REQUIRE_NE(observables.mean.value.error, observables.mean.value.error);
+        BOOST_REQUIRE_NE(observables.variance.value.estimate, observables.variance.value.estimate);
+        BOOST_REQUIRE_NE(observables.variance.value.error, observables.variance.value.error);
+        BOOST_REQUIRE_NE(observables.skewness.value.estimate, observables.skewness.value.estimate);
+        BOOST_REQUIRE_NE(observables.skewness.value.error, observables.skewness.value.error);
+        BOOST_REQUIRE_NE(observables.kurtosis.value.estimate, observables.kurtosis.value.estimate);
+        BOOST_REQUIRE_NE(observables.kurtosis.value.error, observables.kurtosis.value.error);
         // Test names
         BOOST_REQUIRE_EQUAL(observables.observableNames[0], "mean");
         BOOST_REQUIRE_EQUAL(observables.observableNames[1], "variance");

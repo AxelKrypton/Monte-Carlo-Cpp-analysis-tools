@@ -49,7 +49,7 @@ typedef DataSample (*functionForEstimatorsForJackknife)(std::vector<DataSample>)
 
 class QuantityAbstract {
   public:
-    QuantityAbstract(bool isMeanKnownToBeZero);
+    QuantityAbstract(bool isMeanKnownToBeZero = false);
     virtual ~QuantityAbstract(){};
     EstimateAndError value;
 

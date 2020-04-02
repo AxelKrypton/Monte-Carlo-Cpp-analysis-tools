@@ -40,6 +40,8 @@ const functionForEstimators Variance::functionToBeAppliedToEstimatorsWithMultipl
     return in[2] - firstMoment * firstMoment;
 };
 
+Variance::Variance() : QuantityAbstract() {}
+
 Variance::Variance(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);

@@ -32,6 +32,8 @@ const functionForEstimators Mean::functionToBeAppliedToEstimatorsWithNonZeroMean
 const functionForEstimators Mean::functionToBeAppliedToEstimatorsWithMultipleEstimates
     = [](MomentsEstimators in) -> DataSample { return getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1); };
 
+Mean::Mean() : QuantityAbstract() {}
+
 Mean::Mean(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);

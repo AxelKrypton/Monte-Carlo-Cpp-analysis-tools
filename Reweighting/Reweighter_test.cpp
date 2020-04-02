@@ -306,8 +306,8 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
             0.514121218873, 0.514196632603, 0.514272858625, 0.514349887439, 0.514427708644, 0.514506310930};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-8);
-            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].mean.estimate, 1.e-8);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].mean.value.estimate, 1.e-8);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].mean.value.estimate, 1.e-8);
         }
     }
 
@@ -339,7 +339,7 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
             0.524156573418, 0.524394807658, 0.524623808921};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++)
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-8);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.value.estimate, 1.e-8);
     }
 
     BOOST_AUTO_TEST_CASE(meanReweighting3)
@@ -373,8 +373,8 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
             0.524156573418, 0.524394807658, 0.524623808921};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-8);
-            BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].mean.error, (realFloat)1.e-6);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.value.estimate, 1.e-8);
+            BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].mean.value.error, (realFloat)1.e-6);
         }
     }
 
@@ -417,9 +417,10 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
         std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
 
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.value.estimate, valuesObsNewPoints2[2 * i][0].mean.value.estimate,
+                                realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].mean.estimate, valuesObsNewPoints2[2 * i][0].mean.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.error, valuesObsNewPoints2[2 * i][0].mean.error, realFloatPrecisionInPercent);
+                valuesObsNewPoints1[i][0].mean.value.error, valuesObsNewPoints2[2 * i][0].mean.value.error, realFloatPrecisionInPercent);
         }
     }
 
@@ -441,8 +442,8 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
         ReweighterTester reweighter(options, true);
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            BOOST_REQUIRE_EQUAL(valuesObsNewPoints[i][0].mean.estimate, 0.0);
-            BOOST_REQUIRE_EQUAL(valuesObsNewPoints[i][0].mean.error, 0.0);
+            BOOST_REQUIRE_EQUAL(valuesObsNewPoints[i][0].mean.value.estimate, 0.0);
+            BOOST_REQUIRE_EQUAL(valuesObsNewPoints[i][0].mean.value.error, 0.0);
         }
     }
 
@@ -481,8 +482,8 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
                1.904902525324e-05, 1.924032734962e-05, 1.942943513494e-05, 1.961613529244e-05, 1.980021250880e-05, 1.998144945525e-05};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].variance.estimate, 2e-7);
-            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].variance.estimate, 2e-7);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].variance.value.estimate, 2e-7);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].variance.value.estimate, 2e-7);
         }
     }
 
@@ -513,7 +514,7 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
                1.952194950905e-05, 1.877562633973e-05, 1.803850752757e-05};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++)
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].variance.estimate, 2e-7);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].variance.value.estimate, 2e-7);
     }
 
     BOOST_AUTO_TEST_CASE(suscReweighting3)
@@ -540,8 +541,8 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
                1.952194950905e-05, 1.877562633973e-05, 1.803850752757e-05};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].variance.estimate, 2e-7);
-            BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].variance.error, realFloat(1.e-6));
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].variance.value.estimate, 2e-7);
+            BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].variance.value.error, realFloat(1.e-6));
         }
     }
 
@@ -569,10 +570,10 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
         reweighter = ReweighterTester(options2, true);
         std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].variance.estimate, valuesObsNewPoints2[2 * i][0].variance.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].variance.error, valuesObsNewPoints2[2 * i][0].variance.error, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].variance.value.estimate, valuesObsNewPoints2[2 * i][0].variance.value.estimate,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].variance.value.error, valuesObsNewPoints2[2 * i][0].variance.value.error,
+                                realFloatPrecisionInPercent);
         }
     }
 
@@ -607,10 +608,10 @@ BOOST_AUTO_TEST_SUITE(skewReweighting)
         reweighter = ReweighterTester(options2, true);
         std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].skewness.estimate, valuesObsNewPoints2[2 * i][0].skewness.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].skewness.error, valuesObsNewPoints2[2 * i][0].skewness.error, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.value.estimate, valuesObsNewPoints2[2 * i][0].skewness.value.estimate,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.value.error, valuesObsNewPoints2[2 * i][0].skewness.value.error,
+                                realFloatPrecisionInPercent);
         }
     }
 
@@ -666,8 +667,8 @@ BOOST_AUTO_TEST_SUITE(kurtReweighting)
                                                     2.6677822776443, 2.6426871106605, 2.6179747425739, 2.5940106172587, 2.5708020671102};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.003);
-            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].kurtosis.estimate, 0.003);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].kurtosis.value.estimate, 0.003);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].kurtosis.value.estimate, 0.003);
         }
     }
 
@@ -693,7 +694,7 @@ BOOST_AUTO_TEST_SUITE(kurtReweighting)
             3.073140076998, 3.169952202463, 3.267167961059};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.003);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.value.estimate, 0.003);
         }
     }
 
@@ -719,8 +720,8 @@ BOOST_AUTO_TEST_SUITE(kurtReweighting)
             3.073140076998, 3.169952202463, 3.267167961059};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.003);
-            BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].kurtosis.error, (realFloat)1.e-6);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.value.estimate, 0.003);
+            BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].kurtosis.value.error, (realFloat)1.e-6);
         }
     }
 
@@ -748,10 +749,10 @@ BOOST_AUTO_TEST_SUITE(kurtReweighting)
         reweighter = ReweighterTester(options2, true);
         std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].kurtosis.estimate, valuesObsNewPoints2[2 * i][0].kurtosis.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].kurtosis.error, valuesObsNewPoints2[2 * i][0].kurtosis.error, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].kurtosis.value.estimate, valuesObsNewPoints2[2 * i][0].kurtosis.value.estimate,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].kurtosis.value.error, valuesObsNewPoints2[2 * i][0].kurtosis.value.error,
+                                realFloatPrecisionInPercent);
         }
     }
 
@@ -786,8 +787,8 @@ BOOST_AUTO_TEST_SUITE(kurtReweighting)
                                                     1.0002923473237, 1.0002951037463, 1.0002978196993, 1.000300491936,  1.0003031171917};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 1.e-8);
-            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].kurtosis.estimate, 1.e-8);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].kurtosis.value.estimate, 1.e-8);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].kurtosis.value.estimate, 1.e-8);
         }
     }
 
@@ -811,21 +812,22 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
         std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
 
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.value.estimate, valuesObsNewPoints2[2 * i][0].mean.value.estimate,
+                                realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].mean.estimate, valuesObsNewPoints2[2 * i][0].mean.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.error, valuesObsNewPoints2[2 * i][0].mean.error, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].variance.estimate, valuesObsNewPoints2[2 * i][0].variance.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].variance.error, valuesObsNewPoints2[2 * i][0].variance.error, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].skewness.estimate, valuesObsNewPoints2[2 * i][0].skewness.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].skewness.error, valuesObsNewPoints2[2 * i][0].skewness.error, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].kurtosis.estimate, valuesObsNewPoints2[2 * i][0].kurtosis.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].kurtosis.error, valuesObsNewPoints2[2 * i][0].kurtosis.error, realFloatPrecisionInPercent);
+                valuesObsNewPoints1[i][0].mean.value.error, valuesObsNewPoints2[2 * i][0].mean.value.error, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].variance.value.estimate, valuesObsNewPoints2[2 * i][0].variance.value.estimate,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].variance.value.error, valuesObsNewPoints2[2 * i][0].variance.value.error,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.value.estimate, valuesObsNewPoints2[2 * i][0].skewness.value.estimate,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.value.error, valuesObsNewPoints2[2 * i][0].skewness.value.error,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].kurtosis.value.estimate, valuesObsNewPoints2[2 * i][0].kurtosis.value.estimate,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].kurtosis.value.error, valuesObsNewPoints2[2 * i][0].kurtosis.value.error,
+                                realFloatPrecisionInPercent);
         }
     }
 
@@ -847,21 +849,22 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
         std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter2.getReweightedObservables();
 
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.value.estimate, valuesObsNewPoints2[2 * i][0].mean.value.estimate,
+                                realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].mean.estimate, valuesObsNewPoints2[2 * i][0].mean.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.error, valuesObsNewPoints2[2 * i][0].mean.error, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].variance.estimate, valuesObsNewPoints2[2 * i][0].variance.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].variance.error, valuesObsNewPoints2[2 * i][0].variance.error, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].skewness.estimate, valuesObsNewPoints2[2 * i][0].skewness.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].skewness.error, valuesObsNewPoints2[2 * i][0].skewness.error, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].kurtosis.estimate, valuesObsNewPoints2[2 * i][0].kurtosis.estimate, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(
-                valuesObsNewPoints1[i][0].kurtosis.error, valuesObsNewPoints2[2 * i][0].kurtosis.error, realFloatPrecisionInPercent);
+                valuesObsNewPoints1[i][0].mean.value.error, valuesObsNewPoints2[2 * i][0].mean.value.error, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].variance.value.estimate, valuesObsNewPoints2[2 * i][0].variance.value.estimate,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].variance.value.error, valuesObsNewPoints2[2 * i][0].variance.value.error,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.value.estimate, valuesObsNewPoints2[2 * i][0].skewness.value.estimate,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].skewness.value.error, valuesObsNewPoints2[2 * i][0].skewness.value.error,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].kurtosis.value.estimate, valuesObsNewPoints2[2 * i][0].kurtosis.value.estimate,
+                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].kurtosis.value.error, valuesObsNewPoints2[2 * i][0].kurtosis.value.error,
+                                realFloatPrecisionInPercent);
         }
     }
 

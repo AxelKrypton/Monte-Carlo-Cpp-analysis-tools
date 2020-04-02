@@ -23,7 +23,6 @@
 
 class Variance : public QuantityAbstract {
   public:
-    Variance() = delete;
     Variance(DataSample& dataSample, Parameters parameters);
     Variance(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
@@ -40,10 +39,12 @@ class Variance : public QuantityAbstract {
     evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 
   private:
+    Variance();
     Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
     void printCorrectBinningInformation(const Parameters& parameters);
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
     functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
     functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);
     std::initializer_list<unsigned int> getNeededMoments();
+    friend class Quantities;
 };

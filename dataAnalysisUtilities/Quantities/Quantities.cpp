@@ -20,7 +20,7 @@
 
 #include "Quantities.hpp"
 
-Quantities::Quantities() : mean(NAN, NAN), variance(NAN, NAN), skewness(NAN, NAN), kurtosis(NAN, NAN)
+Quantities::Quantities() : mean(), variance(), skewness(), kurtosis()
 {
     observableNames.push_back("mean");
     observableNames.push_back("variance");
@@ -42,9 +42,9 @@ std::string Quantities::getObservablesAsString()
     std::stringstream values;
     values.precision(12);
     values << std::scientific;
-    values << mean.estimate << "\t" << mean.error << "\t";
-    values << variance.estimate << "\t" << variance.error << "\t";
-    values << skewness.estimate << "\t" << skewness.error << "\t";
-    values << kurtosis.estimate << "\t" << kurtosis.error;
+    values << mean.value.estimate << "\t" << mean.value.error << "\t";
+    values << variance.value.estimate << "\t" << variance.value.error << "\t";
+    values << skewness.value.estimate << "\t" << skewness.value.error << "\t";
+    values << kurtosis.value.estimate << "\t" << kurtosis.value.error;
     return values.str();
 }

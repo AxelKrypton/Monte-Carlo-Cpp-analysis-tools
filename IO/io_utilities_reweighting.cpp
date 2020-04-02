@@ -155,13 +155,13 @@ static std::vector<Quantities> convertMapOfObservableNameAndDataSampleToVectorOf
                                    "DataSample sizes, not allowed!");
         for (int dataIndex = 0; dataIndex < mapElement.second.getNumberOfElements(); dataIndex++) {
             if (mapElement.first == Mean::observableName)
-                returnValue[dataIndex].mean.estimate = mapElement.second[dataIndex];
+                returnValue[dataIndex].mean.value.estimate = mapElement.second[dataIndex];
             else if (mapElement.first == Variance::observableName)
-                returnValue[dataIndex].variance.estimate = mapElement.second[dataIndex];
+                returnValue[dataIndex].variance.value.estimate = mapElement.second[dataIndex];
             else if (mapElement.first == Skewness::observableName)
-                returnValue[dataIndex].skewness.estimate = mapElement.second[dataIndex];
+                returnValue[dataIndex].skewness.value.estimate = mapElement.second[dataIndex];
             else if (mapElement.first == Kurtosis::observableName)
-                returnValue[dataIndex].kurtosis.estimate = mapElement.second[dataIndex];
+                returnValue[dataIndex].kurtosis.value.estimate = mapElement.second[dataIndex];
             else
                 throw std::invalid_argument(
                     "In \"convertMapOfObservableNameAndDataSampleToVectorOfObservables\" map seems to contain unknown observable!");

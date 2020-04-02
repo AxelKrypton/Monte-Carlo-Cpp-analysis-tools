@@ -54,6 +54,8 @@ const functionForEstimators Kurtosis::functionToBeAppliedToEstimatorsWithMultipl
            / ((in[2] - (firstMoment ^ 2)) ^ 2);
 };
 
+Kurtosis::Kurtosis() : QuantityAbstract() {}
+
 Kurtosis::Kurtosis(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);
