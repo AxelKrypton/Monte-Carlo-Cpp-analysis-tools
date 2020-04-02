@@ -20,9 +20,9 @@
 #pragma once
 
 #include "Moments.hpp"
-#include "Observables.hpp"
+#include "Quantities.hpp"
 
-class Variance : public ObservableAbstract {
+class Variance : public QuantityAbstract {
   public:
     Variance() = delete;
     Variance(DataSample& dataSample, Parameters parameters);

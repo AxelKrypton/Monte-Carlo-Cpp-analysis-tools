@@ -20,9 +20,9 @@
 #pragma once
 
 #include "Moments.hpp"
-#include "Observables.hpp"
+#include "Quantities.hpp"
 
-class Skewness : public ObservableAbstract {
+class Skewness : public QuantityAbstract {
   public:
     Skewness() = delete;
     Skewness(DataSample& dataSample, Parameters parameters);

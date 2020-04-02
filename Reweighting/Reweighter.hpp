@@ -23,7 +23,7 @@
 #define REWEIGHTER_HPP_
 
 #include "../Parameters/LqcdReweightingParameters.hpp"
-#include "../dataAnalysisUtilities/Quantities/Observables.hpp"
+#include "../dataAnalysisUtilities/Quantities/Quantities.hpp"
 #include "Histogram.hpp"
 #include "ReweighterIO.hpp"
 #include "SimulationDataContainer.hpp"
@@ -71,7 +71,7 @@ class Reweighter {
      */
     Reweighter(LqcdReweightingParameters parameters);
     std::vector<std::vector<realFloat>> getValuesOfNewParameters();
-    std::vector<std::vector<Observables>> getReweightedObservables();
+    std::vector<std::vector<Quantities>> getReweightedObservables();
     std::vector<std::vector<std::map<std::string, DataSample>>> getReweightedObservablesEstimators();
     std::vector<std::vector<ProbabilityDistribution>> getReweightedProbabilityDistributions();
 
@@ -84,7 +84,7 @@ class Reweighter {
     bool useSimulatedPointsAsNewPoints;
     std::vector<std::vector<realFloat>> valuesOfNewParameters;
     realFloat precisionOfIterativeProcedureToCalculateLogZ;
-    std::vector<std::vector<Observables>> observablesAtNewPoints;
+    std::vector<std::vector<Quantities>> observablesAtNewPoints;
     std::unique_ptr<std::vector<std::vector<std::map<std::string, DataSample>>>> observablesEstimatorsAtNewPoints;  // e.g.
                                                                                                                     // [newPoint][obsInFile][Skewness::observableName]
     std::vector<std::vector<ProbabilityDistribution>> probabilityDistributionsAtNewPoints;
@@ -105,7 +105,7 @@ class ReweighterTester {
     {
         return reweighter.getReweightingProceduresToBePerformed();
     };
-    std::vector<std::vector<Observables>> getReweightedObservables() { return reweighter.getReweightedObservables(); };
+    std::vector<std::vector<Quantities>> getReweightedObservables() { return reweighter.getReweightedObservables(); };
     // The following method is used to test MomentsReweighter(Helper) class
     RawDataForReweightingAndMetainformation getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted,
                                                                                        std::vector<int> binsizesToBeUsed,

@@ -18,7 +18,7 @@
  *
  */
 
-#include "Observables.hpp"
+#include "Quantities.hpp"
 
 #include "../binning.hpp"
 #include "../bootstrapAnalysis.hpp"
@@ -36,17 +36,17 @@ realFloat evaluateErrorBasedOnMethod(DataSample dataSample, ErrorCalculationMeth
         throw std::logic_error("Unknown error method in \"evaluateErrorBasedOnMethod\"! Aborting...");
 }
 
-ObservableAbstract::ObservableAbstract(bool isMeanKnownToBeZero) : isMeanZero(isMeanKnownToBeZero)
+QuantityAbstract::QuantityAbstract(bool isMeanKnownToBeZero) : isMeanZero(isMeanKnownToBeZero)
 {
     observableEstimateAndError = EstimateAndError();
 }
 
-EstimateAndError ObservableAbstract::getValueAndError()
+EstimateAndError QuantityAbstract::getValueAndError()
 {
     return observableEstimateAndError;
 }
 
-void ObservableAbstract::calculateAndSetValueAndError(DataSample& dataSample, Parameters parameters)
+void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, Parameters parameters)
 {
     std::vector<DataSample> neededMomentsPerDataPoint = calculateNeededMomentsPerDataPoint(dataSample);
     Parameters binningParameters = getLocalParametersWithCorrectBinningInformation(parameters);
@@ -55,20 +55,20 @@ void ObservableAbstract::calculateAndSetValueAndError(DataSample& dataSample, Pa
     observableEstimateAndError = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
 }
 
-void ObservableAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
-                                                      bool useMultipleEstimate)
+void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
+                                                    bool useMultipleEstimate)
 {
     observableEstimateAndError.estimate = getFunctionToCalculateObservable(useMultipleEstimate)(moments);
     DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators(useMultipleEstimate)(estimators);
     observableEstimateAndError.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 }
 
-std::vector<DataSample> ObservableAbstract::calculateNeededMomentsPerDataPoint(DataSample& dataSample)
+std::vector<DataSample> QuantityAbstract::calculateNeededMomentsPerDataPoint(DataSample& dataSample)
 {
     return getMomentsPerDataPoint(dataSample, getNeededMoments(), isMeanZero);
 }
 
-std::vector<DataSample> ObservableAbstract::getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const Parameters& parameters)
+std::vector<DataSample> QuantityAbstract::getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const Parameters& parameters)
 {
     std::vector<DataSample> returnData;
     for (size_t i = 0; i < dataSampleToBeBinned.size(); i++)

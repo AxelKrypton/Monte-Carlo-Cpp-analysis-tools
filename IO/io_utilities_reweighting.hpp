@@ -22,14 +22,14 @@
 #define IO_UTILITIES_REWEIGHTING_HPP_
 
 #include "../Reweighting/Histogram.hpp"
-#include "../dataAnalysisUtilities/Quantities/Observables.hpp"
+#include "../dataAnalysisUtilities/Quantities/Quantities.hpp"
 #include "../types.hpp"
 
 #include <iostream>
 #include <vector>
 
 void writeLqcdReweightedObservablesToFile(const std::vector<std::vector<realFloat>>& newBetaValues,
-                                          const std::vector<std::vector<Observables>>& reweightedData, std::string outputfilePrefix);
+                                          const std::vector<std::vector<Quantities>>& reweightedData, std::string outputfilePrefix);
 void writeLqcdReweightedObservablesEstimatorsToFile(const std::vector<std::vector<realFloat>>& newBetaValues,
                                                     const std::vector<std::vector<std::map<std::string, DataSample>>>& reweightedEstimators,
                                                     std::string outputfilePrefix);

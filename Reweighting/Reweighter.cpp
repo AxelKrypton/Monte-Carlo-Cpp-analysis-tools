@@ -38,7 +38,7 @@ static unsigned int getMaximumMomentToBeReweighted(const std::vector<Reweighting
 static void printInformationAboutReweightingProcedure(const ReweightingProcedure&);
 static void
     checkSizesOfMomentsAndMomentsEstimators(std::vector<std::vector<Moments>>, std::vector<std::vector<MomentsEstimators>>, size_t, size_t);
-static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<std::vector<Observables>>&, bool, ErrorCalculationMethod,
+static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<std::vector<Quantities>>&, bool, ErrorCalculationMethod,
                                                                     std::vector<std::vector<Moments>>,
                                                                     std::vector<std::vector<MomentsEstimators>>, std::vector<std::string>,
                                                                     const std::vector<unsigned int>&, const unsigned int, const unsigned int);
@@ -53,7 +53,7 @@ static void setObservablesEstimatorsAtNewPointsFromMomentsEstimators(std::vector
                                                                      const std::vector<unsigned int>&, const unsigned int, const unsigned int);
 static bool
 isObservableToBeEvaluatedUsingMultipleColumns(const unsigned int, const std::vector<unsigned int>&, const unsigned int, const unsigned int);
-static void setMeanToZeroAtNewPoints(std::vector<std::vector<Observables>>&);
+static void setMeanToZeroAtNewPoints(std::vector<std::vector<Quantities>>&);
 
 /*****************************************************************************************/
 
@@ -108,7 +108,7 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters)
                                      - reweighterIO.columnsToBeReweightedUsingMultipleColumns.size()
                                            * (maximumMomentNeededOverall - 1);  // neglect multiple columns (count one column only)
         observablesAtNewPoints
-            = std::vector<std::vector<Observables>>(numberOfNewPoints, std::vector<Observables>(numberOfObservablesInFiles, Observables()));
+            = std::vector<std::vector<Quantities>>(numberOfNewPoints, std::vector<Quantities>(numberOfObservablesInFiles, Quantities()));
         if (parameters.getPrintEstimatorsToFile())
             observablesEstimatorsAtNewPoints = std::unique_ptr<std::vector<std::vector<std::map<std::string, DataSample>>>>(
                 new std::vector<std::vector<std::map<std::string, DataSample>>>(
@@ -176,7 +176,7 @@ std::vector<std::vector<realFloat>> Reweighter::getValuesOfNewParameters()
     return valuesOfNewParameters;
 }
 
-std::vector<std::vector<Observables>> Reweighter::getReweightedObservables()
+std::vector<std::vector<Quantities>> Reweighter::getReweightedObservables()
 {
     return observablesAtNewPoints;
 }
@@ -392,7 +392,7 @@ static void checkSizesOfMomentsAndMomentsEstimators(std::vector<std::vector<Mome
 }
 
 static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(
-    std::vector<std::vector<Observables>>& observables, bool isMeanZero, ErrorCalculationMethod errorMethod,
+    std::vector<std::vector<Quantities>>& observables, bool isMeanZero, ErrorCalculationMethod errorMethod,
     std::vector<std::vector<Moments>> moments, std::vector<std::vector<MomentsEstimators>> momentsEstimators,
     std::vector<std::string> quantitiesToBeSet, const std::vector<unsigned int>& columnsToBeReweightedUsingMultipleColumns,
     const unsigned int numberOfReweightingParameters, const unsigned int mximumMomentNeeded)
@@ -483,7 +483,7 @@ static bool isObservableToBeEvaluatedUsingMultipleColumns(const unsigned int obs
            != colsToBeRewUsingMultipleColsMappedIntoObsNumber.end();
 }
 
-static void setMeanToZeroAtNewPoints(std::vector<std::vector<Observables>>& observables)
+static void setMeanToZeroAtNewPoints(std::vector<std::vector<Quantities>>& observables)
 {
     for (size_t newPoint = 0; newPoint < observables.size(); newPoint++) {
         for (size_t obsInFile = 0; obsInFile < observables[newPoint].size(); obsInFile++) {

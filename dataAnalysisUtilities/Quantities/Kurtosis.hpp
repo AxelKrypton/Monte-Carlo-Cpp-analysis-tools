@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "Observables.hpp"
+#include "Quantities.hpp"
 
-class Kurtosis : public ObservableAbstract {
+class Kurtosis : public QuantityAbstract {
   public:
     Kurtosis() = delete;
     Kurtosis(DataSample& dataSample, Parameters parameters);

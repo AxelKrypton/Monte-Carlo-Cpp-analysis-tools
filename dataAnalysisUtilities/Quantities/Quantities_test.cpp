@@ -20,7 +20,8 @@
 
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE Observables
-#include "Observables.hpp"
+
+#include "Quantities.hpp"
 
 #include "../dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
 
@@ -30,8 +31,8 @@ BOOST_AUTO_TEST_SUITE(QuantitiesTest)
 
     BOOST_AUTO_TEST_CASE(build)
     {
-        BOOST_REQUIRE_NO_THROW(Observables observables);
-        Observables observables;
+        BOOST_REQUIRE_NO_THROW(Quantities observables);
+        Quantities observables;
         // All entry NAN by default
         BOOST_REQUIRE_NE(observables.mean.estimate, observables.mean.estimate);
         BOOST_REQUIRE_NE(observables.mean.error, observables.mean.error);

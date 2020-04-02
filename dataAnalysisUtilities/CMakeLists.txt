@@ -27,7 +27,7 @@ add_library(dataAnalysisUtilities
 	bootstrapAnalysis.cpp
 	binning.cpp
 	Quantities/Moments.cpp
-	Quantities/Observables.cpp
+	Quantities/Quantities.cpp
 	Quantities/Mean.cpp
 	Quantities/Variance.cpp
 	Quantities/Skewness.cpp
@@ -47,7 +47,7 @@ if( USE_REW_MULTI_PRECISION )
 		bootstrapAnalysis.cpp
 		binning.cpp
 		Quantities/Moments.cpp
-		Quantities/Observables.cpp
+		Quantities/Quantities.cpp
 		Quantities/Mean.cpp
 		Quantities/Variance.cpp
 		Quantities/Skewness.cpp
@@ -78,7 +78,7 @@ add_unit_test(binnedDataSample binnedDataSample_test dataAnalysisUtilities)
 add_unit_test(jackknifeEstimators jackknifeEstimators_test dataAnalysisUtilities)
 add_unit_test(dataAnalysisUtilities dataAnalysisUtilities_test dataAnalysisUtilities Parameters)
 add_unit_test(moments Quantities/Moments_test dataAnalysisUtilities)
-add_unit_test(quantities Quantities/Observables_test dataAnalysisUtilities)
+add_unit_test(quantities Quantities/Quantities_test dataAnalysisUtilities)
 add_unit_test(mean Quantities/Mean_test dataAnalysisUtilities)
 add_unit_test(variance Quantities/Variance_test dataAnalysisUtilities)
 add_unit_test(skewness Quantities/Skewness_test dataAnalysisUtilities)

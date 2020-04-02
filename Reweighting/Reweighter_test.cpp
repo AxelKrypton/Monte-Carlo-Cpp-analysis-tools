@@ -304,7 +304,7 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
             0.513029572905, 0.513091370361, 0.513154023485, 0.513217534696, 0.513281905844, 0.513347138179, 0.513413232332, 0.513480188285,
             0.513548005351, 0.513616682143, 0.513686216557, 0.513756605745, 0.513827846094, 0.513899933203, 0.513972861865, 0.514046626048,
             0.514121218873, 0.514196632603, 0.514272858625, 0.514349887439, 0.514427708644, 0.514506310930};
-        std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
             BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-8);
             BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].mean.estimate, 1.e-8);
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
             0.519283538110, 0.519621296244, 0.519959033190, 0.520295630948, 0.520629985226, 0.520961026348, 0.521287738610, 0.521609177330,
             0.521924482996, 0.522232892118, 0.522533744605, 0.522826487667, 0.523110676440, 0.523385971675, 0.523652134929, 0.523909021753,
             0.524156573418, 0.524394807658, 0.524623808921};
-        std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++)
             BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-8);
     }
@@ -371,7 +371,7 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
             0.519283538110, 0.519621296244, 0.519959033190, 0.520295630948, 0.520629985226, 0.520961026348, 0.521287738610, 0.521609177330,
             0.521924482996, 0.522232892118, 0.522533744605, 0.522826487667, 0.523110676440, 0.523385971675, 0.523652134929, 0.523909021753,
             0.524156573418, 0.524394807658, 0.524623808921};
-        std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
             BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].mean.estimate, 1.e-8);
             BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].mean.error, (realFloat)1.e-6);
@@ -404,7 +404,7 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
                                                        "--deactivateReweightingForSkewness",
                                                        "--deactivateReweightingForKurtosis"};
         ReweighterTester reweighter(options1, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
         std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist,
                                                        "--useBootstrapAsErrorMethod",
                                                        "--newBetaRange_low=5.348",
@@ -414,7 +414,7 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
                                                        "--deactivateReweightingForSkewness",
                                                        "--deactivateReweightingForKurtosis"};
         reweighter = ReweighterTester(options2, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
 
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
             BOOST_REQUIRE_CLOSE(
@@ -439,7 +439,7 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
                                                       "--deactivateReweightingForKurtosis",
                                                       "--isMeanKnownToBeZero"};
         ReweighterTester reweighter(options, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
             BOOST_REQUIRE_EQUAL(valuesObsNewPoints[i][0].mean.estimate, 0.0);
             BOOST_REQUIRE_EQUAL(valuesObsNewPoints[i][0].mean.error, 0.0);
@@ -479,7 +479,7 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
                1.665488615382e-05, 1.685727680922e-05, 1.705971313576e-05, 1.726203684049e-05, 1.746408385900e-05, 1.766568464595e-05,
                1.786666369691e-05, 1.806684052041e-05, 1.826602939597e-05, 1.846403963840e-05, 1.866067613976e-05, 1.885573915039e-05,
                1.904902525324e-05, 1.924032734962e-05, 1.942943513494e-05, 1.961613529244e-05, 1.980021250880e-05, 1.998144945525e-05};
-        std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
             BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 2e-7);
             BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].susceptibility.estimate, 2e-7);
@@ -511,7 +511,7 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
                2.675477541869e-05, 2.644681210945e-05, 2.605985582160e-05, 2.560022551895e-05, 2.507524896922e-05, 2.449298741691e-05,
                2.386195408399e-05, 2.319084028335e-05, 2.248826432305e-05, 2.176255198727e-05, 2.102155488620e-05, 2.027251168252e-05,
                1.952194950905e-05, 1.877562633973e-05, 1.803850752757e-05};
-        std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++)
             BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 2e-7);
     }
@@ -538,7 +538,7 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
                2.675477541869e-05, 2.644681210945e-05, 2.605985582160e-05, 2.560022551895e-05, 2.507524896922e-05, 2.449298741691e-05,
                2.386195408399e-05, 2.319084028335e-05, 2.248826432305e-05, 2.176255198727e-05, 2.102155488620e-05, 2.027251168252e-05,
                1.952194950905e-05, 1.877562633973e-05, 1.803850752757e-05};
-        std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
             BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 2e-7);
             BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].susceptibility.error, realFloat(1.e-6));
@@ -557,7 +557,7 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
                                                        "--deactivateReweightingForSkewness",
                                                        "--deactivateReweightingForKurtosis"};
         ReweighterTester reweighter(options1, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
         std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist,
                                                        "--useBootstrapAsErrorMethod",
                                                        "--newBetaRange_low=5.348",
@@ -567,7 +567,7 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
                                                        "--deactivateReweightingForSkewness",
                                                        "--deactivateReweightingForKurtosis"};
         reweighter = ReweighterTester(options2, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
             BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.estimate, valuesObsNewPoints2[2 * i][0].susceptibility.estimate,
                                 realFloatPrecisionInPercent);
@@ -595,7 +595,7 @@ BOOST_AUTO_TEST_SUITE(skewReweighting)
                                                        "--deactivateReweightingForVariance",
                                                        "--deactivateReweightingForKurtosis"};
         ReweighterTester reweighter(options1, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
         std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist,
                                                        "--useBootstrapAsErrorMethod",
                                                        "--newBetaRange_low=5.348",
@@ -605,7 +605,7 @@ BOOST_AUTO_TEST_SUITE(skewReweighting)
                                                        "--deactivateReweightingForVariance",
                                                        "--deactivateReweightingForKurtosis"};
         reweighter = ReweighterTester(options2, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
             BOOST_REQUIRE_CLOSE(
                 valuesObsNewPoints1[i][0].skewness.estimate, valuesObsNewPoints2[2 * i][0].skewness.estimate, realFloatPrecisionInPercent);
@@ -664,7 +664,7 @@ BOOST_AUTO_TEST_SUITE(kurtReweighting)
                                                     2.9499462312277, 2.9195688180622, 2.8897888452079, 2.8602595356053, 2.8311959138636,
                                                     2.8027897318024, 2.7745873579532, 2.7472733252531, 2.7201933236896, 2.6936569294425,
                                                     2.6677822776443, 2.6426871106605, 2.6179747425739, 2.5940106172587, 2.5708020671102};
-        std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
             BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.003);
             BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].kurtosis.estimate, 0.003);
@@ -691,7 +691,7 @@ BOOST_AUTO_TEST_SUITE(kurtReweighting)
             2.222823530362, 2.212114121404, 2.211507215736, 2.220941285527, 2.240339735026, 2.269438789375, 2.307890805072, 2.355298699153,
             2.411128319662, 2.474664796862, 2.545320647525, 2.622395651726, 2.704936325050, 2.792237859045, 2.883234474431, 2.977133174541,
             3.073140076998, 3.169952202463, 3.267167961059};
-        std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
             BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.003);
         }
@@ -717,7 +717,7 @@ BOOST_AUTO_TEST_SUITE(kurtReweighting)
             2.222823530362, 2.212114121404, 2.211507215736, 2.220941285527, 2.240339735026, 2.269438789375, 2.307890805072, 2.355298699153,
             2.411128319662, 2.474664796862, 2.545320647525, 2.622395651726, 2.704936325050, 2.792237859045, 2.883234474431, 2.977133174541,
             3.073140076998, 3.169952202463, 3.267167961059};
-        std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
             BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 0.003);
             BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].kurtosis.error, (realFloat)1.e-6);
@@ -736,7 +736,7 @@ BOOST_AUTO_TEST_SUITE(kurtReweighting)
                                                        "--deactivateReweightingForVariance",
                                                        "--deactivateReweightingForSkewness"};
         ReweighterTester reweighter(options1, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
         std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist,
                                                        "--useBootstrapAsErrorMethod",
                                                        "--newBetaRange_low=5.348",
@@ -746,7 +746,7 @@ BOOST_AUTO_TEST_SUITE(kurtReweighting)
                                                        "--deactivateReweightingForVariance",
                                                        "--deactivateReweightingForSkewness"};
         reweighter = ReweighterTester(options2, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
             BOOST_REQUIRE_CLOSE(
                 valuesObsNewPoints1[i][0].kurtosis.estimate, valuesObsNewPoints2[2 * i][0].kurtosis.estimate, realFloatPrecisionInPercent);
@@ -784,7 +784,7 @@ BOOST_AUTO_TEST_SUITE(kurtReweighting)
                                                     1.0002632443403, 1.0002662358576, 1.0002692168908, 1.0002721847263, 1.0002751365755,
                                                     1.0002780695779, 1.0002809808061, 1.0002838672684, 1.0002867259175, 1.0002895536515,
                                                     1.0002923473237, 1.0002951037463, 1.0002978196993, 1.000300491936,  1.0003031171917};
-        std::vector<std::vector<Observables>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
             BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].kurtosis.estimate, 1.e-8);
             BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].kurtosis.estimate, 1.e-8);
@@ -804,11 +804,11 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
         std::initializer_list<std::string> options1 = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
                                                        "--newBetaRange_high=5.363", "--numberOfNewBetaPoints=11"};
         ReweighterTester reweighter(options1, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
         std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--newBetaRange_low=5.348",
                                                        "--newBetaRange_high=5.363", "--numberOfNewBetaPoints=21"};
         reweighter = ReweighterTester(options2, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
 
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
             BOOST_REQUIRE_CLOSE(
@@ -839,12 +839,12 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
                                                        "--newBetaRange_low=5.348",   "--newBetaRange_high=5.363",
                                                        "--numberOfNewBetaPoints=11", "--obsMultipleColumns=3"};
         ReweighterTester reweighter(options1, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
         std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist,     "--useJackknifeAsErrorMethod",
                                                        "--newBetaRange_low=5.348",   "--newBetaRange_high=5.363",
                                                        "--numberOfNewBetaPoints=21", "--obsMultipleColumns=3"};
         ReweighterTester reweighter2(options2, true);
-        std::vector<std::vector<Observables>> valuesObsNewPoints2 = reweighter2.getReweightedObservables();
+        std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter2.getReweightedObservables();
 
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
             BOOST_REQUIRE_CLOSE(

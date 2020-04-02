@@ -48,13 +48,13 @@ const functionForEstimators Skewness::functionToBeAppliedToEstimatorsWithMultipl
     return (in[3] - ((3 * in[2]) * firstMoment) + (2 * firstMoment * firstMoment * firstMoment)) / ((in[2] - firstMoment * firstMoment) ^ 1.5);
 };
 
-Skewness::Skewness(DataSample& dataSample, Parameters parameters) : ObservableAbstract(parameters.isMeanKnownToBeZero)
+Skewness::Skewness(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);
 }
 
 Skewness::Skewness(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
-    : ObservableAbstract(isMeanZero)
+    : QuantityAbstract(isMeanZero)
 {
     calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }

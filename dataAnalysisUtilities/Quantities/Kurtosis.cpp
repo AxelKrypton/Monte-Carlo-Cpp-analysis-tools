@@ -54,13 +54,13 @@ const functionForEstimators Kurtosis::functionToBeAppliedToEstimatorsWithMultipl
            / ((in[2] - (firstMoment ^ 2)) ^ 2);
 };
 
-Kurtosis::Kurtosis(DataSample& dataSample, Parameters parameters) : ObservableAbstract(parameters.isMeanKnownToBeZero)
+Kurtosis::Kurtosis(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);
 }
 
 Kurtosis::Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
-    : ObservableAbstract(isMeanZero)
+    : QuantityAbstract(isMeanZero)
 {
     calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }

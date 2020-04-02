@@ -55,10 +55,10 @@ typedef DataSample (*functionForEstimatorsForJackknife)(std::vector<DataSample>)
  *       This is also the reason why for the moment there are no static members with this function that is hard coded in the getter.
  */
 
-class ObservableAbstract {
+class QuantityAbstract {
   public:
-    ObservableAbstract(bool isMeanKnownToBeZero);
-    virtual ~ObservableAbstract(){};
+    QuantityAbstract(bool isMeanKnownToBeZero);
+    virtual ~QuantityAbstract(){};
     EstimateAndError getValueAndError();
 
   protected:
@@ -89,11 +89,11 @@ class ObservableAbstract {
  *       when it is asked for an unset quantity (implement operator[] and function at or something like that)
  */
 
-class Observables {
+class Quantities {
   public:
     //    Observables() : mean(0.0, 0.0), susceptibility(0.0, 0.0),
     //                    skewness(0.0, 0.0), kurtosis(0.0, 0.0)
-    Observables() : mean(NAN, NAN), susceptibility(NAN, NAN), skewness(NAN, NAN), kurtosis(NAN, NAN)
+    Quantities() : mean(NAN, NAN), susceptibility(NAN, NAN), skewness(NAN, NAN), kurtosis(NAN, NAN)
     {
         observableNames.push_back("mean");
         observableNames.push_back("variance");

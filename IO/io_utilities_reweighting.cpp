@@ -35,9 +35,9 @@ class LqcdReweightedData {
         filename = outputfilePrefix + "_" + quantityName;
     }
 
-    void append(realFloat betaValue, Observables observables)
+    void append(realFloat betaValue, Quantities observables)
     {
-        std::pair<realFloat, Observables> tmpPair(betaValue, observables);
+        std::pair<realFloat, Quantities> tmpPair(betaValue, observables);
         values.push_back(tmpPair);
     }
 
@@ -83,7 +83,7 @@ class LqcdReweightedData {
   private:
     std::string quantityName;
     std::string filename;
-    std::vector<std::pair<realFloat, Observables>> values;
+    std::vector<std::pair<realFloat, Quantities>> values;
 };
 
 template<typename T>
@@ -109,7 +109,7 @@ static void checkInputSizes(const std::vector<std::vector<realFloat>>& newBetaVa
 }
 
 void writeLqcdReweightedObservablesToFile(const std::vector<std::vector<realFloat>>& newBetaValues,
-                                          const std::vector<std::vector<Observables>>& reweightedData, std::string outputfilePrefix)
+                                          const std::vector<std::vector<Quantities>>& reweightedData, std::string outputfilePrefix)
 {
     try {
         checkInputSizes(newBetaValues, reweightedData);
@@ -140,13 +140,13 @@ void writeLqcdReweightedObservablesToFile(const std::vector<std::vector<realFloa
     }
 }
 
-static std::vector<Observables> convertMapOfObservableNameAndDataSampleToVectorOfObservables(std::map<std::string, DataSample> inputMap)
+static std::vector<Quantities> convertMapOfObservableNameAndDataSampleToVectorOfObservables(std::map<std::string, DataSample> inputMap)
 {
     if (inputMap.empty())
         throw std::logic_error("Called \"convertMapOfObservableNameAndDataSampleToVectorOfObservables\" function with empty map!");
 
     const int numberOfEstimatorsPerQuantity = inputMap.begin()->second.getNumberOfElements();
-    std::vector<Observables> returnValue(numberOfEstimatorsPerQuantity, Observables());
+    std::vector<Quantities> returnValue(numberOfEstimatorsPerQuantity, Quantities());
 
     for (auto& mapElement : inputMap) {
         if (mapElement.second.getNumberOfElements() != numberOfEstimatorsPerQuantity)
@@ -187,8 +187,8 @@ void writeLqcdReweightedObservablesEstimatorsToFile(const std::vector<std::vecto
 
     unsigned int numberOfNewPoints = reweightedEstimators.size();
     unsigned int numberOfQuantities = reweightedEstimators[0].size();
-    std::vector<std::vector<std::vector<Observables>>> reweightedEstimatorsNew(
-        numberOfNewPoints, std::vector<std::vector<Observables>>(numberOfQuantities, std::vector<Observables>()));
+    std::vector<std::vector<std::vector<Quantities>>> reweightedEstimatorsNew(
+        numberOfNewPoints, std::vector<std::vector<Quantities>>(numberOfQuantities, std::vector<Quantities>()));
 
     for (unsigned int newPointIndex = 0; newPointIndex < numberOfNewPoints; newPointIndex++) {
         for (unsigned int quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)

@@ -20,9 +20,9 @@
 #pragma once
 
 #include "Moments.hpp"
-#include "Observables.hpp"
+#include "Quantities.hpp"
 
-class Mean : public ObservableAbstract {
+class Mean : public QuantityAbstract {
   public:
     Mean() = delete;
     Mean(DataSample& dataSample, Parameters parameters);
