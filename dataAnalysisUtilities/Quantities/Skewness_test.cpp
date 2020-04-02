@@ -34,16 +34,16 @@ BOOST_AUTO_TEST_SUITE(SkewnessTest)
     {
         EstimateAndError referenceValue(1.000072760979389, 0.0);
         Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
-        BOOST_CHECK_CLOSE(skewness.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(skewness.getValueAndError().error, 1.e-7);
+        BOOST_CHECK_CLOSE(skewness.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(skewness.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
     {
         EstimateAndError referenceValue(0.5694793357428045, 0.0);
         Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
-        BOOST_CHECK_CLOSE(skewness.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(skewness.getValueAndError().error, 1.e-7);
+        BOOST_CHECK_CLOSE(skewness.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(skewness.error, 1.e-7);
     }
 
     // TODO: Test for Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
@@ -53,8 +53,8 @@ BOOST_AUTO_TEST_SUITE(SkewnessTest)
     {
         EstimateAndError referenceValue(1.000072760979389, 0.0);
         Skewness skewness(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
-        BOOST_CHECK_CLOSE(skewness.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(skewness.getValueAndError().error, 1.e-7);
+        BOOST_CHECK_CLOSE(skewness.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(skewness.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
@@ -62,8 +62,8 @@ BOOST_AUTO_TEST_SUITE(SkewnessTest)
         EstimateAndError referenceValue(0.5694793357428045, 0.0);
         Skewness skewness(
             buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
-        BOOST_CHECK_CLOSE(skewness.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(skewness.getValueAndError().error, 1.e-7);
+        BOOST_CHECK_CLOSE(skewness.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(skewness.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)

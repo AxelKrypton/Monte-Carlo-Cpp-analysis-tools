@@ -30,7 +30,7 @@
  *       and several sets of estimators per moment in the MomentsEstimators class, we use a std::multimap
  *       member. Then we cannot use the access operator[] in the standard way, i.e. both to get and to set
  *       an entry. This is related to the fact that multimap has no operator[] defined. Another thing it
- *       would be cool to have is a method that get the number of the moment and return either a single
+ *       would be cool to have is a method that gets the number of the moment and returns either a single
  *       object or a set of objects (in the case several were set). Nevertheless overload based on return
  *       value is not allowed in C++. So we decided to do in this way. We have an insert method to set
  *       elements. Then we use the operator[] to get a single value (checking for this case) and we use

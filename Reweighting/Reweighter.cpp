@@ -402,24 +402,23 @@ static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(
             bool useMultipleEstimate = isObservableToBeEvaluatedUsingMultipleColumns(
                 obsInFile, columnsToBeReweightedUsingMultipleColumns, numberOfReweightingParameters, mximumMomentNeeded);
             for (auto quantity : quantitiesToBeSet) {
-                if (quantity == Mean::observableName)
-                    observables[newPoint][obsInFile].mean = Mean(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
-                                                                 isMeanZero, errorMethod, useMultipleEstimate)
-                                                                .getValueAndError();
-                else if (quantity == Variance::observableName)
-                    observables[newPoint][obsInFile].susceptibility = Variance(moments[newPoint][obsInFile],
-                                                                               momentsEstimators[newPoint][obsInFile], isMeanZero,
-                                                                               errorMethod, useMultipleEstimate)
-                                                                          .getValueAndError();
-                else if (quantity == Skewness::observableName)
-                    observables[newPoint][obsInFile].skewness = Skewness(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
-                                                                         isMeanZero, errorMethod, useMultipleEstimate)
-                                                                    .getValueAndError();
-                else if (quantity == Kurtosis::observableName)
-                    observables[newPoint][obsInFile].kurtosis = Kurtosis(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
-                                                                         isMeanZero, errorMethod, useMultipleEstimate)
-                                                                    .getValueAndError();
-                else
+                if (quantity == Mean::observableName) {
+                    Mean tmpMean(
+                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
+                    observables[newPoint][obsInFile].mean = EstimateAndError(tmpMean.estimate, tmpMean.error);
+                } else if (quantity == Variance::observableName) {
+                    Variance tmpVariance(
+                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
+                    observables[newPoint][obsInFile].susceptibility = EstimateAndError(tmpVariance.estimate, tmpVariance.error);
+                } else if (quantity == Skewness::observableName) {
+                    Skewness tmpSkewness(
+                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
+                    observables[newPoint][obsInFile].skewness = EstimateAndError(tmpSkewness.estimate, tmpSkewness.error);
+                } else if (quantity == Kurtosis::observableName) {
+                    Kurtosis tmpKurtosis(
+                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
+                    observables[newPoint][obsInFile].kurtosis = EstimateAndError(tmpKurtosis.estimate, tmpKurtosis.error);
+                } else
                     throw std::invalid_argument(
                         "Unknown observable in \"setObservablesAtNewPointsFromMomentsAndMomentEstimators\" function!");
             }
@@ -515,16 +514,16 @@ setObservablesEstimatorsAtNewPointsFromMomentsEstimators(std::vector<std::vector
                 obsInFile, columnsToBeReweightedUsingMultipleColumns, numberOfReweightingParameters, mximumMomentNeeded);
             for (auto quantity : quantitiesToBeSet) {
                 if (quantity == Mean::observableName)
-                    observablesEstimators[newPoint][obsInFile][Mean::observableName] = Mean::evaluateObservableOnMomentEstimators(
+                    observablesEstimators[newPoint][obsInFile][quantity] = Mean::evaluateObservableOnMomentEstimators(
                         momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
                 else if (quantity == Variance::observableName)
-                    observablesEstimators[newPoint][obsInFile][Variance::observableName] = Variance::evaluateObservableOnMomentEstimators(
+                    observablesEstimators[newPoint][obsInFile][quantity] = Variance::evaluateObservableOnMomentEstimators(
                         momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
                 else if (quantity == Skewness::observableName)
-                    observablesEstimators[newPoint][obsInFile][Skewness::observableName] = Skewness::evaluateObservableOnMomentEstimators(
+                    observablesEstimators[newPoint][obsInFile][quantity] = Skewness::evaluateObservableOnMomentEstimators(
                         momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
                 else if (quantity == Kurtosis::observableName)
-                    observablesEstimators[newPoint][obsInFile][Kurtosis::observableName] = Kurtosis::evaluateObservableOnMomentEstimators(
+                    observablesEstimators[newPoint][obsInFile][quantity] = Kurtosis::evaluateObservableOnMomentEstimators(
                         momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
                 else
                     throw std::invalid_argument(

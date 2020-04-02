@@ -59,7 +59,8 @@ class QuantityAbstract {
   public:
     QuantityAbstract(bool isMeanKnownToBeZero);
     virtual ~QuantityAbstract(){};
-    EstimateAndError getValueAndError();
+    const realFloat& estimate;
+    const realFloat& error;
 
   protected:
     // Calculation from raw data
@@ -67,7 +68,6 @@ class QuantityAbstract {
     // Calculation for Reweighting
     void calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
                                       bool useMultipleEstimate);
-    std::string observableName;
     bool isMeanZero;
     EstimateAndError observableEstimateAndError;
 
@@ -89,10 +89,11 @@ class QuantityAbstract {
  *       when it is asked for an unset quantity (implement operator[] and function at or something like that)
  */
 
+/*
+ * This class is meant to be the only one to handle quantities by composition.
+ */
 class Quantities {
   public:
-    //    Observables() : mean(0.0, 0.0), susceptibility(0.0, 0.0),
-    //                    skewness(0.0, 0.0), kurtosis(0.0, 0.0)
     Quantities() : mean(NAN, NAN), susceptibility(NAN, NAN), skewness(NAN, NAN), kurtosis(NAN, NAN)
     {
         observableNames.push_back("mean");
@@ -137,7 +138,7 @@ class Quantities {
     //      have an object to which delegate the calculation of the observables all together: it could
     //      use the object in DataSampleAnalyzer that should be then local to the Observables.cpp file!
 
-    std::vector<std::string> observableNames;
+    std::vector<std::string> observableNames;  // TODO: to be removed!
 };
 
 #endif /* OBSERVABLES_HPP_ */

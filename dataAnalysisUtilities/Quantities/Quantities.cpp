@@ -36,14 +36,12 @@ realFloat evaluateErrorBasedOnMethod(DataSample dataSample, ErrorCalculationMeth
         throw std::logic_error("Unknown error method in \"evaluateErrorBasedOnMethod\"! Aborting...");
 }
 
-QuantityAbstract::QuantityAbstract(bool isMeanKnownToBeZero) : isMeanZero(isMeanKnownToBeZero)
+QuantityAbstract::QuantityAbstract(bool isMeanKnownToBeZero)
+    : estimate(observableEstimateAndError.estimate)
+    , error(observableEstimateAndError.error)
+    , isMeanZero(isMeanKnownToBeZero)
+    , observableEstimateAndError(NAN, NAN)
 {
-    observableEstimateAndError = EstimateAndError();
-}
-
-EstimateAndError QuantityAbstract::getValueAndError()
-{
-    return observableEstimateAndError;
 }
 
 void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, Parameters parameters)

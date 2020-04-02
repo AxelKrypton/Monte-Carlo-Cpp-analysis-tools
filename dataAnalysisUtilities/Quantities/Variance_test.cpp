@@ -34,24 +34,24 @@ BOOST_AUTO_TEST_SUITE(VarianceTest)
     {
         EstimateAndError referenceValue(0.2622374015645983, 0.0);
         Variance variance(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
-        BOOST_CHECK_CLOSE(variance.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(variance.getValueAndError().error, 1.e-7);
+        BOOST_CHECK_CLOSE(variance.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(variance.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
     {
         EstimateAndError referenceValue(1.268738973830841e-05, 0.0);
         Variance variance(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
-        BOOST_CHECK_CLOSE(variance.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(variance.getValueAndError().error, 1.e-7);
+        BOOST_CHECK_CLOSE(variance.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(variance.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
     {
         EstimateAndError referenceValue(1.268738973830841e-05, 3.0259317682406541e-06);
         Variance variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
-        BOOST_CHECK_CLOSE(variance.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_CLOSE(variance.getValueAndError().error, referenceValue.error, realFloatPrecisionInPercent);
+        BOOST_CHECK_CLOSE(variance.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_CLOSE(variance.error, referenceValue.error, realFloatPrecisionInPercent);
     }
 
     // TODO: Test for Variance variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
@@ -60,8 +60,8 @@ BOOST_AUTO_TEST_SUITE(VarianceTest)
     {
         EstimateAndError referenceValue(0.2622374015645983, 0.0);
         Variance variance(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
-        BOOST_CHECK_CLOSE(variance.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(variance.getValueAndError().error, 1.e-7);
+        BOOST_CHECK_CLOSE(variance.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(variance.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
@@ -69,8 +69,8 @@ BOOST_AUTO_TEST_SUITE(VarianceTest)
         EstimateAndError referenceValue(1.268738973830841e-05, 0.0);
         Variance variance(
             buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
-        BOOST_CHECK_CLOSE(variance.getValueAndError().estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(variance.getValueAndError().error, 1.e-7);
+        BOOST_CHECK_CLOSE(variance.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
+        BOOST_CHECK_SMALL(variance.error, 1.e-7);
     }
 
     BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)
