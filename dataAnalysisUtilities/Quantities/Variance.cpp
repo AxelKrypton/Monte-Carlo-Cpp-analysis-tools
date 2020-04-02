@@ -25,10 +25,10 @@
 const std::initializer_list<unsigned int> Variance::neededMoments = {1, 2};
 const std::initializer_list<unsigned int> Variance::neededMomentsWithZeroMean = {2};
 const std::string Variance::observableName = "VARIANCE";
-const functionForObservable Variance::functionToCalculateOservableWithZeroMean = [](Moments in) -> realFloat { return in[2]; };
-const functionForObservable Variance::functionToCalculateOservableWithNonZeroMean
+const functionForObservable Variance::functionToCalculateQuantityWithZeroMean = [](Moments in) -> realFloat { return in[2]; };
+const functionForObservable Variance::functionToCalculateQuantityWithNonZeroMean
     = [](Moments in) -> realFloat { return in[2] - in[1] * in[1]; };
-const functionForObservable Variance::functionToCalculateOservableWithMultipleEstimates = [](Moments in) -> realFloat {
+const functionForObservable Variance::functionToCalculateQuantityWithMultipleEstimates = [](Moments in) -> realFloat {
     realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
     return in[2] - firstMoment * firstMoment;
 };

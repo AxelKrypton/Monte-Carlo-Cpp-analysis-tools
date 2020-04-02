@@ -61,12 +61,12 @@ template<typename OBSERVABLE>
 functionForObservable pickUpCorrectFunctionForObservable(const bool isMeanZero, const bool useMultipleEstimate)
 {
     if (isMeanZero)
-        return OBSERVABLE::functionToCalculateOservableWithZeroMean;
+        return OBSERVABLE::functionToCalculateQuantityWithZeroMean;
     else {
         if (useMultipleEstimate)
-            return OBSERVABLE::functionToCalculateOservableWithMultipleEstimates;
+            return OBSERVABLE::functionToCalculateQuantityWithMultipleEstimates;
         else
-            return OBSERVABLE::functionToCalculateOservableWithNonZeroMean;
+            return OBSERVABLE::functionToCalculateQuantityWithNonZeroMean;
     }
 }
 template<typename OBSERVABLE> functionForEstimators pickUpCorrectFunctionForEstimator(const bool isMeanZero, const bool useMultipleEstimate)
@@ -88,9 +88,9 @@ template<> inline functionForObservable pickUpCorrectFunctionForObservable<Mean>
             "The Mean::getFunctionToCalculateObservable method should not be called with isMeanZero==true!! Aborting...");
     else {
         if (useMultipleEstimate)
-            return Mean::functionToCalculateOservableWithMultipleEstimates;
+            return Mean::functionToCalculateQuantityWithMultipleEstimates;
         else
-            return Mean::functionToCalculateOservableWithNonZeroMean;
+            return Mean::functionToCalculateQuantityWithNonZeroMean;
     }
 }
 template<> inline functionForEstimators pickUpCorrectFunctionForEstimator<Mean>(const bool isMeanZero, const bool useMultipleEstimate)

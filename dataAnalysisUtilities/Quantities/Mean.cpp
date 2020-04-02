@@ -25,8 +25,8 @@
 const std::initializer_list<unsigned int> Mean::neededMoments = {1};
 const std::initializer_list<unsigned int> Mean::neededMomentsWithZeroMean = {};
 const std::string Mean::observableName = "MEAN";
-const functionForObservable Mean::functionToCalculateOservableWithNonZeroMean = [](Moments in) -> realFloat { return in[1]; };
-const functionForObservable Mean::functionToCalculateOservableWithMultipleEstimates
+const functionForObservable Mean::functionToCalculateQuantityWithNonZeroMean = [](Moments in) -> realFloat { return in[1]; };
+const functionForObservable Mean::functionToCalculateQuantityWithMultipleEstimates
     = [](Moments in) -> realFloat { return getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1); };
 const functionForEstimators Mean::functionToBeAppliedToEstimatorsWithNonZeroMean = [](MomentsEstimators in) -> DataSample { return in[1]; };
 const functionForEstimators Mean::functionToBeAppliedToEstimatorsWithMultipleEstimates

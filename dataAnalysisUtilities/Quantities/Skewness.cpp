@@ -25,15 +25,15 @@
 const std::initializer_list<unsigned int> Skewness::neededMoments = {1, 2, 3};
 const std::initializer_list<unsigned int> Skewness::neededMomentsWithZeroMean = {2, 3};
 const std::string Skewness::observableName = "SKEWNESS";
-const functionForObservable Skewness::functionToCalculateOservableWithZeroMean
+const functionForObservable Skewness::functionToCalculateQuantityWithZeroMean
     = [](Moments in) -> realFloat { return in[3] / pow(in[2], 1.5); };
-const functionForObservable Skewness::functionToCalculateOservableWithNonZeroMean = [](Moments in) -> realFloat {
+const functionForObservable Skewness::functionToCalculateQuantityWithNonZeroMean = [](Moments in) -> realFloat {
     realFloat x1 = in[1];
     realFloat x2 = in[2];
     realFloat x3 = in[3];
     return (x3 - 3 * x2 * x1 + 2 * x1 * x1 * x1) / (pow(x2 - x1 * x1, 1.5));
 };
-const functionForObservable Skewness::functionToCalculateOservableWithMultipleEstimates = [](Moments in) -> realFloat {
+const functionForObservable Skewness::functionToCalculateQuantityWithMultipleEstimates = [](Moments in) -> realFloat {
     realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
     realFloat x2 = in[2];
     realFloat x3 = in[3];

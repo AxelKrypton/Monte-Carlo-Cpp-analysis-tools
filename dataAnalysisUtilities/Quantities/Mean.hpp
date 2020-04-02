@@ -31,8 +31,8 @@ class Mean : public QuantityAbstract {
     static const std::initializer_list<unsigned int> neededMoments;
     static const std::initializer_list<unsigned int> neededMomentsWithZeroMean;
     static const std::string observableName;
-    static const functionForObservable functionToCalculateOservableWithNonZeroMean;
-    static const functionForObservable functionToCalculateOservableWithMultipleEstimates;
+    static const functionForObservable functionToCalculateQuantityWithNonZeroMean;
+    static const functionForObservable functionToCalculateQuantityWithMultipleEstimates;
     static const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean;
     static const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates;
     static DataSample

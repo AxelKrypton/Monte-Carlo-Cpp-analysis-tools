@@ -25,16 +25,16 @@
 const std::initializer_list<unsigned int> Kurtosis::neededMoments = {1, 2, 3, 4};
 const std::initializer_list<unsigned int> Kurtosis::neededMomentsWithZeroMean = {2, 4};
 const std::string Kurtosis::observableName = "KURTOSIS";
-const functionForObservable Kurtosis::functionToCalculateOservableWithZeroMean
+const functionForObservable Kurtosis::functionToCalculateQuantityWithZeroMean
     = [](Moments in) -> realFloat { return in[4] / pow(in[2], 2.0); };
-const functionForObservable Kurtosis::functionToCalculateOservableWithNonZeroMean = [](Moments in) -> realFloat {
+const functionForObservable Kurtosis::functionToCalculateQuantityWithNonZeroMean = [](Moments in) -> realFloat {
     realFloat x1 = in[1];
     realFloat x2 = in[2];
     realFloat x3 = in[3];
     realFloat x4 = in[4];
     return (x4 - 4 * x3 * x1 + 6 * x2 * x1 * x1 - 3 * x1 * x1 * x1 * x1) / (pow(x2 - x1 * x1, 2.0));
 };
-const functionForObservable Kurtosis::functionToCalculateOservableWithMultipleEstimates = [](Moments in) -> realFloat {
+const functionForObservable Kurtosis::functionToCalculateQuantityWithMultipleEstimates = [](Moments in) -> realFloat {
     realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
     realFloat x2 = in[2];
     realFloat x3 = in[3];
