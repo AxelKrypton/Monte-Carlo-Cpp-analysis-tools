@@ -28,6 +28,7 @@ add_library(dataAnalysisUtilities
 	binning.cpp
 	Quantities/Moments.cpp
 	Quantities/Quantities.cpp
+	Quantities/AbstractQuantity.cpp
 	Quantities/Mean.cpp
 	Quantities/Variance.cpp
 	Quantities/Skewness.cpp
@@ -48,6 +49,7 @@ if( USE_REW_MULTI_PRECISION )
 		binning.cpp
 		Quantities/Moments.cpp
 		Quantities/Quantities.cpp
+		Quantities/AbstractQuantity.cpp
 		Quantities/Mean.cpp
 		Quantities/Variance.cpp
 		Quantities/Skewness.cpp

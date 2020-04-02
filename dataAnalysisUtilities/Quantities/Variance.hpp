@@ -19,8 +19,7 @@
 
 #pragma once
 
-#include "Moments.hpp"
-#include "Quantities.hpp"
+#include "AbstractQuantity.hpp"
 
 class Variance : public QuantityAbstract {
   public:

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "Quantities.hpp"
+#include "AbstractQuantity.hpp"
 
 class Kurtosis : public QuantityAbstract {
   public:

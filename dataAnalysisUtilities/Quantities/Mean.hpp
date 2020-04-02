@@ -19,8 +19,10 @@
 
 #pragma once
 
-#include "Moments.hpp"
-#include "Quantities.hpp"
+#include "AbstractQuantity.hpp"
+
+#include <initializer_list>
+#include <iostream>
 
 class Mean : public QuantityAbstract {
   public:

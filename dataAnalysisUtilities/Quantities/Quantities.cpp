@@ -20,56 +20,31 @@
 
 #include "Quantities.hpp"
 
-#include "../binning.hpp"
-#include "../bootstrapAnalysis.hpp"
-#include "../jackknifeAnalysis.hpp"
-#include "Moments.hpp"
-#include "Tools.hpp"
-
-realFloat evaluateErrorBasedOnMethod(DataSample dataSample, ErrorCalculationMethod errorMethod)
+Quantities::Quantities() : mean(NAN, NAN), variance(NAN, NAN), skewness(NAN, NAN), kurtosis(NAN, NAN)
 {
-    if (errorMethod == jackknife)
-        return calculateJacknifeError(dataSample);
-    else if (errorMethod == bootstrap)
-        return calculateBootstrapError(dataSample);
-    else
-        throw std::logic_error("Unknown error method in \"evaluateErrorBasedOnMethod\"! Aborting...");
+    observableNames.push_back("mean");
+    observableNames.push_back("variance");
+    observableNames.push_back("skewness");
+    observableNames.push_back("kurtosis");
 }
 
-QuantityAbstract::QuantityAbstract(bool isMeanKnownToBeZero)
-    : estimate(observableEstimateAndError.estimate)
-    , error(observableEstimateAndError.error)
-    , isMeanZero(isMeanKnownToBeZero)
-    , observableEstimateAndError(NAN, NAN)
+std::string Quantities::getMetaInformation()
 {
+    std::string metaInfos = "";
+    for (unsigned int index = 0; index < observableNames.size(); index++) {
+        metaInfos += observableNames[index] + "\t\t\terror\t\t\t";
+    }
+    return metaInfos;
 }
 
-void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, Parameters parameters)
+std::string Quantities::getObservablesAsString()
 {
-    std::vector<DataSample> neededMomentsPerDataPoint = calculateNeededMomentsPerDataPoint(dataSample);
-    Parameters binningParameters = getLocalParametersWithCorrectBinningInformation(parameters);
-    printCorrectBinningInformation(binningParameters);
-    std::vector<DataSample> binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, binningParameters);
-    observableEstimateAndError = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
-}
-
-void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
-                                                    bool useMultipleEstimate)
-{
-    observableEstimateAndError.estimate = getFunctionToCalculateObservable(useMultipleEstimate)(moments);
-    DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators(useMultipleEstimate)(estimators);
-    observableEstimateAndError.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
-}
-
-std::vector<DataSample> QuantityAbstract::calculateNeededMomentsPerDataPoint(DataSample& dataSample)
-{
-    return getMomentsPerDataPoint(dataSample, getNeededMoments(), isMeanZero);
-}
-
-std::vector<DataSample> QuantityAbstract::getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const Parameters& parameters)
-{
-    std::vector<DataSample> returnData;
-    for (size_t i = 0; i < dataSampleToBeBinned.size(); i++)
-        returnData.push_back(performBinning(dataSampleToBeBinned[i], parameters));
-    return returnData;
+    std::stringstream values;
+    values.precision(12);
+    values << std::scientific;
+    values << mean.estimate << "\t" << mean.error << "\t";
+    values << variance.estimate << "\t" << variance.error << "\t";
+    values << skewness.estimate << "\t" << skewness.error << "\t";
+    values << kurtosis.estimate << "\t" << kurtosis.error;
+    return values.str();
 }

@@ -33,56 +33,6 @@ class Parameters;
 class Moments;
 class MomentsEstimators;
 
-enum ErrorCalculationMethod { bootstrap = 1, jackknife };
-realFloat evaluateErrorBasedOnMethod(DataSample, ErrorCalculationMethod);
-
-/*
- * TODO: So far the error method is not a private member of the class, since for the raw data only Jackknife is used!
- *       Think whether put it as private member and in case do it.
- */
-
-typedef std::function<realFloat(Moments)> functionForObservable;
-typedef std::function<DataSample(MomentsEstimators)> functionForEstimators;
-typedef DataSample (*functionForEstimatorsForJackknife)(std::vector<DataSample>);
-/*
- * TODO: Change the last line above with the following:
- *           typedef std::function<DataSample(std::vector<DataSample>)> functionForEstimatorsForJackknife;
- *       Actually it could be possible that this can be completely removed and only the std::function<DataSample(MomentsEstimators)>
- *       can be used. The thing that one should think of is that in jackknifeAnalysis the functions take as second argument a function that
- *       has in input a vector of DataSample and there the MomentsEstimators are not used. It should be possible to use there the
- *       MomentsEstimators and one could have here just one single functionForEstimators.
- *
- *       This is also the reason why for the moment there are no static members with this function that is hard coded in the getter.
- */
-
-class QuantityAbstract {
-  public:
-    QuantityAbstract(bool isMeanKnownToBeZero);
-    virtual ~QuantityAbstract(){};
-    const realFloat& estimate;
-    const realFloat& error;
-
-  protected:
-    // Calculation from raw data
-    void calculateAndSetValueAndError(DataSample& dataSample, Parameters parameters);
-    // Calculation for Reweighting
-    void calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
-                                      bool useMultipleEstimate);
-    bool isMeanZero;
-    EstimateAndError observableEstimateAndError;
-
-  private:
-    std::vector<DataSample> getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const Parameters& parameters);
-    std::vector<DataSample> calculateNeededMomentsPerDataPoint(DataSample& dataSample);
-    // Virtual method that must be provided by children classes
-    virtual Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters) = 0;
-    virtual void printCorrectBinningInformation(const Parameters& parameters) = 0;
-    virtual functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() = 0;
-    virtual functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false) = 0;
-    virtual functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false) = 0;
-    virtual std::initializer_list<unsigned int> getNeededMoments() = 0;
-};
-
 /*
  * TODO: The following class should be a container for the quantities above and it should allow the possibility to set only some.
  *       One idea could be to use the access operator with the observable name as argument to recover values and do something
@@ -94,34 +44,9 @@ class QuantityAbstract {
  */
 class Quantities {
   public:
-    Quantities() : mean(NAN, NAN), variance(NAN, NAN), skewness(NAN, NAN), kurtosis(NAN, NAN)
-    {
-        observableNames.push_back("mean");
-        observableNames.push_back("variance");
-        observableNames.push_back("skewness");
-        observableNames.push_back("kurtosis");
-    }
-
-    std::string getMetaInformation()
-    {
-        std::string metaInfos = "";
-        for (unsigned int index = 0; index < observableNames.size(); index++) {
-            metaInfos += observableNames[index] + "\t\t\terror\t\t\t";
-        }
-        return metaInfos;
-    }
-
-    std::string getObservablesAsString()
-    {
-        std::stringstream values;
-        values.precision(12);
-        values << std::scientific;
-        values << mean.estimate << "\t" << mean.error << "\t";
-        values << variance.estimate << "\t" << variance.error << "\t";
-        values << skewness.estimate << "\t" << skewness.error << "\t";
-        values << kurtosis.estimate << "\t" << kurtosis.error;
-        return values.str();
-    }
+    Quantities();
+    std::string getMetaInformation();
+    std::string getObservablesAsString();
 
     /*
      * Here in the following the observables we deal with around in the

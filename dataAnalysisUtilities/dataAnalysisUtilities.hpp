@@ -30,6 +30,8 @@
  * This means that, if known, the mean is not estimated out from the sampleIn, but manually set to zero.
  */
 
+realFloat evaluateErrorBasedOnMethod(DataSample, ErrorCalculationMethod);
+
 /*
  * The following 4 functions DO BINNING(!) on sampleIn and then calculate the observable
  *

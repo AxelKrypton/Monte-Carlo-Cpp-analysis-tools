@@ -23,7 +23,18 @@
 #include "../IO/io_utilities.hpp"
 #include "binnedDataSample.hpp"
 #include "binning.hpp"
+#include "bootstrapAnalysis.hpp"
 #include "jackknifeAnalysis.hpp"
+
+realFloat evaluateErrorBasedOnMethod(DataSample dataSample, ErrorCalculationMethod errorMethod)
+{
+    if (errorMethod == jackknife)
+        return calculateJacknifeError(dataSample);
+    else if (errorMethod == bootstrap)
+        return calculateBootstrapError(dataSample);
+    else
+        throw std::logic_error("Unknown error method in \"evaluateErrorBasedOnMethod\"! Aborting...");
+}
 
 static Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable)
 {
