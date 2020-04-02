@@ -20,6 +20,7 @@
 
 #include "io_utilities_reweighting.hpp"
 
+#include "../Reweighting/Histogram.hpp"
 #include "../dataAnalysisUtilities/Quantities/Kurtosis.hpp"
 #include "../dataAnalysisUtilities/Quantities/Mean.hpp"
 #include "../dataAnalysisUtilities/Quantities/Skewness.hpp"
