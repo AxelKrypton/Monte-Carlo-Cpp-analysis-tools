@@ -451,7 +451,7 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(suscReweighting)
 
     /*
-     * Same tests as the suite meanReweighting, but on the susceptibility. Read the comments
+     * Same tests as the suite meanReweighting, but on the variance. Read the comments
      * of that suite for more information (e.g. for the precision used here in the following cases).
      */
     BOOST_AUTO_TEST_CASE(suscReweighting1)
@@ -481,8 +481,8 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
                1.904902525324e-05, 1.924032734962e-05, 1.942943513494e-05, 1.961613529244e-05, 1.980021250880e-05, 1.998144945525e-05};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 2e-7);
-            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].susceptibility.estimate, 2e-7);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs1NewPoints[i], valuesObsNewPoints[i][0].variance.estimate, 2e-7);
+            BOOST_REQUIRE_CLOSE(referenceValuesObs2NewPoints[i], valuesObsNewPoints[i][1].variance.estimate, 2e-7);
         }
     }
 
@@ -513,7 +513,7 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
                1.952194950905e-05, 1.877562633973e-05, 1.803850752757e-05};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++)
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 2e-7);
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].variance.estimate, 2e-7);
     }
 
     BOOST_AUTO_TEST_CASE(suscReweighting3)
@@ -540,8 +540,8 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
                1.952194950905e-05, 1.877562633973e-05, 1.803850752757e-05};
         std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
-            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].susceptibility.estimate, 2e-7);
-            BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].susceptibility.error, realFloat(1.e-6));
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0].variance.estimate, 2e-7);
+            BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0].variance.error, realFloat(1.e-6));
         }
     }
 
@@ -569,10 +569,10 @@ BOOST_AUTO_TEST_SUITE(suscReweighting)
         reweighter = ReweighterTester(options2, true);
         std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter.getReweightedObservables();
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
-            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.estimate, valuesObsNewPoints2[2 * i][0].susceptibility.estimate,
-                                realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.error, valuesObsNewPoints2[2 * i][0].susceptibility.error,
-                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(
+                valuesObsNewPoints1[i][0].variance.estimate, valuesObsNewPoints2[2 * i][0].variance.estimate, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(
+                valuesObsNewPoints1[i][0].variance.error, valuesObsNewPoints2[2 * i][0].variance.error, realFloatPrecisionInPercent);
         }
     }
 
@@ -814,10 +814,10 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
             BOOST_REQUIRE_CLOSE(
                 valuesObsNewPoints1[i][0].mean.estimate, valuesObsNewPoints2[2 * i][0].mean.estimate, realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.error, valuesObsNewPoints2[2 * i][0].mean.error, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.estimate, valuesObsNewPoints2[2 * i][0].susceptibility.estimate,
-                                realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.error, valuesObsNewPoints2[2 * i][0].susceptibility.error,
-                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(
+                valuesObsNewPoints1[i][0].variance.estimate, valuesObsNewPoints2[2 * i][0].variance.estimate, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(
+                valuesObsNewPoints1[i][0].variance.error, valuesObsNewPoints2[2 * i][0].variance.error, realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(
                 valuesObsNewPoints1[i][0].skewness.estimate, valuesObsNewPoints2[2 * i][0].skewness.estimate, realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(
@@ -850,10 +850,10 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
             BOOST_REQUIRE_CLOSE(
                 valuesObsNewPoints1[i][0].mean.estimate, valuesObsNewPoints2[2 * i][0].mean.estimate, realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].mean.error, valuesObsNewPoints2[2 * i][0].mean.error, realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.estimate, valuesObsNewPoints2[2 * i][0].susceptibility.estimate,
-                                realFloatPrecisionInPercent);
-            BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0].susceptibility.error, valuesObsNewPoints2[2 * i][0].susceptibility.error,
-                                realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(
+                valuesObsNewPoints1[i][0].variance.estimate, valuesObsNewPoints2[2 * i][0].variance.estimate, realFloatPrecisionInPercent);
+            BOOST_REQUIRE_CLOSE(
+                valuesObsNewPoints1[i][0].variance.error, valuesObsNewPoints2[2 * i][0].variance.error, realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(
                 valuesObsNewPoints1[i][0].skewness.estimate, valuesObsNewPoints2[2 * i][0].skewness.estimate, realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(

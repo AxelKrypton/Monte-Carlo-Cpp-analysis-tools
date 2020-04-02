@@ -156,7 +156,7 @@ static std::vector<Quantities> convertMapOfObservableNameAndDataSampleToVectorOf
             if (mapElement.first == Mean::observableName)
                 returnValue[dataIndex].mean.estimate = mapElement.second[dataIndex];
             else if (mapElement.first == Variance::observableName)
-                returnValue[dataIndex].susceptibility.estimate = mapElement.second[dataIndex];
+                returnValue[dataIndex].variance.estimate = mapElement.second[dataIndex];
             else if (mapElement.first == Skewness::observableName)
                 returnValue[dataIndex].skewness.estimate = mapElement.second[dataIndex];
             else if (mapElement.first == Kurtosis::observableName)

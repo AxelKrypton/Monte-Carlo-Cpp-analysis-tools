@@ -36,8 +36,8 @@ BOOST_AUTO_TEST_SUITE(QuantitiesTest)
         // All entry NAN by default
         BOOST_REQUIRE_NE(observables.mean.estimate, observables.mean.estimate);
         BOOST_REQUIRE_NE(observables.mean.error, observables.mean.error);
-        BOOST_REQUIRE_NE(observables.susceptibility.estimate, observables.susceptibility.estimate);
-        BOOST_REQUIRE_NE(observables.susceptibility.error, observables.susceptibility.error);
+        BOOST_REQUIRE_NE(observables.variance.estimate, observables.variance.estimate);
+        BOOST_REQUIRE_NE(observables.variance.error, observables.variance.error);
         BOOST_REQUIRE_NE(observables.skewness.estimate, observables.skewness.estimate);
         BOOST_REQUIRE_NE(observables.skewness.error, observables.skewness.error);
         BOOST_REQUIRE_NE(observables.kurtosis.estimate, observables.kurtosis.estimate);

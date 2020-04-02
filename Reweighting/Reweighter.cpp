@@ -409,7 +409,7 @@ static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(
                 } else if (quantity == Variance::observableName) {
                     Variance tmpVariance(
                         moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
-                    observables[newPoint][obsInFile].susceptibility = EstimateAndError(tmpVariance.estimate, tmpVariance.error);
+                    observables[newPoint][obsInFile].variance = EstimateAndError(tmpVariance.estimate, tmpVariance.error);
                 } else if (quantity == Skewness::observableName) {
                     Skewness tmpSkewness(
                         moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);

@@ -94,7 +94,7 @@ class QuantityAbstract {
  */
 class Quantities {
   public:
-    Quantities() : mean(NAN, NAN), susceptibility(NAN, NAN), skewness(NAN, NAN), kurtosis(NAN, NAN)
+    Quantities() : mean(NAN, NAN), variance(NAN, NAN), skewness(NAN, NAN), kurtosis(NAN, NAN)
     {
         observableNames.push_back("mean");
         observableNames.push_back("variance");
@@ -117,7 +117,7 @@ class Quantities {
         values.precision(12);
         values << std::scientific;
         values << mean.estimate << "\t" << mean.error << "\t";
-        values << susceptibility.estimate << "\t" << susceptibility.error << "\t";
+        values << variance.estimate << "\t" << variance.error << "\t";
         values << skewness.estimate << "\t" << skewness.error << "\t";
         values << kurtosis.estimate << "\t" << kurtosis.error;
         return values.str();
@@ -128,10 +128,10 @@ class Quantities {
      * library, together with their definition (thinking to a sample set X
      * with mean mu, x1,x2,x3,x4 are the 1st,2nd,3rd,4th moment of the sample)
      */
-    EstimateAndError mean;            // <x>                            --->  x1
-    EstimateAndError susceptibility;  // <(x-mu)^2>                     --->  x2-x1^2
-    EstimateAndError skewness;        // <(x-mu)^3> / <(x-mu)^2>^(3/2)  --->  (x3-3x2*x1+2*x1^3)/(x2-x1^2)^(3/2)
-    EstimateAndError kurtosis;        // <(x-mu)^4> / <(x-mu)^2>^2      --->  (x4-4*x3*x1+6*x2*x1^2-3*x1^4)/(x2-x1^2)^2
+    EstimateAndError mean;      // <x>                            --->  x1
+    EstimateAndError variance;  // <(x-mu)^2>                     --->  x2-x1^2
+    EstimateAndError skewness;  // <(x-mu)^3> / <(x-mu)^2>^(3/2)  --->  (x3-3x2*x1+2*x1^3)/(x2-x1^2)^(3/2)
+    EstimateAndError kurtosis;  // <(x-mu)^4> / <(x-mu)^2>^2      --->  (x4-4*x3*x1+6*x2*x1^2-3*x1^4)/(x2-x1^2)^2
 
     // TODO: Implement functions to calculate here the observables given either the DataSample or
     //      the moments and the estimators (the latter needed in Reweighting). The idea would be to
