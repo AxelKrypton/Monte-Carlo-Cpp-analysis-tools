@@ -66,8 +66,6 @@ class Quantities {
     //      the moments and the estimators (the latter needed in Reweighting). The idea would be to
     //      have an object to which delegate the calculation of the observables all together: it could
     //      use the object in DataSampleAnalyzer that should be then local to the Observables.cpp file!
-
-    std::vector<std::string> observableNames;  // TODO: to be removed!
 };
 
 #endif /* OBSERVABLES_HPP_ */

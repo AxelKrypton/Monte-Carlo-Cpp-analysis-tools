@@ -20,17 +20,13 @@
 
 #include "Quantities.hpp"
 
-Quantities::Quantities() : mean(), variance(), skewness(), kurtosis()
-{
-    observableNames.push_back("mean");
-    observableNames.push_back("variance");
-    observableNames.push_back("skewness");
-    observableNames.push_back("kurtosis");
-}
+Quantities::Quantities() : mean(), variance(), skewness(), kurtosis() {}
 
 std::string Quantities::getMetaInformation()
 {
     std::string metaInfos = "";
+    std::vector<std::string> observableNames
+        = {Mean::observableName, Variance::observableName, Skewness::observableName, Kurtosis::observableName};
     for (unsigned int index = 0; index < observableNames.size(); index++) {
         metaInfos += observableNames[index] + "\t\t\terror\t\t\t";
     }

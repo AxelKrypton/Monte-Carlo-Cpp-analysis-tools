@@ -43,10 +43,10 @@ BOOST_AUTO_TEST_SUITE(QuantitiesTest)
         BOOST_REQUIRE_NE(observables.kurtosis.value.estimate, observables.kurtosis.value.estimate);
         BOOST_REQUIRE_NE(observables.kurtosis.value.error, observables.kurtosis.value.error);
         // Test names
-        BOOST_REQUIRE_EQUAL(observables.observableNames[0], "mean");
-        BOOST_REQUIRE_EQUAL(observables.observableNames[1], "variance");
-        BOOST_REQUIRE_EQUAL(observables.observableNames[2], "skewness");
-        BOOST_REQUIRE_EQUAL(observables.observableNames[3], "kurtosis");
+        BOOST_REQUIRE_EQUAL(Mean::observableName, "MEAN");
+        BOOST_REQUIRE_EQUAL(Variance::observableName, "VARIANCE");
+        BOOST_REQUIRE_EQUAL(Skewness::observableName, "SKEWNESS");
+        BOOST_REQUIRE_EQUAL(Kurtosis::observableName, "KURTOSIS");
     }
 
 BOOST_AUTO_TEST_SUITE_END()
