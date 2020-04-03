@@ -26,8 +26,6 @@
 #include "../dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
 #include "TestUtilities.hpp"
 
-#include <boost/test/unit_test.hpp>
-
 BOOST_AUTO_TEST_SUITE(VarianceTest)
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)

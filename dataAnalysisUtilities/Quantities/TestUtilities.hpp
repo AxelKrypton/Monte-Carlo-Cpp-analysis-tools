@@ -19,7 +19,17 @@
 
 #pragma once
 
+#include "../DataSample.hpp"
+#include "EstimateAndError.hpp"
 #include "Moments.hpp"
+
+#include <boost/test/unit_test.hpp>
+
+void checkEstimateAndError(EstimateAndError expectedEstimateAndError, EstimateAndError calculatedEstimateAndError, realFloat testPrecision)
+{
+    BOOST_CHECK_CLOSE(expectedEstimateAndError.error, calculatedEstimateAndError.error, testPrecision);
+    BOOST_CHECK_CLOSE(expectedEstimateAndError.estimate, calculatedEstimateAndError.estimate, testPrecision);
+}
 
 Moments buildMomentsForTest()
 {

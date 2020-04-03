@@ -22,6 +22,7 @@
 #define DATASAMPLETESTUTITLITIES_HPP_
 
 #include "../types.hpp"
+#include "DataSample.hpp"
 
 #include <valarray>
 
@@ -110,5 +111,28 @@ enum FillType {
     entriesBetweenOneAndEight,
     bigAndSmallEntries
 };
+
+DataSample getDataSampleBasedOnFillType(int length, FillType fillType)
+{
+    switch (fillType) {
+        case zeros:
+            return DataSample(std::valarray<realFloat>(length));
+        case ones:
+            return DataSample(makeValarrayWithOnes(length));
+        case onesMinusOnes:
+            return DataSample(makeValarrayWithOnesAndMinusOnes(length));
+        case arrayPosition:
+            return DataSample(makeValarrayWithArrayPosition(length));
+        case entriesSymmetricBetweenZeroAndOne:
+            return DataSample(makeValarrayWithEntriesBetweenZeroAndOne(length));
+        case entriesBetweenOneAndEight:
+            return DataSample(makeValarrayWithEntriesBetweenOneAndEight(length));
+        case bigAndSmallEntries:
+            return DataSample(makeValarrayWithBigAndSmallEntries(length / 2));
+        default:
+            throw std::invalid_argument("Unknown fillType selected!");
+            break;
+    }
+}
 
 #endif /* DATASAMPLETESTUTITLITIES_HPP_ */
