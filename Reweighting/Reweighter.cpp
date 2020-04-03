@@ -403,16 +403,16 @@ static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(
                 obsInFile, columnsToBeReweightedUsingMultipleColumns, numberOfReweightingParameters, mximumMomentNeeded);
             for (auto quantity : quantitiesToBeSet) {
                 if (quantity == Mean::observableName) {
-                    observables[newPoint][obsInFile].mean = Mean(
+                    observables[newPoint][obsInFile][quantity] = Mean(
                         moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
                 } else if (quantity == Variance::observableName) {
-                    observables[newPoint][obsInFile].variance = Variance(
+                    observables[newPoint][obsInFile][quantity] = Variance(
                         moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
                 } else if (quantity == Skewness::observableName) {
-                    observables[newPoint][obsInFile].skewness = Skewness(
+                    observables[newPoint][obsInFile][quantity] = Skewness(
                         moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
                 } else if (quantity == Kurtosis::observableName) {
-                    observables[newPoint][obsInFile].kurtosis = Kurtosis(
+                    observables[newPoint][obsInFile][quantity] = Kurtosis(
                         moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
                 } else
                     throw std::invalid_argument(
@@ -482,14 +482,13 @@ static void setMeanToZeroAtNewPoints(std::vector<std::vector<Quantities>>& obser
 {
     for (size_t newPoint = 0; newPoint < observables.size(); newPoint++) {
         for (size_t obsInFile = 0; obsInFile < observables[newPoint].size(); obsInFile++) {
-            if ((boost::math::isnan)(observables[newPoint][obsInFile].mean.value.estimate))  // parenthesis around boost::math::isnan crucial
-                                                                                             // otherwise the std lib macro is called!
-                observables[newPoint][obsInFile].mean.value.estimate = 0.0;
+            EstimateAndError& meanValue = observables[newPoint][obsInFile][Mean::observableName].value;
+            if (meanValue.estimate != meanValue.estimate)
+                meanValue.estimate = 0.0;
             else
                 throw std::logic_error("Error setting mean.estimate to 0.0 since it should be NAN but it isn't!");
-            if ((boost::math::isnan)(observables[newPoint][obsInFile].mean.value.error))  // parenthesis around boost::math::isnan crucial
-                                                                                          // otherwise the std lib macro is called!
-                observables[newPoint][obsInFile].mean.value.error = 0.0;
+            if (meanValue.error != meanValue.error)
+                meanValue.error = 0.0;
             else
                 throw std::logic_error("Error setting mean.error to 0.0 since it should be NAN but it isn't!");
         }

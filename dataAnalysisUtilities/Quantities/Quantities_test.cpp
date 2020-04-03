@@ -29,24 +29,36 @@
 
 BOOST_AUTO_TEST_SUITE(QuantitiesTest)
 
+    const std::vector<std::string> labels = {"MEAN", "VARIANCE", "SKEWNESS", "KURTOSIS"};
+
     BOOST_AUTO_TEST_CASE(build)
     {
-        BOOST_REQUIRE_NO_THROW(Quantities observables);
-        Quantities observables;
+        BOOST_REQUIRE_NO_THROW(Quantities quantities);
+        Quantities quantities;
         // All entry NAN by default
-        BOOST_REQUIRE_NE(observables.mean.value.estimate, observables.mean.value.estimate);
-        BOOST_REQUIRE_NE(observables.mean.value.error, observables.mean.value.error);
-        BOOST_REQUIRE_NE(observables.variance.value.estimate, observables.variance.value.estimate);
-        BOOST_REQUIRE_NE(observables.variance.value.error, observables.variance.value.error);
-        BOOST_REQUIRE_NE(observables.skewness.value.estimate, observables.skewness.value.estimate);
-        BOOST_REQUIRE_NE(observables.skewness.value.error, observables.skewness.value.error);
-        BOOST_REQUIRE_NE(observables.kurtosis.value.estimate, observables.kurtosis.value.estimate);
-        BOOST_REQUIRE_NE(observables.kurtosis.value.error, observables.kurtosis.value.error);
+        for (auto label : labels) {
+            EstimateAndError quantity = quantities[label].value;
+            BOOST_REQUIRE_NE(quantity.estimate, quantity.estimate);
+            BOOST_REQUIRE_NE(quantity.error, quantity.error);
+        }
         // Test names
-        BOOST_REQUIRE_EQUAL(Mean::observableName, "MEAN");
-        BOOST_REQUIRE_EQUAL(Variance::observableName, "VARIANCE");
-        BOOST_REQUIRE_EQUAL(Skewness::observableName, "SKEWNESS");
-        BOOST_REQUIRE_EQUAL(Kurtosis::observableName, "KURTOSIS");
+        BOOST_REQUIRE_EQUAL(Mean::observableName, labels[0]);
+        BOOST_REQUIRE_EQUAL(Variance::observableName, labels[1]);
+        BOOST_REQUIRE_EQUAL(Skewness::observableName, labels[2]);
+        BOOST_REQUIRE_EQUAL(Kurtosis::observableName, labels[3]);
+    }
+
+    BOOST_AUTO_TEST_CASE(accessOperator)
+    {
+        Quantities quantities;
+        const Quantities quantities_const;
+
+        for (auto label : labels) {
+            BOOST_REQUIRE_NO_THROW(quantities[label]);
+            BOOST_REQUIRE_NO_THROW(quantities_const[label]);
+        }
+        BOOST_REQUIRE_THROW(quantities["WRONG_LABEL"], std::out_of_range);
+        BOOST_REQUIRE_THROW(quantities_const["WRONG_LABEL"], std::out_of_range);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

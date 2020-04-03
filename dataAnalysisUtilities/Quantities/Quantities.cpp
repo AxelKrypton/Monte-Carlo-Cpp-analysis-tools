@@ -44,3 +44,23 @@ std::string Quantities::getObservablesAsString()
     values << kurtosis.value.estimate << "\t" << kurtosis.value.error;
     return values.str();
 }
+
+const QuantityAbstract& Quantities::operator[](std::string quantityLabel) const
+{
+    if (quantityLabel == Mean::observableName)
+        return mean;
+    else if (quantityLabel == Variance::observableName)
+        return variance;
+    else if (quantityLabel == Skewness::observableName)
+        return skewness;
+    else if (quantityLabel == Kurtosis::observableName)
+        return kurtosis;
+    else
+        throw std::out_of_range("Quantities::operator[] accessed an invalid quantity!");
+}
+
+QuantityAbstract& Quantities::operator[](std::string quantityLabel)
+{
+    // Item 3 "Use const whenever possible," in Effective C++, 3d ed by Scott Meyers, ISBN-13: 9780321334879.
+    return const_cast<QuantityAbstract&>(static_cast<const Quantities&>(*this)[quantityLabel]);
+}

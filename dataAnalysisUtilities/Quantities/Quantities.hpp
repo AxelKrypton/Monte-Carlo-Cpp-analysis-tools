@@ -49,18 +49,22 @@ class MomentsEstimators;
 class Quantities {
   public:
     Quantities();
+    const QuantityAbstract& operator[](std::string quantityLabel) const;
+    QuantityAbstract& operator[](std::string quantityLabel);
+
     std::string getMetaInformation();
     std::string getObservablesAsString();
 
+  private:
     /*
-     * Here in the following the observables we deal with around in the
+     * Here in the following the quantities we deal with around in the
      * library, together with their definition (thinking to a sample set X
      * with mean mu, x1,x2,x3,x4 are the 1st,2nd,3rd,4th moment of the sample)
      */
-    Mean mean;          // <x>                            --->  x1
-    Variance variance;  // <(x-mu)^2>                     --->  x2-x1^2
-    Skewness skewness;  // <(x-mu)^3> / <(x-mu)^2>^(3/2)  --->  (x3-3x2*x1+2*x1^3)/(x2-x1^2)^(3/2)
-    Kurtosis kurtosis;  // <(x-mu)^4> / <(x-mu)^2>^2      --->  (x4-4*x3*x1+6*x2*x1^2-3*x1^4)/(x2-x1^2)^2
+    Mean mean;          // <x>                            ->  x1
+    Variance variance;  // <(x-mu)^2>                     ->  x2-x1^2
+    Skewness skewness;  // <(x-mu)^3> / <(x-mu)^2>^(3/2)  ->  (x3-3x2*x1+2*x1^3)/(x2-x1^2)^(3/2)
+    Kurtosis kurtosis;  // <(x-mu)^4> / <(x-mu)^2>^2      ->  (x4-4*x3*x1+6*x2*x1^2-3*x1^4)/(x2-x1^2)^2
 
     // TODO: Implement functions to calculate here the observables given either the DataSample or
     //      the moments and the estimators (the latter needed in Reweighting). The idea would be to
