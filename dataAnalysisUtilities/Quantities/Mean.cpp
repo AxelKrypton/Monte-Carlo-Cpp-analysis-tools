@@ -23,7 +23,7 @@
 
 // Definition of the static member for the linker
 const std::initializer_list<unsigned int> Mean::neededMoments = {1};
-const std::initializer_list<unsigned int> Mean::neededMomentsWithZeroMean = {};
+const std::initializer_list<unsigned int> Mean::neededMomentsWithZeroMean = {1};  // Needed for the jackknife error!
 const std::string Mean::observableName = "MEAN";
 const functionForObservable Mean::functionToCalculateQuantityWithNonZeroMean = [](Moments in) -> realFloat { return in[1]; };
 const functionForObservable Mean::functionToCalculateQuantityWithMultipleEstimates
@@ -60,18 +60,17 @@ void Mean::printCorrectBinningInformation(const Parameters& parameters)
 
 functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToEstimatorsForJackknife()
 {
-    if (isMeanZero)
-        return [](std::vector<DataSample> in) -> DataSample {
-            if (in.size() != 0)
-                throw std::invalid_argument("Invalid call to Mean function with zero mean for estimators!");
-            return DataSample(std::valarray<realFloat>(0.0, in[0].getNumberOfElements()));
-        };
-    else
-        return [](std::vector<DataSample> in) -> DataSample {
-            if (in.size() != 1)
-                throw std::invalid_argument("Invalid call to Mean function for estimators!");
-            return in[0];
-        };
+    /*
+     * Here for the jackknife we always need f(x)=x also if the mean is known to be zero.
+     * This is necessary to get the standard deviation of the sample evaluated and the
+     * idea if the mean is known to be zero is then to set it by hand ignoring the value
+     * returned by the jackknife -> see QuantityAbstract::calculateAndSetValueAndError
+     */
+    return [](std::vector<DataSample> in) -> DataSample {
+        if (in.size() != 1)
+            throw std::invalid_argument("Invalid call to Mean function for estimators!");
+        return in[0];
+    };
 }
 
 functionForEstimators Mean::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)

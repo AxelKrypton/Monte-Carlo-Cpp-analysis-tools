@@ -33,6 +33,10 @@ void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, Para
     printCorrectBinningInformation(binningParameters);
     std::vector<DataSample> binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, binningParameters);
     value = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
+    if (isMeanZero && dynamic_cast<Mean*>(this) != nullptr) {
+        std::cout << "# MEAN is known to be zero, setting calculated value ( " << value.estimate << " ) to zero.\n";
+        value.estimate = 0.0;
+    }
 }
 
 void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
@@ -45,7 +49,10 @@ void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEsti
 
 std::vector<DataSample> QuantityAbstract::calculateNeededMomentsPerDataPoint(DataSample& dataSample)
 {
-    return getMomentsPerDataPoint(dataSample, getNeededMoments(), isMeanZero);
+    std::vector<DataSample> returnVec;
+    for (auto i : getNeededMoments())
+        returnVec.push_back(dataSample.getNthMomentPerDataPoint(i));
+    return returnVec;
 }
 
 std::vector<DataSample> QuantityAbstract::getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const Parameters& parameters)

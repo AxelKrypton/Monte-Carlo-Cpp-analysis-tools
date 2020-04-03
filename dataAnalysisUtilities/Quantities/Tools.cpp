@@ -19,14 +19,6 @@
 
 #include "Tools.hpp"
 
-std::vector<DataSample> getMomentsPerDataPoint(DataSample& sampleIn, std::initializer_list<unsigned int> whichMoments, bool isMeanZero)
-{
-    std::vector<DataSample> returnVec;
-    for (auto i : whichMoments)
-        returnVec.push_back(isMeanZero ? sampleIn.getNthMomentPerDataPoint(i) : sampleIn.getNthCentralMomentPerDataPoint(i));
-    return returnVec;
-}
-
 Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable)
 {
     Parameters tmp = parameters;

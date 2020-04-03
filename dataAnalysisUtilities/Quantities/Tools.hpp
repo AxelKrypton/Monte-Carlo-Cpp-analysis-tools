@@ -27,7 +27,6 @@
 #include "Skewness.hpp"
 #include "Variance.hpp"
 
-std::vector<DataSample> getMomentsPerDataPoint(DataSample& sampleIn, std::initializer_list<unsigned int> whichMoments, bool isMeanZero);
 Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable);
 void printBinningInformation(const Parameters& parameters, std::string observable);
 
