@@ -29,6 +29,15 @@
 #include "iostream"
 namespace po = boost::program_options;
 
+class BinningParameters {
+  public:
+    bool performBinning = false;
+    bool binningMustFitDataSample = false;
+    bool adjustDataSample = false;
+    bool useNumberOfBins = false;
+    int number = 0;  // Meaningless since by default binning is not done
+};
+
 class Parameters {
   public:
     Parameters(int argc, const char** argv);
@@ -59,6 +68,7 @@ class Parameters {
     bool doNotAnalyzeKurtosis;
     bool binningMustFitDataSampleSize;
     bool adjustDataSampleSizeToBinning;
+    BinningParameters getBinningParametersForObservablesAnalysis(std::string observable) const;
 
   private:
     void printParameters();

@@ -20,6 +20,7 @@
 
 #include "Parameters.hpp"
 
+#include "../Quantities/Constants.hpp"
 #include "HelperTools.hpp"
 
 Parameters::Parameters(std::vector<std::string> argv)
@@ -243,4 +244,28 @@ void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithB
         else
             vectorWithBinningInformations.push_back(defaultValue);
     }
+}
+
+BinningParameters Parameters::getBinningParametersForObservablesAnalysis(std::string observable) const
+{
+    BinningParameters returnValue;
+    returnValue.performBinning = ! doNotUseBinning;
+    returnValue.binningMustFitDataSample = binningMustFitDataSampleSize;
+    returnValue.adjustDataSample = adjustDataSampleSizeToBinning;
+    returnValue.useNumberOfBins = useNumberOfBinsForBinning;
+
+    if (observable == constants::observableName<Mean>) {
+        returnValue.number = useNumberOfBinsForBinning ? numberOfBinsMoments[1] : binsizeMoments[1];
+    } else if (observable == constants::observableName<Variance>) {
+        returnValue.number = useNumberOfBinsForBinning ? binsizeCentralMoments[2] : numberOfBinsCentralMoments[2];
+    } else if (observable == constants::observableName<Skewness>) {
+        returnValue.number = (useNumberOfBinsForBinning) ? std::max(binsizeCentralMoments[2], binsizeCentralMoments[3])
+                                                         : std::min(numberOfBinsCentralMoments[2], numberOfBinsCentralMoments[3]);
+    } else if (observable == constants::observableName<Kurtosis>) {
+        returnValue.number = (useNumberOfBinsForBinning) ? std::max(binsizeCentralMoments[2], binsizeCentralMoments[4])
+                                                         : std::min(numberOfBinsCentralMoments[2], numberOfBinsCentralMoments[4]);
+    } else {
+        throw std::invalid_argument("Unknown observable in getBinningParametersForObservablesAnalysis function!");
+    }
+    return returnValue;
 }
