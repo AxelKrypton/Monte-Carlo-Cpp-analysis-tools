@@ -23,9 +23,9 @@
 
 #include "Mean.hpp"
 
-#include "../../Parameters/Parameters.hpp"
-#include "../binning.hpp"
-#include "../dataSampleTestUtilities.hpp"
+#include "../Parameters/Parameters.hpp"
+#include "../dataAnalysisUtilities/binning.hpp"
+#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"
 #include "TestUtilities.hpp"
 
 static void testMeanAndError(DataSample sample, EstimateAndError expectedMeanAndError, Parameters* parameters = nullptr,

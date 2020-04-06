@@ -23,7 +23,7 @@
 #define BOOST_TEST_MODULE MomentsReweighter_objects
 #include "MomentsReweighter.hpp"
 
-#include "../dataAnalysisUtilities/Quantities/Moments.hpp"
+#include "../Quantities/Moments.hpp"
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"  // For realFloatPrecisionInPercent
 #include "MomentsReweighterHelper.hpp"
 #include "Reweighter.hpp"

@@ -19,9 +19,9 @@
 
 #include "AbstractQuantity.hpp"
 
-#include "../binning.hpp"
-#include "../dataAnalysisUtilities.hpp"
-#include "../jackknifeAnalysis.hpp"
+#include "../dataAnalysisUtilities/binning.hpp"
+#include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
+#include "../dataAnalysisUtilities/jackknifeAnalysis.hpp"
 #include "Tools.hpp"
 
 QuantityAbstract::QuantityAbstract(bool isMeanKnownToBeZero) : value(NAN, NAN), isMeanZero(isMeanKnownToBeZero) {}

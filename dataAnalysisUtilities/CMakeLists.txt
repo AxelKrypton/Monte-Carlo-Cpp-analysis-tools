@@ -26,16 +26,8 @@ add_library(dataAnalysisUtilities
 	jackknifeAnalysis.cpp
 	bootstrapAnalysis.cpp
 	binning.cpp
-	Quantities/Moments.cpp
-	Quantities/Quantities.cpp
-	Quantities/AbstractQuantity.cpp
-	Quantities/Mean.cpp
-	Quantities/Variance.cpp
-	Quantities/Skewness.cpp
-	Quantities/Kurtosis.cpp
-	Quantities/Tools.cpp
 )
-target_link_libraries(dataAnalysisUtilities IO Parameters)
+target_link_libraries(dataAnalysisUtilities IO Parameters Quantities)
 
 if( USE_REW_MULTI_PRECISION )
 
@@ -47,14 +39,6 @@ if( USE_REW_MULTI_PRECISION )
 		jackknifeAnalysis.cpp
 		bootstrapAnalysis.cpp
 		binning.cpp
-		Quantities/Moments.cpp
-		Quantities/Quantities.cpp
-		Quantities/AbstractQuantity.cpp
-		Quantities/Mean.cpp
-		Quantities/Variance.cpp
-		Quantities/Skewness.cpp
-		Quantities/Kurtosis.cpp
-		Quantities/Tools.cpp
 	)
 	target_compile_definitions(supportSourceForMultiprecisionReweighting PUBLIC -D_USE_BIG_FLOAT_)
 	target_link_libraries(supportSourceForMultiprecisionReweighting IO Parameters ${MPFR_LIBRARIES})
@@ -79,9 +63,3 @@ add_unit_test(dataSample DataSample_test dataAnalysisUtilities)
 add_unit_test(binnedDataSample binnedDataSample_test dataAnalysisUtilities)
 add_unit_test(jackknifeEstimators jackknifeEstimators_test dataAnalysisUtilities)
 add_unit_test(dataAnalysisUtilities dataAnalysisUtilities_test dataAnalysisUtilities Parameters)
-add_unit_test(moments Quantities/Moments_test dataAnalysisUtilities)
-add_unit_test(quantities Quantities/Quantities_test dataAnalysisUtilities)
-add_unit_test(mean Quantities/Mean_test dataAnalysisUtilities)
-add_unit_test(variance Quantities/Variance_test dataAnalysisUtilities)
-add_unit_test(skewness Quantities/Skewness_test dataAnalysisUtilities)
-add_unit_test(kurtosis Quantities/Kurtosis_test dataAnalysisUtilities)

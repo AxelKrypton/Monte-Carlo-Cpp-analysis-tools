@@ -23,7 +23,7 @@
 #define BOOST_TEST_MODULE dataSample
 #include "dataAnalysisUtilities.hpp"
 
-#include "Quantities/TestUtilities.hpp"
+#include "../Quantities/TestUtilities.hpp"
 #include "TestDataSample.hpp"
 #include "binnedDataSample.hpp"
 #include "binning.hpp"

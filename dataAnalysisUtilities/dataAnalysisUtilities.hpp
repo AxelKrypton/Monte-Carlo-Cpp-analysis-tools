@@ -22,8 +22,8 @@
 #define DATAANALYSISUTILITIES_HPP_
 
 #include "../Parameters/Parameters.hpp"
+#include "../Quantities/EstimateAndError.hpp"
 #include "DataSample.hpp"
-#include "Quantities/EstimateAndError.hpp"
 
 /*
  * In all the quantities calculation, it is taken into account whether the mean is known to be zero or not.

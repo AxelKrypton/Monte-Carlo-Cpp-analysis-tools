@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "../../types.hpp"
-#include "../DataSample.hpp"
+#include "../dataAnalysisUtilities/DataSample.hpp"
+#include "../types.hpp"
 #include "EstimateAndError.hpp"
 #include "Moments.hpp"
 

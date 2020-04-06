@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "../DataSample.hpp"
+#include "../dataAnalysisUtilities/DataSample.hpp"
 #include "EstimateAndError.hpp"
 #include "Moments.hpp"
 

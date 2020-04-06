@@ -20,11 +20,11 @@
 
 #include "io_utilities_reweighting.hpp"
 
+#include "../Quantities/Kurtosis.hpp"
+#include "../Quantities/Mean.hpp"
+#include "../Quantities/Skewness.hpp"
+#include "../Quantities/Variance.hpp"
 #include "../Reweighting/Histogram.hpp"
-#include "../dataAnalysisUtilities/Quantities/Kurtosis.hpp"
-#include "../dataAnalysisUtilities/Quantities/Mean.hpp"
-#include "../dataAnalysisUtilities/Quantities/Skewness.hpp"
-#include "../dataAnalysisUtilities/Quantities/Variance.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <fstream>

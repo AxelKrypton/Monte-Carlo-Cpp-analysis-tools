@@ -23,7 +23,7 @@
 
 #include "Quantities.hpp"
 
-#include "../dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
+#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
 
 #include <boost/test/unit_test.hpp>
 

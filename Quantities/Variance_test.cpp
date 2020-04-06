@@ -23,7 +23,7 @@
 
 #include "Variance.hpp"
 
-#include "../dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
+#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
 #include "TestUtilities.hpp"
 
 BOOST_AUTO_TEST_SUITE(VarianceTest)

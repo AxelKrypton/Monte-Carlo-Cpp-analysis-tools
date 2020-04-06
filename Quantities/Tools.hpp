@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "../../Parameters/Parameters.hpp"
-#include "../../types.hpp"
-#include "../DataSample.hpp"
+#include "../Parameters/Parameters.hpp"
+#include "../dataAnalysisUtilities/DataSample.hpp"
+#include "../types.hpp"
 #include "Kurtosis.hpp"
 #include "Mean.hpp"
 #include "Skewness.hpp"

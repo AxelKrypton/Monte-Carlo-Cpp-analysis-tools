@@ -20,8 +20,8 @@
 #ifndef MOMENTS_HPP_
 #define MOMENTS_HPP_
 
-#include "../../types.hpp"
-#include "../DataSample.hpp"
+#include "../dataAnalysisUtilities/DataSample.hpp"
+#include "../types.hpp"
 
 #include <map>
 

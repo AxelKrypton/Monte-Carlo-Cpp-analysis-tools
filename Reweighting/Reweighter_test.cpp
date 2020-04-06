@@ -23,10 +23,10 @@
 #define BOOST_TEST_MODULE Reweighter
 #include "Reweighter.hpp"
 
-#include "../dataAnalysisUtilities/Quantities/Kurtosis.hpp"
-#include "../dataAnalysisUtilities/Quantities/Mean.hpp"
-#include "../dataAnalysisUtilities/Quantities/Skewness.hpp"
-#include "../dataAnalysisUtilities/Quantities/Variance.hpp"
+#include "../Quantities/Kurtosis.hpp"
+#include "../Quantities/Mean.hpp"
+#include "../Quantities/Skewness.hpp"
+#include "../Quantities/Variance.hpp"
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"  // For realFloatPrecisionInPercent
 
 #include <boost/test/unit_test.hpp>

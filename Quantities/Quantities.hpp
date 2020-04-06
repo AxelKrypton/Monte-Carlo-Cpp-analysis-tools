@@ -22,8 +22,8 @@
 #ifndef OBSERVABLES_HPP_
 #define OBSERVABLES_HPP_
 
-#include "../../types.hpp"
-#include "../DataSample.hpp"
+#include "../dataAnalysisUtilities/DataSample.hpp"
+#include "../types.hpp"
 #include "EstimateAndError.hpp"
 #include "Kurtosis.hpp"
 #include "Mean.hpp"
