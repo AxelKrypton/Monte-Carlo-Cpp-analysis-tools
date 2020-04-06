@@ -26,15 +26,6 @@ class Skewness : public QuantityAbstract {
     Skewness(DataSample& dataSample, Parameters parameters);
     Skewness(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
-    static const std::initializer_list<unsigned int> neededMoments;
-    static const std::initializer_list<unsigned int> neededMomentsWithZeroMean;
-    static const std::string observableName;
-    static const functionForObservable functionToCalculateQuantityWithZeroMean;
-    static const functionForObservable functionToCalculateQuantityWithNonZeroMean;
-    static const functionForObservable functionToCalculateQuantityWithMultipleEstimates;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithZeroMean;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates;
     static DataSample
     evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 

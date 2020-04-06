@@ -21,22 +21,16 @@
 
 #include "../dataAnalysisUtilities/DataSample.hpp"
 #include "../types.hpp"
+#include "Constants.hpp"
 #include "EstimateAndError.hpp"
 #include "Moments.hpp"
-
-#include <functional>
 
 class Parameters;
 
 /*
  * TODO: So far the error method is not a private member of the class, since for the raw data only Jackknife is used!
  *       Think whether put it as private member and in case do it.
- */
-
-typedef std::function<realFloat(Moments)> functionForObservable;
-typedef std::function<DataSample(MomentsEstimators)> functionForEstimators;
-typedef DataSample (*functionForEstimatorsForJackknife)(std::vector<DataSample>);
-/*
+ *
  * TODO: Change the last line above with the following:
  *           typedef std::function<DataSample(std::vector<DataSample>)> functionForEstimatorsForJackknife;
  *       Actually it could be possible that this can be completely removed and only the std::function<DataSample(MomentsEstimators)>

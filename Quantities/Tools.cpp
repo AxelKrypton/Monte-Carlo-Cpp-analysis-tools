@@ -22,16 +22,16 @@
 Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable)
 {
     Parameters tmp = parameters;
-    if (observable == Mean::observableName) {
+    if (observable == constants::observableName<Mean>) {
         tmp.binsize = tmp.binsizeMoments[1];
         tmp.numberOfBins = tmp.numberOfBinsMoments[1];
-    } else if (observable == Variance::observableName) {
+    } else if (observable == constants::observableName<Variance>) {
         tmp.binsize = tmp.binsizeCentralMoments[2];
         tmp.numberOfBins = tmp.numberOfBinsCentralMoments[2];
-    } else if (observable == Skewness::observableName) {
+    } else if (observable == constants::observableName<Skewness>) {
         tmp.binsize = std::max(tmp.binsizeCentralMoments[2], tmp.binsizeCentralMoments[3]);
         tmp.numberOfBins = std::min(tmp.numberOfBinsCentralMoments[2], tmp.numberOfBinsCentralMoments[3]);
-    } else if (observable == Kurtosis::observableName) {
+    } else if (observable == constants::observableName<Kurtosis>) {
         tmp.binsize = std::max(tmp.binsizeCentralMoments[2], tmp.binsizeCentralMoments[4]);
         tmp.numberOfBins = std::min(tmp.numberOfBinsCentralMoments[2], tmp.numberOfBinsCentralMoments[4]);
     } else {

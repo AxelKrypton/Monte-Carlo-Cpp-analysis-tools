@@ -166,7 +166,8 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters)
 
         // Set manually mean to zero if mean is known to be zero and MEAN is asked
         if (reweighterIO.isMeanKnownToBeZero
-            && find(quantitiesToBeReweighted.begin(), quantitiesToBeReweighted.end(), Mean::observableName) != quantitiesToBeReweighted.end())
+            && find(quantitiesToBeReweighted.begin(), quantitiesToBeReweighted.end(), constants::observableName<Mean>)
+                   != quantitiesToBeReweighted.end())
             setMeanToZeroAtNewPoints(observablesAtNewPoints);
     }
 }
@@ -249,20 +250,20 @@ static std::vector<std::string> getQuantitiesToBeReweighted(LqcdReweightingParam
 {
     std::vector<std::string> quantities;
     if (! parameters.getDeactivateReweightingForMean())
-        quantities.push_back(Mean::observableName);
+        quantities.push_back(constants::observableName<Mean>);
     if (! parameters.getDeactivateReweightingForVariance())
-        quantities.push_back(Variance::observableName);
+        quantities.push_back(constants::observableName<Variance>);
     if (! parameters.getDeactivateReweightingForSkewness())
-        quantities.push_back(Skewness::observableName);
+        quantities.push_back(constants::observableName<Skewness>);
     if (! parameters.getDeactivateReweightingForKurtosis())
-        quantities.push_back(Kurtosis::observableName);
+        quantities.push_back(constants::observableName<Kurtosis>);
     return quantities;
 }
 
 static std::vector<int> getBinsizesToBeUsedBasedOnObservable(std::string obsName, bool isMeanZero, std::vector<Binsizes> binsizesFromConfigFile)
 {
     std::vector<int> result;
-    if (obsName == Mean::observableName && isMeanZero)
+    if (obsName == constants::observableName<Mean> && isMeanZero)
         return result;  // Particular case, return empty object, no reweighting to be done!!
     else {
         for (size_t i = 0; i < binsizesFromConfigFile.size(); i++) {
@@ -275,14 +276,14 @@ static std::vector<int> getBinsizesToBeUsedBasedOnObservable(std::string obsName
 
 static std::initializer_list<unsigned int> getNeededMomentsBasedOnObservableName(std::string obsName, bool isMeanZero)
 {
-    if (obsName == Mean::observableName)
-        return isMeanZero ? Mean::neededMomentsWithZeroMean : Mean::neededMoments;
-    else if (obsName == Variance::observableName)
-        return isMeanZero ? Variance::neededMomentsWithZeroMean : Variance::neededMoments;
-    else if (obsName == Skewness::observableName)
-        return isMeanZero ? Skewness::neededMomentsWithZeroMean : Skewness::neededMoments;
-    else if (obsName == Kurtosis::observableName)
-        return isMeanZero ? Kurtosis::neededMomentsWithZeroMean : Kurtosis::neededMoments;
+    if (obsName == constants::observableName<Mean>)
+        return isMeanZero ? constants::neededMomentsWithZeroMean<Mean> : constants::neededMoments<Mean>;
+    else if (obsName == constants::observableName<Variance>)
+        return isMeanZero ? constants::neededMomentsWithZeroMean<Variance> : constants::neededMoments<Variance>;
+    else if (obsName == constants::observableName<Skewness>)
+        return isMeanZero ? constants::neededMomentsWithZeroMean<Skewness> : constants::neededMoments<Skewness>;
+    else if (obsName == constants::observableName<Kurtosis>)
+        return isMeanZero ? constants::neededMomentsWithZeroMean<Kurtosis> : constants::neededMoments<Kurtosis>;
     else
         throw std::invalid_argument("Unknown observable in \"getNeededMomentsBasedOnObservableName\" function!");
 }
@@ -310,7 +311,7 @@ getReweightingProceduresToBePerformedBasedOnBinsizesPerQuantity(std::map<std::st
         }
         bool isMeanCalculated = false;
         for (std::string quantity : reweightingProcedure.quantitiesConsidered) {
-            if (quantity == Mean::observableName) {
+            if (quantity == constants::observableName<Mean>) {
                 isMeanCalculated = true;
                 break;
             }
@@ -402,16 +403,16 @@ static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(
             bool useMultipleEstimate = isObservableToBeEvaluatedUsingMultipleColumns(
                 obsInFile, columnsToBeReweightedUsingMultipleColumns, numberOfReweightingParameters, mximumMomentNeeded);
             for (auto quantity : quantitiesToBeSet) {
-                if (quantity == Mean::observableName) {
+                if (quantity == constants::observableName<Mean>) {
                     observables[newPoint][obsInFile][quantity] = Mean(
                         moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
-                } else if (quantity == Variance::observableName) {
+                } else if (quantity == constants::observableName<Variance>) {
                     observables[newPoint][obsInFile][quantity] = Variance(
                         moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
-                } else if (quantity == Skewness::observableName) {
+                } else if (quantity == constants::observableName<Skewness>) {
                     observables[newPoint][obsInFile][quantity] = Skewness(
                         moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
-                } else if (quantity == Kurtosis::observableName) {
+                } else if (quantity == constants::observableName<Kurtosis>) {
                     observables[newPoint][obsInFile][quantity] = Kurtosis(
                         moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
                 } else
@@ -482,7 +483,7 @@ static void setMeanToZeroAtNewPoints(std::vector<std::vector<Quantities>>& obser
 {
     for (size_t newPoint = 0; newPoint < observables.size(); newPoint++) {
         for (size_t obsInFile = 0; obsInFile < observables[newPoint].size(); obsInFile++) {
-            EstimateAndError& meanValue = observables[newPoint][obsInFile][Mean::observableName].value;
+            EstimateAndError& meanValue = observables[newPoint][obsInFile][constants::observableName<Mean>].value;
             if (meanValue.estimate != meanValue.estimate)
                 meanValue.estimate = 0.0;
             else
@@ -508,16 +509,16 @@ setObservablesEstimatorsAtNewPointsFromMomentsEstimators(std::vector<std::vector
             bool useMultipleEstimate = isObservableToBeEvaluatedUsingMultipleColumns(
                 obsInFile, columnsToBeReweightedUsingMultipleColumns, numberOfReweightingParameters, mximumMomentNeeded);
             for (auto quantity : quantitiesToBeSet) {
-                if (quantity == Mean::observableName)
+                if (quantity == constants::observableName<Mean>)
                     observablesEstimators[newPoint][obsInFile][quantity] = Mean::evaluateObservableOnMomentEstimators(
                         momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
-                else if (quantity == Variance::observableName)
+                else if (quantity == constants::observableName<Variance>)
                     observablesEstimators[newPoint][obsInFile][quantity] = Variance::evaluateObservableOnMomentEstimators(
                         momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
-                else if (quantity == Skewness::observableName)
+                else if (quantity == constants::observableName<Skewness>)
                     observablesEstimators[newPoint][obsInFile][quantity] = Skewness::evaluateObservableOnMomentEstimators(
                         momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
-                else if (quantity == Kurtosis::observableName)
+                else if (quantity == constants::observableName<Kurtosis>)
                     observablesEstimators[newPoint][obsInFile][quantity] = Kurtosis::evaluateObservableOnMomentEstimators(
                         momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
                 else

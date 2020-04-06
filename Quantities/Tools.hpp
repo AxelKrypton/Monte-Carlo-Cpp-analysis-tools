@@ -22,10 +22,13 @@
 #include "../Parameters/Parameters.hpp"
 #include "../dataAnalysisUtilities/DataSample.hpp"
 #include "../types.hpp"
+#include "Constants.hpp"
 #include "Kurtosis.hpp"
 #include "Mean.hpp"
 #include "Skewness.hpp"
 #include "Variance.hpp"
+
+#include <type_traits>
 
 Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable);
 void printBinningInformation(const Parameters& parameters, std::string observable);
@@ -59,48 +62,29 @@ template<typename T> static T getPowerOfFirstMomentUsingSeveralEstimate(const st
 template<typename OBSERVABLE>
 functionForObservable pickUpCorrectFunctionForObservable(const bool isMeanZero, const bool useMultipleEstimate)
 {
-    if (isMeanZero)
-        return OBSERVABLE::functionToCalculateQuantityWithZeroMean;
-    else {
-        if (useMultipleEstimate)
-            return OBSERVABLE::functionToCalculateQuantityWithMultipleEstimates;
+    if (isMeanZero) {
+        if (std::is_same_v<OBSERVABLE, Mean>)
+            throw std::logic_error("Attempt to get function to calculate mean but isMeanZero==true!");
         else
-            return OBSERVABLE::functionToCalculateQuantityWithNonZeroMean;
+            return constants::functionToCalculateQuantityWithZeroMean<OBSERVABLE>;
+    } else {
+        if (useMultipleEstimate)
+            return constants::functionToCalculateQuantityWithMultipleEstimates<OBSERVABLE>;
+        else
+            return constants::functionToCalculateQuantityWithNonZeroMean<OBSERVABLE>;
     }
 }
 template<typename OBSERVABLE> functionForEstimators pickUpCorrectFunctionForEstimator(const bool isMeanZero, const bool useMultipleEstimate)
 {
-    if (isMeanZero)
-        return OBSERVABLE::functionToBeAppliedToEstimatorsWithZeroMean;
-    else {
-        if (useMultipleEstimate)
-            return OBSERVABLE::functionToBeAppliedToEstimatorsWithMultipleEstimates;
+    if (isMeanZero) {
+        if (std::is_same_v<OBSERVABLE, Mean>)
+            throw std::logic_error("Attempt to get function to calculate mean estimators but isMeanZero==true!");
         else
-            return OBSERVABLE::functionToBeAppliedToEstimatorsWithNonZeroMean;
-    }
-}
-// Specialization for Mean case (we want to throw in the zeroMean case!) https://stackoverflow.com/a/10536588
-template<> inline functionForObservable pickUpCorrectFunctionForObservable<Mean>(const bool isMeanZero, const bool useMultipleEstimate)
-{
-    if (isMeanZero)
-        throw std::logic_error(
-            "The Mean::getFunctionToCalculateObservable method should not be called with isMeanZero==true!! Aborting...");
-    else {
+            return constants::functionToBeAppliedToEstimatorsWithZeroMean<OBSERVABLE>;
+    } else {
         if (useMultipleEstimate)
-            return Mean::functionToCalculateQuantityWithMultipleEstimates;
+            return constants::functionToBeAppliedToEstimatorsWithMultipleEstimates<OBSERVABLE>;
         else
-            return Mean::functionToCalculateQuantityWithNonZeroMean;
-    }
-}
-template<> inline functionForEstimators pickUpCorrectFunctionForEstimator<Mean>(const bool isMeanZero, const bool useMultipleEstimate)
-{
-    if (isMeanZero)
-        throw std::logic_error(
-            "The Mean::getFunctionToBeAppliedToEstimators method should not be called with isMeanZero==true!! Aborting...");
-    else {
-        if (useMultipleEstimate)
-            return Mean::functionToBeAppliedToEstimatorsWithMultipleEstimates;
-        else
-            return Mean::functionToBeAppliedToEstimatorsWithNonZeroMean;
+            return constants::functionToBeAppliedToEstimatorsWithNonZeroMean<OBSERVABLE>;
     }
 }

@@ -29,13 +29,6 @@ class Mean : public QuantityAbstract {
     Mean(DataSample& dataSample, Parameters parameters);
     Mean(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
          bool useMultipleEstimate = false);
-    static const std::initializer_list<unsigned int> neededMoments;
-    static const std::initializer_list<unsigned int> neededMomentsWithZeroMean;
-    static const std::string observableName;
-    static const functionForObservable functionToCalculateQuantityWithNonZeroMean;
-    static const functionForObservable functionToCalculateQuantityWithMultipleEstimates;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean;
-    static const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates;
     static DataSample
     evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 

@@ -21,17 +21,6 @@
 
 #include "Tools.hpp"
 
-// Definition of the static member for the linker
-const std::initializer_list<unsigned int> Mean::neededMoments = {1};
-const std::initializer_list<unsigned int> Mean::neededMomentsWithZeroMean = {1};  // Needed for the jackknife error!
-const std::string Mean::observableName = "MEAN";
-const functionForObservable Mean::functionToCalculateQuantityWithNonZeroMean = [](Moments in) -> realFloat { return in[1]; };
-const functionForObservable Mean::functionToCalculateQuantityWithMultipleEstimates
-    = [](Moments in) -> realFloat { return getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1); };
-const functionForEstimators Mean::functionToBeAppliedToEstimatorsWithNonZeroMean = [](MomentsEstimators in) -> DataSample { return in[1]; };
-const functionForEstimators Mean::functionToBeAppliedToEstimatorsWithMultipleEstimates
-    = [](MomentsEstimators in) -> DataSample { return getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1); };
-
 Mean::Mean() : QuantityAbstract() {}
 
 Mean::Mean(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
@@ -50,12 +39,12 @@ Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, Error
 
 Parameters Mean::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
 {
-    return buildLocalParametersWithCorrectBinningInformation(parameters, Mean::observableName);
+    return buildLocalParametersWithCorrectBinningInformation(parameters, constants::observableName<Mean>);
 }
 
 void Mean::printCorrectBinningInformation(const Parameters& parameters)
 {
-    printBinningInformation(parameters, Mean::observableName);
+    printBinningInformation(parameters, constants::observableName<Mean>);
 }
 
 functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToEstimatorsForJackknife()
@@ -73,14 +62,14 @@ functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToEstimatorsForJac
     };
 }
 
-functionForEstimators Mean::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
-{
-    return pickUpCorrectFunctionForEstimator<Mean>(isMeanZero, useMultipleEstimate);
-}
-
 functionForObservable Mean::getFunctionToCalculateObservable(bool useMultipleEstimate)
 {
     return pickUpCorrectFunctionForObservable<Mean>(isMeanZero, useMultipleEstimate);
+}
+
+functionForEstimators Mean::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
+{
+    return pickUpCorrectFunctionForEstimator<Mean>(isMeanZero, useMultipleEstimate);
 }
 
 DataSample Mean::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)
@@ -90,5 +79,5 @@ DataSample Mean::evaluateObservableOnMomentEstimators(MomentsEstimators estimato
 
 std::initializer_list<unsigned int> Mean::getNeededMoments()
 {
-    return isMeanZero ? Mean::neededMomentsWithZeroMean : Mean::neededMoments;
+    return isMeanZero ? constants::neededMomentsWithZeroMean<Mean> : constants::neededMoments<Mean>;
 }

@@ -21,33 +21,6 @@
 
 #include "Tools.hpp"
 
-// Definition of the static member for the linker
-const std::initializer_list<unsigned int> Skewness::neededMoments = {1, 2, 3};
-const std::initializer_list<unsigned int> Skewness::neededMomentsWithZeroMean = {2, 3};
-const std::string Skewness::observableName = "SKEWNESS";
-const functionForObservable Skewness::functionToCalculateQuantityWithZeroMean
-    = [](Moments in) -> realFloat { return in[3] / pow(in[2], 1.5); };
-const functionForObservable Skewness::functionToCalculateQuantityWithNonZeroMean = [](Moments in) -> realFloat {
-    realFloat x1 = in[1];
-    realFloat x2 = in[2];
-    realFloat x3 = in[3];
-    return (x3 - 3 * x2 * x1 + 2 * x1 * x1 * x1) / (pow(x2 - x1 * x1, 1.5));
-};
-const functionForObservable Skewness::functionToCalculateQuantityWithMultipleEstimates = [](Moments in) -> realFloat {
-    realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
-    realFloat x2 = in[2];
-    realFloat x3 = in[3];
-    return (x3 - 3 * x2 * firstMoment + 2 * firstMoment * firstMoment * firstMoment) / (pow(x2 - firstMoment * firstMoment, 1.5));
-};
-const functionForEstimators Skewness::functionToBeAppliedToEstimatorsWithZeroMean
-    = [](MomentsEstimators in) -> DataSample { return in[3] / (in[2] ^ 1.5); };
-const functionForEstimators Skewness::functionToBeAppliedToEstimatorsWithNonZeroMean
-    = [](MomentsEstimators in) -> DataSample { return (in[3] - ((3 * in[2]) * in[1]) + (2 * (in[1] ^ 3))) / ((in[2] - (in[1] ^ 2)) ^ 1.5); };
-const functionForEstimators Skewness::functionToBeAppliedToEstimatorsWithMultipleEstimates = [](MomentsEstimators in) -> DataSample {
-    DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
-    return (in[3] - ((3 * in[2]) * firstMoment) + (2 * firstMoment * firstMoment * firstMoment)) / ((in[2] - firstMoment * firstMoment) ^ 1.5);
-};
-
 Skewness::Skewness() : QuantityAbstract() {}
 
 Skewness::Skewness(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
@@ -63,12 +36,12 @@ Skewness::Skewness(Moments moments, MomentsEstimators estimators, bool isMeanZer
 
 Parameters Skewness::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
 {
-    return buildLocalParametersWithCorrectBinningInformation(parameters, Skewness::observableName);
+    return buildLocalParametersWithCorrectBinningInformation(parameters, constants::observableName<Skewness>);
 }
 
 void Skewness::printCorrectBinningInformation(const Parameters& parameters)
 {
-    printBinningInformation(parameters, Skewness::observableName);
+    printBinningInformation(parameters, constants::observableName<Skewness>);
 }
 
 functionForEstimatorsForJackknife Skewness::getFunctionToBeAppliedToEstimatorsForJackknife()
@@ -109,5 +82,5 @@ DataSample Skewness::evaluateObservableOnMomentEstimators(MomentsEstimators esti
 
 std::initializer_list<unsigned int> Skewness::getNeededMoments()
 {
-    return isMeanZero ? Skewness::neededMomentsWithZeroMean : Skewness::neededMoments;
+    return isMeanZero ? constants::neededMomentsWithZeroMean<Skewness> : constants::neededMoments<Skewness>;
 }

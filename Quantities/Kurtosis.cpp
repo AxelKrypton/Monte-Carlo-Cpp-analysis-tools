@@ -21,39 +21,6 @@
 
 #include "Tools.hpp"
 
-// Definition of the static member for the linker
-const std::initializer_list<unsigned int> Kurtosis::neededMoments = {1, 2, 3, 4};
-const std::initializer_list<unsigned int> Kurtosis::neededMomentsWithZeroMean = {2, 4};
-const std::string Kurtosis::observableName = "KURTOSIS";
-const functionForObservable Kurtosis::functionToCalculateQuantityWithZeroMean
-    = [](Moments in) -> realFloat { return in[4] / pow(in[2], 2.0); };
-const functionForObservable Kurtosis::functionToCalculateQuantityWithNonZeroMean = [](Moments in) -> realFloat {
-    realFloat x1 = in[1];
-    realFloat x2 = in[2];
-    realFloat x3 = in[3];
-    realFloat x4 = in[4];
-    return (x4 - 4 * x3 * x1 + 6 * x2 * x1 * x1 - 3 * x1 * x1 * x1 * x1) / (pow(x2 - x1 * x1, 2.0));
-};
-const functionForObservable Kurtosis::functionToCalculateQuantityWithMultipleEstimates = [](Moments in) -> realFloat {
-    realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
-    realFloat x2 = in[2];
-    realFloat x3 = in[3];
-    realFloat x4 = in[4];
-    return (x4 - 4 * x3 * firstMoment + 6 * x2 * firstMoment * firstMoment - 3 * firstMoment * firstMoment * firstMoment * firstMoment)
-           / (pow(x2 - firstMoment * firstMoment, 2.0));
-};
-const functionForEstimators Kurtosis::functionToBeAppliedToEstimatorsWithZeroMean
-    = [](MomentsEstimators in) -> DataSample { return in[4] / (in[2] ^ 2.0); };
-const functionForEstimators Kurtosis::functionToBeAppliedToEstimatorsWithNonZeroMean = [](MomentsEstimators in) -> DataSample {
-    return (in[4] - (4 * in[3] * in[1]) + (6 * in[2] * in[1] * in[1]) - (3 * in[1] * in[1] * in[1] * in[1])) / ((in[2] - (in[1] ^ 2)) ^ 2);
-};
-const functionForEstimators Kurtosis::functionToBeAppliedToEstimatorsWithMultipleEstimates = [](MomentsEstimators in) -> DataSample {
-    DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
-    return (in[4] - (4 * in[3] * firstMoment) + (6 * in[2] * firstMoment * firstMoment)
-            - (3 * firstMoment * firstMoment * firstMoment * firstMoment))
-           / ((in[2] - (firstMoment ^ 2)) ^ 2);
-};
-
 Kurtosis::Kurtosis() : QuantityAbstract() {}
 
 Kurtosis::Kurtosis(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
@@ -69,12 +36,12 @@ Kurtosis::Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanZer
 
 Parameters Kurtosis::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
 {
-    return buildLocalParametersWithCorrectBinningInformation(parameters, Kurtosis::observableName);
+    return buildLocalParametersWithCorrectBinningInformation(parameters, constants::observableName<Kurtosis>);
 }
 
 void Kurtosis::printCorrectBinningInformation(const Parameters& parameters)
 {
-    printBinningInformation(parameters, Kurtosis::observableName);
+    printBinningInformation(parameters, constants::observableName<Kurtosis>);
 }
 
 functionForEstimatorsForJackknife Kurtosis::getFunctionToBeAppliedToEstimatorsForJackknife()
@@ -116,5 +83,5 @@ DataSample Kurtosis::evaluateObservableOnMomentEstimators(MomentsEstimators esti
 
 std::initializer_list<unsigned int> Kurtosis::getNeededMoments()
 {
-    return isMeanZero ? Kurtosis::neededMomentsWithZeroMean : Kurtosis::neededMoments;
+    return isMeanZero ? constants::neededMomentsWithZeroMean<Kurtosis> : constants::neededMoments<Kurtosis>;
 }

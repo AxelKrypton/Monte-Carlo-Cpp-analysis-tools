@@ -21,25 +21,6 @@
 
 #include "Tools.hpp"
 
-// Definition of the static member for the linker
-const std::initializer_list<unsigned int> Variance::neededMoments = {1, 2};
-const std::initializer_list<unsigned int> Variance::neededMomentsWithZeroMean = {2};
-const std::string Variance::observableName = "VARIANCE";
-const functionForObservable Variance::functionToCalculateQuantityWithZeroMean = [](Moments in) -> realFloat { return in[2]; };
-const functionForObservable Variance::functionToCalculateQuantityWithNonZeroMean
-    = [](Moments in) -> realFloat { return in[2] - in[1] * in[1]; };
-const functionForObservable Variance::functionToCalculateQuantityWithMultipleEstimates = [](Moments in) -> realFloat {
-    realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
-    return in[2] - firstMoment * firstMoment;
-};
-const functionForEstimators Variance::functionToBeAppliedToEstimatorsWithZeroMean = [](MomentsEstimators in) -> DataSample { return in[2]; };
-const functionForEstimators Variance::functionToBeAppliedToEstimatorsWithNonZeroMean
-    = [](MomentsEstimators in) -> DataSample { return in[2] - (in[1] ^ 2); };
-const functionForEstimators Variance::functionToBeAppliedToEstimatorsWithMultipleEstimates = [](MomentsEstimators in) -> DataSample {
-    DataSample firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1);
-    return in[2] - firstMoment * firstMoment;
-};
-
 Variance::Variance() : QuantityAbstract() {}
 
 Variance::Variance(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
@@ -55,12 +36,12 @@ Variance::Variance(Moments moments, MomentsEstimators estimators, bool isMeanZer
 
 Parameters Variance::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
 {
-    return buildLocalParametersWithCorrectBinningInformation(parameters, Variance::observableName);
+    return buildLocalParametersWithCorrectBinningInformation(parameters, constants::observableName<Variance>);
 }
 
 void Variance::printCorrectBinningInformation(const Parameters& parameters)
 {
-    printBinningInformation(parameters, Variance::observableName);
+    printBinningInformation(parameters, constants::observableName<Variance>);
 }
 
 functionForEstimatorsForJackknife Variance::getFunctionToBeAppliedToEstimatorsForJackknife()
@@ -98,5 +79,5 @@ DataSample Variance::evaluateObservableOnMomentEstimators(MomentsEstimators esti
 
 std::initializer_list<unsigned int> Variance::getNeededMoments()
 {
-    return isMeanZero ? Variance::neededMomentsWithZeroMean : Variance::neededMoments;
+    return isMeanZero ? constants::neededMomentsWithZeroMean<Variance> : constants::neededMoments<Variance>;
 }

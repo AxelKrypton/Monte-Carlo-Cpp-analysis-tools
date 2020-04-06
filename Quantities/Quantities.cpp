@@ -25,8 +25,8 @@ Quantities::Quantities() : mean(), variance(), skewness(), kurtosis() {}
 std::string Quantities::getMetaInformation()
 {
     std::string metaInfos = "";
-    std::vector<std::string> observableNames
-        = {Mean::observableName, Variance::observableName, Skewness::observableName, Kurtosis::observableName};
+    std::vector<std::string> observableNames = {constants::observableName<Mean>, constants::observableName<Variance>,
+                                                constants::observableName<Skewness>, constants::observableName<Kurtosis>};
     for (unsigned int index = 0; index < observableNames.size(); index++) {
         metaInfos += observableNames[index] + "\t\t\terror\t\t\t";
     }
@@ -47,13 +47,13 @@ std::string Quantities::getObservablesAsString()
 
 const QuantityAbstract& Quantities::operator[](std::string quantityLabel) const
 {
-    if (quantityLabel == Mean::observableName)
+    if (quantityLabel == constants::observableName<Mean>)
         return mean;
-    else if (quantityLabel == Variance::observableName)
+    else if (quantityLabel == constants::observableName<Variance>)
         return variance;
-    else if (quantityLabel == Skewness::observableName)
+    else if (quantityLabel == constants::observableName<Skewness>)
         return skewness;
-    else if (quantityLabel == Kurtosis::observableName)
+    else if (quantityLabel == constants::observableName<Kurtosis>)
         return kurtosis;
     else
         throw std::out_of_range("Quantities::operator[] accessed an invalid quantity!");

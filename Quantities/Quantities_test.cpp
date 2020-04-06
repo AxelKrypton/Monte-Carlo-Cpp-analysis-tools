@@ -42,10 +42,10 @@ BOOST_AUTO_TEST_SUITE(QuantitiesTest)
             BOOST_REQUIRE_NE(quantity.error, quantity.error);
         }
         // Test names
-        BOOST_REQUIRE_EQUAL(Mean::observableName, labels[0]);
-        BOOST_REQUIRE_EQUAL(Variance::observableName, labels[1]);
-        BOOST_REQUIRE_EQUAL(Skewness::observableName, labels[2]);
-        BOOST_REQUIRE_EQUAL(Kurtosis::observableName, labels[3]);
+        BOOST_REQUIRE_EQUAL(constants::observableName<Mean>, labels[0]);
+        BOOST_REQUIRE_EQUAL(constants::observableName<Variance>, labels[1]);
+        BOOST_REQUIRE_EQUAL(constants::observableName<Skewness>, labels[2]);
+        BOOST_REQUIRE_EQUAL(constants::observableName<Kurtosis>, labels[3]);
     }
 
     BOOST_AUTO_TEST_CASE(accessOperator)
