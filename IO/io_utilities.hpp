@@ -22,7 +22,6 @@
 #define IO_UTILITIES_HPP_
 
 #include "../Parameters/Parameters.hpp"
-#include "../Quantities/Quantities.hpp"
 
 #include <iostream>
 
