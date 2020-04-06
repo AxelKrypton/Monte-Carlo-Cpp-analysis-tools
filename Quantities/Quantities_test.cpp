@@ -23,15 +23,13 @@
 
 #include "Quantities.hpp"
 
-#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
-
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(QuantitiesTest)
 
     const std::vector<std::string> labels = {"MEAN", "VARIANCE", "SKEWNESS", "KURTOSIS"};
 
-    BOOST_AUTO_TEST_CASE(build)
+    BOOST_AUTO_TEST_CASE(build1)
     {
         BOOST_REQUIRE_NO_THROW(Quantities quantities);
         Quantities quantities;
@@ -46,6 +44,13 @@ BOOST_AUTO_TEST_SUITE(QuantitiesTest)
         BOOST_REQUIRE_EQUAL(constants::observableName<Variance>, labels[1]);
         BOOST_REQUIRE_EQUAL(constants::observableName<Skewness>, labels[2]);
         BOOST_REQUIRE_EQUAL(constants::observableName<Kurtosis>, labels[3]);
+    }
+
+    BOOST_AUTO_TEST_CASE(build2)
+    {
+        // Parameters parameters(0, NULL);
+        // DataSample sample;
+        // BOOST_REQUIRE_NO_THROW(Quantities quantities(sample, parameters));
     }
 
     BOOST_AUTO_TEST_CASE(accessOperator)

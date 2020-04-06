@@ -23,7 +23,7 @@
 
 Kurtosis::Kurtosis() : QuantityAbstract() {}
 
-Kurtosis::Kurtosis(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
+Kurtosis::Kurtosis(DataSample& dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);
 }
@@ -34,12 +34,7 @@ Kurtosis::Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanZer
     calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }
 
-Parameters Kurtosis::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
-{
-    return buildLocalParametersWithCorrectBinningInformation(parameters, constants::observableName<Kurtosis>);
-}
-
-void Kurtosis::printCorrectBinningInformation(const Parameters& parameters)
+void Kurtosis::printCorrectBinningInformation(const BinningParameters& parameters)
 {
     printBinningInformation(parameters, constants::observableName<Kurtosis>);
 }

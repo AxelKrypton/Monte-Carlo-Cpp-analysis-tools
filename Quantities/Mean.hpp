@@ -24,9 +24,11 @@
 #include <initializer_list>
 #include <iostream>
 
+class Parameters;
+
 class Mean : public QuantityAbstract {
   public:
-    Mean(DataSample& dataSample, Parameters parameters);
+    Mean(DataSample& dataSample, BinningParameters parameters, bool isMeanZero = false);
     Mean(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
          bool useMultipleEstimate = false);
     static DataSample
@@ -34,8 +36,7 @@ class Mean : public QuantityAbstract {
 
   private:
     Mean();
-    Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
-    void printCorrectBinningInformation(const Parameters& parameters);
+    void printCorrectBinningInformation(const BinningParameters& parameters);
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
     functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
     functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);

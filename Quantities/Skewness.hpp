@@ -23,7 +23,7 @@
 
 class Skewness : public QuantityAbstract {
   public:
-    Skewness(DataSample& dataSample, Parameters parameters);
+    Skewness(DataSample& dataSample, BinningParameters parameters, bool isMeanZero = false);
     Skewness(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
     static DataSample
@@ -31,8 +31,7 @@ class Skewness : public QuantityAbstract {
 
   private:
     Skewness();
-    Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
-    void printCorrectBinningInformation(const Parameters& parameters);
+    void printCorrectBinningInformation(const BinningParameters& parameters);
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
     functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
     functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);

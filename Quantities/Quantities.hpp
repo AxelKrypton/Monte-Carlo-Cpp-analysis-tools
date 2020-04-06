@@ -22,7 +22,6 @@
 #ifndef OBSERVABLES_HPP_
 #define OBSERVABLES_HPP_
 
-#include "../dataAnalysisUtilities/DataSample.hpp"
 #include "../types.hpp"
 #include "EstimateAndError.hpp"
 #include "Kurtosis.hpp"
@@ -33,6 +32,7 @@
 #include <functional>
 #include <sstream>
 
+class DataSample;
 class Parameters;
 class Moments;
 class MomentsEstimators;
@@ -49,6 +49,7 @@ class MomentsEstimators;
 class Quantities {
   public:
     Quantities();
+    Quantities(DataSample& dataSample, Parameters parameters);
     const QuantityAbstract& operator[](std::string quantityLabel) const;
     QuantityAbstract& operator[](std::string quantityLabel);
 

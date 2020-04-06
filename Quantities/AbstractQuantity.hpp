@@ -25,7 +25,7 @@
 #include "EstimateAndError.hpp"
 #include "Moments.hpp"
 
-class Parameters;
+class BinningParameters;
 
 /*
  * TODO: So far the error method is not a private member of the class, since for the raw data only Jackknife is used!
@@ -49,18 +49,18 @@ class QuantityAbstract {
 
   protected:
     // Calculation from raw data
-    void calculateAndSetValueAndError(DataSample& dataSample, Parameters parameters);
+    void calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters);
     // Calculation for Reweighting
     void calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
                                       bool useMultipleEstimate);
     bool isMeanZero;
 
   private:
-    std::vector<DataSample> getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const Parameters& parameters);
+    std::vector<DataSample> getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const BinningParameters& parameters);
     std::vector<DataSample> calculateNeededMomentsPerDataPoint(DataSample& dataSample);
     // Virtual method that must be provided by children classes
-    virtual Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters) = 0;
-    virtual void printCorrectBinningInformation(const Parameters& parameters) = 0;
+    // virtual Parameters getLocalParametersWithCorrectBinningInformation(const BinningParameters& parameters) = 0;
+    virtual void printCorrectBinningInformation(const BinningParameters& parameters) = 0;
     virtual functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() = 0;
     virtual functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false) = 0;
     virtual functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false) = 0;

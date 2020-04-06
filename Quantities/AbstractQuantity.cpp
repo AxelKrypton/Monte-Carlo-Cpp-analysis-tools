@@ -26,12 +26,12 @@
 
 QuantityAbstract::QuantityAbstract(bool isMeanKnownToBeZero) : value(NAN, NAN), isMeanZero(isMeanKnownToBeZero) {}
 
-void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, Parameters parameters)
+void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)
 {
     std::vector<DataSample> neededMomentsPerDataPoint = calculateNeededMomentsPerDataPoint(dataSample);
-    Parameters binningParameters = getLocalParametersWithCorrectBinningInformation(parameters);
-    printCorrectBinningInformation(binningParameters);
-    std::vector<DataSample> binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, binningParameters);
+    printCorrectBinningInformation(parameters);
+    std::vector<DataSample> binnedMomentsPerDataPoint
+        = (parameters.performBinning) ? getBinnedNeededMoments(neededMomentsPerDataPoint, parameters) : neededMomentsPerDataPoint;
     value = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
     if (isMeanZero && dynamic_cast<Mean*>(this) != nullptr) {
         std::cout << "# MEAN is known to be zero, setting calculated value ( " << value.estimate << " ) to zero.\n";
@@ -55,7 +55,8 @@ std::vector<DataSample> QuantityAbstract::calculateNeededMomentsPerDataPoint(Dat
     return returnVec;
 }
 
-std::vector<DataSample> QuantityAbstract::getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const Parameters& parameters)
+std::vector<DataSample>
+QuantityAbstract::getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const BinningParameters& parameters)
 {
     std::vector<DataSample> returnData;
     for (size_t i = 0; i < dataSampleToBeBinned.size(); i++)

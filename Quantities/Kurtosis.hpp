@@ -23,7 +23,7 @@
 
 class Kurtosis : public QuantityAbstract {
   public:
-    Kurtosis(DataSample& dataSample, Parameters parameters);
+    Kurtosis(DataSample& dataSample, BinningParameters parameters, bool isMeanZero = false);
     Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
     static DataSample
@@ -31,8 +31,7 @@ class Kurtosis : public QuantityAbstract {
 
   private:
     Kurtosis();
-    Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
-    void printCorrectBinningInformation(const Parameters& parameters);
+    void printCorrectBinningInformation(const BinningParameters& parameters);
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
     functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
     functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);

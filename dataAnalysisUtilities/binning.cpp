@@ -22,16 +22,14 @@
 
 #include "binnedDataSample.hpp"
 
-DataSample performBinning(DataSample& rawData, const Parameters parameters)
+DataSample performBinning(DataSample& rawData, const BinningParameters& parameters)
 {
-    if (! parameters.doNotUseBinning) {
+    if (parameters.performBinning) {
         std::cout << "# Perform binning on data sample..." << std::endl;
-        if (parameters.useNumberOfBinsForBinning) {
-            return performBinningFromNumberOfBins(
-                rawData, parameters.numberOfBins, parameters.adjustDataSampleSizeToBinning, parameters.binningMustFitDataSampleSize);
+        if (parameters.useNumberOfBins) {
+            return performBinningFromNumberOfBins(rawData, parameters.number, parameters.adjustDataSample, parameters.binningMustFitDataSample);
         } else {
-            return performBinningFromBinsize(
-                rawData, parameters.binsize, parameters.adjustDataSampleSizeToBinning, parameters.binningMustFitDataSampleSize);
+            return performBinningFromBinsize(rawData, parameters.number, parameters.adjustDataSample, parameters.binningMustFitDataSample);
         }
     } else {
         throw std::invalid_argument("Binning requested, but have different inputparameters!");

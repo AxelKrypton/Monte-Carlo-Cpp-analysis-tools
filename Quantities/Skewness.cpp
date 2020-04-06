@@ -23,7 +23,7 @@
 
 Skewness::Skewness() : QuantityAbstract() {}
 
-Skewness::Skewness(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
+Skewness::Skewness(DataSample& dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);
 }
@@ -34,12 +34,7 @@ Skewness::Skewness(Moments moments, MomentsEstimators estimators, bool isMeanZer
     calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }
 
-Parameters Skewness::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
-{
-    return buildLocalParametersWithCorrectBinningInformation(parameters, constants::observableName<Skewness>);
-}
-
-void Skewness::printCorrectBinningInformation(const Parameters& parameters)
+void Skewness::printCorrectBinningInformation(const BinningParameters& parameters)
 {
     printBinningInformation(parameters, constants::observableName<Skewness>);
 }

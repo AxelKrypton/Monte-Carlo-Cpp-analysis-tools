@@ -23,7 +23,7 @@
 
 Mean::Mean() : QuantityAbstract() {}
 
-Mean::Mean(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
+Mean::Mean(DataSample& dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);
 }
@@ -37,12 +37,7 @@ Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, Error
         calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }
 
-Parameters Mean::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
-{
-    return buildLocalParametersWithCorrectBinningInformation(parameters, constants::observableName<Mean>);
-}
-
-void Mean::printCorrectBinningInformation(const Parameters& parameters)
+void Mean::printCorrectBinningInformation(const BinningParameters& parameters)
 {
     printBinningInformation(parameters, constants::observableName<Mean>);
 }

@@ -36,34 +36,13 @@ realFloat evaluateErrorBasedOnMethod(DataSample dataSample, ErrorCalculationMeth
         throw std::logic_error("Unknown error method in \"evaluateErrorBasedOnMethod\"! Aborting...");
 }
 
-static Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable)
-{
-    Parameters tmp = parameters;
-    if (observable == "mean") {
-        tmp.binsize = tmp.binsizeMoments[1];
-        tmp.numberOfBins = tmp.numberOfBinsMoments[1];
-    } else if (observable == "variance") {
-        tmp.binsize = tmp.binsizeCentralMoments[2];
-        tmp.numberOfBins = tmp.numberOfBinsCentralMoments[2];
-    } else if (observable == "skewness") {
-        tmp.binsize = std::max(tmp.binsizeCentralMoments[2], tmp.binsizeCentralMoments[3]);
-        tmp.numberOfBins = std::min(tmp.numberOfBinsCentralMoments[2], tmp.numberOfBinsCentralMoments[3]);
-    } else if (observable == "kurtosis") {
-        tmp.binsize = std::max(tmp.binsizeCentralMoments[2], tmp.binsizeCentralMoments[4]);
-        tmp.numberOfBins = std::min(tmp.numberOfBinsCentralMoments[2], tmp.numberOfBinsCentralMoments[4]);
-    } else {
-        throw std::invalid_argument("Unknown observable in buildLocalParametersWithCorrectBinningInformation function!");
-    }
-    return tmp;
-}
-
-static void printBinningInformation(const Parameters& parameters, std::string observable)
+static void printBinningInformation(const BinningParameters& parameters, std::string observable)
 {
     std::cout << "# Performing binning in " << observable << " calculation using ";
-    if (parameters.useNumberOfBinsForBinning)
-        std::cout << parameters.numberOfBins << " as number of bins!\n";
+    if (parameters.useNumberOfBins)
+        std::cout << parameters.number << " as number of bins!\n";
     else
-        std::cout << parameters.binsize << " as binsize!\n";
+        std::cout << parameters.number << " as binsize!\n";
 }
 
 static realFloat meanOfDataSample(DataSample& sampleIn)
@@ -98,7 +77,7 @@ EstimateAndError calcMeanAndErrorOfUncorrelatedDataSample(DataSample& sampleIn, 
 
 EstimateAndError calcMeanAndErrorOfDataSample(DataSample sampleIn, Parameters parameters)
 {
-    Parameters binningParameters = buildLocalParametersWithCorrectBinningInformation(parameters, "mean");
+    BinningParameters binningParameters = parameters.getBinningParametersForObservablesAnalysis("MEAN");
     printBinningInformation(binningParameters, "MEAN");
     DataSample binnedData = performBinning(sampleIn, binningParameters);
 
@@ -152,7 +131,7 @@ calcVarianceAndError(DataSample& sampleIn, bool isMeanKnownToBeZero, Parameters*
 
     DataSample varianceSample = isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(2) : sampleIn.getNthCentralMomentPerDataPoint(2);
     if (shouldUseBinning) {
-        Parameters binningParameters = buildLocalParametersWithCorrectBinningInformation(*parameters, "variance");
+        BinningParameters binningParameters = parameters->getBinningParametersForObservablesAnalysis("VARIANCE");
         printBinningInformation(binningParameters, "VARIANCE");
         DataSample binnedData = performBinning(varianceSample, binningParameters);
         error = unbiasedErrorOfVariance(binnedData);
@@ -189,7 +168,7 @@ EstimateAndError calcSkewnessAndErrorOfDataSample(DataSample sampleIn, Parameter
     DataSample secondCentralMomentSample = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(2)
                                                                           : sampleIn.getNthCentralMomentPerDataPoint(2);
 
-    Parameters binningParameters = buildLocalParametersWithCorrectBinningInformation(parameters, "skewness");
+    BinningParameters binningParameters = parameters.getBinningParametersForObservablesAnalysis("SKEWNESS");
     printBinningInformation(binningParameters, "SKEWNESS");
     DataSample binnedSample1 = performBinning(thirdCentralMomentSample, binningParameters);
     DataSample binnedSample2 = performBinning(secondCentralMomentSample, binningParameters);
@@ -218,7 +197,7 @@ EstimateAndError calcKurtosisAndErrorOfDataSample(DataSample sampleIn, Parameter
     DataSample secondCentralMoment = parameters.isMeanKnownToBeZero ? sampleIn.getNthMomentPerDataPoint(2)
                                                                     : sampleIn.getNthCentralMomentPerDataPoint(2);
 
-    Parameters binningParameters = buildLocalParametersWithCorrectBinningInformation(parameters, "kurtosis");
+    BinningParameters binningParameters = parameters.getBinningParametersForObservablesAnalysis("KURTOSIS");
     printBinningInformation(binningParameters, "KURTOSIS");
     DataSample binnedSample1 = performBinning(fourthCentralMoment, binningParameters);
     DataSample binnedSample2 = performBinning(secondCentralMoment, binningParameters);

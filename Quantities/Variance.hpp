@@ -21,9 +21,11 @@
 
 #include "AbstractQuantity.hpp"
 
+class Parameters;
+
 class Variance : public QuantityAbstract {
   public:
-    Variance(DataSample& dataSample, Parameters parameters);
+    Variance(DataSample& dataSample, BinningParameters parameters, bool isMeanZero = false);
     Variance(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
     static DataSample
@@ -31,8 +33,7 @@ class Variance : public QuantityAbstract {
 
   private:
     Variance();
-    Parameters getLocalParametersWithCorrectBinningInformation(const Parameters& parameters);
-    void printCorrectBinningInformation(const Parameters& parameters);
+    void printCorrectBinningInformation(const BinningParameters& parameters);
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
     functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
     functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);

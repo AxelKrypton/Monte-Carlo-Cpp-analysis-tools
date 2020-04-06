@@ -20,7 +20,22 @@
 
 #include "Quantities.hpp"
 
+#include "../Parameters/Parameters.hpp"
+#include "../dataAnalysisUtilities/DataSample.hpp"
+#include "Constants.hpp"
+
 Quantities::Quantities() : mean(), variance(), skewness(), kurtosis() {}
+
+Quantities::Quantities(DataSample& dataSample, Parameters parameters)
+    : mean(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Mean>), parameters.isMeanKnownToBeZero)
+    , variance(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Variance>),
+               parameters.isMeanKnownToBeZero)
+    , skewness(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Skewness>),
+               parameters.isMeanKnownToBeZero)
+    , kurtosis(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Kurtosis>),
+               parameters.isMeanKnownToBeZero)
+{
+}
 
 std::string Quantities::getMetaInformation()
 {

@@ -23,7 +23,7 @@
 
 Variance::Variance() : QuantityAbstract() {}
 
-Variance::Variance(DataSample& dataSample, Parameters parameters) : QuantityAbstract(parameters.isMeanKnownToBeZero)
+Variance::Variance(DataSample& dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);
 }
@@ -34,12 +34,7 @@ Variance::Variance(Moments moments, MomentsEstimators estimators, bool isMeanZer
     calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }
 
-Parameters Variance::getLocalParametersWithCorrectBinningInformation(const Parameters& parameters)
-{
-    return buildLocalParametersWithCorrectBinningInformation(parameters, constants::observableName<Variance>);
-}
-
-void Variance::printCorrectBinningInformation(const Parameters& parameters)
+void Variance::printCorrectBinningInformation(const BinningParameters& parameters)
 {
     printBinningInformation(parameters, constants::observableName<Variance>);
 }

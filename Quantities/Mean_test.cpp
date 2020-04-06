@@ -28,33 +28,27 @@
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"
 #include "TestUtilities.hpp"
 
-static void testMeanAndError(DataSample sample, EstimateAndError expectedMeanAndError, Parameters* parameters = nullptr,
-                             realFloat testPrecision = realFloatPrecisionInPercent)
+static void testMeanAndError(DataSample sample, EstimateAndError expectedMeanAndError)
 {
-    bool deleteParameters = false;
-    if (parameters == nullptr) {
-        std::string meanZeroOption = "-m" + std::to_string(expectedMeanAndError.estimate == 0.0);
-        const char* arguments[] = {"foo", "fileName", "--binsize=1", meanZeroOption.c_str()};
-        parameters = new Parameters(4, arguments);
-        deleteParameters = true;
-    }
-    Mean mean(sample, *parameters);
-    checkEstimateAndError(expectedMeanAndError, mean.value, testPrecision);
-    if (deleteParameters)
-        delete parameters;
+    BinningParameters parameters;
+    Mean mean(sample, parameters, (expectedMeanAndError.estimate == 0.0));
+    checkEstimateAndError(expectedMeanAndError, mean.value, realFloatPrecisionInPercent);
 }
 
 static void testMeanAndErrorFromFile(std::string file, int binsizeOrNumberOfBins, bool useBinsize, EstimateAndError expectedMeanAndError,
                                      realFloat testPrecision)
 {
-    std::string argumentFile = "--file=" + file;
-    std::string argumentBinsize = useBinsize ? "--binsize=" : "--numberOfBins=";
-    argumentBinsize += std::to_string(binsizeOrNumberOfBins);
-    std::string meanZeroOption = "-m" + std::to_string(expectedMeanAndError.estimate == 0.0);
-    const char* arguments[] = {"foo", argumentFile.c_str(), argumentBinsize.c_str(), meanZeroOption.c_str()};
-    Parameters parameters(4, arguments);
+    std::vector<std::string> options;
+    options.push_back("foo");
+    options.push_back("--file=" + file);
+    options.push_back(useBinsize ? "--binsize=" : "--numberOfBins=");
+    options.back() += std::to_string(binsizeOrNumberOfBins);
+    options.push_back("-m" + std::to_string(expectedMeanAndError.estimate == 0.0));
+    Parameters parameters(options);
     DataSample sample(file);
-    testMeanAndError(sample, expectedMeanAndError, &parameters, testPrecision);
+    Mean mean(sample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Mean>),
+              (expectedMeanAndError.estimate == 0.0));
+    checkEstimateAndError(expectedMeanAndError, mean.value, testPrecision);
 }
 
 BOOST_AUTO_TEST_SUITE(meanAndError)

@@ -40,11 +40,11 @@ Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& p
     return tmp;
 }
 
-void printBinningInformation(const Parameters& parameters, std::string observable)
+void printBinningInformation(const BinningParameters& parameters, std::string observable)
 {
     std::cout << "### Performing binning in " << observable << " calculation using ";
-    if (parameters.useNumberOfBinsForBinning)
-        std::cout << parameters.numberOfBins << " as number of bins!\n";
+    if (parameters.useNumberOfBins)
+        std::cout << parameters.number << " as number of bins!\n";
     else
-        std::cout << parameters.binsize << " as binsize!\n";
+        std::cout << parameters.number << " as binsize!\n";
 }
