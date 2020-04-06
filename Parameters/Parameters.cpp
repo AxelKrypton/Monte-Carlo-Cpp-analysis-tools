@@ -22,6 +22,14 @@
 
 #include "HelperTools.hpp"
 
+Parameters::Parameters(std::vector<std::string> argv)
+{
+    int argc = argv.size();
+    std::vector<const char*> Ptrs;
+    std::transform(std::begin(argv), std::end(argv), std::back_inserter(Ptrs), [](std::string& str) { return str.c_str(); });
+    *this = Parameters{argc, Ptrs.data()};
+}
+
 Parameters::Parameters(int argc, const char** argv)
 {
     po::options_description desc("\nProgram to analyze (correlated) data evaluating mean, variance, skewness and kurtosis.\n\n"

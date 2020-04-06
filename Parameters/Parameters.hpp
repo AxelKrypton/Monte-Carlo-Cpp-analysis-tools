@@ -32,6 +32,7 @@ namespace po = boost::program_options;
 class Parameters {
   public:
     Parameters(int argc, const char** argv);
+    Parameters(std::vector<std::string> argv);
 
     struct parse_aborted {
     };
