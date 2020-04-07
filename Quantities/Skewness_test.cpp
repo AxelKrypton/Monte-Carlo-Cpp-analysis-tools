@@ -19,14 +19,45 @@
 
 // use the boost test framework
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE XXXXX_to_be_completed_XXXXX
+#define BOOST_TEST_MODULE Skewness
 
 #include "Skewness.hpp"
 
-#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
+#include "../Parameters/Parameters.hpp"
+#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"
 #include "TestUtilities.hpp"
 
-BOOST_AUTO_TEST_SUITE(SkewnessTest)
+BOOST_AUTO_TEST_SUITE(SkewnessAndError)
+
+    const std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_1_3.dat";
+
+    BOOST_AUTO_TEST_CASE(withBinning1)
+    {
+        realFloat expectedSkewness = 1.;
+        DataSample sample(gaussianData);
+        Skewness skewness(sample, {true, false, false, false, 100});
+        realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue
+            = std::fabs(skewness.value.estimate - expectedSkewness) / skewness.value.error;
+
+        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
+        BOOST_WARN(std::fabs(skewness.value.error / skewness.value.estimate) < 0.001);
+    }
+
+    BOOST_AUTO_TEST_CASE(withBinning2)
+    {
+        realFloat expectedSkewness = 1.;
+        DataSample sample(gaussianData);
+        Skewness skewness(sample, {true, false, false, false, 100}, true);
+        realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue
+            = std::fabs(skewness.value.estimate - expectedSkewness) / skewness.value.error;
+
+        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
+        BOOST_WARN(std::fabs(skewness.value.error / skewness.value.estimate) < 0.001);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)
     {

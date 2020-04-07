@@ -19,12 +19,45 @@
 
 // use the boost test framework
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE XXXXX_to_be_completed_XXXXX
+#define BOOST_TEST_MODULE Kurtosis
 
 #include "Kurtosis.hpp"
 
-#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
+#include "../Parameters/Parameters.hpp"
+#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"
 #include "TestUtilities.hpp"
+
+BOOST_AUTO_TEST_SUITE(kurtosisAndError)
+
+    const std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_1_3.dat";
+
+    BOOST_AUTO_TEST_CASE(withBinning1)
+    {
+        realFloat expectedKurtosis = 3.;
+        DataSample sample(gaussianData);
+        Kurtosis kurtosis(sample, {true, false, false, false, 100});
+        std::cout << "Kurtosis = " << kurtosis.value.estimate << " +/- " << kurtosis.value.error << "\n";
+        realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue
+            = std::fabs(kurtosis.value.estimate - expectedKurtosis) / kurtosis.value.error;
+
+        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
+        BOOST_WARN(fabs(kurtosis.value.error / kurtosis.value.estimate) < 0.001);
+    }
+
+    BOOST_AUTO_TEST_CASE(withBinning2)
+    {
+        realFloat expectedKurtosis = 3.;
+        DataSample sample(gaussianData);
+        Kurtosis kurtosis(sample, {true, false, false, false, 100}, true);
+        std::cout << "Kurtosis = " << kurtosis.value.estimate << " +/- " << kurtosis.value.error << "\n";
+        realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue
+            = std::fabs(kurtosis.value.estimate - expectedKurtosis) / kurtosis.value.error;
+
+        BOOST_REQUIRE(NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue < 3.0);
+        BOOST_WARN(fabs(kurtosis.value.error / kurtosis.value.estimate) < 0.001);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(KurtosisTest)
 
