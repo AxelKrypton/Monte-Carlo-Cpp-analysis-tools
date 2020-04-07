@@ -19,6 +19,7 @@
 
 #include "Variance.hpp"
 
+#include "../dataAnalysisUtilities/binning.hpp"
 #include "Tools.hpp"
 
 Variance::Variance() : QuantityAbstract() {}
@@ -31,7 +32,25 @@ Variance::Variance(DataSample& dataSample, BinningParameters parameters, bool is
 Variance::Variance(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
     : QuantityAbstract(isMeanZero)
 {
-    calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
+    QuantityAbstract::calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
+}
+
+static realFloat unbiasedVarianceOfDataSample(DataSample&, bool);
+static realFloat unbiasedErrorOfVariance(DataSample&);
+
+void Variance::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)
+{
+    DataSample binnedVarianceSample(dataSample);
+    if (parameters.performBinning) {
+        printCorrectBinningInformation(parameters);
+        // It is important to do binning on original sample, which then gets resized discarding
+        // last elements and then the calculation ofvariance and error is on consistent samples!
+        binnedVarianceSample = performBinning(dataSample, parameters);
+    }
+    binnedVarianceSample = isMeanZero ? binnedVarianceSample.getNthMomentPerDataPoint(2)
+                                      : binnedVarianceSample.getNthCentralMomentPerDataPoint(2);
+    value.estimate = unbiasedVarianceOfDataSample(dataSample, isMeanZero);
+    value.error = unbiasedErrorOfVariance(binnedVarianceSample);
 }
 
 void Variance::printCorrectBinningInformation(const BinningParameters& parameters)
@@ -75,4 +94,54 @@ DataSample Variance::evaluateObservableOnMomentEstimators(MomentsEstimators esti
 std::initializer_list<unsigned int> Variance::getNeededMoments()
 {
     return isMeanZero ? constants::neededMomentsWithZeroMean<Variance> : constants::neededMoments<Variance>;
+}
+
+/**
+ * A Jackknife analysis of the (naive) sample variance
+ *
+ *    1/N Sum ( sample[i] - mean )^2
+ *
+ * yields that the pseudovalues are
+ *
+ *    N/(N-1) Sum ( sample[i] - mean )^2
+ *
+ * (Example 3 in "Jackknife.pdf").
+ *
+ * This means that the jackknife error estimate is
+ *
+ *    sqrt(1/(N-1) * (Variance of the pseudo-values) )
+ *
+ * Hence, one can generate a new sample with each entry x_j the "variance" of
+ * entry x_j ( (x_j - mean)^2 ) and treat it the same way as an error on a mean.
+ *
+ * NOTE: Here no bool is present to indicate a zero mean, because we are working
+ *       on a sample with the second central moment per original data point and
+ *       the mean of this sample is in general different from zero (we do not
+ *       consider the very remote case where it is known to be zero).
+ */
+static realFloat unbiasedErrorOfVariance(DataSample& sampleWithSecondCentralMomentPerDataPoint)
+{
+    return std::sqrt(1. / realFloat(sampleWithSecondCentralMomentPerDataPoint.getNumberOfElements() - 1)
+                     * sampleWithSecondCentralMomentPerDataPoint.getNthCentralMoment(2));
+}
+
+/**
+ * A biased estimate of the sample variance is the naive definition, the second central moment.
+ * An unbiased estimate of variance of the sample is
+ *
+ *    n/(n-1) * biasedEstimator(varianceOfSample)
+ *
+ * and the estimate of the variance of the mean of the sample is always:
+ *
+ *    varianceEstimator(sample) / n
+ *
+ * because of the central limit theorem. See B.A. Berg,
+ * "Markov Chain Monte Carlo Simulations and Their Statistical Analysis"
+ * Note that for the mean the unbiased variance yields the same error as jackknifing.
+ */
+static realFloat unbiasedVarianceOfDataSample(DataSample& sampleIn, bool isMeanKnownToBeZero)
+{
+    return isMeanKnownToBeZero
+               ? realFloat(sampleIn.getNumberOfElements()) / realFloat(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthMoment(2)
+               : realFloat(sampleIn.getNumberOfElements()) / realFloat(sampleIn.getNumberOfElements() - 1.) * sampleIn.getNthCentralMoment(2);
 }

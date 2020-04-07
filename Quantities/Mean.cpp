@@ -19,6 +19,7 @@
 
 #include "Mean.hpp"
 
+#include "../dataAnalysisUtilities/binning.hpp"
 #include "Tools.hpp"
 
 Mean::Mean() : QuantityAbstract() {}
@@ -32,9 +33,25 @@ Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, Error
     : QuantityAbstract(isMeanZero)
 {
     if (isMeanZero)
-        value = EstimateAndError(0.0, 0.0);
+        value = EstimateAndError(0.0, 0.0);  // TODO: Shouldn't the error still be calculated!?
     else
-        calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
+        QuantityAbstract::calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
+}
+
+void Mean::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)
+{
+    DataSample binnedSample(dataSample);
+    if (parameters.performBinning) {
+        printCorrectBinningInformation(parameters);
+        binnedSample = performBinning(dataSample, parameters);
+    }
+    if (isMeanZero) {
+        value.estimate = 0.0;
+        value.error = std::sqrt(1. / realFloat(binnedSample.getNumberOfElements() - 1) * binnedSample.getNthMoment(2));
+    } else {
+        value.estimate = binnedSample.getNthMoment(1);
+        value.error = std::sqrt(1. / realFloat(binnedSample.getNumberOfElements() - 1) * binnedSample.getNthCentralMoment(2));
+    }
 }
 
 void Mean::printCorrectBinningInformation(const BinningParameters& parameters)

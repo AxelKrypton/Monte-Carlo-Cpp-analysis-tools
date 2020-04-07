@@ -48,8 +48,12 @@ class QuantityAbstract {
     EstimateAndError value;
 
   protected:
-    // Calculation from raw data
-    void calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters);
+    /*
+     *  Calculation from raw data. Note that this is virtual since we want to implement here
+     *  a general method using jackknife, but override it avoiding jackknife when not needed,
+     *  like for the mean and for the variance where jackknife triggers only rounding errors.
+     */
+    virtual void calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters);
     // Calculation for Reweighting
     void calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
                                       bool useMultipleEstimate);

@@ -36,10 +36,11 @@ class Mean : public QuantityAbstract {
 
   private:
     Mean();
-    void printCorrectBinningInformation(const BinningParameters& parameters);
-    functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife();
-    functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false);
-    functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false);
-    std::initializer_list<unsigned int> getNeededMoments();
+    void calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters) override;
+    void printCorrectBinningInformation(const BinningParameters& parameters) override;
+    functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() override;
+    functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false) override;
+    functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false) override;
+    std::initializer_list<unsigned int> getNeededMoments() override;
     friend class Quantities;
 };
