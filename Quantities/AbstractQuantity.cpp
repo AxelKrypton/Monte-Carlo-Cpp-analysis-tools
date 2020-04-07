@@ -29,9 +29,11 @@ QuantityAbstract::QuantityAbstract(bool isMeanKnownToBeZero) : value(NAN, NAN), 
 void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)
 {
     std::vector<DataSample> neededMomentsPerDataPoint = calculateNeededMomentsPerDataPoint(dataSample);
-    printCorrectBinningInformation(parameters);
-    std::vector<DataSample> binnedMomentsPerDataPoint
-        = (parameters.performBinning) ? getBinnedNeededMoments(neededMomentsPerDataPoint, parameters) : neededMomentsPerDataPoint;
+    std::vector<DataSample> binnedMomentsPerDataPoint(neededMomentsPerDataPoint);
+    if (parameters.performBinning) {
+        printCorrectBinningInformation(parameters);
+        binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, parameters);
+    }
     value = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
     if (isMeanZero && dynamic_cast<Mean*>(this) != nullptr) {
         std::cout << "# MEAN is known to be zero, setting calculated value ( " << value.estimate << " ) to zero.\n";
