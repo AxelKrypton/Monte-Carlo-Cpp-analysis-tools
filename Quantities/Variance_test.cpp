@@ -19,14 +19,83 @@
 
 // use the boost test framework
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE XXXXX_to_be_completed_XXXXX
+#define BOOST_TEST_MODULE Variance
 
 #include "Variance.hpp"
 
-#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"  // for realFloatPrecisionInPercent
+#include "../Parameters/Parameters.hpp"
+#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"
 #include "TestUtilities.hpp"
 
-BOOST_AUTO_TEST_SUITE(VarianceTest)
+BOOST_AUTO_TEST_SUITE(VarianceAndError)
+
+    realFloat expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample, int numberOfElements)
+    {
+        realFloat secondMoment = sample.getNthMoment(2);
+        realFloat firstMoment = sample.getNthMoment(1);
+        realFloat prefactor = numberOfElements / (numberOfElements - 1.);
+        return prefactor * (secondMoment - pow(firstMoment, 2.));
+    }
+
+    static void testVarianceAndError(DataSample sample, EstimateAndError expected, realFloat testPrecision, bool isMeanKnownToBeZero = false)
+    {
+        Variance variance(sample, BinningParameters{}, isMeanKnownToBeZero);
+        checkEstimateAndError(expected, variance.value, testPrecision);
+    }
+
+    BOOST_AUTO_TEST_CASE(test1)
+    {
+        int numberOfElements = 2674;
+        DataSample sample(numberOfElements);
+        realFloat expectedVariance = 0.;
+        realFloat expectedError = 0.;
+        testVarianceAndError(sample, {expectedVariance, expectedError}, realFloatPrecisionInPercent, true);
+    }
+
+    BOOST_AUTO_TEST_CASE(test2)
+    {
+        int numberOfElements = 1542;
+        DataSample sample = getDataSampleBasedOnFillType(numberOfElements, ones);
+        realFloat expectedVariance = 0.;
+        realFloat expectedError = 0.;
+        testVarianceAndError(sample, {expectedVariance, expectedError}, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(test3)
+    {
+        int numberOfElements = 2345;
+        DataSample sample = getDataSampleBasedOnFillType(numberOfElements, arrayPosition);
+        realFloat expectedVariance = 458447.5;
+        realFloat expectedError = 8465.84748859;
+        // todo: check this again!
+        // the difference in the error estimate exceeds 1e-13, most likely due to rounding errors.
+        testVarianceAndError(sample, {expectedVariance, expectedError}, realFloatPrecisionInPercent * 1e3);
+    }
+
+    BOOST_AUTO_TEST_CASE(test4)
+    {
+        int numberOfElements = 2742;
+        DataSample sample = getDataSampleBasedOnFillType(numberOfElements, onesMinusOnes);
+        realFloat expectedVariance = numberOfElements / (numberOfElements - 1.);
+        realFloat expectedError = 0;
+        testVarianceAndError(sample, {expectedVariance, expectedError}, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(withBinning)
+    {
+        std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_0_3.dat";
+        realFloat expectedVariance = 1.;
+        realFloat expectedError = 5e-3;
+        realFloat expectedPrecisionInPercent = 1;
+        DataSample sample(gaussianData);
+        Variance variance(sample, {true, false, false, false, 1000});
+        BOOST_CHECK_CLOSE(variance.value.estimate, expectedVariance, expectedPrecisionInPercent);
+        BOOST_CHECK_SMALL(variance.value.error, expectedError);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
 
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)
     {

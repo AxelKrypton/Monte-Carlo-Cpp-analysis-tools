@@ -24,14 +24,14 @@
 #include "Mean.hpp"
 
 #include "../Parameters/Parameters.hpp"
-#include "../dataAnalysisUtilities/binning.hpp"
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"
 #include "TestUtilities.hpp"
 
+#include <boost/test/unit_test.hpp>
+
 static void testMeanAndError(DataSample sample, EstimateAndError expectedMeanAndError)
 {
-    BinningParameters parameters;
-    Mean mean(sample, parameters, (expectedMeanAndError.estimate == 0.0));
+    Mean mean(sample, BinningParameters{}, (expectedMeanAndError.estimate == 0.0));
     checkEstimateAndError(expectedMeanAndError, mean.value, realFloatPrecisionInPercent);
 }
 
@@ -143,35 +143,27 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
         testMeanAndErrorFromFile(fileThatDoesExist, binsize, true, expectedEstimateAndError, precisionOfDataInFileInPercent);
     }
 
-    /*
     BOOST_AUTO_TEST_CASE(error3)
     {
-        int binsize = 201;
-
+        int binsize = 1;
         DataSample sample(fileThatDoesExist);
-        DataSample binnedData = performBinningFromBinsize(sample, binsize);
+        Mean mean1(sample, BinningParameters{});
+        Mean mean2(sample, BinningParameters{true, false, false, false, binsize});
 
-        Mean mean1(sample, ...);
-        Mean mean2(binnedData, ...); // ... to be binning information and mean known to be 0
-
-        //Binning for mean should not change value as long as data are not discarded
-        BOOST_CHECK_CLOSE(mean1.value.estimate, mean2.value.estimate, precisionOfDataInFileInPercent);
+        // Trivial binning should not do anything
+        checkEstimateAndError(mean1.value, mean2.value, precisionOfDataInFileInPercent);
     }
 
     BOOST_AUTO_TEST_CASE(error4)
     {
-        int binsize = 100;
-        Parameters parameters = createParameters(binsize);
-
+        int binsize = 201;
         DataSample sample(fileThatDoesExist);
-        DataSample binnedData = performBinningFromBinsize(sample, binsize);
+        Mean mean1(sample, BinningParameters{});
+        Mean mean2(sample, BinningParameters{true, false, false, true, binsize});
 
-        Mean mean1(sample, ...);
-        Mean mean2(binnedData, ...); // ... to be binning information and mean known to be 0
-
-        checkEstimateAndError(mean1.value, mean2.value, precisionOfDataInFileInPercent);
+        // Binning for mean should not change estimate as long as data are not discarded
+        BOOST_CHECK_CLOSE(mean1.value.estimate, mean2.value.estimate, precisionOfDataInFileInPercent);
     }
-    */
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -199,33 +191,27 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
         testMeanAndErrorFromFile(fileThatDoesExist, numberOfBins, false, expectedEstimateAndError, precisionOfDataInFileInPercent);
     }
 
-    /*
-
-    // Adjust following two tests as those above commented out.
-
     BOOST_AUTO_TEST_CASE(error3)
     {
-        int numberOfBins = 10;
+        int numberOfBins = 1005;
         DataSample sample(fileThatDoesExist);
-        DataSample binnedData = performBinningFromNumberOfBins(sample, numberOfBins);
+        Mean mean1(sample, BinningParameters{});
+        Mean mean2(sample, BinningParameters{true, false, false, true, numberOfBins});
 
-        BOOST_CHECK_CLOSE(sample.getNthMoment(1), binnedData.getNthMoment(1), precisionOfDataInFileInPercent);
+        // Trivial binning should not do anything
+        checkEstimateAndError(mean1.value, mean2.value, precisionOfDataInFileInPercent);
     }
 
     BOOST_AUTO_TEST_CASE(error4)
     {
-        int numberOfBins = 10;
-        Parameters parameters = createParameters(numberOfBins);
-
+        int numberOfBins = 5;
         DataSample sample(fileThatDoesExist);
-        DataSample binnedData = performBinningFromNumberOfBins(sample, numberOfBins);
+        Mean mean1(sample, BinningParameters{});
+        Mean mean2(sample, BinningParameters{true, false, false, true, numberOfBins});
 
-        EstimateAndError meanAndErrorFromBinnedDataSample = calcMeanAndErrorOfUncorrelatedDataSample(binnedData);
-        EstimateAndError meanAndErrorFromDataSample = calcMeanAndErrorOfDataSample(sample, parameters);
-
-        checkEstimateAndError(meanAndErrorFromBinnedDataSample, meanAndErrorFromDataSample, precisionOfDataInFileInPercent);
+        // Binning for mean should not change estimate as long as data are not discarded
+        BOOST_CHECK_CLOSE(mean1.value.estimate, mean2.value.estimate, precisionOfDataInFileInPercent);
     }
-    */
 
 BOOST_AUTO_TEST_SUITE_END()
 
