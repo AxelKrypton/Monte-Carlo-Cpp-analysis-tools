@@ -35,10 +35,6 @@ void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, Binn
         binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, parameters);
     }
     value = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
-    if (isMeanZero && dynamic_cast<Mean*>(this) != nullptr) {
-        std::cout << "# MEAN is known to be zero, setting calculated value ( " << value.estimate << " ) to zero.\n";
-        value.estimate = 0.0;
-    }
 }
 
 void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
