@@ -21,6 +21,8 @@
 
 #include "Moments.hpp"
 
+#include <climits>
+#include <cmath>
 #include <functional>
 
 typedef std::function<realFloat(Moments)> functionForObservable;
@@ -122,20 +124,20 @@ namespace constants {
     template<> inline const std::initializer_list<unsigned int> neededMomentsWithZeroMean<Skewness> = {2, 3};
     template<>
     inline const functionForObservable
-        functionToCalculateQuantityWithZeroMean<Skewness> = [](Moments in) -> realFloat { return in[3] / pow(in[2], 1.5); };
+        functionToCalculateQuantityWithZeroMean<Skewness> = [](Moments in) -> realFloat { return in[3] / std::pow(in[2], 1.5); };
     template<>
     inline const functionForObservable functionToCalculateQuantityWithNonZeroMean<Skewness> = [](Moments in) -> realFloat {
         realFloat x1 = in[1];
         realFloat x2 = in[2];
         realFloat x3 = in[3];
-        return (x3 - 3 * x2 * x1 + 2 * x1 * x1 * x1) / (pow(x2 - x1 * x1, 1.5));
+        return (x3 - 3 * x2 * x1 + 2 * x1 * x1 * x1) / (std::pow(x2 - x1 * x1, 1.5));
     };
     template<>
     inline const functionForObservable functionToCalculateQuantityWithMultipleEstimates<Skewness> = [](Moments in) -> realFloat {
         realFloat firstMoment = getPowerOfFirstMomentUsingSeveralEstimate<realFloat>(in(1), 1);
         realFloat x2 = in[2];
         realFloat x3 = in[3];
-        return (x3 - 3 * x2 * firstMoment + 2 * firstMoment * firstMoment * firstMoment) / (pow(x2 - firstMoment * firstMoment, 1.5));
+        return (x3 - 3 * x2 * firstMoment + 2 * firstMoment * firstMoment * firstMoment) / (std::pow(x2 - firstMoment * firstMoment, 1.5));
     };
     template<>
     inline const functionForEstimators
@@ -156,14 +158,14 @@ namespace constants {
     template<> inline const std::initializer_list<unsigned int> neededMomentsWithZeroMean<Kurtosis> = {2, 4};
     template<>
     inline const functionForObservable
-        functionToCalculateQuantityWithZeroMean<Kurtosis> = [](Moments in) -> realFloat { return in[4] / pow(in[2], 2.0); };
+        functionToCalculateQuantityWithZeroMean<Kurtosis> = [](Moments in) -> realFloat { return in[4] / std::pow(in[2], 2.0); };
     template<>
     inline const functionForObservable functionToCalculateQuantityWithNonZeroMean<Kurtosis> = [](Moments in) -> realFloat {
         realFloat x1 = in[1];
         realFloat x2 = in[2];
         realFloat x3 = in[3];
         realFloat x4 = in[4];
-        return (x4 - 4 * x3 * x1 + 6 * x2 * x1 * x1 - 3 * x1 * x1 * x1 * x1) / (pow(x2 - x1 * x1, 2.0));
+        return (x4 - 4 * x3 * x1 + 6 * x2 * x1 * x1 - 3 * x1 * x1 * x1 * x1) / (std::pow(x2 - x1 * x1, 2.0));
     };
     template<>
     inline const functionForObservable functionToCalculateQuantityWithMultipleEstimates<Kurtosis> = [](Moments in) -> realFloat {
@@ -172,7 +174,7 @@ namespace constants {
         realFloat x3 = in[3];
         realFloat x4 = in[4];
         return (x4 - 4 * x3 * firstMoment + 6 * x2 * firstMoment * firstMoment - 3 * firstMoment * firstMoment * firstMoment * firstMoment)
-               / (pow(x2 - firstMoment * firstMoment, 2.0));
+               / (std::pow(x2 - firstMoment * firstMoment, 2.0));
     };
     template<>
     inline const functionForEstimators
