@@ -23,6 +23,8 @@
 #define ESTIMATEANDERROR_HPP_
 #include "../types.hpp"
 
+#include <iostream>
+
 class EstimateAndError {
   public:
     // Here default initialisation to 0.0 is crucial, because Histogram classes rely on it!
@@ -32,5 +34,10 @@ class EstimateAndError {
     realFloat estimate;
     realFloat error;
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const EstimateAndError& value)
+{
+    return stream << value.estimate << " ± " << value.error;
+}
 
 #endif
