@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         DataSample sample = getDataSampleBasedOnFillType(numberOfElements, arrayPosition);
         realFloat expectedVariance = 458447.5;
         realFloat expectedError = 8465.84748859;
-        // todo: check this again!
+        // TODO: check this again!
         // the difference in the error estimate exceeds 1e-13, most likely due to rounding errors.
         testVarianceAndError(sample, {expectedVariance, expectedError}, realFloatPrecisionInPercent * 1e3);
     }
@@ -79,6 +79,22 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         realFloat expectedVariance = numberOfElements / (numberOfElements - 1.);
         realFloat expectedError = 0;
         testVarianceAndError(sample, {expectedVariance, expectedError}, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(test5)
+    {
+        /*
+         * This test would fail if binning was done before calculating the second central moment,
+         * because of rounding errors. The error is the standard deviation of
+         *    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+         * in the correct scenario, while it is the standard deviation of
+         *    {0.2, -0.2, 0.2, -0.2, 0.2, -0.2, 0.2, -0.2, 0.2, -0.2}
+         * in the wrong scenario and numerically this gives something in e-18.
+         */
+        int numberOfElements = 50;
+        DataSample sample = getDataSampleBasedOnFillType(numberOfElements, onesMinusOnes);
+        Variance variance(sample, {true, false, false, false, 5});
+        BOOST_REQUIRE_EQUAL(variance.value.error, 0);
     }
 
     BOOST_AUTO_TEST_CASE(withBinning)

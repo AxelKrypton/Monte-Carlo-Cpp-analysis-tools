@@ -41,15 +41,21 @@ static realFloat unbiasedErrorOfVariance(DataSample&);
 
 void Variance::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)
 {
-    DataSample binnedVarianceSample(dataSample);
+    /*
+     * ATTENTION: It is in general wrong to perform binning on the sample BEFORE calculating
+     *            the n-th (central) moment per data point. Binning must be done AFTER!
+     *            The reason boils down to a power of a sum VS a sum of powers.
+     */
+    DataSample varianceSample = isMeanZero ? dataSample.getNthMomentPerDataPoint(2) : dataSample.getNthCentralMomentPerDataPoint(2);
+    DataSample binnedVarianceSample(varianceSample);
     if (parameters.performBinning) {
         printCorrectBinningInformation(parameters);
+        binnedVarianceSample = performBinning(varianceSample, parameters);
         // It is important to do binning on original sample, which then gets resized discarding
         // last elements and then the calculation of variance and error is on consistent samples!
-        binnedVarianceSample = performBinning(dataSample, parameters);
+        // TODO: improve, e.g. just resize!
+        performBinning(dataSample, parameters);
     }
-    binnedVarianceSample = isMeanZero ? binnedVarianceSample.getNthMomentPerDataPoint(2)
-                                      : binnedVarianceSample.getNthCentralMomentPerDataPoint(2);
     value.estimate = unbiasedVarianceOfDataSample(dataSample, isMeanZero);
     value.error = unbiasedErrorOfVariance(binnedVarianceSample);
 }

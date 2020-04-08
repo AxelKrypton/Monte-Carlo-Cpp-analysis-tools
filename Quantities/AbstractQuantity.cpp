@@ -28,6 +28,11 @@ QuantityAbstract::QuantityAbstract(bool isMeanKnownToBeZero) : value(NAN, NAN), 
 
 void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)
 {
+    /*
+     * ATTENTION: It is in general wrong to perform binning on the sample BEFORE calculating
+     *            the n-th (central) moment per data point. Binning must be done AFTER!
+     *            The reason boils down to a power of a sum VS a sum of powers.
+     */
     std::vector<DataSample> neededMomentsPerDataPoint = calculateNeededMomentsPerDataPoint(dataSample);
     std::vector<DataSample> binnedMomentsPerDataPoint(neededMomentsPerDataPoint);
     if (parameters.performBinning) {
@@ -48,6 +53,11 @@ void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEsti
 std::vector<DataSample> QuantityAbstract::calculateNeededMomentsPerDataPoint(DataSample& dataSample)
 {
     std::vector<DataSample> returnVec;
+    /*
+     * NOTE: Here we always get the non-central moment because it is later in the function
+     *       provided to the jackkinfe which we consider if the mean is zero or not, but ther
+     *       we work only with non-zero moments and therefore we need to do the same here!
+     */
     for (auto i : getNeededMoments())
         returnVec.push_back(dataSample.getNthMomentPerDataPoint(i));
     return returnVec;
@@ -58,7 +68,10 @@ std::vector<DataSample>
 QuantityAbstract::getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const BinningParameters& parameters)
 {
     std::vector<DataSample> returnData;
-    for (size_t i = 0; i < dataSampleToBeBinned.size(); i++)
+    std::vector<unsigned int> moments = getNeededMoments();
+    for (size_t i = 0; i < dataSampleToBeBinned.size(); i++) {
+        std::cout << "## Moment " << moments[i] << "\n";
         returnData.push_back(performBinning(dataSampleToBeBinned[i], parameters));
+    }
     return returnData;
 }
