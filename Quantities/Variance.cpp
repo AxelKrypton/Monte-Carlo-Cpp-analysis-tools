@@ -26,7 +26,6 @@ Variance::Variance() : QuantityAbstract() {}
 
 Variance::Variance(DataSample dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
 {
-    std::cout << "parameters.useNumberOfBins = " << parameters.useNumberOfBins << "\n";
     calculateAndSetValueAndError(dataSample, parameters);
 }
 

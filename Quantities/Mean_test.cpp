@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
         Mean mean1(sample, BinningParameters{});
         Mean mean2(sample, BinningParameters{true, false, false, true, binsize});
 
-        // Binning for mean should not change estimate as long as data are not discarded
+        // Binning should not change estimate as long as data are not discarded
         BOOST_CHECK_CLOSE(mean1.value.estimate, mean2.value.estimate, precisionOfDataInFileInPercent);
     }
 
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
         Mean mean1(sample, BinningParameters{});
         Mean mean2(sample, BinningParameters{true, false, false, true, numberOfBins});
 
-        // Binning for mean should not change estimate as long as data are not discarded
+        // Binning should not change estimate as long as data are not discarded
         BOOST_CHECK_CLOSE(mean1.value.estimate, mean2.value.estimate, precisionOfDataInFileInPercent);
     }
 

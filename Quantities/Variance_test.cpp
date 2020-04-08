@@ -96,8 +96,20 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         Variance variance(sample, {true, false, false, false, 5});
         BOOST_REQUIRE_EQUAL(variance.value.error, 0);
     }
+    BOOST_AUTO_TEST_CASE(withBinning1)
+    {
+        // This file has 1005 entries, from which 5 are discarded when binning with binsize 100
+        std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
+        realFloat precisionOfDataInFileInPercent = 1e-10;
+        DataSample sample(fileThatDoesExist);
+        Variance variance1(sample, {});
+        Variance variance2(sample, {true, false, false, false, 201});
 
-    BOOST_AUTO_TEST_CASE(withBinning)
+        // Binning should not change estimate as long as data are not discarded
+        BOOST_REQUIRE_CLOSE(variance1.value.estimate, variance2.value.estimate, precisionOfDataInFileInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(withBinning2)
     {
         std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_0_3.dat";
         realFloat expectedVariance = 1.;
