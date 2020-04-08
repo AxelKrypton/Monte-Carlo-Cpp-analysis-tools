@@ -61,17 +61,7 @@ void Mean::printCorrectBinningInformation(const BinningParameters& parameters)
 
 functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToEstimatorsForJackknife()
 {
-    /*
-     * Here for the jackknife we always need f(x)=x also if the mean is known to be zero.
-     * This is necessary to get the standard deviation of the sample evaluated and the
-     * idea if the mean is known to be zero is then to set it by hand ignoring the value
-     * returned by the jackknife -> see QuantityAbstract::calculateAndSetValueAndError
-     */
-    return [](std::vector<DataSample> in) -> DataSample {
-        if (in.size() != 1)
-            throw std::invalid_argument("Invalid call to Mean function for estimators!");
-        return in[0];
-    };
+    throw std::logic_error("Forbidden to retrieve function for jackknife from Mean class!");
 }
 
 functionForObservable Mean::getFunctionToCalculateObservable(bool useMultipleEstimate)

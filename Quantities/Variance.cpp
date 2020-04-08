@@ -66,20 +66,7 @@ void Variance::printCorrectBinningInformation(const BinningParameters& parameter
 
 functionForEstimatorsForJackknife Variance::getFunctionToBeAppliedToEstimatorsForJackknife()
 {
-    if (isMeanZero)
-        return [](std::vector<DataSample> in) -> DataSample {
-            if (in.size() != 1)
-                throw std::invalid_argument("Invalid call to Variance function with zero mean for estimators!");
-            return in[0];
-        };
-    else
-        return [](std::vector<DataSample> in) -> DataSample {
-            if (in.size() != 2)
-                throw std::invalid_argument("Invalid call to Variance function for estimators!");
-            DataSample ex1 = in[0];  // estimator first moment
-            DataSample ex2 = in[1];  // estimator second moment
-            return ex2 - (ex1 ^ 2);
-        };
+    throw std::logic_error("Forbidden to retrieve function for jackknife from Variance class!");
 }
 
 functionForEstimators Variance::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
