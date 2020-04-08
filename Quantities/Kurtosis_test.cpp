@@ -27,11 +27,21 @@
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"
 #include "TestUtilities.hpp"
 
-BOOST_AUTO_TEST_SUITE(kurtosisAndError)
+BOOST_AUTO_TEST_SUITE(KurtosisAndError)
 
     const std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_1_3.dat";
 
     BOOST_AUTO_TEST_CASE(withBinning1)
+    {
+        DataSample sample(gaussianData);
+        Kurtosis kurtosis1(sample, {});
+        Kurtosis kurtosis2(sample, {true, false, false, false, 5000});
+
+        // Binning should change kurtosis estimate
+        BOOST_REQUIRE_NE(kurtosis1.value.estimate, kurtosis2.value.estimate);
+    }
+
+    BOOST_AUTO_TEST_CASE(withBinning2)
     {
         realFloat expectedKurtosis = 3.;
         DataSample sample(gaussianData);
@@ -44,7 +54,7 @@ BOOST_AUTO_TEST_SUITE(kurtosisAndError)
         BOOST_WARN(fabs(kurtosis.value.error / kurtosis.value.estimate) < 0.001);
     }
 
-    BOOST_AUTO_TEST_CASE(withBinning2)
+    BOOST_AUTO_TEST_CASE(withBinning3)
     {
         realFloat expectedKurtosis = 3.;
         DataSample sample(gaussianData);

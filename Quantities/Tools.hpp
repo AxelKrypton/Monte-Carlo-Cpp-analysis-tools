@@ -34,7 +34,7 @@ Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& p
 void printBinningInformation(const BinningParameters& parameters, std::string observable);
 
 // TODO: Implement the following function in a general way
-template<typename T> static T getPowerOfFirstMomentUsingSeveralEstimate(const std::vector<T>& estimates, const int power)
+template<typename T> T getPowerOfFirstMomentUsingSeveralEstimate(const std::vector<T>& estimates, const int power)
 {
     if (estimates.size() != 4)
         throw std::invalid_argument("So far only 4 multiple estimates are allowed in quantities calculations! Aborting...");

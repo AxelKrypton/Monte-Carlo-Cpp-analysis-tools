@@ -20,7 +20,8 @@
 
 // use the boost test framework
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE dataSample
+#define BOOST_TEST_MODULE dataAnalysisUtilities
+
 #include "dataAnalysisUtilities.hpp"
 
 #include "../Quantities/TestUtilities.hpp"

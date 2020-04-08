@@ -33,6 +33,16 @@ BOOST_AUTO_TEST_SUITE(SkewnessAndError)
 
     BOOST_AUTO_TEST_CASE(withBinning1)
     {
+        DataSample sample(gaussianData);
+        Skewness skewness1(sample, {});
+        Skewness skewness2(sample, {true, false, false, false, 5000});
+
+        // Binning should change estimate
+        BOOST_REQUIRE_NE(skewness1.value.estimate, skewness2.value.estimate);
+    }
+
+    BOOST_AUTO_TEST_CASE(withBinning2)
+    {
         realFloat expectedSkewness = 1.;
         DataSample sample(gaussianData);
         Skewness skewness(sample, {true, false, false, false, 100});
@@ -43,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(SkewnessAndError)
         BOOST_WARN(std::fabs(skewness.value.error / skewness.value.estimate) < 0.001);
     }
 
-    BOOST_AUTO_TEST_CASE(withBinning2)
+    BOOST_AUTO_TEST_CASE(withBinning3)
     {
         realFloat expectedSkewness = 1.;
         DataSample sample(gaussianData);
