@@ -23,7 +23,7 @@
 
 Kurtosis::Kurtosis() : QuantityAbstract() {}
 
-Kurtosis::Kurtosis(DataSample& dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Kurtosis::Kurtosis(DataSample dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);
 }

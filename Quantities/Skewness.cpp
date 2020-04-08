@@ -23,7 +23,7 @@
 
 Skewness::Skewness() : QuantityAbstract() {}
 
-Skewness::Skewness(DataSample& dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Skewness::Skewness(DataSample dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);
 }

@@ -53,6 +53,7 @@ std::vector<DataSample> QuantityAbstract::calculateNeededMomentsPerDataPoint(Dat
     return returnVec;
 }
 
+// ATTENTION: This function takes std::vector<DataSample> by value, since it will change it doing binning inside!
 std::vector<DataSample>
 QuantityAbstract::getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const BinningParameters& parameters)
 {

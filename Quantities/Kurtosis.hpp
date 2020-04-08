@@ -21,9 +21,13 @@
 
 #include "AbstractQuantity.hpp"
 
+/*
+ * ATTENTION: Constructor which takes DataSample must take it by value, since it will
+ *            change it doing binning inside!
+ */
 class Kurtosis : public QuantityAbstract {
   public:
-    Kurtosis(DataSample& dataSample, BinningParameters parameters, bool isMeanZero = false);
+    Kurtosis(DataSample dataSample, BinningParameters parameters, bool isMeanZero = false);
     Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
     static DataSample

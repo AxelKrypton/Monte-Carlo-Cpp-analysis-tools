@@ -24,8 +24,9 @@
 
 Variance::Variance() : QuantityAbstract() {}
 
-Variance::Variance(DataSample& dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Variance::Variance(DataSample dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
 {
+    std::cout << "parameters.useNumberOfBins = " << parameters.useNumberOfBins << "\n";
     calculateAndSetValueAndError(dataSample, parameters);
 }
 
@@ -44,7 +45,7 @@ void Variance::calculateAndSetValueAndError(DataSample& dataSample, BinningParam
     if (parameters.performBinning) {
         printCorrectBinningInformation(parameters);
         // It is important to do binning on original sample, which then gets resized discarding
-        // last elements and then the calculation ofvariance and error is on consistent samples!
+        // last elements and then the calculation of variance and error is on consistent samples!
         binnedVarianceSample = performBinning(dataSample, parameters);
     }
     binnedVarianceSample = isMeanZero ? binnedVarianceSample.getNthMomentPerDataPoint(2)

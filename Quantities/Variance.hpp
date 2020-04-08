@@ -23,9 +23,13 @@
 
 class Parameters;
 
+/*
+ * ATTENTION: Constructor which takes DataSample must take it by value, since it will
+ *            change it doing binning inside!
+ */
 class Variance : public QuantityAbstract {
   public:
-    Variance(DataSample& dataSample, BinningParameters parameters, bool isMeanZero = false);
+    Variance(DataSample dataSample, BinningParameters parameters, bool isMeanZero = false);
     Variance(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
     static DataSample

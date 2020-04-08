@@ -21,9 +21,13 @@
 
 #include "AbstractQuantity.hpp"
 
+/*
+ * ATTENTION: Constructor which takes DataSample must take it by value, since it will
+ *            change it doing binning inside!
+ */
 class Skewness : public QuantityAbstract {
   public:
-    Skewness(DataSample& dataSample, BinningParameters parameters, bool isMeanZero = false);
+    Skewness(DataSample dataSample, BinningParameters parameters, bool isMeanZero = false);
     Skewness(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
     static DataSample

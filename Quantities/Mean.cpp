@@ -24,7 +24,7 @@
 
 Mean::Mean() : QuantityAbstract() {}
 
-Mean::Mean(DataSample& dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Mean::Mean(DataSample dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
 {
     calculateAndSetValueAndError(dataSample, parameters);
 }
