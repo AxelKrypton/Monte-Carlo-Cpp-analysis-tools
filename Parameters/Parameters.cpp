@@ -257,13 +257,13 @@ BinningParameters Parameters::getBinningParametersForObservablesAnalysis(std::st
     if (observable == constants::observableName<Mean>) {
         returnValue.number = useNumberOfBinsForBinning ? numberOfBinsMoments[1] : binsizeMoments[1];
     } else if (observable == constants::observableName<Variance>) {
-        returnValue.number = useNumberOfBinsForBinning ? binsizeCentralMoments[2] : numberOfBinsCentralMoments[2];
+        returnValue.number = useNumberOfBinsForBinning ? numberOfBinsCentralMoments[2] : binsizeCentralMoments[2];
     } else if (observable == constants::observableName<Skewness>) {
-        returnValue.number = (useNumberOfBinsForBinning) ? std::max(binsizeCentralMoments[2], binsizeCentralMoments[3])
-                                                         : std::min(numberOfBinsCentralMoments[2], numberOfBinsCentralMoments[3]);
+        returnValue.number = (useNumberOfBinsForBinning) ? std::min(numberOfBinsCentralMoments[2], numberOfBinsCentralMoments[3])
+                                                         : std::max(binsizeCentralMoments[2], binsizeCentralMoments[3]);
     } else if (observable == constants::observableName<Kurtosis>) {
-        returnValue.number = (useNumberOfBinsForBinning) ? std::max(binsizeCentralMoments[2], binsizeCentralMoments[4])
-                                                         : std::min(numberOfBinsCentralMoments[2], numberOfBinsCentralMoments[4]);
+        returnValue.number = (useNumberOfBinsForBinning) ? std::min(numberOfBinsCentralMoments[2], numberOfBinsCentralMoments[4])
+                                                         : std::max(binsizeCentralMoments[2], binsizeCentralMoments[4]);
     } else {
         throw std::invalid_argument("Unknown observable in getBinningParametersForObservablesAnalysis function!");
     }
