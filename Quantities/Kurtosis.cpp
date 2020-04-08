@@ -61,14 +61,14 @@ functionForEstimatorsForJackknife Kurtosis::getFunctionToBeAppliedToEstimatorsFo
         };
 }
 
-functionForEstimators Kurtosis::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
-{
-    return pickUpCorrectFunctionForEstimator<Kurtosis>(isMeanZero, useMultipleEstimate);
-}
-
 functionForObservable Kurtosis::getFunctionToCalculateObservable(bool useMultipleEstimate)
 {
     return pickUpCorrectFunctionForObservable<Kurtosis>(isMeanZero, useMultipleEstimate);
+}
+
+functionForEstimators Kurtosis::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
+{
+    return pickUpCorrectFunctionForEstimator<Kurtosis>(isMeanZero, useMultipleEstimate);
 }
 
 DataSample Kurtosis::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)
@@ -76,7 +76,7 @@ DataSample Kurtosis::evaluateObservableOnMomentEstimators(MomentsEstimators esti
     return pickUpCorrectFunctionForEstimator<Kurtosis>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
-std::initializer_list<unsigned int> Kurtosis::getNeededMoments()
+std::initializer_list<unsigned int> Kurtosis::getNeededMoments(bool expanded)
 {
-    return isMeanZero ? constants::neededMomentsWithZeroMean<Kurtosis> : constants::neededMoments<Kurtosis>;
+    return expanded ? constants::neededMomentsExpanded<Kurtosis> : constants::neededMomentsUnexpanded<Kurtosis>;
 }

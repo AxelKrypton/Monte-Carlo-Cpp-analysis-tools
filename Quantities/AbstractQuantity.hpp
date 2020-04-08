@@ -68,5 +68,5 @@ class QuantityAbstract {
     virtual functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() = 0;
     virtual functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false) = 0;
     virtual functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false) = 0;
-    virtual std::initializer_list<unsigned int> getNeededMoments() = 0;
+    virtual std::initializer_list<unsigned int> getNeededMoments(bool expanded = false) = 0;
 };

@@ -97,9 +97,9 @@ DataSample Variance::evaluateObservableOnMomentEstimators(MomentsEstimators esti
     return pickUpCorrectFunctionForEstimator<Variance>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
-std::initializer_list<unsigned int> Variance::getNeededMoments()
+std::initializer_list<unsigned int> Variance::getNeededMoments(bool expanded)
 {
-    return isMeanZero ? constants::neededMomentsWithZeroMean<Variance> : constants::neededMoments<Variance>;
+    return expanded ? constants::neededMomentsExpanded<Variance> : constants::neededMomentsUnexpanded<Variance>;
 }
 
 /**

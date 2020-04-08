@@ -277,13 +277,13 @@ static std::vector<int> getBinsizesToBeUsedBasedOnObservable(std::string obsName
 static std::initializer_list<unsigned int> getNeededMomentsBasedOnObservableName(std::string obsName, bool isMeanZero)
 {
     if (obsName == constants::observableName<Mean>)
-        return isMeanZero ? constants::neededMomentsWithZeroMean<Mean> : constants::neededMoments<Mean>;
+        return isMeanZero ? constants::neededMomentsUnexpanded<Mean> : constants::neededMomentsExpanded<Mean>;
     else if (obsName == constants::observableName<Variance>)
-        return isMeanZero ? constants::neededMomentsWithZeroMean<Variance> : constants::neededMoments<Variance>;
+        return isMeanZero ? constants::neededMomentsUnexpanded<Variance> : constants::neededMomentsExpanded<Variance>;
     else if (obsName == constants::observableName<Skewness>)
-        return isMeanZero ? constants::neededMomentsWithZeroMean<Skewness> : constants::neededMoments<Skewness>;
+        return isMeanZero ? constants::neededMomentsUnexpanded<Skewness> : constants::neededMomentsExpanded<Skewness>;
     else if (obsName == constants::observableName<Kurtosis>)
-        return isMeanZero ? constants::neededMomentsWithZeroMean<Kurtosis> : constants::neededMoments<Kurtosis>;
+        return isMeanZero ? constants::neededMomentsUnexpanded<Kurtosis> : constants::neededMomentsExpanded<Kurtosis>;
     else
         throw std::invalid_argument("Unknown observable in \"getNeededMomentsBasedOnObservableName\" function!");
 }

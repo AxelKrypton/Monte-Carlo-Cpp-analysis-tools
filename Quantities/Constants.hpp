@@ -61,8 +61,8 @@ namespace constants {
     }
 
     template<class T> const std::string observableName = "UNKNOWN";
-    template<class T> const std::initializer_list<unsigned int> neededMoments = {UINT_MAX};
-    template<class T> const std::initializer_list<unsigned int> neededMomentsWithZeroMean = {UINT_MAX};
+    template<class T> const std::initializer_list<unsigned int> neededMomentsExpanded = {UINT_MAX};
+    template<class T> const std::initializer_list<unsigned int> neededMomentsUnexpanded = {UINT_MAX};
     template<class T>
     const functionForObservable functionToCalculateQuantityWithZeroMean = [](Moments in) -> realFloat { return in[UINT_MAX]; };
     template<class T>
@@ -80,8 +80,8 @@ namespace constants {
 
     // Template specialisations -> inline to avoid linking errors! https://stackoverflow.com/a/51987559
     template<> inline const std::string observableName<Mean> = "MEAN";
-    template<> inline const std::initializer_list<unsigned int> neededMoments<Mean> = {1};
-    template<> inline const std::initializer_list<unsigned int> neededMomentsWithZeroMean<Mean> = {1};  // Needed for the jackknife error!
+    template<> inline const std::initializer_list<unsigned int> neededMomentsExpanded<Mean> = {1};
+    template<> inline const std::initializer_list<unsigned int> neededMomentsUnexpanded<Mean> = {1};  // Needed for the jackknife error!
     template<>
     inline const functionForObservable functionToCalculateQuantityWithNonZeroMean<Mean> = [](Moments in) -> realFloat { return in[1]; };
     template<>
@@ -95,8 +95,8 @@ namespace constants {
         [](MomentsEstimators in) -> DataSample { return getPowerOfFirstMomentUsingSeveralEstimate<DataSample>(in(1), 1); };
 
     template<> inline const std::string observableName<Variance> = "VARIANCE";
-    template<> inline const std::initializer_list<unsigned int> neededMoments<Variance> = {1, 2};
-    template<> inline const std::initializer_list<unsigned int> neededMomentsWithZeroMean<Variance> = {2};
+    template<> inline const std::initializer_list<unsigned int> neededMomentsExpanded<Variance> = {1, 2};
+    template<> inline const std::initializer_list<unsigned int> neededMomentsUnexpanded<Variance> = {2};
     template<>
     inline const functionForObservable functionToCalculateQuantityWithZeroMean<Variance> = [](Moments in) -> realFloat { return in[2]; };
     template<>
@@ -120,8 +120,8 @@ namespace constants {
     };
 
     template<> inline const std::string observableName<Skewness> = "SKEWNESS";
-    template<> inline const std::initializer_list<unsigned int> neededMoments<Skewness> = {1, 2, 3};
-    template<> inline const std::initializer_list<unsigned int> neededMomentsWithZeroMean<Skewness> = {2, 3};
+    template<> inline const std::initializer_list<unsigned int> neededMomentsExpanded<Skewness> = {1, 2, 3};
+    template<> inline const std::initializer_list<unsigned int> neededMomentsUnexpanded<Skewness> = {2, 3};
     template<>
     inline const functionForObservable
         functionToCalculateQuantityWithZeroMean<Skewness> = [](Moments in) -> realFloat { return in[3] / std::pow(in[2], 1.5); };
@@ -154,8 +154,8 @@ namespace constants {
     };
 
     template<> inline const std::string observableName<Kurtosis> = "KURTOSIS";
-    template<> inline const std::initializer_list<unsigned int> neededMoments<Kurtosis> = {1, 2, 3, 4};
-    template<> inline const std::initializer_list<unsigned int> neededMomentsWithZeroMean<Kurtosis> = {2, 4};
+    template<> inline const std::initializer_list<unsigned int> neededMomentsExpanded<Kurtosis> = {1, 2, 3, 4};
+    template<> inline const std::initializer_list<unsigned int> neededMomentsUnexpanded<Kurtosis> = {2, 4};
     template<>
     inline const functionForObservable
         functionToCalculateQuantityWithZeroMean<Kurtosis> = [](Moments in) -> realFloat { return in[4] / std::pow(in[2], 2.0); };

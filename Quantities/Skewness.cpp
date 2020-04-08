@@ -60,14 +60,14 @@ functionForEstimatorsForJackknife Skewness::getFunctionToBeAppliedToEstimatorsFo
         };
 }
 
-functionForEstimators Skewness::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
-{
-    return pickUpCorrectFunctionForEstimator<Skewness>(isMeanZero, useMultipleEstimate);
-}
-
 functionForObservable Skewness::getFunctionToCalculateObservable(bool useMultipleEstimate)
 {
     return pickUpCorrectFunctionForObservable<Skewness>(isMeanZero, useMultipleEstimate);
+}
+
+functionForEstimators Skewness::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
+{
+    return pickUpCorrectFunctionForEstimator<Skewness>(isMeanZero, useMultipleEstimate);
 }
 
 DataSample Skewness::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)
@@ -75,7 +75,7 @@ DataSample Skewness::evaluateObservableOnMomentEstimators(MomentsEstimators esti
     return pickUpCorrectFunctionForEstimator<Skewness>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
-std::initializer_list<unsigned int> Skewness::getNeededMoments()
+std::initializer_list<unsigned int> Skewness::getNeededMoments(bool expanded)
 {
-    return isMeanZero ? constants::neededMomentsWithZeroMean<Skewness> : constants::neededMoments<Skewness>;
+    return expanded ? constants::neededMomentsExpanded<Skewness> : constants::neededMomentsUnexpanded<Skewness>;
 }

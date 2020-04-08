@@ -89,7 +89,7 @@ DataSample Mean::evaluateObservableOnMomentEstimators(MomentsEstimators estimato
     return pickUpCorrectFunctionForEstimator<Mean>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
-std::initializer_list<unsigned int> Mean::getNeededMoments()
+std::initializer_list<unsigned int> Mean::getNeededMoments(bool expanded)
 {
-    return isMeanZero ? constants::neededMomentsWithZeroMean<Mean> : constants::neededMoments<Mean>;
+    return expanded ? constants::neededMomentsExpanded<Mean> : constants::neededMomentsUnexpanded<Mean>;
 }

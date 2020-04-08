@@ -42,6 +42,6 @@ class Variance : public QuantityAbstract {
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() override;
     functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false) override;
     functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false) override;
-    std::initializer_list<unsigned int> getNeededMoments() override;
+    std::initializer_list<unsigned int> getNeededMoments(bool expanded = false) override;
     friend class Quantities;
 };
