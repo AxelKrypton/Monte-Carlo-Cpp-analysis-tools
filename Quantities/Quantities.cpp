@@ -26,15 +26,29 @@
 
 Quantities::Quantities() : mean(), variance(), skewness(), kurtosis() {}
 
-Quantities::Quantities(DataSample& dataSample, Parameters parameters)
-    : mean(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Mean>), parameters.isMeanKnownToBeZero)
-    , variance(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Variance>),
-               parameters.isMeanKnownToBeZero)
-    , skewness(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Skewness>),
-               parameters.isMeanKnownToBeZero)
-    , kurtosis(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Kurtosis>),
-               parameters.isMeanKnownToBeZero)
+/*
+ * NOTE: It it important to get the full parameters here and to extract the binning
+ *       information for each quantity, since the number to make binning depends
+ *       on the needed moment to calculate the quantity!
+ */
+Quantities::Quantities(const DataSample& dataSample, Parameters parameters)
 {
+    if (! parameters.doNotAnalyzeMean) {
+        mean = Mean(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Mean>),
+                    parameters.isMeanKnownToBeZero);
+    }
+    if (! parameters.doNotAnalyzeVariance) {
+        variance = Variance(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Variance>),
+                            parameters.isMeanKnownToBeZero);
+    }
+    if (! parameters.doNotAnalyzeSkewness) {
+        skewness = Skewness(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Skewness>),
+                            parameters.isMeanKnownToBeZero);
+    }
+    if (! parameters.doNotAnalyzeKurtosis) {
+        kurtosis = Kurtosis(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Kurtosis>),
+                            parameters.isMeanKnownToBeZero);
+    }
 }
 
 std::string Quantities::getMetaInformation()

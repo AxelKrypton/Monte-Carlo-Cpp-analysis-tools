@@ -23,11 +23,14 @@
 
 #include "Quantities.hpp"
 
+#include "../Parameters/Parameters.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(QuantitiesTest)
 
     const std::vector<std::string> labels = {"MEAN", "VARIANCE", "SKEWNESS", "KURTOSIS"};
+    std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
 
     BOOST_AUTO_TEST_CASE(build1)
     {
@@ -48,9 +51,64 @@ BOOST_AUTO_TEST_SUITE(QuantitiesTest)
 
     BOOST_AUTO_TEST_CASE(build2)
     {
-        // Parameters parameters(0, NULL);
-        // DataSample sample;
-        // BOOST_REQUIRE_NO_THROW(Quantities quantities(sample, parameters));
+        std::vector<std::string> options
+            = {"foo", "file", "--doNotAnalyzeMean", "--doNotAnalyzeVariance", "--doNotAnalyzeSkewness", "--doNotAnalyzeKurtosis"};
+        Parameters parameters(options);
+        DataSample sample;  // empty, anyway nothing should be calculated
+        Quantities quantities(sample, parameters);
+        // All entry NAN by default
+        for (auto label : labels) {
+            EstimateAndError quantity = quantities[label].value;
+            BOOST_REQUIRE_NE(quantity.estimate, quantity.estimate);
+            BOOST_REQUIRE_NE(quantity.error, quantity.error);
+        }
+    }
+
+    BOOST_AUTO_TEST_CASE(build3)
+    {
+        std::vector<std::string> options = {"foo", "file", "--doNotAnalyzeMean", "--isMeanKnownToBeZero"};
+        Parameters parameters(options);
+        DataSample sample(fileThatDoesExist);
+        Quantities quantities(sample, parameters);
+        // Not calculated entry NAN by default
+        EstimateAndError quantity = quantities[labels[0]].value;
+        BOOST_REQUIRE_NE(quantity.estimate, quantity.estimate);
+        BOOST_REQUIRE_NE(quantity.error, quantity.error);
+    }
+
+    BOOST_AUTO_TEST_CASE(build4)
+    {
+        std::vector<std::string> options = {"foo", "file", "--doNotAnalyzeVariance"};
+        Parameters parameters(options);
+        DataSample sample(fileThatDoesExist);
+        Quantities quantities(sample, parameters);
+        // Not calculated entry NAN by default
+        EstimateAndError quantity = quantities[labels[1]].value;
+        BOOST_REQUIRE_NE(quantity.estimate, quantity.estimate);
+        BOOST_REQUIRE_NE(quantity.error, quantity.error);
+    }
+    BOOST_AUTO_TEST_CASE(build5)
+    {
+        std::vector<std::string> options = {"foo", "file", "--doNotAnalyzeSkewness"};
+        Parameters parameters(options);
+        DataSample sample(fileThatDoesExist);
+        Quantities quantities(sample, parameters);
+        // Not calculated entry NAN by default
+        EstimateAndError quantity = quantities[labels[2]].value;
+        BOOST_REQUIRE_NE(quantity.estimate, quantity.estimate);
+        BOOST_REQUIRE_NE(quantity.error, quantity.error);
+    }
+
+    BOOST_AUTO_TEST_CASE(build6)
+    {
+        std::vector<std::string> options = {"foo", "file", "--doNotAnalyzeKurtosis"};
+        Parameters parameters(options);
+        DataSample sample(fileThatDoesExist);
+        Quantities quantities(sample, parameters);
+        // Not calculated entry NAN by default
+        EstimateAndError quantity = quantities[labels[3]].value;
+        BOOST_REQUIRE_NE(quantity.estimate, quantity.estimate);
+        BOOST_REQUIRE_NE(quantity.error, quantity.error);
     }
 
     BOOST_AUTO_TEST_CASE(accessOperator)

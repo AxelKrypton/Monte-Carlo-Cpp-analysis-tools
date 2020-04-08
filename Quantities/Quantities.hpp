@@ -49,7 +49,7 @@ class MomentsEstimators;
 class Quantities {
   public:
     Quantities();
-    Quantities(DataSample& dataSample, Parameters parameters);
+    Quantities(const DataSample& dataSample, Parameters parameters);
     const QuantityAbstract& operator[](std::string quantityLabel) const;
     QuantityAbstract& operator[](std::string quantityLabel);
 
