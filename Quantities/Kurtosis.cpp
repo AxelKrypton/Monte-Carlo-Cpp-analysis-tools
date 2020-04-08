@@ -41,24 +41,13 @@ void Kurtosis::printCorrectBinningInformation(const BinningParameters& parameter
 
 functionForEstimatorsForJackknife Kurtosis::getFunctionToBeAppliedToEstimatorsForJackknife()
 {
-    if (isMeanZero)
-        return [](std::vector<DataSample> in) -> DataSample {
-            if (in.size() != 2)
-                throw std::invalid_argument("Invalid call to Kurtosis function with zero mean for estimators!");
-            DataSample ex2 = in[0];  // estimator second moment
-            DataSample ex4 = in[1];  // estimator third moment
-            return ex4 / (ex2 ^ 2.0);
-        };
-    else
-        return [](std::vector<DataSample> in) -> DataSample {
-            if (in.size() != 4)
-                throw std::invalid_argument("Invalid call to Kurtosis function for estimators!");
-            DataSample ex1 = in[0];  // estimator first moment
-            DataSample ex2 = in[1];  // estimator second moment
-            DataSample ex3 = in[2];  // estimator third moment
-            DataSample ex4 = in[3];  // estimator fourth moment
-            return (ex4 - (4 * ex3 * ex1) + (6 * ex2 * ex1 * ex1) - (3 * ex1 * ex1 * ex1 * ex1)) / ((ex2 - (ex1 ^ 2)) ^ 2);
-        };
+    return [](std::vector<DataSample> in) -> DataSample {
+        if (in.size() != 2)
+            throw std::invalid_argument("Invalid call to Kurtosis function for Jackknife!");
+        DataSample ex2 = in[0];  // estimator second central moment
+        DataSample ex4 = in[1];  // estimator fourth central moment
+        return ex4 / (ex2 ^ 2.0);
+    };
 }
 
 functionForObservable Kurtosis::getFunctionToCalculateObservable(bool useMultipleEstimate)

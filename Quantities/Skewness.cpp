@@ -41,23 +41,13 @@ void Skewness::printCorrectBinningInformation(const BinningParameters& parameter
 
 functionForEstimatorsForJackknife Skewness::getFunctionToBeAppliedToEstimatorsForJackknife()
 {
-    if (isMeanZero)
-        return [](std::vector<DataSample> in) -> DataSample {
-            if (in.size() != 2)
-                throw std::invalid_argument("Invalid call to Skewness function with zero mean for estimators!");
-            DataSample ex2 = in[0];  // estimator second moment
-            DataSample ex3 = in[1];  // estimator third moment
-            return ex3 / (ex2 ^ 1.5);
-        };
-    else
-        return [](std::vector<DataSample> in) -> DataSample {
-            if (in.size() != 3)
-                throw std::invalid_argument("Invalid call to Skewness function for estimators!");
-            DataSample ex1 = in[0];  // estimator first moment
-            DataSample ex2 = in[1];  // estimator second moment
-            DataSample ex3 = in[2];  // estimator third moment
-            return (ex3 - ((3 * ex2) * ex1) + (2 * (ex1 ^ 3))) / ((ex2 - (ex1 ^ 2)) ^ 1.5);
-        };
+    return [](std::vector<DataSample> in) -> DataSample {
+        if (in.size() != 2)
+            throw std::invalid_argument("Invalid call to Skewness function for Jackknife!");
+        DataSample ex2 = in[0];  // estimator second central moment
+        DataSample ex3 = in[1];  // estimator third  central moment
+        return ex3 / (ex2 ^ 1.5);
+    };
 }
 
 functionForObservable Skewness::getFunctionToCalculateObservable(bool useMultipleEstimate)

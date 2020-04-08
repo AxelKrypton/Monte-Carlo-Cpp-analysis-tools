@@ -53,13 +53,8 @@ void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEsti
 std::vector<DataSample> QuantityAbstract::calculateNeededMomentsPerDataPoint(DataSample& dataSample)
 {
     std::vector<DataSample> returnVec;
-    /*
-     * NOTE: Here we always get the non-central moment because it is later in the function
-     *       provided to the jackkinfe which we consider if the mean is zero or not, but ther
-     *       we work only with non-zero moments and therefore we need to do the same here!
-     */
     for (auto i : getNeededMoments())
-        returnVec.push_back(dataSample.getNthMomentPerDataPoint(i));
+        returnVec.push_back((isMeanZero) ? dataSample.getNthMomentPerDataPoint(i) : dataSample.getNthCentralMomentPerDataPoint(i));
     return returnVec;
 }
 
