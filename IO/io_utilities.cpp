@@ -29,7 +29,13 @@ void PrintRepeatedSymbol(char symbol, int times)
 
 std::string getFilenameForObservables(Parameters parameters)
 {
-    return parameters.analysisOutputFilePrefix + parameters.file + parameters.analysisOutputFilePostfix;
+    if (parameters.calcAutocorrelation)
+        return parameters.analysisOutputFilePrefix + parameters.file + parameters.analysisOutputFilePostfix;
+    else {
+        std::string filename = parameters.file;
+        std::size_t found = filename.find_last_of(".");
+        return filename.substr(0, found) + "_stat" + filename.substr(found);
+    }
 }
 
 void printEstimateAndError(std::string estimateName, realFloat estimateValue, realFloat errorValue)

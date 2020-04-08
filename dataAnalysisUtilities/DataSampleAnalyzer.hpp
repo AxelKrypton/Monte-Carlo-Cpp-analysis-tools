@@ -22,6 +22,7 @@
 #define DATASAMPLEANALYZER_HPP_
 
 #include "../Parameters/Parameters.hpp"
+#include "../Quantities/Quantities.hpp"
 #include "DataSample.hpp"
 #include "dataAnalysisUtilities.hpp"
 

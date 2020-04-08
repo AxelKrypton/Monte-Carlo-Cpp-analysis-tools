@@ -24,6 +24,18 @@
 #include "../IO/io_utilities.hpp"
 #include "DataSampleAnalyzer.hpp"
 
+class ObservableAnalyzer {
+  public:
+    ObservableAnalyzer(std::vector<DataSample> data, Parameters parameters);
+    ~ObservableAnalyzer();
+
+  private:
+    void PrintResultOfAnalysisToOutput();
+    void PrintResultOfAnalysisToFile();
+    Parameters parameters;
+    Quantities quantities;
+};
+
 class DatafileAnalyzer {
   public:
     DatafileAnalyzer(Parameters parameters)
@@ -31,6 +43,11 @@ class DatafileAnalyzer {
         PrintRepeatedSymbol();
         DataSample data(parameters.file, parameters.column, parameters.offset);
         DataSampleAnalyzer analyzer(data, parameters);
+        std::cout << "\n==================\n\n";
+        if (parameters.calcAutocorrelation)
+            AutocorrelationAnalyzer analyzer(data, parameters);
+        else
+            ObservableAnalyzer analyzer(std::vector<DataSample>({data}), parameters);
         PrintRepeatedSymbol();
         std::cout << "\n";
     }

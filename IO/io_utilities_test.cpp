@@ -28,9 +28,7 @@
 BOOST_AUTO_TEST_CASE(filenameForObservables)
 {
     std::string dummyFilename = "foo";
-    const char* arguments[] = {"foo", dummyFilename.c_str()};
-    Parameters parameters(2, arguments);
-
+    Parameters parameters({"foo", dummyFilename.c_str(), "--calcAutocorrelation", "--timeMaxAutocorrelationFunction=10"});
     std::string expectedName = parameters.analysisOutputFilePrefix + dummyFilename + parameters.analysisOutputFilePostfix;
 
     BOOST_CHECK(expectedName == getFilenameForObservables(parameters));
