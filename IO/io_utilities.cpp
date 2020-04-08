@@ -22,6 +22,11 @@
 
 #include <fstream>
 
+void PrintRepeatedSymbol(char symbol, int times)
+{
+    std::cout << "#" << std::setfill(symbol) << std::setw(times) << "\n" << std::setfill(' ');
+}
+
 std::string getFilenameForObservables(Parameters parameters)
 {
     return parameters.analysisOutputFilePrefix + parameters.file + parameters.analysisOutputFilePostfix;

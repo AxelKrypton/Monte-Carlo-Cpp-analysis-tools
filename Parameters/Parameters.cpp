@@ -20,6 +20,7 @@
 
 #include "Parameters.hpp"
 
+#include "../IO/io_utilities.hpp"
 #include "../Quantities/Constants.hpp"
 #include "HelperTools.hpp"
 
@@ -167,7 +168,7 @@ void Parameters::checkParsedArguments(po::variables_map& vm, po::options_descrip
 void Parameters::printParameters()
 {
     std::cout << std::endl;
-    std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+    PrintRepeatedSymbol();
     std::cout << "# Datafile:\t" << file << std::endl;
     std::cout << "# Use column:\t" << column;
     if (isMeanKnownToBeZero)
@@ -175,7 +176,7 @@ void Parameters::printParameters()
     std::cout << std::endl;
     std::cout << "# Offset:\t" << offset << std::endl;
     // todo: add output of observables which are analyzed
-    std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+    PrintRepeatedSymbol();
     if (! doNotUseBinning) {
         std::cout << "# Perform binning with:" << std::endl;
         if (useNumberOfBinsForBinning) {
@@ -192,24 +193,25 @@ void Parameters::printParameters()
                 std::cout << "#   - central moment " << i << ": " << binsizeCentralMoments[i] << std::endl;
         }
         if (binningMustFitDataSampleSize) {
-            std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+            PrintRepeatedSymbol();
             std::cout << "# Require binsize/numberOfBins\n#   to be multiple of number of\n#   data points" << std::endl;
         }
         if (adjustDataSampleSizeToBinning) {
-            std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+            PrintRepeatedSymbol();
             std::cout << "# Resize raw data sample in case data points are discarded during binning" << std::endl;
         }
     } else {
         std::cout << "# Do not perform binning!" << std::endl;
     }
     if (calcAutocorrelation) {
-        std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+        PrintRepeatedSymbol();
         std::cout << "# Calculate estimate of autocorrelation time:" << std::endl;
         std::cout << "#  - for \"t\" up to " << timeMaxAutocorrelationFunction << "," << std::endl;
         std::cout << "#  - using " << numberOfBinsForAutocorrelation << " bins to bin the data before" << std::endl;
         std::cout << "#    applying Jackknife." << std::endl;
     }
-    std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+    PrintRepeatedSymbol();
+    std::cout << "\n";
 }
 
 /*

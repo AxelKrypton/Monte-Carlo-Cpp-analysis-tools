@@ -77,7 +77,7 @@ AnalyzerWrapperBasic::AnalyzerWrapperBasic(std::string name, std::string outputF
     : estimateName(name)
     , outputFilename(outputFilename)
 {
-    std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+    PrintRepeatedSymbol();
     std::cout << "# Analyse " << name << "..." << std::endl;
 }
 

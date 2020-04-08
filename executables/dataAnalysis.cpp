@@ -27,9 +27,7 @@ int main(int argc, const char** argv)
 {
     try {
         Parameters parameters(argc, argv);
-        std::cout << std::endl << "#------------------------------------------------------------------------------------" << std::endl;
         DatafileAnalyzer analyzer(parameters);
-        std::cout << "#------------------------------------------------------------------------------------" << std::endl << std::endl;
     }
     // todo: move catch block into own function?
     catch (wrongBinningParameter& e) {

@@ -20,9 +20,13 @@
 
 #include "Quantities.hpp"
 
+#include "../IO/io_utilities.hpp"
 #include "../Parameters/Parameters.hpp"
 #include "../dataAnalysisUtilities/DataSample.hpp"
 #include "Constants.hpp"
+
+#include <iomanip>
+#include <regex>
 
 Quantities::Quantities() : mean(), variance(), skewness(), kurtosis() {}
 
@@ -34,18 +38,22 @@ Quantities::Quantities() : mean(), variance(), skewness(), kurtosis() {}
 Quantities::Quantities(const DataSample& dataSample, Parameters parameters)
 {
     if (! parameters.doNotAnalyzeMean) {
+        PrintRepeatedSymbol();
         mean = Mean(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Mean>),
                     parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeVariance) {
+        PrintRepeatedSymbol();
         variance = Variance(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Variance>),
                             parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeSkewness) {
+        PrintRepeatedSymbol();
         skewness = Skewness(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Skewness>),
                             parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeKurtosis) {
+        PrintRepeatedSymbol();
         kurtosis = Kurtosis(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Kurtosis>),
                             parameters.isMeanKnownToBeZero);
     }
@@ -53,25 +61,30 @@ Quantities::Quantities(const DataSample& dataSample, Parameters parameters)
 
 std::string Quantities::getMetaInformation()
 {
-    std::string metaInfos = "";
-    std::vector<std::string> observableNames = {constants::observableName<Mean>, constants::observableName<Variance>,
-                                                constants::observableName<Skewness>, constants::observableName<Kurtosis>};
-    for (unsigned int index = 0; index < observableNames.size(); index++) {
-        metaInfos += observableNames[index] + "\t\t\terror\t\t\t";
+    std::string metaInfos = constants::observableName<Mean> + "\t\t\terror";
+    std::vector<std::string> observableNames
+        = {constants::observableName<Variance>, constants::observableName<Skewness>, constants::observableName<Kurtosis>};
+    for (auto label : observableNames) {
+        metaInfos += "\t\t\t" + label + "\t\terror";
     }
     return metaInfos;
+}
+
+static void AddValueToStreamWithNiceLayout(std::stringstream& stream, EstimateAndError value)
+{
+    stream << std::scientific << std::setw(20) << std::left << value.estimate << "\t";
+    stream << std::scientific << std::setw(20) << std::left << value.error << "\t";
 }
 
 std::string Quantities::getObservablesAsString()
 {
     std::stringstream values;
     values.precision(12);
-    values << std::scientific;
-    values << mean.value.estimate << "\t" << mean.value.error << "\t";
-    values << variance.value.estimate << "\t" << variance.value.error << "\t";
-    values << skewness.value.estimate << "\t" << skewness.value.error << "\t";
-    values << kurtosis.value.estimate << "\t" << kurtosis.value.error;
-    return values.str();
+    values.fill(' ');
+    for (auto value : {mean.value, variance.value, skewness.value, kurtosis.value})
+        AddValueToStreamWithNiceLayout(values, value);
+    // Remove trailing tab
+    return std::regex_replace(values.str(), std::regex("\t$"), "");
 }
 
 const QuantityAbstract& Quantities::operator[](std::string quantityLabel) const

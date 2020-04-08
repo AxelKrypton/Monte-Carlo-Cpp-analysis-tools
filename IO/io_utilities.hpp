@@ -25,6 +25,7 @@
 
 #include <iostream>
 
+void PrintRepeatedSymbol(char symbol = '-', int times = 80);
 std::string getFilenameForObservables(Parameters parameters);
 
 void printEstimateAndError(std::string estimateName, realFloat estimateValue, realFloat errorValue);

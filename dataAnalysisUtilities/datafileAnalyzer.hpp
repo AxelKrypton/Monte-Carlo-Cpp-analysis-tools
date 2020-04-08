@@ -21,14 +21,18 @@
 #ifndef DATAFILEANALYZER_HPP_
 #define DATAFILEANALYZER_HPP_
 
+#include "../IO/io_utilities.hpp"
 #include "DataSampleAnalyzer.hpp"
 
 class DatafileAnalyzer {
   public:
     DatafileAnalyzer(Parameters parameters)
     {
+        PrintRepeatedSymbol();
         DataSample data(parameters.file, parameters.column, parameters.offset);
         DataSampleAnalyzer analyzer(data, parameters);
+        PrintRepeatedSymbol();
+        std::cout << "\n";
     }
 };
 
