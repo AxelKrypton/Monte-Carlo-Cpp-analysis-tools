@@ -103,6 +103,10 @@ void Parameters::checkParsedArguments(po::variables_map& vm, po::options_descrip
             "If calcAutocorrelation==true then the option --timeMaxAutocorrelationFunction=... must be given. Aborting!");
     }
 
+    if (calcAutocorrelation && numberOfColumnsToBeConsidered != 1) {
+        throw std::invalid_argument("No multiple estimators supported in autocorrelation analysis. Aborting!");
+    }
+
     /**
      * For the binning one has to know if it should be
      * performed with numberOfBins or with binsize parameter.
