@@ -19,7 +19,7 @@
  */
 
 #include "../Parameters/Parameters.hpp"
-#include "../dataAnalysisUtilities/datafileAnalyzer.hpp"
+#include "../dataAnalysisUtilities/Analyzer.hpp"
 #include "exceptions.hpp"
 #include "exitCodes.hpp"
 

@@ -22,8 +22,7 @@ add_library(dataAnalysisUtilities
 	binnedDataSample.cpp
 	jackknifeEstimators.cpp
 	dataAnalysisUtilities.cpp
-	DataSampleAnalyzer.cpp
-	datafileAnalyzer.cpp
+	Analyzer.cpp
 	jackknifeAnalysis.cpp
 	bootstrapAnalysis.cpp
 	binning.cpp

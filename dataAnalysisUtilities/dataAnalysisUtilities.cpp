@@ -283,26 +283,11 @@ std::vector<EstimateAndError> calcArrayOfAutocorrelationTimesAndErrorEstimatesOf
     return result;
 }
 
-// todo: move this to IO
-static std::string getFilenameForAutocorrelation(Parameters parameters)
-{
-    return parameters.file + "_auto";
-}
-
 void calcAutocorrelationAndErrorOfDataSample(DataSample& sample, Parameters parameters)
 {
     std::vector<EstimateAndError> result = calcArrayOfAutocorrelationTimesAndErrorEstimatesOfDataSample(sample, parameters);
-
-    std::vector<realFloat> estimates;
-    std::vector<realFloat> errors;
-    for (int i = 0; i < int(result.size()); i++) {
-        estimates.push_back(result[i].estimate);
-        errors.push_back(result[i].error);
-    }
-
     std::string filename = getFilenameForAutocorrelation(parameters);
-
-    writeEstimateAndErrorArraysToFile("auto", estimates, errors, filename);
+    writeEstimateAndErrorArraysToFile(result, filename);
 }
 
 /*****************************************************************************************/

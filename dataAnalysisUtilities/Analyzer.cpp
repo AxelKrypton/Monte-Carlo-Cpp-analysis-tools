@@ -17,9 +17,10 @@
  *
  */
 
-#include "datafileAnalyzer.hpp"
+#include "Analyzer.hpp"
 
 #include "../IO/io_utilities.hpp"
+#include "dataAnalysisUtilities.hpp"
 
 #include <fstream>
 
@@ -42,8 +43,9 @@ static void PrintQuantityToOutput(std::string name, const Quantities& quantities
     PrintRepeatedSymbol();
     std::ios oldState(nullptr);
     oldState.copyfmt(std::cout);
-    std::cout << "# " << Color::observables.at(name) << name << ": " << Color::FG_LIGHT_CYAN << std::scientific << std::setprecision(6)
-              << quantities[name].value << Color::DEFAULT << "\n";
+    std::ostringstream value;
+    operator<<(value << std::scientific << std::setprecision(6), {quantities[name].value, " ± "});
+    std::cout << "# " << Color::observables.at(name) << name << ": " << Color::FG_LIGHT_CYAN << value.str() << Color::DEFAULT << "\n";
     std::cout.copyfmt(oldState);
 }
 
@@ -72,4 +74,15 @@ void ObservableAnalyzer::PrintResultOfAnalysisToFile()
     } else {
         throw std::invalid_argument("Could not open file for observable. Aborting!");
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+AutocorrelationAnalyzer::AutocorrelationAnalyzer(DataSample& sample, Parameters parameters)
+    : estimateName("AUTOCORRELATION")
+    , outputFilename(getFilenameForObservables(parameters))
+{
+    PrintRepeatedSymbol();
+    std::cout << "# Analyse " << Color::FG_LIGHT_CYAN << estimateName << Color::DEFAULT << "...\n";
+    calcAutocorrelationAndErrorOfDataSample(sample, parameters);
 }

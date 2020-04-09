@@ -23,16 +23,17 @@
 
 #include "../Parameters/Parameters.hpp"
 #include "../Quantities/Constants.hpp"
+#include "../Quantities/EstimateAndError.hpp"
 
 #include <iostream>
 
 void PrintRepeatedSymbol(char symbol = '-', int times = 80);
 std::string getFilenameForObservables(Parameters parameters);
+std::string getFilenameForAutocorrelation(Parameters parameters);
 
 void printEstimateAndError(std::string estimateName, realFloat estimateValue, realFloat errorValue);
 void writeEstimateAndErrorToFile(std::string estimateName, realFloat estimateValue, realFloat errorValue, std::string filename);
-void writeEstimateAndErrorArraysToFile(std::string estimateName, std::vector<realFloat> estimate, std::vector<realFloat> error,
-                                       std::string filename);
+void writeEstimateAndErrorArraysToFile(std::vector<EstimateAndError> values, std::string filename);
 
 namespace Color {
     enum Code {

@@ -66,11 +66,6 @@ class Quantities {
     Variance variance;  // <(x-mu)^2>                     ->  x2-x1^2
     Skewness skewness;  // <(x-mu)^3> / <(x-mu)^2>^(3/2)  ->  (x3-3x2*x1+2*x1^3)/(x2-x1^2)^(3/2)
     Kurtosis kurtosis;  // <(x-mu)^4> / <(x-mu)^2>^2      ->  (x4-4*x3*x1+6*x2*x1^2-3*x1^4)/(x2-x1^2)^2
-
-    // TODO: Implement functions to calculate here the observables given either the DataSample or
-    //      the moments and the estimators (the latter needed in Reweighting). The idea would be to
-    //      have an object to which delegate the calculation of the observables all together: it could
-    //      use the object in DataSampleAnalyzer that should be then local to the Observables.cpp file!
 };
 
 #endif /* OBSERVABLES_HPP_ */

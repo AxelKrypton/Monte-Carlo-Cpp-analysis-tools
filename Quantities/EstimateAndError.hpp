@@ -35,9 +35,14 @@ class EstimateAndError {
     realFloat error;
 };
 
+inline std::ostream& operator<<(std::ostream& stream, const std::pair<EstimateAndError, std::string>& value)
+{
+    return stream << value.first.estimate << value.second << value.first.error;
+}
+
 inline std::ostream& operator<<(std::ostream& stream, const EstimateAndError& value)
 {
-    return stream << value.estimate << " ± " << value.error;
+    return operator<<(stream, {value, "\t"});
 }
 
 #endif

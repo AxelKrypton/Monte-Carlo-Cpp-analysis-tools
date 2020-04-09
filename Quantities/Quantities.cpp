@@ -70,19 +70,13 @@ std::string Quantities::getMetaInformation()
     return metaInfos;
 }
 
-static void AddValueToStreamWithNiceLayout(std::stringstream& stream, EstimateAndError value)
-{
-    stream << std::scientific << std::setw(20) << std::left << value.estimate << "\t";
-    stream << std::scientific << std::setw(20) << std::left << value.error << "\t";
-}
-
 std::string Quantities::getObservablesAsString()
 {
     std::stringstream values;
     values.precision(12);
     values.fill(' ');
     for (auto value : {mean.value, variance.value, skewness.value, kurtosis.value})
-        AddValueToStreamWithNiceLayout(values, value);
+        values << std::scientific << std::setw(20) << std::left << value << "\t";
     // Remove trailing tab
     return std::regex_replace(values.str(), std::regex("\t$"), "");
 }

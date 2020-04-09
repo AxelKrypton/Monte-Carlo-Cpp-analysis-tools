@@ -1,6 +1,5 @@
 /*
  *
- *  Copyright (c) 2014 Christopher Pinke
  *  Copyright (c) 2020 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -18,11 +17,11 @@
  *
  */
 
-#ifndef DATAFILEANALYZER_HPP_
-#define DATAFILEANALYZER_HPP_
+#ifndef DATAANALYSISUTILITIES_ANALYZER_HPP_
+#define DATAANALYSISUTILITIES_ANALYZER_HPP_
 
 #include "../IO/io_utilities.hpp"
-#include "DataSampleAnalyzer.hpp"
+#include "../Quantities/Quantities.hpp"
 
 class ObservableAnalyzer {
   public:
@@ -36,14 +35,21 @@ class ObservableAnalyzer {
     Quantities quantities;
 };
 
+class AutocorrelationAnalyzer {
+  public:
+    AutocorrelationAnalyzer(DataSample& sample, Parameters parameters);
+
+  private:
+    std::string estimateName;
+    std::string outputFilename;
+};
+
 class DatafileAnalyzer {
   public:
     DatafileAnalyzer(Parameters parameters)
     {
         PrintRepeatedSymbol();
         DataSample data(parameters.file, parameters.column, parameters.offset);
-        DataSampleAnalyzer analyzer(data, parameters);
-        std::cout << "\n==================\n\n";
         if (parameters.calcAutocorrelation)
             AutocorrelationAnalyzer analyzer(data, parameters);
         else
@@ -53,4 +59,4 @@ class DatafileAnalyzer {
     }
 };
 
-#endif /* DATAFILEANALYZER_HPP_ */
+#endif /* DATAANALYSISUTILITIES_ANALYZER_HPP_ */
