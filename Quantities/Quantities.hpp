@@ -50,6 +50,7 @@ class Quantities {
   public:
     Quantities();
     Quantities(const DataSample& dataSample, Parameters parameters);
+    Quantities(const std::vector<DataSample>& dataSamples, Parameters parameters);
     const QuantityAbstract& operator[](std::string quantityLabel) const;
     QuantityAbstract& operator[](std::string quantityLabel);
 

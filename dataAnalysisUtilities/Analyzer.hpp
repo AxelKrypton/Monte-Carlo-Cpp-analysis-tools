@@ -23,6 +23,11 @@
 #include "../IO/io_utilities.hpp"
 #include "../Quantities/Quantities.hpp"
 
+class DatafileAnalyzer {
+  public:
+    DatafileAnalyzer(Parameters parameters);
+};
+
 class ObservableAnalyzer {
   public:
     ObservableAnalyzer(std::vector<DataSample> data, Parameters parameters);
@@ -42,21 +47,6 @@ class AutocorrelationAnalyzer {
   private:
     std::string estimateName;
     std::string outputFilename;
-};
-
-class DatafileAnalyzer {
-  public:
-    DatafileAnalyzer(Parameters parameters)
-    {
-        PrintRepeatedSymbol();
-        DataSample data(parameters.file, parameters.column, parameters.offset);
-        if (parameters.calcAutocorrelation)
-            AutocorrelationAnalyzer analyzer(data, parameters);
-        else
-            ObservableAnalyzer observableAnalyzer(std::vector<DataSample>({data}), parameters);
-        PrintRepeatedSymbol();
-        std::cout << "\n";
-    }
 };
 
 #endif /* DATAANALYSISUTILITIES_ANALYZER_HPP_ */

@@ -30,31 +30,36 @@
 
 Quantities::Quantities() : mean(), variance(), skewness(), kurtosis() {}
 
+Quantities::Quantities(const DataSample& dataSample, Parameters parameters) : Quantities(std::vector<DataSample>{dataSample}, parameters) {}
+
 /*
  * NOTE: It it important to get the full parameters here and to extract the binning
  *       information for each quantity, since the number to make binning depends
  *       on the needed moment to calculate the quantity!
  */
-Quantities::Quantities(const DataSample& dataSample, Parameters parameters)
+Quantities::Quantities(const std::vector<DataSample>& dataSamples, Parameters parameters)
 {
+    if (dataSamples.size() > 1)
+        throw std::invalid_argument("Analysis of observable with multiple columns not implemented yet!");
+
     if (! parameters.doNotAnalyzeMean) {
         PrintRepeatedSymbol();
-        mean = Mean(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Mean>),
+        mean = Mean(dataSamples[0], parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Mean>),
                     parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeVariance) {
         PrintRepeatedSymbol();
-        variance = Variance(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Variance>),
+        variance = Variance(dataSamples[0], parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Variance>),
                             parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeSkewness) {
         PrintRepeatedSymbol();
-        skewness = Skewness(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Skewness>),
+        skewness = Skewness(dataSamples[0], parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Skewness>),
                             parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeKurtosis) {
         PrintRepeatedSymbol();
-        kurtosis = Kurtosis(dataSample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Kurtosis>),
+        kurtosis = Kurtosis(dataSamples[0], parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Kurtosis>),
                             parameters.isMeanKnownToBeZero);
     }
 }

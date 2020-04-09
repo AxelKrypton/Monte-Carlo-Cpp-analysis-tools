@@ -24,12 +24,24 @@
 
 #include <fstream>
 
+DatafileAnalyzer::DatafileAnalyzer(Parameters parameters)
+{
+    PrintRepeatedSymbol();
+    std::vector<DataSample> data;
+    for (int i = 0; i < parameters.numberOfColumnsToBeConsidered; i++)
+        data.push_back(DataSample{parameters.file, parameters.column + i, parameters.offset});
+    if (parameters.calcAutocorrelation)
+        AutocorrelationAnalyzer analyzer(data[0], parameters);
+    else
+        ObservableAnalyzer observableAnalyzer(data, parameters);
+    PrintRepeatedSymbol();
+    std::cout << "\n";
+}
+
 ObservableAnalyzer::ObservableAnalyzer(std::vector<DataSample> data, Parameters parameters)
     : parameters(parameters)
-    , quantities(data[0], parameters)
+    , quantities(data, parameters)
 {
-    if (data.size() > 1)
-        throw std::invalid_argument("Analysis of observable with multiple columns not implemented yet!");
 }
 
 ObservableAnalyzer::~ObservableAnalyzer()
