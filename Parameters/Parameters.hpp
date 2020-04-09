@@ -58,6 +58,7 @@ class Parameters {
     int timeMaxAutocorrelationFunction;
     int offset;
     int column;
+    int numberOfColumnsToBeConsidered;
     bool isMeanKnownToBeZero;
     bool doNotUseBinning;
     bool useNumberOfBinsForBinning;

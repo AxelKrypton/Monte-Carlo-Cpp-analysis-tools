@@ -54,6 +54,7 @@ Parameters::Parameters(int argc, const char** argv)
         ("file,f", po::value<std::string>(&file), "File containing data")
         ("offset,o", po::value<int>(&offset)->default_value(0), "Discard first <offset> values of data")
         ("column,c", po::value<int>(&column)->default_value(1), "Read data from column number <column> (must be >= 1)")
+        ("numberOfColumns", po::value<int>(&numberOfColumnsToBeConsidered)->default_value(1), "Consider multiple columns for estimators of the same observable (must be >= 1)")
         ("isMeanKnownToBeZero,m", po::value<bool>(&isMeanKnownToBeZero)->default_value(false)->implicit_value(true), "The mean for given column is set to zero in the observables' calculation")
         ("binsize,b", po::value<int>(&binsize), "Binsize used for all moments (default: 100)")
         ("binsizeMoments", po::value<std::vector<int> >(&binsizeMoments)->multitoken(), "Binsize for Nth moment (use it giving: N1 binsize N2 binsize ...)")
@@ -170,7 +171,10 @@ void Parameters::printParameters()
     std::cout << std::endl;
     PrintRepeatedSymbol();
     std::cout << "# Datafile:\t" << file << std::endl;
-    std::cout << "# Use column:\t" << column;
+    if (numberOfColumnsToBeConsidered == 1)
+        std::cout << "# Use column:\t" << column;
+    else
+        std::cout << "# Use columns:\t" << column << " to " << column + numberOfColumnsToBeConsidered - 1;
     if (isMeanKnownToBeZero)
         std::cout << "\t(mean is known to be zero)";
     std::cout << std::endl;
