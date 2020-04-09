@@ -33,31 +33,6 @@
 Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable);
 void printBinningInformation(const BinningParameters& parameters, std::string observable, int elementsOfSample);
 
-// TODO: Implement the following function in a general way
-template<typename T> T getPowerOfFirstMomentUsingSeveralEstimate(const std::vector<T>& estimates, const int power)
-{
-    if (estimates.size() != 4)
-        throw std::invalid_argument("So far only 4 multiple estimates are allowed in quantities calculations! Aborting...");
-
-    switch (power) {
-        case 1:
-            return (estimates[0] + estimates[1] + estimates[2] + estimates[3]) / (realFloat)4.0;
-        case 2:
-            return ((estimates[0] * estimates[1]) + (estimates[0] * estimates[2]) + (estimates[0] * estimates[3])
-                    + (estimates[1] * estimates[2]) + (estimates[1] * estimates[3]) + (estimates[2] * estimates[3]))
-                   / (realFloat)6.0;
-        case 3:
-            return ((estimates[0] * estimates[1] * estimates[2]) + (estimates[0] * estimates[1] * estimates[3])
-                    + (estimates[0] * estimates[2] * estimates[3]) + (estimates[1] * estimates[2] * estimates[3]))
-                   / (realFloat)4.0;
-        case 4:
-            return (estimates[0] * estimates[1] * estimates[2] * estimates[3]);
-        default:
-            throw std::invalid_argument(
-                "Asked for a not implemented power in \"getPowerOfFirstMomentUsingSeveralEstimate\" function! Aborting...");
-    }
-}
-
 // TODO: Think whether it is possible to unify the following two templates in only one
 template<typename OBSERVABLE>
 functionForObservable pickUpCorrectFunctionForObservable(const bool isMeanZero, const bool useMultipleEstimate)
