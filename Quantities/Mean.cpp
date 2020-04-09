@@ -42,7 +42,8 @@ void Mean::calculateAndSetValueAndError(DataSample& dataSample, BinningParameter
 {
     DataSample binnedSample(dataSample);
     if (parameters.performBinning) {
-        printCorrectBinningInformation(parameters);
+        printCorrectBinningInformation(parameters, dataSample.getNumberOfElements());
+        DEBUG(std::cout << "# Moment 1\n");
         binnedSample = performBinning(dataSample, parameters);
     }
     if (isMeanZero) {
@@ -54,9 +55,9 @@ void Mean::calculateAndSetValueAndError(DataSample& dataSample, BinningParameter
     }
 }
 
-void Mean::printCorrectBinningInformation(const BinningParameters& parameters)
+void Mean::printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample)
 {
-    printBinningInformation(parameters, constants::observableName<Mean>);
+    printBinningInformation(parameters, constants::observableName<Mean>, elementsOfSample);
 }
 
 functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToEstimatorsForJackknife()

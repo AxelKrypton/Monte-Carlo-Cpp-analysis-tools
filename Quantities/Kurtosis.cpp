@@ -34,9 +34,9 @@ Kurtosis::Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanZer
     calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }
 
-void Kurtosis::printCorrectBinningInformation(const BinningParameters& parameters)
+void Kurtosis::printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample)
 {
-    printBinningInformation(parameters, constants::observableName<Kurtosis>);
+    printBinningInformation(parameters, constants::observableName<Kurtosis>, elementsOfSample);
 }
 
 functionForEstimatorsForJackknife Kurtosis::getFunctionToBeAppliedToEstimatorsForJackknife()

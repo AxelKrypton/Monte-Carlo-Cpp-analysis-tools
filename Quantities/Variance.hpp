@@ -38,7 +38,7 @@ class Variance : public QuantityAbstract {
   private:
     Variance();
     void calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters) override;
-    void printCorrectBinningInformation(const BinningParameters& parameters) override;
+    void printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample) override;
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() override;
     functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false) override;
     functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false) override;

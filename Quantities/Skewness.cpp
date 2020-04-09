@@ -34,9 +34,9 @@ Skewness::Skewness(Moments moments, MomentsEstimators estimators, bool isMeanZer
     calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
 }
 
-void Skewness::printCorrectBinningInformation(const BinningParameters& parameters)
+void Skewness::printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample)
 {
-    printBinningInformation(parameters, constants::observableName<Skewness>);
+    printBinningInformation(parameters, constants::observableName<Skewness>, elementsOfSample);
 }
 
 functionForEstimatorsForJackknife Skewness::getFunctionToBeAppliedToEstimatorsForJackknife()

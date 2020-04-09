@@ -37,22 +37,26 @@ ObservableAnalyzer::~ObservableAnalyzer()
     PrintResultOfAnalysisToFile();
 }
 
-static void PrintQuantityToOutput(std::string name, const Quantities& quantities, Color::Code color)
+static void PrintQuantityToOutput(std::string name, const Quantities& quantities)
 {
     PrintRepeatedSymbol();
-    std::cout << "# " << color << name << ": " << Color::FG_LIGHT_CYAN << quantities[name].value << Color::DEFAULT << "\n";
+    std::ios oldState(nullptr);
+    oldState.copyfmt(std::cout);
+    std::cout << "# " << Color::observables.at(name) << name << ": " << Color::FG_LIGHT_CYAN << std::scientific << std::setprecision(6)
+              << quantities[name].value << Color::DEFAULT << "\n";
+    std::cout.copyfmt(oldState);
 }
 
 void ObservableAnalyzer::PrintResultOfAnalysisToOutput()
 {
     if (! parameters.doNotAnalyzeMean)
-        PrintQuantityToOutput(constants::observableName<Mean>, quantities, Color::FG_LIGHT_BLUE);
+        PrintQuantityToOutput(constants::observableName<Mean>, quantities);
     if (! parameters.doNotAnalyzeVariance)
-        PrintQuantityToOutput(constants::observableName<Variance>, quantities, Color::FG_LIGHT_YELLOW);
+        PrintQuantityToOutput(constants::observableName<Variance>, quantities);
     if (! parameters.doNotAnalyzeSkewness)
-        PrintQuantityToOutput(constants::observableName<Skewness>, quantities, Color::FG_LIGHT_GREEN);
+        PrintQuantityToOutput(constants::observableName<Skewness>, quantities);
     if (! parameters.doNotAnalyzeKurtosis)
-        PrintQuantityToOutput(constants::observableName<Kurtosis>, quantities, Color::FG_LIGHT_MAGENTA);
+        PrintQuantityToOutput(constants::observableName<Kurtosis>, quantities);
     PrintRepeatedSymbol();
 }
 void ObservableAnalyzer::PrintResultOfAnalysisToFile()

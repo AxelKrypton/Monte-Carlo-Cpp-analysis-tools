@@ -35,7 +35,7 @@ class Kurtosis : public QuantityAbstract {
 
   private:
     Kurtosis();
-    void printCorrectBinningInformation(const BinningParameters& parameters) override;
+    void printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample) override;
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() override;
     functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false) override;
     functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false) override;

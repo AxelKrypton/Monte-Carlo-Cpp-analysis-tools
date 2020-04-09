@@ -19,6 +19,10 @@
 
 #include "Tools.hpp"
 
+#include "../IO/io_utilities.hpp"
+
+#include <iomanip>
+
 Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable)
 {
     Parameters tmp = parameters;
@@ -40,11 +44,36 @@ Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& p
     return tmp;
 }
 
-void printBinningInformation(const BinningParameters& parameters, std::string observable)
+static void warnIfDiscardedElements(const BinningParameters& parameters, int elementsOfSample)
 {
-    std::cout << "### Performing binning in " << observable << " calculation using ";
+    std::string binningMessage;
     if (parameters.useNumberOfBins)
-        std::cout << parameters.number << " as number of bins!\n";
+        binningMessage = "Number of bins (";
     else
-        std::cout << parameters.number << " as binsize!\n";
+        binningMessage = "Binsize (";
+    binningMessage += std::to_string(parameters.number) + ")";
+    int discardedElements = elementsOfSample % parameters.number;
+    if (discardedElements != 0) {
+        std::ios oldState(nullptr);
+        oldState.copyfmt(std::cout);
+        std::cout << "# " << Color::FG_LIGHT_YELLOW << Font::BOLD << "WARNING: " << Font::NO_BOLD << binningMessage
+                  << " does not divide the sample size (" << elementsOfSample << ").\n"
+                  << Color::DEFAULT << "#          " << Color::FG_LIGHT_YELLOW << "Last " << Color::FG_LIGHT_RED << Font::BOLD
+                  << discardedElements << Font::NO_BOLD << Color::FG_LIGHT_YELLOW << " values (" << std::fixed << std::setprecision(2)
+                  << 100.0 * parameters.number / elementsOfSample << "%) will be discarded!" << Color::DEFAULT << "\n";
+        std::cout.copyfmt(oldState);
+    }
+}
+
+void printBinningInformation(const BinningParameters& parameters, std::string observable, int elementsOfSample)
+{
+    std::cout << "# Analzying " << Color::observables.at(observable) << observable << Color::DEFAULT << "...\n";
+    if (parameters.useNumberOfBins) {
+        // std::cout << parameters.number << " as number of bins!\n";
+        std::cout << "# Number of bins = " << parameters.number << "\n# Binsize = " << elementsOfSample / parameters.number << "\n";
+    } else {
+        // std::cout << parameters.number << " as binsize!\n";
+        std::cout << "# Binsize = " << parameters.number << "\n# Number of bins = " << elementsOfSample / parameters.number << "\n";
+    }
+    warnIfDiscardedElements(parameters, elementsOfSample);
 }

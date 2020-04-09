@@ -327,7 +327,7 @@ static std::vector<BinnedDataSampleFromNumberOfBins> calcAutocorrelationFunction
     std::vector<BinnedDataSampleFromNumberOfBins> autocorrelationFunctionValuesBinnedSets;
     for (int time = 0; time < parameters.timeMaxAutocorrelationFunction; time++) {
         autocorrelationFunctionValuesBinnedSets.push_back(BinnedDataSampleFromNumberOfBins(
-            autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(sample, time), parameters.numberOfBinsForAutocorrelation, false, false));
+            autocorrelationFunctionValuesAtCertainTimeNotAveragedOut(sample, time), parameters.numberOfBinsForAutocorrelation, false));
     }
     return autocorrelationFunctionValuesBinnedSets;
 }

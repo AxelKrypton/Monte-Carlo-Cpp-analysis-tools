@@ -36,7 +36,7 @@ void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, Binn
     std::vector<DataSample> neededMomentsPerDataPoint = calculateNeededMomentsPerDataPoint(dataSample);
     std::vector<DataSample> binnedMomentsPerDataPoint(neededMomentsPerDataPoint);
     if (parameters.performBinning) {
-        printCorrectBinningInformation(parameters);
+        printCorrectBinningInformation(parameters, dataSample.getNumberOfElements());
         binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, parameters);
     }
     value = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
@@ -65,7 +65,7 @@ QuantityAbstract::getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeB
     std::vector<DataSample> returnData;
     std::vector<unsigned int> moments = getNeededMoments();
     for (size_t i = 0; i < dataSampleToBeBinned.size(); i++) {
-        std::cout << "## Moment " << moments[i] << "\n";
+        DEBUG(std::cout << "# Moment " << moments[i] << "\n");
         returnData.push_back(performBinning(dataSampleToBeBinned[i], parameters));
     }
     return returnData;

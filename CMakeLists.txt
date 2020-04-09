@@ -30,6 +30,10 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
+if( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+    add_definitions( -DDEBUG_MODE )
+endif( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+
 ## Have the user asked for tests
 enable_testing()
 

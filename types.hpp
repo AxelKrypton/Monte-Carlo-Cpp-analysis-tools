@@ -28,6 +28,14 @@ typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<
 typedef double realFloat;
 #endif
 
+#ifdef DEBUG_MODE
+    #define DEBUG(x) (x)
+#else
+    #define DEBUG(x) \
+        do {         \
+        } while (0)
+#endif
+
 enum ErrorCalculationMethod { bootstrap = 1, jackknife };
 
 #endif /* TYPES_HPP_ */

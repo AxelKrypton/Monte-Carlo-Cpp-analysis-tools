@@ -20,12 +20,13 @@
 
 #include "binning.hpp"
 
+#include "../types.hpp"
 #include "binnedDataSample.hpp"
 
 DataSample performBinning(DataSample& rawData, const BinningParameters& parameters)
 {
     if (parameters.performBinning) {
-        std::cout << "# Perform binning on data sample..." << std::endl;
+        DEBUG(std::cout << "# Perform binning on data sample..." << std::endl);
         if (parameters.useNumberOfBins) {
             return performBinningFromNumberOfBins(rawData, parameters.number, parameters.adjustDataSample, parameters.binningMustFitDataSample);
         } else {

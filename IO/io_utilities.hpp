@@ -22,6 +22,7 @@
 #define IO_UTILITIES_HPP_
 
 #include "../Parameters/Parameters.hpp"
+#include "../Quantities/Constants.hpp"
 
 #include <iostream>
 
@@ -59,6 +60,10 @@ namespace Color {
         BG_BLUE = 44,
         BG_DEFAULT = 49,
     };
+    const std::map<std::string, Color::Code> observables = {{constants::observableName<Mean>, FG_LIGHT_BLUE},
+                                                            {constants::observableName<Variance>, FG_LIGHT_GRAY},
+                                                            {constants::observableName<Skewness>, FG_LIGHT_GREEN},
+                                                            {constants::observableName<Kurtosis>, FG_LIGHT_MAGENTA}};
     inline std::ostream& operator<<(std::ostream& os, Code code) { return os << "\033[" << static_cast<int>(code) << "m"; }
 }
 

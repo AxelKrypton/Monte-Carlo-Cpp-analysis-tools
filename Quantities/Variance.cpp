@@ -48,20 +48,22 @@ void Variance::calculateAndSetValueAndError(DataSample& dataSample, BinningParam
     DataSample varianceSample = isMeanZero ? dataSample.getNthMomentPerDataPoint(2) : dataSample.getNthCentralMomentPerDataPoint(2);
     DataSample binnedVarianceSample(varianceSample);
     if (parameters.performBinning) {
-        printCorrectBinningInformation(parameters);
-        binnedVarianceSample = performBinning(varianceSample, parameters);
+        printCorrectBinningInformation(parameters, dataSample.getNumberOfElements());
         // It is important to do binning on original sample, which then gets resized discarding
         // last elements and then the calculation of variance and error is on consistent samples!
         // TODO: improve, e.g. just resize!
+        DEBUG(std::cout << "# Moment 1\n");
         performBinning(dataSample, parameters);
+        DEBUG(std::cout << "# Moment 2\n");
+        binnedVarianceSample = performBinning(varianceSample, parameters);
     }
     value.estimate = unbiasedVarianceOfDataSample(dataSample, isMeanZero);
     value.error = unbiasedErrorOfVariance(binnedVarianceSample);
 }
 
-void Variance::printCorrectBinningInformation(const BinningParameters& parameters)
+void Variance::printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample)
 {
-    printBinningInformation(parameters, constants::observableName<Variance>);
+    printBinningInformation(parameters, constants::observableName<Variance>, elementsOfSample);
 }
 
 functionForEstimatorsForJackknife Variance::getFunctionToBeAppliedToEstimatorsForJackknife()

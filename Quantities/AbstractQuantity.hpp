@@ -64,7 +64,7 @@ class QuantityAbstract {
     std::vector<DataSample> calculateNeededMomentsPerDataPoint(DataSample& dataSample);
     // Virtual method that must be provided by children classes
     // virtual Parameters getLocalParametersWithCorrectBinningInformation(const BinningParameters& parameters) = 0;
-    virtual void printCorrectBinningInformation(const BinningParameters& parameters) = 0;
+    virtual void printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample) = 0;
     virtual functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() = 0;
     virtual functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false) = 0;
     virtual functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false) = 0;

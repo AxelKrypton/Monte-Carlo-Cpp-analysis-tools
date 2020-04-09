@@ -31,7 +31,7 @@
 #include <type_traits>
 
 Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable);
-void printBinningInformation(const BinningParameters& parameters, std::string observable);
+void printBinningInformation(const BinningParameters& parameters, std::string observable, int elementsOfSample);
 
 // TODO: Implement the following function in a general way
 template<typename T> T getPowerOfFirstMomentUsingSeveralEstimate(const std::vector<T>& estimates, const int power)

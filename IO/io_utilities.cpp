@@ -40,8 +40,11 @@ std::string getFilenameForObservables(Parameters parameters)
 
 void printEstimateAndError(std::string estimateName, realFloat estimateValue, realFloat errorValue)
 {
+    std::ios oldState(nullptr);
+    oldState.copyfmt(std::cout);
     std::cout << "# \033[40m\033[1;32m" << estimateName << ": \033[1;36m" << std::scientific;
     std::cout << estimateValue << " \033[0m\u00B1\033[1;36m " << errorValue << "\033[0m" << std::endl;
+    std::cout.copyfmt(oldState);
 }
 
 // todo: add test for exception

@@ -47,7 +47,7 @@ class DatafileAnalyzer {
         if (parameters.calcAutocorrelation)
             AutocorrelationAnalyzer analyzer(data, parameters);
         else
-            ObservableAnalyzer analyzer(std::vector<DataSample>({data}), parameters);
+            ObservableAnalyzer observableAnalyzer(std::vector<DataSample>({data}), parameters);
         PrintRepeatedSymbol();
         std::cout << "\n";
     }
