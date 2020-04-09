@@ -24,9 +24,17 @@
 
 Variance::Variance() : QuantityAbstract() {}
 
-Variance::Variance(DataSample dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Variance::Variance(DataSample dataSample, BinningParameters parameters, bool isMeanZero)
+    : Variance(std::vector<DataSample>{dataSample}, parameters, isMeanZero)
 {
-    calculateAndSetValueAndError(dataSample, parameters);
+}
+
+Variance::Variance(std::vector<DataSample> dataSamples, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+{
+    if (dataSamples.size() > 1)
+        throw std::invalid_argument("Analysis of Variance with multiple columns not implemented yet!");
+
+    calculateAndSetValueAndError(dataSamples[0], parameters);
 }
 
 Variance::Variance(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)

@@ -28,6 +28,7 @@
 class Skewness : public QuantityAbstract {
   public:
     Skewness(DataSample dataSample, BinningParameters parameters, bool isMeanZero = false);
+    Skewness(std::vector<DataSample> dataSamples, BinningParameters parameters, bool isMeanZero = false);
     Skewness(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
     static DataSample

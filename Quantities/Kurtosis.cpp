@@ -23,11 +23,18 @@
 
 Kurtosis::Kurtosis() : QuantityAbstract() {}
 
-Kurtosis::Kurtosis(DataSample dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Kurtosis::Kurtosis(DataSample dataSample, BinningParameters parameters, bool isMeanZero)
+    : Kurtosis(std::vector<DataSample>{dataSample}, parameters, isMeanZero)
 {
-    calculateAndSetValueAndError(dataSample, parameters);
 }
 
+Kurtosis::Kurtosis(std::vector<DataSample> dataSamples, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+{
+    if (dataSamples.size() > 1)
+        throw std::invalid_argument("Analysis of Kurtosis with multiple columns not implemented yet!");
+
+    calculateAndSetValueAndError(dataSamples[0], parameters);
+}
 Kurtosis::Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
     : QuantityAbstract(isMeanZero)
 {

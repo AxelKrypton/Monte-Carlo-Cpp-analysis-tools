@@ -23,9 +23,17 @@
 
 Skewness::Skewness() : QuantityAbstract() {}
 
-Skewness::Skewness(DataSample dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Skewness::Skewness(DataSample dataSample, BinningParameters parameters, bool isMeanZero)
+    : Skewness(std::vector<DataSample>{dataSample}, parameters, isMeanZero)
 {
-    calculateAndSetValueAndError(dataSample, parameters);
+}
+
+Skewness::Skewness(std::vector<DataSample> dataSamples, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+{
+    if (dataSamples.size() > 1)
+        throw std::invalid_argument("Analysis of Skewness with multiple columns not implemented yet!");
+
+    calculateAndSetValueAndError(dataSamples[0], parameters);
 }
 
 Skewness::Skewness(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)

@@ -24,10 +24,18 @@
 
 Mean::Mean() : QuantityAbstract() {}
 
-Mean::Mean(DataSample dataSample, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Mean::Mean(DataSample dataSample, BinningParameters parameters, bool isMeanZero)
+    : Mean(std::vector<DataSample>{dataSample}, parameters, isMeanZero)
 {
-    calculateAndSetValueAndError(dataSample, parameters);
 }
+
+Mean::Mean(std::vector<DataSample> dataSamples, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+{
+    if (dataSamples.size() > 1)
+        throw std::invalid_argument("Analysis of Mean with multiple columns not implemented yet!");
+
+    calculateAndSetValueAndError(dataSamples[0], parameters);
+};
 
 Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
     : QuantityAbstract(isMeanZero)

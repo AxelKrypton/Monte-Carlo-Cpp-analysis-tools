@@ -28,6 +28,7 @@
 class Kurtosis : public QuantityAbstract {
   public:
     Kurtosis(DataSample dataSample, BinningParameters parameters, bool isMeanZero = false);
+    Kurtosis(std::vector<DataSample> dataSamples, BinningParameters parameters, bool isMeanZero = false);
     Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
     static DataSample
