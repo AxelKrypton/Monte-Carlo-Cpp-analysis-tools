@@ -26,15 +26,15 @@
 
 DatafileAnalyzer::DatafileAnalyzer(Parameters parameters)
 {
-    PrintRepeatedSymbol();
     std::vector<DataSample> data;
+    PrintRepeatedSymbol();
     for (int i = 0; i < parameters.numberOfColumnsToBeConsidered; i++)
         data.push_back(DataSample{parameters.file, parameters.column + i, parameters.offset});
+    PrintRepeatedSymbol();
     if (parameters.calcAutocorrelation)
         AutocorrelationAnalyzer analyzer(data[0], parameters);
     else
         ObservableAnalyzer observableAnalyzer(data, parameters);
-    PrintRepeatedSymbol();
     std::cout << "\n";
 }
 
@@ -46,19 +46,23 @@ ObservableAnalyzer::ObservableAnalyzer(std::vector<DataSample> data, Parameters 
 
 ObservableAnalyzer::~ObservableAnalyzer()
 {
+    std::cout << "\n";
+    PrintRepeatedSymbol();
     PrintResultOfAnalysisToOutput();
     PrintResultOfAnalysisToFile();
+    PrintRepeatedSymbol();
 }
 
 static void PrintQuantityToOutput(std::string name, const Quantities& quantities)
 {
-    PrintRepeatedSymbol();
     std::ios oldState(nullptr);
     oldState.copyfmt(std::cout);
     std::ostringstream value;
-    operator<<(value << std::scientific << std::setprecision(6), {quantities[name].value, " ± "});
-    std::cout << "# " << Color::observables.at(name) << name << ": " << Color::FG_LIGHT_CYAN << value.str() << Color::DEFAULT << "\n";
+    value << std::scientific << std::setprecision(6) << std::make_pair(quantities[name].value, " ± ");
+    std::cout << "# " << Color::observables.at(name) << std::setw(9) << name << ": " << Color::FG_LIGHT_CYAN << value.str()
+              << Color::DEFAULT << "\n";
     std::cout.copyfmt(oldState);
+    PrintRepeatedSymbol();
 }
 
 void ObservableAnalyzer::PrintResultOfAnalysisToOutput()
@@ -71,7 +75,6 @@ void ObservableAnalyzer::PrintResultOfAnalysisToOutput()
         PrintQuantityToOutput(constants::observableName<Skewness>, quantities);
     if (! parameters.doNotAnalyzeKurtosis)
         PrintQuantityToOutput(constants::observableName<Kurtosis>, quantities);
-    PrintRepeatedSymbol();
 }
 void ObservableAnalyzer::PrintResultOfAnalysisToFile()
 {

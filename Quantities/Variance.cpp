@@ -19,6 +19,7 @@
 
 #include "Variance.hpp"
 
+#include "../IO/io_utilities.hpp"
 #include "../dataAnalysisUtilities/binning.hpp"
 #include "Tools.hpp"
 
@@ -35,6 +36,7 @@ Variance::Variance(std::vector<DataSample> dataSamples, BinningParameters parame
         throw std::invalid_argument("Analysis of Variance with multiple columns not implemented yet!");
 
     calculateAndSetValueAndError(dataSamples[0], parameters);
+    PrintRepeatedSymbol();
 }
 
 Variance::Variance(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)

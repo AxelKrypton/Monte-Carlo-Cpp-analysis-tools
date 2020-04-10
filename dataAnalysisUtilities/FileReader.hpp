@@ -25,6 +25,8 @@
 #ifndef FILEREADER_HPP_
 #define FILEREADER_HPP_
 
+#include "../IO/io_utilities.hpp"
+
 #include <fstream>
 #include <sstream>
 
@@ -51,7 +53,7 @@ static void checkIfOffsetIsValid(int offset)
 
 class FileReader {
   public:
-    FileReader() { throw std::invalid_argument("Need input file to create FileReader!"); }
+    FileReader() = delete;
     FileReader(std::string filename, int column, int offset)
         : filename(filename)
         , column(column)
@@ -78,7 +80,8 @@ class FileReader {
         if (isAnyEntryBad != NULL)
             *isAnyEntryBad = anyBadEntry;
 
-        std::cout << "# read " << data.size() << " data points from file \"" << filename << "\"" << std::endl;
+        std::cout << "# Read " << Color::FG_LIGHT_CYAN << data.size() << Color::DEFAULT << " data points from column " << Color::FG_LIGHT_CYAN
+                  << column << Color::DEFAULT << " of file " << Color::FG_LIGHT_CYAN << filename << Color::DEFAULT << "\n";
 
         return DataSampleBasic(std::valarray<realFloat>(data.data(), data.size()));
     }

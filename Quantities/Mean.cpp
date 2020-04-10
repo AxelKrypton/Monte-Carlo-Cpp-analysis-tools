@@ -19,6 +19,7 @@
 
 #include "Mean.hpp"
 
+#include "../IO/io_utilities.hpp"
 #include "../dataAnalysisUtilities/binning.hpp"
 #include "Tools.hpp"
 
@@ -35,6 +36,7 @@ Mean::Mean(std::vector<DataSample> dataSamples, BinningParameters parameters, bo
         throw std::invalid_argument("Analysis of Mean with multiple columns not implemented yet!");
 
     calculateAndSetValueAndError(dataSamples[0], parameters);
+    PrintRepeatedSymbol();
 };
 
 Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)

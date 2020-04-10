@@ -20,7 +20,6 @@
 
 #include "Quantities.hpp"
 
-#include "../IO/io_utilities.hpp"
 #include "../Parameters/Parameters.hpp"
 #include "../dataAnalysisUtilities/DataSample.hpp"
 #include "Constants.hpp"
@@ -40,22 +39,18 @@ Quantities::Quantities(const DataSample& dataSample, Parameters parameters) : Qu
 Quantities::Quantities(const std::vector<DataSample>& dataSamples, Parameters parameters)
 {
     if (! parameters.doNotAnalyzeMean) {
-        PrintRepeatedSymbol();
         mean = Mean(dataSamples, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Mean>),
                     parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeVariance) {
-        PrintRepeatedSymbol();
         variance = Variance(dataSamples, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Variance>),
                             parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeSkewness) {
-        PrintRepeatedSymbol();
         skewness = Skewness(dataSamples, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Skewness>),
                             parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeKurtosis) {
-        PrintRepeatedSymbol();
         kurtosis = Kurtosis(dataSamples, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Kurtosis>),
                             parameters.isMeanKnownToBeZero);
     }

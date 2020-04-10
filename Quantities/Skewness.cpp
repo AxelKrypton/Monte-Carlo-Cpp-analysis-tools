@@ -19,6 +19,7 @@
 
 #include "Skewness.hpp"
 
+#include "../IO/io_utilities.hpp"
 #include "Tools.hpp"
 
 Skewness::Skewness() : QuantityAbstract() {}
@@ -34,6 +35,7 @@ Skewness::Skewness(std::vector<DataSample> dataSamples, BinningParameters parame
         throw std::invalid_argument("Analysis of Skewness with multiple columns not implemented yet!");
 
     calculateAndSetValueAndError(dataSamples[0], parameters);
+    PrintRepeatedSymbol();
 }
 
 Skewness::Skewness(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)

@@ -19,6 +19,7 @@
 
 #include "Kurtosis.hpp"
 
+#include "../IO/io_utilities.hpp"
 #include "Tools.hpp"
 
 Kurtosis::Kurtosis() : QuantityAbstract() {}
@@ -34,6 +35,7 @@ Kurtosis::Kurtosis(std::vector<DataSample> dataSamples, BinningParameters parame
         throw std::invalid_argument("Analysis of Kurtosis with multiple columns not implemented yet!");
 
     calculateAndSetValueAndError(dataSamples[0], parameters);
+    PrintRepeatedSymbol();
 }
 Kurtosis::Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
     : QuantityAbstract(isMeanZero)
