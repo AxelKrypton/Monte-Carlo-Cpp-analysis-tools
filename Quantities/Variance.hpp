@@ -30,7 +30,7 @@ class Parameters;
 class Variance : public QuantityAbstract {
   public:
     Variance(DataSample dataSample, BinningParameters parameters, bool isMeanZero = false);
-    Variance(std::vector<DataSample> dataSamples, BinningParameters parameters, bool isMeanZero = false);
+    Variance(MultipleDataSample dataSamples, BinningParameters parameters, bool isMeanZero = false);
     Variance(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
              bool useMultipleEstimate = false);
     static DataSample

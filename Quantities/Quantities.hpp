@@ -33,6 +33,7 @@
 #include <sstream>
 
 class DataSample;
+class MultipleDataSample;
 class Parameters;
 class Moments;
 class MomentsEstimators;
@@ -50,7 +51,7 @@ class Quantities {
   public:
     Quantities();
     Quantities(const DataSample& dataSample, Parameters parameters);
-    Quantities(const std::vector<DataSample>& dataSamples, Parameters parameters);
+    Quantities(const MultipleDataSample& dataSamples, Parameters parameters);
     const QuantityAbstract& operator[](std::string quantityLabel) const;
     QuantityAbstract& operator[](std::string quantityLabel);
 

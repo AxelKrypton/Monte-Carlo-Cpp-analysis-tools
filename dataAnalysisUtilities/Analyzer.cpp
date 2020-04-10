@@ -38,7 +38,7 @@ DatafileAnalyzer::DatafileAnalyzer(Parameters parameters)
     std::cout << "\n";
 }
 
-ObservableAnalyzer::ObservableAnalyzer(std::vector<DataSample> data, Parameters parameters)
+ObservableAnalyzer::ObservableAnalyzer(MultipleDataSample data, Parameters parameters)
     : parameters(parameters)
     , quantities(data, parameters)
 {

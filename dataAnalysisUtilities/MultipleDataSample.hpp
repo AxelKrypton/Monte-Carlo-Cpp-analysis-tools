@@ -28,6 +28,8 @@ class MultipleDataSample {
     MultipleDataSample(std::vector<DataSample> dataIn);
 
     DataSample getNthMomentPerDataPoint(unsigned int n);
+    DataSample& operator[](size_t n);
+    size_t size();
 
   private:
     std::vector<DataSample> data;

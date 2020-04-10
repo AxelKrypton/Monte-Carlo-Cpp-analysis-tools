@@ -22,6 +22,7 @@
 
 #include "../Parameters/Parameters.hpp"
 #include "../dataAnalysisUtilities/DataSample.hpp"
+#include "../dataAnalysisUtilities/MultipleDataSample.hpp"
 #include "Constants.hpp"
 
 #include <iomanip>
@@ -29,29 +30,29 @@
 
 Quantities::Quantities() : mean(), variance(), skewness(), kurtosis() {}
 
-Quantities::Quantities(const DataSample& dataSample, Parameters parameters) : Quantities(std::vector<DataSample>{dataSample}, parameters) {}
+Quantities::Quantities(const DataSample& dataSample, Parameters parameters) : Quantities(MultipleDataSample({dataSample}), parameters) {}
 
 /*
  * NOTE: It it important to get the full parameters here and to extract the binning
  *       information for each quantity, since the number to make binning depends
  *       on the needed moment to calculate the quantity!
  */
-Quantities::Quantities(const std::vector<DataSample>& dataSamples, Parameters parameters)
+Quantities::Quantities(const MultipleDataSample& data, Parameters parameters)
 {
     if (! parameters.doNotAnalyzeMean) {
-        mean = Mean(dataSamples, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Mean>),
-                    parameters.isMeanKnownToBeZero);
+        mean = Mean(
+            data, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Mean>), parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeVariance) {
-        variance = Variance(dataSamples, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Variance>),
+        variance = Variance(data, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Variance>),
                             parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeSkewness) {
-        skewness = Skewness(dataSamples, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Skewness>),
+        skewness = Skewness(data, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Skewness>),
                             parameters.isMeanKnownToBeZero);
     }
     if (! parameters.doNotAnalyzeKurtosis) {
-        kurtosis = Kurtosis(dataSamples, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Kurtosis>),
+        kurtosis = Kurtosis(data, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Kurtosis>),
                             parameters.isMeanKnownToBeZero);
     }
 }

@@ -30,7 +30,7 @@ class DatafileAnalyzer {
 
 class ObservableAnalyzer {
   public:
-    ObservableAnalyzer(std::vector<DataSample> data, Parameters parameters);
+    ObservableAnalyzer(MultipleDataSample data, Parameters parameters);
     ~ObservableAnalyzer();
 
   private:

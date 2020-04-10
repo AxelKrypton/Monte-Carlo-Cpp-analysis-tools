@@ -40,3 +40,13 @@ DataSample MultipleDataSample::getNthMomentPerDataPoint(unsigned int n)
 {
     throw std::runtime_error("Calculation of moment number " + std::to_string(n) + " for MultipleDataSample not implemented yet!");
 }
+
+DataSample& MultipleDataSample::operator[](size_t n)
+{
+    return data[n];
+}
+
+size_t MultipleDataSample::size()
+{
+    return data.size();
+}

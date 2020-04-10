@@ -20,6 +20,7 @@
 #pragma once
 
 #include "../dataAnalysisUtilities/DataSample.hpp"
+#include "../dataAnalysisUtilities/MultipleDataSample.hpp"
 #include "../types.hpp"
 #include "Constants.hpp"
 #include "EstimateAndError.hpp"

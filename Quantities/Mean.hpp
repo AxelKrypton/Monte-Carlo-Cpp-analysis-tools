@@ -33,7 +33,7 @@ class Parameters;
 class Mean : public QuantityAbstract {
   public:
     Mean(DataSample dataSample, BinningParameters parameters, bool isMeanZero = false);
-    Mean(std::vector<DataSample> dataSamples, BinningParameters parameters, bool isMeanZero = false);
+    Mean(MultipleDataSample dataSamples, BinningParameters parameters, bool isMeanZero = false);
     Mean(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
          bool useMultipleEstimate = false);
     static DataSample
