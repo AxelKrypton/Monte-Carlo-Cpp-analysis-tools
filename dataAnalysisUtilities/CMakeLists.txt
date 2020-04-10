@@ -19,6 +19,7 @@
 add_library(dataAnalysisUtilities
 	DataSampleBasic.cpp
 	DataSample.cpp
+	MultipleDataSample.cpp
 	binnedDataSample.cpp
 	jackknifeEstimators.cpp
 	dataAnalysisUtilities.cpp
@@ -34,6 +35,7 @@ if( USE_REW_MULTI_PRECISION )
 	add_library(supportSourceForMultiprecisionReweighting
 		DataSampleBasic.cpp
 		DataSample.cpp
+		MultipleDataSample.cpp
 		binnedDataSample.cpp
 		jackknifeEstimators.cpp
 		jackknifeAnalysis.cpp
@@ -60,6 +62,7 @@ endif(EXTRACTION_EXIT_CODE EQUAL 0)
 
 add_unit_test(dataSampleBasic DataSampleBasic_test dataAnalysisUtilities)
 add_unit_test(dataSample DataSample_test dataAnalysisUtilities)
+add_unit_test(multipleDataSample MultipleDataSample_test dataAnalysisUtilities)
 add_unit_test(binnedDataSample binnedDataSample_test dataAnalysisUtilities)
 add_unit_test(jackknifeEstimators jackknifeEstimators_test dataAnalysisUtilities)
 add_unit_test(dataAnalysisUtilities dataAnalysisUtilities_test dataAnalysisUtilities Parameters)
