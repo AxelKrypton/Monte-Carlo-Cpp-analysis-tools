@@ -21,6 +21,7 @@
 #include "io_utilities.hpp"
 
 #include <fstream>
+#include <iomanip>
 
 void PrintRepeatedSymbol(char symbol, int times)
 {

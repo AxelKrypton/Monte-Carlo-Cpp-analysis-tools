@@ -23,6 +23,7 @@
 #include "dataAnalysisUtilities.hpp"
 
 #include <fstream>
+#include <iomanip>
 
 DatafileAnalyzer::DatafileAnalyzer(Parameters parameters)
 {
