@@ -55,9 +55,9 @@ SimulationData::SimulationData(std::map<std::string, realFloat> simulationParame
                  */
                 if (charInLine)
                     throwInvalidColumnOfFile(filenameIn, i + 1);
-            } catch (std::out_of_range exceptionThrown) {
+            } catch (std::out_of_range& exceptionThrown) {
                 break;
-            } catch (std::invalid_argument exceptionThrown) {
+            } catch (std::invalid_argument& exceptionThrown) {
                 throwInvalidColumnOfFile(filenameIn, i + 1);
             }
         }

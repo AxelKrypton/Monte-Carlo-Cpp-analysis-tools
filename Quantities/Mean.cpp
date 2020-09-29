@@ -37,7 +37,7 @@ Mean::Mean(MultipleDataSample dataSamples, BinningParameters parameters, bool is
 
     calculateAndSetValueAndError(dataSamples[0], parameters);
     PrintRepeatedSymbol();
-};
+}
 
 Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
     : QuantityAbstract(isMeanZero)

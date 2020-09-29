@@ -56,7 +56,7 @@ std::vector<realFloat> Moments::operator()(const unsigned int& whichMoment)
 
 /**********************************************************************************/
 
-MomentsEstimators::MomentsEstimators(){};
+MomentsEstimators::MomentsEstimators(){}
 
 void MomentsEstimators::insert(const unsigned int& whichMoment, const DataSample& momentEstValues)
 {
