@@ -2,7 +2,7 @@
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
  *  Copyright (c) 2019 David Leemueller
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ inline std::ostream& operator<<(std::ostream& stream, const std::pair<EstimateAn
 
 inline std::ostream& operator<<(std::ostream& stream, const EstimateAndError& value)
 {
-    return operator<<(stream, {value, "\t"});
+    return operator<<(stream, std::make_pair(value, std::string{"\t"}));
 }
 
 #endif
