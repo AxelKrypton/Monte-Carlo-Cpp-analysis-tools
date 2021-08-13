@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,10 +27,10 @@
  */
 class Skewness : public QuantityAbstract {
   public:
-    Skewness(DataSample dataSample, BinningParameters parameters, bool isMeanZero = false);
-    Skewness(MultipleDataSample dataSamples, BinningParameters parameters, bool isMeanZero = false);
-    Skewness(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
-             bool useMultipleEstimate = false);
+    Skewness(DataSample, BinningParameters, QuantityAttributes);
+    Skewness(MultipleDataSample, BinningParameters, QuantityAttributes);
+    Skewness(Moments, MomentsEstimators, QuantityAttributes, ErrorCalculationMethod);
+
     static DataSample
     evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 
 static void testMeanAndError(DataSample sample, EstimateAndError expectedMeanAndError)
 {
-    Mean mean(sample, BinningParameters{}, (expectedMeanAndError.estimate == 0.0));
+    Mean mean(sample, BinningParameters{}, QuantityAttributes{expectedMeanAndError.estimate == 0.0, false});
     checkEstimateAndError(expectedMeanAndError, mean.value, realFloatPrecisionInPercent);
 }
 
@@ -47,7 +47,7 @@ static void testMeanAndErrorFromFile(std::string file, int binsizeOrNumberOfBins
     Parameters parameters(options);
     DataSample sample(file);
     Mean mean(sample, parameters.getBinningParametersForAnalysis(constants::observableName<Mean>),
-              (expectedMeanAndError.estimate == 0.0));
+              QuantityAttributes{expectedMeanAndError.estimate == 0.0, false});
     checkEstimateAndError(expectedMeanAndError, mean.value, testPrecision);
 }
 
@@ -147,8 +147,8 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
     {
         int binsize = 1;
         DataSample sample(fileThatDoesExist);
-        Mean mean1(sample, BinningParameters{});
-        Mean mean2(sample, BinningParameters{true, false, false, false, binsize});
+        Mean mean1(sample, BinningParameters{}, QuantityAttributes{});
+        Mean mean2(sample, BinningParameters{true, false, false, false, binsize}, QuantityAttributes{});
 
         // Trivial binning should not do anything
         checkEstimateAndError(mean1.value, mean2.value, precisionOfDataInFileInPercent);
@@ -158,8 +158,8 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromBinsize)
     {
         int binsize = 201;
         DataSample sample(fileThatDoesExist);
-        Mean mean1(sample, BinningParameters{});
-        Mean mean2(sample, BinningParameters{true, false, false, true, binsize});
+        Mean mean1(sample, BinningParameters{}, QuantityAttributes{});
+        Mean mean2(sample, BinningParameters{true, false, false, true, binsize}, QuantityAttributes{});
 
         // Binning should not change estimate as long as data are not discarded
         BOOST_CHECK_CLOSE(mean1.value.estimate, mean2.value.estimate, precisionOfDataInFileInPercent);
@@ -195,8 +195,8 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
     {
         int numberOfBins = 1005;
         DataSample sample(fileThatDoesExist);
-        Mean mean1(sample, BinningParameters{});
-        Mean mean2(sample, BinningParameters{true, false, false, true, numberOfBins});
+        Mean mean1(sample, BinningParameters{}, QuantityAttributes{});
+        Mean mean2(sample, BinningParameters{true, false, false, true, numberOfBins}, QuantityAttributes{});
 
         // Trivial binning should not do anything
         checkEstimateAndError(mean1.value, mean2.value, precisionOfDataInFileInPercent);
@@ -206,8 +206,8 @@ BOOST_AUTO_TEST_SUITE(meanAndErrorWithBinningFromNumberOfBins)
     {
         int numberOfBins = 5;
         DataSample sample(fileThatDoesExist);
-        Mean mean1(sample, BinningParameters{});
-        Mean mean2(sample, BinningParameters{true, false, false, true, numberOfBins});
+        Mean mean1(sample, BinningParameters{}, QuantityAttributes{});
+        Mean mean2(sample, BinningParameters{true, false, false, true, numberOfBins}, QuantityAttributes{});
 
         // Binning should not change estimate as long as data are not discarded
         BOOST_CHECK_CLOSE(mean1.value.estimate, mean2.value.estimate, precisionOfDataInFileInPercent);
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimators)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)
     {
         EstimateAndError referenceValue(0.0, 0.0);
-        Mean mean(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
+        Mean mean(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), QuantityAttributes{true, false}, bootstrap);
         BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(mean.value.error, 1.e-7);
     }
@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimators)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
     {
         EstimateAndError referenceValue(0.5120788163699608, 0.0);
-        Mean mean(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
+        Mean mean(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), QuantityAttributes{false, false}, bootstrap);
         BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(mean.value.error, 1.e-7);
     }
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimators)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
     {
         EstimateAndError referenceValue(0.5120788163699608, 1.1520239122276158e-03);
-        Mean mean(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
+        Mean mean(buildMomentsForTest(), buildMomentsEstimatorsForTest(), QuantityAttributes{false, false}, bootstrap);
         BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_CLOSE(mean.value.error, referenceValue.error, realFloatPrecisionInPercent);
     }
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimators)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
     {
         EstimateAndError referenceValue(0.0, 0.0);
-        Mean mean(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
+        Mean mean(buildMomentsForTest(), buildMomentsEstimatorsForTest(), QuantityAttributes{true, false}, bootstrap);
         BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_CLOSE(mean.value.error, referenceValue.error, realFloatPrecisionInPercent);
     }
@@ -252,7 +252,8 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimators)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
     {
         EstimateAndError referenceValue(0.0, 0.0);
-        Mean mean(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
+        Mean mean(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
+                  QuantityAttributes{true, true}, bootstrap);
         BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(mean.value.error, 1.e-7);
     }
@@ -260,7 +261,8 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimators)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator6)
     {
         EstimateAndError referenceValue(0.5120788163699608, 0.0);
-        Mean mean(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
+        Mean mean(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
+                  QuantityAttributes{false, true}, bootstrap);
         BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(mean.value.error, 1.e-7);
     }

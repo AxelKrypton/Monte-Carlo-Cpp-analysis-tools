@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2015 Christopher Pinke
- *  Copyright (c) 2015-2016,2018-2020 Alessandro Sciarra
+ *  Copyright (c) 2015-2016,2018-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -404,17 +404,17 @@ static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(
                 obsInFile, columnsToBeReweightedUsingMultipleColumns, numberOfReweightingParameters, mximumMomentNeeded);
             for (auto quantity : quantitiesToBeSet) {
                 if (quantity == constants::observableName<Mean>) {
-                    observables[newPoint][obsInFile][quantity] = Mean(
-                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
+                    observables[newPoint][obsInFile][quantity] = Mean(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
+                                                                      QuantityAttributes{isMeanZero, useMultipleEstimate}, errorMethod);
                 } else if (quantity == constants::observableName<Variance>) {
-                    observables[newPoint][obsInFile][quantity] = Variance(
-                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
+                    observables[newPoint][obsInFile][quantity] = Variance(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
+                                                                          QuantityAttributes{isMeanZero, useMultipleEstimate}, errorMethod);
                 } else if (quantity == constants::observableName<Skewness>) {
-                    observables[newPoint][obsInFile][quantity] = Skewness(
-                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
+                    observables[newPoint][obsInFile][quantity] = Skewness(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
+                                                                          QuantityAttributes{isMeanZero, useMultipleEstimate}, errorMethod);
                 } else if (quantity == constants::observableName<Kurtosis>) {
-                    observables[newPoint][obsInFile][quantity] = Kurtosis(
-                        moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile], isMeanZero, errorMethod, useMultipleEstimate);
+                    observables[newPoint][obsInFile][quantity] = Kurtosis(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
+                                                                          QuantityAttributes{isMeanZero, useMultipleEstimate}, errorMethod);
                 } else
                     throw std::invalid_argument(
                         "Unknown observable in \"setObservablesAtNewPointsFromMomentsAndMomentEstimators\" function!");

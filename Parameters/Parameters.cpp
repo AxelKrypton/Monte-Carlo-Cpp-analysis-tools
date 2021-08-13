@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014 Christopher Pinke
- *  Copyright (c) 2014-2015,2018,2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2018,2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -278,4 +278,10 @@ BinningParameters Parameters::getBinningParametersForAnalysis(std::string observ
         throw std::invalid_argument("Unknown observable in getBinningParametersForObservablesAnalysis function!");
     }
     return returnValue;
+}
+
+QuantityAttributes Parameters::getAnalysisOptions() const
+{
+    // TODO: Add member to let use toggle use of multiple estimates!
+    return QuantityAttributes{isMeanKnownToBeZero, false};
 }

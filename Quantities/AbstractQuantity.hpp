@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "Moments.hpp"
 
 class BinningParameters;
+class QuantityAttributes;
 
 /*
  * TODO: So far the error method is not a private member of the class, since for the raw data only Jackknife is used!
@@ -44,7 +45,7 @@ class BinningParameters;
 
 class QuantityAbstract {
   public:
-    QuantityAbstract(bool isMeanKnownToBeZero = false);
+    QuantityAbstract(const QuantityAttributes& options);
     virtual ~QuantityAbstract(){};
     EstimateAndError value;
 
@@ -59,6 +60,7 @@ class QuantityAbstract {
     void calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
                                       bool useMultipleEstimate);
     bool isMeanZero;
+    bool useMultipleEstimates;
 
   private:
     std::vector<DataSample> getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const BinningParameters& parameters);

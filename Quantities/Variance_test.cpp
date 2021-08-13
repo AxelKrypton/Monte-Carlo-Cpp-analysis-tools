@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
 
     static void testVarianceAndError(DataSample sample, EstimateAndError expected, realFloat testPrecision, bool isMeanKnownToBeZero = false)
     {
-        Variance variance(sample, BinningParameters{}, isMeanKnownToBeZero);
+        Variance variance(sample, BinningParameters{}, QuantityAttributes{isMeanKnownToBeZero, false});
         checkEstimateAndError(expected, variance.value, testPrecision);
     }
 
@@ -86,14 +86,14 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         /*
          * This test would fail if binning was done before calculating the second central moment,
          * because of rounding errors. The error is the standard deviation of
-         *    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+         *    {1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0}
          * in the correct scenario, while it is the standard deviation of
          *    {0.2, -0.2, 0.2, -0.2, 0.2, -0.2, 0.2, -0.2, 0.2, -0.2}
          * in the wrong scenario and numerically this gives something in e-18.
          */
         int numberOfElements = 50;
         DataSample sample = getDataSampleBasedOnFillType(numberOfElements, onesMinusOnes);
-        Variance variance(sample, {true, false, false, false, 5});
+        Variance variance(sample, BinningParameters{true, false, false, false, 5}, QuantityAttributes{});
         BOOST_REQUIRE_EQUAL(variance.value.error, 0);
     }
     BOOST_AUTO_TEST_CASE(withBinning1)
@@ -102,8 +102,8 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         std::string fileThatDoesExist = "SampleDatafiles/datafile.example";
         realFloat precisionOfDataInFileInPercent = 1e-10;
         DataSample sample(fileThatDoesExist);
-        Variance variance1(sample, {});
-        Variance variance2(sample, {true, false, false, false, 201});
+        Variance variance1(sample, BinningParameters{}, QuantityAttributes{});
+        Variance variance2(sample, BinningParameters{true, false, false, false, 201}, QuantityAttributes{});
 
         // Binning should not change estimate as long as data are not discarded
         BOOST_REQUIRE_CLOSE(variance1.value.estimate, variance2.value.estimate, precisionOfDataInFileInPercent);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         realFloat expectedError = 5e-3;
         realFloat expectedPrecisionInPercent = 1;
         DataSample sample(gaussianData);
-        Variance variance(sample, {true, false, false, false, 1000});
+        Variance variance(sample, {true, false, false, false, 1000}, QuantityAttributes{});
         BOOST_CHECK_CLOSE(variance.value.estimate, expectedVariance, expectedPrecisionInPercent);
         BOOST_CHECK_SMALL(variance.value.error, expectedError);
     }
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)
     {
         EstimateAndError referenceValue(0.2622374015645983, 0.0);
-        Variance variance(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
+        Variance variance(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), QuantityAttributes{true, false}, bootstrap);
         BOOST_CHECK_CLOSE(variance.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(variance.value.error, 1.e-7);
     }
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
     {
         EstimateAndError referenceValue(1.268738973830841e-05, 0.0);
-        Variance variance(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
+        Variance variance(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), QuantityAttributes{false, false}, bootstrap);
         BOOST_CHECK_CLOSE(variance.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(variance.value.error, 1.e-7);
     }
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
     {
         EstimateAndError referenceValue(1.268738973830841e-05, 3.0259317682406541e-06);
-        Variance variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
+        Variance variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), QuantityAttributes{false, false}, bootstrap);
         BOOST_CHECK_CLOSE(variance.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_CLOSE(variance.value.error, referenceValue.error, realFloatPrecisionInPercent);
     }
@@ -154,7 +154,8 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
     {
         EstimateAndError referenceValue(0.2622374015645983, 0.0);
-        Variance variance(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
+        Variance variance(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
+                          QuantityAttributes{true, true}, bootstrap);
         BOOST_CHECK_CLOSE(variance.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(variance.value.error, 1.e-7);
     }
@@ -162,8 +163,8 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
     {
         EstimateAndError referenceValue(1.268738973830841e-05, 0.0);
-        Variance variance(
-            buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
+        Variance variance(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
+                          QuantityAttributes{false, true}, bootstrap);
         BOOST_CHECK_CLOSE(variance.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(variance.value.error, 1.e-7);
     }

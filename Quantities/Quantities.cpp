@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2015 Christopher Pinke
- *  Copyright (c) 2015-2016,2018-2020 Alessandro Sciarra
+ *  Copyright (c) 2015-2016,2018-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,20 +40,19 @@ Quantities::Quantities(const DataSample& dataSample, Parameters parameters) : Qu
 Quantities::Quantities(const MultipleDataSample& data, Parameters parameters)
 {
     if (! parameters.doNotAnalyzeMean) {
-        mean = Mean(
-            data, parameters.getBinningParametersForAnalysis(constants::observableName<Mean>), parameters.isMeanKnownToBeZero);
+        mean = Mean(data, parameters.getBinningParametersForAnalysis(constants::observableName<Mean>), parameters.getAnalysisOptions());
     }
     if (! parameters.doNotAnalyzeVariance) {
-        variance = Variance(data, parameters.getBinningParametersForAnalysis(constants::observableName<Variance>),
-                            parameters.isMeanKnownToBeZero);
+        variance = Variance(
+            data, parameters.getBinningParametersForAnalysis(constants::observableName<Variance>), parameters.getAnalysisOptions());
     }
     if (! parameters.doNotAnalyzeSkewness) {
-        skewness = Skewness(data, parameters.getBinningParametersForAnalysis(constants::observableName<Skewness>),
-                            parameters.isMeanKnownToBeZero);
+        skewness = Skewness(
+            data, parameters.getBinningParametersForAnalysis(constants::observableName<Skewness>), parameters.getAnalysisOptions());
     }
     if (! parameters.doNotAnalyzeKurtosis) {
-        kurtosis = Kurtosis(data, parameters.getBinningParametersForAnalysis(constants::observableName<Kurtosis>),
-                            parameters.isMeanKnownToBeZero);
+        kurtosis = Kurtosis(
+            data, parameters.getBinningParametersForAnalysis(constants::observableName<Kurtosis>), parameters.getAnalysisOptions());
     }
 }
 

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,14 +22,14 @@
 #include "../IO/io_utilities.hpp"
 #include "Tools.hpp"
 
-Skewness::Skewness() : QuantityAbstract() {}
+Skewness::Skewness() : QuantityAbstract(QuantityAttributes{}) {}
 
-Skewness::Skewness(DataSample dataSample, BinningParameters parameters, bool isMeanZero)
-    : Skewness(MultipleDataSample({dataSample}), parameters, isMeanZero)
+Skewness::Skewness(DataSample dataSample, BinningParameters parameters, QuantityAttributes options)
+    : Skewness(MultipleDataSample({dataSample}), parameters, options)
 {
 }
 
-Skewness::Skewness(MultipleDataSample dataSamples, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Skewness::Skewness(MultipleDataSample dataSamples, BinningParameters parameters, QuantityAttributes options) : QuantityAbstract(options)
 {
     if (dataSamples.size() > 1)
         throw std::invalid_argument("Analysis of Skewness with multiple columns not implemented yet!");
@@ -38,10 +38,10 @@ Skewness::Skewness(MultipleDataSample dataSamples, BinningParameters parameters,
     PrintRepeatedSymbol();
 }
 
-Skewness::Skewness(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
-    : QuantityAbstract(isMeanZero)
+Skewness::Skewness(Moments moments, MomentsEstimators estimators, QuantityAttributes options, ErrorCalculationMethod errorMethod)
+    : QuantityAbstract(options)
 {
-    calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
+    calculateAndSetValueAndError(moments, estimators, errorMethod, options.useMultipleEstimates);
 }
 
 void Skewness::printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample)

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,14 +23,14 @@
 #include "../dataAnalysisUtilities/binning.hpp"
 #include "Tools.hpp"
 
-Variance::Variance() : QuantityAbstract() {}
+Variance::Variance() : QuantityAbstract(QuantityAttributes{}) {}
 
-Variance::Variance(DataSample dataSample, BinningParameters parameters, bool isMeanZero)
-    : Variance(MultipleDataSample({dataSample}), parameters, isMeanZero)
+Variance::Variance(DataSample dataSample, BinningParameters parameters, QuantityAttributes options)
+    : Variance(MultipleDataSample({dataSample}), parameters, options)
 {
 }
 
-Variance::Variance(MultipleDataSample dataSamples, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Variance::Variance(MultipleDataSample dataSamples, BinningParameters parameters, QuantityAttributes options) : QuantityAbstract(options)
 {
     if (dataSamples.size() > 1)
         throw std::invalid_argument("Analysis of Variance with multiple columns not implemented yet!");
@@ -39,10 +39,10 @@ Variance::Variance(MultipleDataSample dataSamples, BinningParameters parameters,
     PrintRepeatedSymbol();
 }
 
-Variance::Variance(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
-    : QuantityAbstract(isMeanZero)
+Variance::Variance(Moments moments, MomentsEstimators estimators, QuantityAttributes options, ErrorCalculationMethod errorMethod)
+    : QuantityAbstract(options)
 {
-    QuantityAbstract::calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
+    QuantityAbstract::calculateAndSetValueAndError(moments, estimators, errorMethod, options.useMultipleEstimates);
 }
 
 static realFloat unbiasedVarianceOfDataSample(DataSample&, bool);

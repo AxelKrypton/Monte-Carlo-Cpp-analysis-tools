@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,14 +22,14 @@
 #include "../IO/io_utilities.hpp"
 #include "Tools.hpp"
 
-Kurtosis::Kurtosis() : QuantityAbstract() {}
+Kurtosis::Kurtosis() : QuantityAbstract(QuantityAttributes{}) {}
 
-Kurtosis::Kurtosis(DataSample dataSample, BinningParameters parameters, bool isMeanZero)
-    : Kurtosis(MultipleDataSample({dataSample}), parameters, isMeanZero)
+Kurtosis::Kurtosis(DataSample dataSample, BinningParameters parameters, QuantityAttributes options)
+    : Kurtosis(MultipleDataSample({dataSample}), parameters, options)
 {
 }
 
-Kurtosis::Kurtosis(MultipleDataSample dataSamples, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Kurtosis::Kurtosis(MultipleDataSample dataSamples, BinningParameters parameters, QuantityAttributes options) : QuantityAbstract(options)
 {
     if (dataSamples.size() > 1)
         throw std::invalid_argument("Analysis of Kurtosis with multiple columns not implemented yet!");
@@ -37,10 +37,10 @@ Kurtosis::Kurtosis(MultipleDataSample dataSamples, BinningParameters parameters,
     calculateAndSetValueAndError(dataSamples[0], parameters);
     PrintRepeatedSymbol();
 }
-Kurtosis::Kurtosis(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
-    : QuantityAbstract(isMeanZero)
+Kurtosis::Kurtosis(Moments moments, MomentsEstimators estimators, QuantityAttributes options, ErrorCalculationMethod errorMethod)
+    : QuantityAbstract(options)
 {
-    calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
+    calculateAndSetValueAndError(moments, estimators, errorMethod, options.useMultipleEstimates);
 }
 
 void Kurtosis::printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample)

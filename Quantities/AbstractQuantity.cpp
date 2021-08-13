@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,12 @@
 #include "../dataAnalysisUtilities/jackknifeAnalysis.hpp"
 #include "Tools.hpp"
 
-QuantityAbstract::QuantityAbstract(bool isMeanKnownToBeZero) : value(NAN, NAN), isMeanZero(isMeanKnownToBeZero) {}
+QuantityAbstract::QuantityAbstract(const QuantityAttributes& options)
+    : value(NAN, NAN)
+    , isMeanZero(options.isMeanZero)
+    , useMultipleEstimates(options.useMultipleEstimates)
+{
+}
 
 void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)
 {

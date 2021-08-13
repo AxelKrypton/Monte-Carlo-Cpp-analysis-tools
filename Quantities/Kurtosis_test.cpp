@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,8 +34,8 @@ BOOST_AUTO_TEST_SUITE(KurtosisAndError)
     BOOST_AUTO_TEST_CASE(withBinning1)
     {
         DataSample sample(gaussianData);
-        Kurtosis kurtosis1(sample, {});
-        Kurtosis kurtosis2(sample, {true, false, false, false, 5000});
+        Kurtosis kurtosis1(sample, BinningParameters{}, QuantityAttributes{});
+        Kurtosis kurtosis2(sample, BinningParameters{true, false, false, false, 5000}, QuantityAttributes{});
 
         // Binning should change kurtosis estimate
         BOOST_REQUIRE_NE(kurtosis1.value.estimate, kurtosis2.value.estimate);
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_SUITE(KurtosisAndError)
     {
         realFloat expectedKurtosis = 3.;
         DataSample sample(gaussianData);
-        Kurtosis kurtosis(sample, {true, false, false, false, 100});
+        Kurtosis kurtosis(sample, BinningParameters{true, false, false, false, 100}, QuantityAttributes{});
         std::cout << "Kurtosis = " << kurtosis.value.estimate << " +/- " << kurtosis.value.error << "\n";
         realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue
             = std::fabs(kurtosis.value.estimate - expectedKurtosis) / kurtosis.value.error;
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_SUITE(KurtosisAndError)
     {
         realFloat expectedKurtosis = 3.;
         DataSample sample(gaussianData);
-        Kurtosis kurtosis(sample, {true, false, false, false, 100}, true);
+        Kurtosis kurtosis(sample, BinningParameters{true, false, false, false, 100}, QuantityAttributes{true, false});
         std::cout << "Kurtosis = " << kurtosis.value.estimate << " +/- " << kurtosis.value.error << "\n";
         realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue
             = std::fabs(kurtosis.value.estimate - expectedKurtosis) / kurtosis.value.error;
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_SUITE(KurtosisTest)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)
     {
         EstimateAndError referenceValue(1.000194288875983, 0.0);
-        Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
+        Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), QuantityAttributes{true, false}, bootstrap);
         BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(kurtosis.value.error, 1.e-7);
     }
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_SUITE(KurtosisTest)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
     {
         EstimateAndError referenceValue(3.7478114121524830, 0.0);
-        Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
+        Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), QuantityAttributes{false, false}, bootstrap);
         BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(kurtosis.value.error, 3.e-7);
     }
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_SUITE(KurtosisTest)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
     {
         EstimateAndError referenceValue(3.7478114121524830, 7.2132403917648602e-01);
-        Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
+        Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsForTest(), QuantityAttributes{false, false}, bootstrap);
         BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_CLOSE(kurtosis.value.error, referenceValue.error, realFloatPrecisionInPercent);
     }
@@ -100,7 +100,8 @@ BOOST_AUTO_TEST_SUITE(KurtosisTest)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
     {
         EstimateAndError referenceValue(1.000194288875983, 0.0);
-        Kurtosis kurtosis(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
+        Kurtosis kurtosis(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
+                          QuantityAttributes{true, true}, bootstrap);
         BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(kurtosis.value.error, 1.e-7);
     }
@@ -108,8 +109,8 @@ BOOST_AUTO_TEST_SUITE(KurtosisTest)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
     {
         EstimateAndError referenceValue(3.7478114121524830, 0.0);
-        Kurtosis kurtosis(
-            buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
+        Kurtosis kurtosis(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
+                          QuantityAttributes{false, true}, bootstrap);
         BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(kurtosis.value.error, 3.e-7);
     }

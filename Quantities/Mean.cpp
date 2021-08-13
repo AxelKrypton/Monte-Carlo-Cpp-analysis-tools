@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,14 +23,14 @@
 #include "../dataAnalysisUtilities/binning.hpp"
 #include "Tools.hpp"
 
-Mean::Mean() : QuantityAbstract() {}
+Mean::Mean() : QuantityAbstract(QuantityAttributes{}) {}
 
-Mean::Mean(DataSample dataSample, BinningParameters parameters, bool isMeanZero)
-    : Mean(MultipleDataSample({dataSample}), parameters, isMeanZero)
+Mean::Mean(DataSample dataSample, BinningParameters parameters, QuantityAttributes options)
+    : Mean(MultipleDataSample({dataSample}), parameters, options)
 {
 }
 
-Mean::Mean(MultipleDataSample dataSamples, BinningParameters parameters, bool isMeanZero) : QuantityAbstract(isMeanZero)
+Mean::Mean(MultipleDataSample dataSamples, BinningParameters parameters, QuantityAttributes options) : QuantityAbstract(options)
 {
     if (dataSamples.size() > 1)
         throw std::invalid_argument("Analysis of Mean with multiple columns not implemented yet!");
@@ -39,13 +39,13 @@ Mean::Mean(MultipleDataSample dataSamples, BinningParameters parameters, bool is
     PrintRepeatedSymbol();
 }
 
-Mean::Mean(Moments moments, MomentsEstimators estimators, bool isMeanZero, ErrorCalculationMethod errorMethod, bool useMultipleEstimate)
-    : QuantityAbstract(isMeanZero)
+Mean::Mean(Moments moments, MomentsEstimators estimators, QuantityAttributes options, ErrorCalculationMethod errorMethod)
+    : QuantityAbstract(options)
 {
-    if (isMeanZero)
+    if (options.isMeanZero)
         value = EstimateAndError(0.0, 0.0);  // TODO: Shouldn't the error still be calculated!?
     else
-        QuantityAbstract::calculateAndSetValueAndError(moments, estimators, errorMethod, useMultipleEstimate);
+        QuantityAbstract::calculateAndSetValueAndError(moments, estimators, errorMethod, options.useMultipleEstimates);
 }
 
 void Mean::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)

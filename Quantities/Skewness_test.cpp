@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,8 +34,8 @@ BOOST_AUTO_TEST_SUITE(SkewnessAndError)
     BOOST_AUTO_TEST_CASE(withBinning1)
     {
         DataSample sample(gaussianData);
-        Skewness skewness1(sample, {});
-        Skewness skewness2(sample, {true, false, false, false, 5000});
+        Skewness skewness1(sample, BinningParameters{}, QuantityAttributes{});
+        Skewness skewness2(sample, BinningParameters{true, false, false, false, 5000}, QuantityAttributes{});
 
         // Binning should change estimate
         BOOST_REQUIRE_NE(skewness1.value.estimate, skewness2.value.estimate);
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_SUITE(SkewnessAndError)
     {
         realFloat expectedSkewness = 1.;
         DataSample sample(gaussianData);
-        Skewness skewness(sample, {true, false, false, false, 100});
+        Skewness skewness(sample, BinningParameters{true, false, false, false, 100}, QuantityAttributes{});
         realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue
             = std::fabs(skewness.value.estimate - expectedSkewness) / skewness.value.error;
 
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_SUITE(SkewnessAndError)
     {
         realFloat expectedSkewness = 1.;
         DataSample sample(gaussianData);
-        Skewness skewness(sample, {true, false, false, false, 100}, true);
+        Skewness skewness(sample, BinningParameters{true, false, false, false, 100}, QuantityAttributes{true, false});
         realFloat NumberOfSigmaAtWhichTheResultIsCompatibleWithExpectedValue
             = std::fabs(skewness.value.estimate - expectedSkewness) / skewness.value.error;
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator1)
     {
         EstimateAndError referenceValue(1.000072760979389, 0.0);
-        Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), true, bootstrap);
+        Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), QuantityAttributes{true, false}, bootstrap);
         BOOST_CHECK_CLOSE(skewness.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(skewness.value.error, 1.e-7);
     }
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator2)
     {
         EstimateAndError referenceValue(0.5694793357428045, 0.0);
-        Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), false, bootstrap);
+        Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsSameEntryForTest(), QuantityAttributes{false, false}, bootstrap);
         BOOST_CHECK_CLOSE(skewness.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(skewness.value.error, 1.e-7);
     }
@@ -91,7 +91,8 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
     {
         EstimateAndError referenceValue(1.000072760979389, 0.0);
-        Skewness skewness(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), true, bootstrap, true);
+        Skewness skewness(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
+                          QuantityAttributes{true, true}, bootstrap);
         BOOST_CHECK_CLOSE(skewness.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(skewness.value.error, 1.e-7);
     }
@@ -99,8 +100,8 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
     BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
     {
         EstimateAndError referenceValue(0.5694793357428045, 0.0);
-        Skewness skewness(
-            buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(), false, bootstrap, true);
+        Skewness skewness(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
+                          QuantityAttributes{false, true}, bootstrap);
         BOOST_CHECK_CLOSE(skewness.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
         BOOST_CHECK_SMALL(skewness.value.error, 1.e-7);
     }

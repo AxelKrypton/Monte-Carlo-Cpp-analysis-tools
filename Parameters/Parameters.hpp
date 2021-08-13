@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
- *  Copyright (c) 2014-2015,2018,2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2018,2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,6 +38,12 @@ class BinningParameters {
     int number = 0;  // Meaningless since by default binning is not done
 };
 
+class QuantityAttributes {
+  public:
+    bool isMeanZero = false;
+    bool useMultipleEstimates = false;
+};
+
 class Parameters {
   public:
     Parameters(int argc, const char** argv);
@@ -70,6 +76,7 @@ class Parameters {
     bool binningMustFitDataSampleSize;
     bool adjustDataSampleSizeToBinning;
     BinningParameters getBinningParametersForAnalysis(std::string observable) const;
+    QuantityAttributes getAnalysisOptions() const;
 
   private:
     void printParameters();

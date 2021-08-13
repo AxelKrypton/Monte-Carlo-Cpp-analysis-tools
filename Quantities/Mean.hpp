@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,18 +24,16 @@
 #include <initializer_list>
 #include <iostream>
 
-class Parameters;
-
 /*
  * ATTENTION: Constructor which takes DataSample must take it by value, since it will
  *            change it doing binning inside!
  */
 class Mean : public QuantityAbstract {
   public:
-    Mean(DataSample dataSample, BinningParameters parameters, bool isMeanZero = false);
-    Mean(MultipleDataSample dataSamples, BinningParameters parameters, bool isMeanZero = false);
-    Mean(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
-         bool useMultipleEstimate = false);
+    Mean(DataSample, BinningParameters, QuantityAttributes);
+    Mean(MultipleDataSample, BinningParameters, QuantityAttributes);
+    Mean(Moments, MomentsEstimators, QuantityAttributes, ErrorCalculationMethod);
+
     static DataSample
     evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 

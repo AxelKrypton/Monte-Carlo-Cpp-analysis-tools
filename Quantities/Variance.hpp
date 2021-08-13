@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,18 +21,16 @@
 
 #include "AbstractQuantity.hpp"
 
-class Parameters;
-
 /*
  * ATTENTION: Constructor which takes DataSample must take it by value, since it will
  *            change it doing binning inside!
  */
 class Variance : public QuantityAbstract {
   public:
-    Variance(DataSample dataSample, BinningParameters parameters, bool isMeanZero = false);
-    Variance(MultipleDataSample dataSamples, BinningParameters parameters, bool isMeanZero = false);
-    Variance(Moments moments, MomentsEstimators estimators, bool isMeanKnownToBeZero, ErrorCalculationMethod errorMethod,
-             bool useMultipleEstimate = false);
+    Variance(DataSample, BinningParameters, QuantityAttributes);
+    Variance(MultipleDataSample, BinningParameters, QuantityAttributes);
+    Variance(Moments, MomentsEstimators, QuantityAttributes, ErrorCalculationMethod);
+
     static DataSample
     evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate = false);
 
