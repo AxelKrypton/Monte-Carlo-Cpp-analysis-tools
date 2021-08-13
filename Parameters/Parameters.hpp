@@ -69,7 +69,7 @@ class Parameters {
     bool doNotAnalyzeKurtosis;
     bool binningMustFitDataSampleSize;
     bool adjustDataSampleSizeToBinning;
-    BinningParameters getBinningParametersForObservablesAnalysis(std::string observable) const;
+    BinningParameters getBinningParametersForAnalysis(std::string observable) const;
 
   private:
     void printParameters();

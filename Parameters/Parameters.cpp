@@ -256,7 +256,7 @@ void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithB
     }
 }
 
-BinningParameters Parameters::getBinningParametersForObservablesAnalysis(std::string observable) const
+BinningParameters Parameters::getBinningParametersForAnalysis(std::string observable) const
 {
     BinningParameters returnValue;
     returnValue.performBinning = ! doNotUseBinning;

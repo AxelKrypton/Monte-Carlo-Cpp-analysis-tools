@@ -46,7 +46,7 @@ static void testMeanAndErrorFromFile(std::string file, int binsizeOrNumberOfBins
     options.push_back("-m" + std::to_string(expectedMeanAndError.estimate == 0.0));
     Parameters parameters(options);
     DataSample sample(file);
-    Mean mean(sample, parameters.getBinningParametersForObservablesAnalysis(constants::observableName<Mean>),
+    Mean mean(sample, parameters.getBinningParametersForAnalysis(constants::observableName<Mean>),
               (expectedMeanAndError.estimate == 0.0));
     checkEstimateAndError(expectedMeanAndError, mean.value, testPrecision);
 }
