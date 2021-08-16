@@ -31,17 +31,20 @@ QuantityAbstract::QuantityAbstract(const QuantityAttributes& options)
 {
 }
 
-void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)
+void QuantityAbstract::calculateAndSetValueAndError(MultipleDataSample& dataSamples, BinningParameters parameters)
 {
+    if (dataSamples.size() > 1)
+        throw std::invalid_argument("Analysis of generic quantity with multiple columns not implemented yet!");
+
     /*
      * ATTENTION: It is in general wrong to perform binning on the sample BEFORE calculating
      *            the n-th (central) moment per data point. Binning must be done AFTER!
      *            The reason boils down to a power of a sum VS a sum of powers.
      */
-    std::vector<DataSample> neededMomentsPerDataPoint = calculateNeededMomentsPerDataPoint(dataSample);
+    std::vector<DataSample> neededMomentsPerDataPoint = calculateNeededMomentsPerDataPoint(dataSamples[0]);
     std::vector<DataSample> binnedMomentsPerDataPoint(neededMomentsPerDataPoint);
     if (parameters.performBinning) {
-        printCorrectBinningInformation(parameters, dataSample.getNumberOfElements());
+        printCorrectBinningInformation(parameters, dataSamples[0].getNumberOfElements());
         binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, parameters);
     }
     value = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());

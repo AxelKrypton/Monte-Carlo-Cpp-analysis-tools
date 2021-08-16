@@ -35,10 +35,7 @@ Variance::Variance(MultipleDataSample dataSamples, BinningParameters parameters,
     if ((dataSamples.size() > 1 && useMultipleEstimates == false) || (dataSamples.size() == 1 && useMultipleEstimates == true))
         throw std::logic_error("Variance object instantiated with contradicting parameters!");
 
-    if (dataSamples.size() > 1)
-        throw std::invalid_argument("Analysis of Variance with multiple columns not implemented yet!");
-
-    calculateAndSetValueAndError(dataSamples[0], parameters);
+    calculateAndSetValueAndError(dataSamples, parameters);
     PrintRepeatedSymbol();
 }
 
@@ -51,26 +48,29 @@ Variance::Variance(Moments moments, MomentsEstimators estimators, QuantityAttrib
 static realFloat unbiasedVarianceOfDataSample(DataSample&, bool);
 static realFloat unbiasedErrorOfVariance(DataSample&);
 
-void Variance::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)
+void Variance::calculateAndSetValueAndError(MultipleDataSample& dataSamples, BinningParameters parameters)
 {
+    if (dataSamples.size() > 1)
+        throw std::invalid_argument("Analysis of Variance with multiple columns not implemented yet!");
+
     /*
      * ATTENTION: It is in general wrong to perform binning on the sample BEFORE calculating
      *            the n-th (central) moment per data point. Binning must be done AFTER!
      *            The reason boils down to a power of a sum VS a sum of powers.
      */
-    DataSample varianceSample = isMeanZero ? dataSample.getNthMomentPerDataPoint(2) : dataSample.getNthCentralMomentPerDataPoint(2);
+    DataSample varianceSample = isMeanZero ? dataSamples[0].getNthMomentPerDataPoint(2) : dataSamples[0].getNthCentralMomentPerDataPoint(2);
     DataSample binnedVarianceSample(varianceSample);
     if (parameters.performBinning) {
-        printCorrectBinningInformation(parameters, dataSample.getNumberOfElements());
+        printCorrectBinningInformation(parameters, dataSamples[0].getNumberOfElements());
         // It is important to do binning on original sample, which then gets resized discarding
         // last elements and then the calculation of variance and error is on consistent samples!
         // TODO: improve, e.g. just resize!
         DEBUG(std::cout << "# Moment 1\n");
-        performBinning(dataSample, parameters);
+        performBinning(dataSamples[0], parameters);
         DEBUG(std::cout << "# Moment 2\n");
         binnedVarianceSample = performBinning(varianceSample, parameters);
     }
-    value.estimate = unbiasedVarianceOfDataSample(dataSample, isMeanZero);
+    value.estimate = unbiasedVarianceOfDataSample(dataSamples[0], isMeanZero);
     value.error = unbiasedErrorOfVariance(binnedVarianceSample);
 }
 

@@ -39,7 +39,7 @@ class Mean : public QuantityAbstract {
 
   private:
     Mean();
-    void calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters) override;
+    void calculateAndSetValueAndError(MultipleDataSample&, BinningParameters) override;
     void printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample) override;
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() override;
     functionForObservable getFunctionToCalculateObservable() override;

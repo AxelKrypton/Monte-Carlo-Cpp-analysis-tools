@@ -34,10 +34,7 @@ Kurtosis::Kurtosis(MultipleDataSample dataSamples, BinningParameters parameters,
     if ((dataSamples.size() > 1 && useMultipleEstimates == false) || (dataSamples.size() == 1 && useMultipleEstimates == true))
         throw std::logic_error("Kurtosis object instantiated with contradicting parameters!");
 
-    if (dataSamples.size() > 1)
-        throw std::invalid_argument("Analysis of Kurtosis with multiple columns not implemented yet!");
-
-    calculateAndSetValueAndError(dataSamples[0], parameters);
+    calculateAndSetValueAndError(dataSamples, parameters);
     PrintRepeatedSymbol();
 }
 Kurtosis::Kurtosis(Moments moments, MomentsEstimators estimators, QuantityAttributes options, ErrorCalculationMethod errorMethod)

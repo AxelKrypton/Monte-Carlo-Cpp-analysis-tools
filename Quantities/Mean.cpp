@@ -35,10 +35,7 @@ Mean::Mean(MultipleDataSample dataSamples, BinningParameters parameters, Quantit
     if ((dataSamples.size() > 1 && useMultipleEstimates == false) || (dataSamples.size() == 1 && useMultipleEstimates == true))
         throw std::logic_error("Mean object instantiated with contradicting parameters!");
 
-    if (dataSamples.size() > 1)
-        throw std::invalid_argument("Analysis of Mean with multiple columns not implemented yet!");
-
-    calculateAndSetValueAndError(dataSamples[0], parameters);
+    calculateAndSetValueAndError(dataSamples, parameters);
     PrintRepeatedSymbol();
 }
 
@@ -51,13 +48,16 @@ Mean::Mean(Moments moments, MomentsEstimators estimators, QuantityAttributes opt
         QuantityAbstract::calculateAndSetValueAndError(moments, estimators, errorMethod);
 }
 
-void Mean::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)
+void Mean::calculateAndSetValueAndError(MultipleDataSample& dataSamples, BinningParameters parameters)
 {
-    DataSample binnedSample(dataSample);
+    if (dataSamples.size() > 1)
+        throw std::invalid_argument("Analysis of Mean with multiple columns not implemented yet!");
+
+    DataSample binnedSample(dataSamples[0]);
     if (parameters.performBinning) {
-        printCorrectBinningInformation(parameters, dataSample.getNumberOfElements());
+        printCorrectBinningInformation(parameters, dataSamples[0].getNumberOfElements());
         DEBUG(std::cout << "# Moment 1\n");
-        binnedSample = performBinning(dataSample, parameters);
+        binnedSample = performBinning(dataSamples[0], parameters);
     }
     if (isMeanZero) {
         value.estimate = 0.0;
