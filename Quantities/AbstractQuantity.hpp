@@ -57,8 +57,7 @@ class QuantityAbstract {
      */
     virtual void calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters);
     // Calculation for Reweighting
-    void calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
-                                      bool useMultipleEstimate);
+    void calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod);
     bool isMeanZero;
     bool useMultipleEstimates;
 
@@ -69,7 +68,7 @@ class QuantityAbstract {
     // virtual Parameters getLocalParametersWithCorrectBinningInformation(const BinningParameters& parameters) = 0;
     virtual void printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample) = 0;
     virtual functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() = 0;
-    virtual functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false) = 0;
-    virtual functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false) = 0;
+    virtual functionForObservable getFunctionToCalculateObservable() = 0;
+    virtual functionForEstimators getFunctionToBeAppliedToEstimators() = 0;
     virtual std::initializer_list<unsigned int> getNeededMoments(bool expanded = false) = 0;
 };

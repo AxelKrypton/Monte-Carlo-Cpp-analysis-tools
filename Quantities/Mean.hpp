@@ -42,8 +42,8 @@ class Mean : public QuantityAbstract {
     void calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters) override;
     void printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample) override;
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() override;
-    functionForEstimators getFunctionToBeAppliedToEstimators(bool useMultipleEstimate = false) override;
-    functionForObservable getFunctionToCalculateObservable(bool useMultipleEstimate = false) override;
+    functionForObservable getFunctionToCalculateObservable() override;
+    functionForEstimators getFunctionToBeAppliedToEstimators() override;
     std::initializer_list<unsigned int> getNeededMoments(bool expanded = false) override;
     friend class Quantities;
 };

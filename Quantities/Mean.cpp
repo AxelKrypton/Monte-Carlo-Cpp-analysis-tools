@@ -45,7 +45,7 @@ Mean::Mean(Moments moments, MomentsEstimators estimators, QuantityAttributes opt
     if (options.isMeanZero)
         value = EstimateAndError(0.0, 0.0);  // TODO: Shouldn't the error still be calculated!?
     else
-        QuantityAbstract::calculateAndSetValueAndError(moments, estimators, errorMethod, options.useMultipleEstimates);
+        QuantityAbstract::calculateAndSetValueAndError(moments, estimators, errorMethod);
 }
 
 void Mean::calculateAndSetValueAndError(DataSample& dataSample, BinningParameters parameters)
@@ -75,14 +75,14 @@ functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToEstimatorsForJac
     throw std::logic_error("Forbidden to retrieve function for jackknife from Mean class!");
 }
 
-functionForObservable Mean::getFunctionToCalculateObservable(bool useMultipleEstimate)
+functionForObservable Mean::getFunctionToCalculateObservable()
 {
-    return pickUpCorrectFunctionForObservable<Mean>(isMeanZero, useMultipleEstimate);
+    return pickUpCorrectFunctionForObservable<Mean>(isMeanZero, useMultipleEstimates);
 }
 
-functionForEstimators Mean::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
+functionForEstimators Mean::getFunctionToBeAppliedToEstimators()
 {
-    return pickUpCorrectFunctionForEstimator<Mean>(isMeanZero, useMultipleEstimate);
+    return pickUpCorrectFunctionForEstimator<Mean>(isMeanZero, useMultipleEstimates);
 }
 
 DataSample Mean::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)

@@ -41,7 +41,7 @@ Skewness::Skewness(MultipleDataSample dataSamples, BinningParameters parameters,
 Skewness::Skewness(Moments moments, MomentsEstimators estimators, QuantityAttributes options, ErrorCalculationMethod errorMethod)
     : QuantityAbstract(options)
 {
-    calculateAndSetValueAndError(moments, estimators, errorMethod, options.useMultipleEstimates);
+    calculateAndSetValueAndError(moments, estimators, errorMethod);
 }
 
 void Skewness::printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample)
@@ -60,14 +60,14 @@ functionForEstimatorsForJackknife Skewness::getFunctionToBeAppliedToEstimatorsFo
     };
 }
 
-functionForObservable Skewness::getFunctionToCalculateObservable(bool useMultipleEstimate)
+functionForObservable Skewness::getFunctionToCalculateObservable()
 {
-    return pickUpCorrectFunctionForObservable<Skewness>(isMeanZero, useMultipleEstimate);
+    return pickUpCorrectFunctionForObservable<Skewness>(isMeanZero, useMultipleEstimates);
 }
 
-functionForEstimators Skewness::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
+functionForEstimators Skewness::getFunctionToBeAppliedToEstimators()
 {
-    return pickUpCorrectFunctionForEstimator<Skewness>(isMeanZero, useMultipleEstimate);
+    return pickUpCorrectFunctionForEstimator<Skewness>(isMeanZero, useMultipleEstimates);
 }
 
 DataSample Skewness::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)

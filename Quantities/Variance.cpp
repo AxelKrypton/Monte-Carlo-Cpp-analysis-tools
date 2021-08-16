@@ -42,7 +42,7 @@ Variance::Variance(MultipleDataSample dataSamples, BinningParameters parameters,
 Variance::Variance(Moments moments, MomentsEstimators estimators, QuantityAttributes options, ErrorCalculationMethod errorMethod)
     : QuantityAbstract(options)
 {
-    QuantityAbstract::calculateAndSetValueAndError(moments, estimators, errorMethod, options.useMultipleEstimates);
+    QuantityAbstract::calculateAndSetValueAndError(moments, estimators, errorMethod);
 }
 
 static realFloat unbiasedVarianceOfDataSample(DataSample&, bool);
@@ -81,14 +81,14 @@ functionForEstimatorsForJackknife Variance::getFunctionToBeAppliedToEstimatorsFo
     throw std::logic_error("Forbidden to retrieve function for jackknife from Variance class!");
 }
 
-functionForEstimators Variance::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
+functionForObservable Variance::getFunctionToCalculateObservable()
 {
-    return pickUpCorrectFunctionForEstimator<Variance>(isMeanZero, useMultipleEstimate);
+    return pickUpCorrectFunctionForObservable<Variance>(isMeanZero, useMultipleEstimates);
 }
 
-functionForObservable Variance::getFunctionToCalculateObservable(bool useMultipleEstimate)
+functionForEstimators Variance::getFunctionToBeAppliedToEstimators()
 {
-    return pickUpCorrectFunctionForObservable<Variance>(isMeanZero, useMultipleEstimate);
+    return pickUpCorrectFunctionForEstimator<Variance>(isMeanZero, useMultipleEstimates);
 }
 
 DataSample Variance::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)

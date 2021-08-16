@@ -47,11 +47,10 @@ void QuantityAbstract::calculateAndSetValueAndError(DataSample& dataSample, Binn
     value = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
 }
 
-void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod,
-                                                    bool useMultipleEstimate)
+void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod)
 {
-    value.estimate = getFunctionToCalculateObservable(useMultipleEstimate)(moments);
-    DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators(useMultipleEstimate)(estimators);
+    value.estimate = getFunctionToCalculateObservable()(moments);
+    DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators()(estimators);
     value.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 }
 

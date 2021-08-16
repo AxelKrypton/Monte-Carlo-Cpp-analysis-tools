@@ -40,7 +40,7 @@ Kurtosis::Kurtosis(MultipleDataSample dataSamples, BinningParameters parameters,
 Kurtosis::Kurtosis(Moments moments, MomentsEstimators estimators, QuantityAttributes options, ErrorCalculationMethod errorMethod)
     : QuantityAbstract(options)
 {
-    calculateAndSetValueAndError(moments, estimators, errorMethod, options.useMultipleEstimates);
+    calculateAndSetValueAndError(moments, estimators, errorMethod);
 }
 
 void Kurtosis::printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample)
@@ -59,14 +59,14 @@ functionForEstimatorsForJackknife Kurtosis::getFunctionToBeAppliedToEstimatorsFo
     };
 }
 
-functionForObservable Kurtosis::getFunctionToCalculateObservable(bool useMultipleEstimate)
+functionForObservable Kurtosis::getFunctionToCalculateObservable()
 {
-    return pickUpCorrectFunctionForObservable<Kurtosis>(isMeanZero, useMultipleEstimate);
+    return pickUpCorrectFunctionForObservable<Kurtosis>(isMeanZero, useMultipleEstimates);
 }
 
-functionForEstimators Kurtosis::getFunctionToBeAppliedToEstimators(bool useMultipleEstimate)
+functionForEstimators Kurtosis::getFunctionToBeAppliedToEstimators()
 {
-    return pickUpCorrectFunctionForEstimator<Kurtosis>(isMeanZero, useMultipleEstimate);
+    return pickUpCorrectFunctionForEstimator<Kurtosis>(isMeanZero, useMultipleEstimates);
 }
 
 DataSample Kurtosis::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)
