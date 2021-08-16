@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,15 @@
 typedef std::function<realFloat(Moments)> functionForObservable;
 typedef std::function<DataSample(MomentsEstimators)> functionForEstimators;
 typedef DataSample (*functionForEstimatorsForJackknife)(std::vector<DataSample>);
+
+/*
+ * TODO: Change the last line above with the following:
+ *           typedef std::function<DataSample(std::vector<DataSample>)> functionForEstimatorsForJackknife;
+ *       Actually it could be possible that this can be completely removed and only the std::function<DataSample(MomentsEstimators)>
+ *       can be used. The thing that one should think of is that in jackknifeAnalysis the functions take as second argument a function that
+ *       has in input a vector of DataSample and there the MomentsEstimators are not used. It should be possible to use there the
+ *       MomentsEstimators and one could have here just one single functionForEstimators.
+ */
 
 class Mean;
 class Variance;

@@ -31,6 +31,9 @@ Skewness::Skewness(DataSample dataSample, BinningParameters parameters, Quantity
 
 Skewness::Skewness(MultipleDataSample dataSamples, BinningParameters parameters, QuantityAttributes options) : QuantityAbstract(options)
 {
+    if ((dataSamples.size() > 1 && useMultipleEstimates == false) || (dataSamples.size() == 1 && useMultipleEstimates == true))
+        throw std::logic_error("Skewness object instantiated with contradicting parameters!");
+
     if (dataSamples.size() > 1)
         throw std::invalid_argument("Analysis of Skewness with multiple columns not implemented yet!");
 

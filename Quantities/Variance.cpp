@@ -32,6 +32,9 @@ Variance::Variance(DataSample dataSample, BinningParameters parameters, Quantity
 
 Variance::Variance(MultipleDataSample dataSamples, BinningParameters parameters, QuantityAttributes options) : QuantityAbstract(options)
 {
+    if ((dataSamples.size() > 1 && useMultipleEstimates == false) || (dataSamples.size() == 1 && useMultipleEstimates == true))
+        throw std::logic_error("Variance object instantiated with contradicting parameters!");
+
     if (dataSamples.size() > 1)
         throw std::invalid_argument("Analysis of Variance with multiple columns not implemented yet!");
 

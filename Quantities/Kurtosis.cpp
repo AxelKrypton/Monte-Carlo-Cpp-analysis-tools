@@ -31,6 +31,9 @@ Kurtosis::Kurtosis(DataSample dataSample, BinningParameters parameters, Quantity
 
 Kurtosis::Kurtosis(MultipleDataSample dataSamples, BinningParameters parameters, QuantityAttributes options) : QuantityAbstract(options)
 {
+    if ((dataSamples.size() > 1 && useMultipleEstimates == false) || (dataSamples.size() == 1 && useMultipleEstimates == true))
+        throw std::logic_error("Kurtosis object instantiated with contradicting parameters!");
+
     if (dataSamples.size() > 1)
         throw std::invalid_argument("Analysis of Kurtosis with multiple columns not implemented yet!");
 
