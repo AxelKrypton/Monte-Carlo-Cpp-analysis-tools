@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,9 +28,11 @@ class MultipleDataSample {
     MultipleDataSample(std::vector<DataSample> dataIn);
 
     DataSample getNthMomentPerDataPoint(unsigned int n);
+    DataSample getNthCentralMomentPerDataPoint(unsigned int n);
     DataSample& operator[](size_t n);
     size_t size();
 
   private:
+    std::vector<realFloat> getEstimatesPerTrajectory(const unsigned int);
     std::vector<DataSample> data;
 };

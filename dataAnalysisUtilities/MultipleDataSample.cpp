@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 #include "MultipleDataSample.hpp"
 
+#include "../Quantities/Tools.hpp"
+
 MultipleDataSample::MultipleDataSample(std::vector<DataSample> dataIn) : data(dataIn)
 {
     int size = data[0].getNumberOfElements();
@@ -36,9 +38,37 @@ MultipleDataSample::MultipleDataSample(std::string dataFilename, int column, int
     }
 }
 
+std::vector<realFloat> MultipleDataSample::getEstimatesPerTrajectory(const unsigned int trajectory)
+{
+    std::vector<realFloat> result(data.size());
+    for (auto i = 0U; i < result.size(); i++)
+        result[i] = data[i][trajectory];
+    return result;
+}
+
 DataSample MultipleDataSample::getNthMomentPerDataPoint(unsigned int n)
 {
-    throw std::runtime_error("Calculation of moment number " + std::to_string(n) + " for MultipleDataSample not implemented yet!");
+    if (data.size() == 1)
+        return data[0].getNthMomentPerDataPoint(n);
+    else {
+        DataSample result(data[0].getNumberOfElements());
+        for (auto i = 0; i < result.getNumberOfElements(); i++)
+            result[i] = getUnbiasEstimateOfNthMomentPerTrajectory(getEstimatesPerTrajectory(i), n);
+        return result;
+    }
+}
+
+DataSample MultipleDataSample::getNthCentralMomentPerDataPoint(unsigned int n)
+{
+    if (data.size() == 1)
+        return data[0].getNthCentralMomentPerDataPoint(n);
+    else
+        throw std::logic_error("Calculation of central moment for MultipleDataSample shall not be used!");
+    /*
+     * NOTE: If multiple estimates are used, it is understood that an unbiased estimate of every moment
+     *       per trajectory is desired and this implies that no central moment should be evaluated. Moreover
+     *       it would be ill defined which x per trajectory to use in (x-<mu>)^n.
+     */
 }
 
 DataSample& MultipleDataSample::operator[](size_t n)
