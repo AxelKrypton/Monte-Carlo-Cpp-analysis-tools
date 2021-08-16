@@ -73,19 +73,29 @@ namespace constants {
     template<class T> const std::initializer_list<unsigned int> neededMomentsExpanded = {UINT_MAX};
     template<class T> const std::initializer_list<unsigned int> neededMomentsUnexpanded = {UINT_MAX};
     template<class T>
-    const functionForObservable functionToCalculateQuantityWithZeroMean = [](Moments in) -> realFloat { return in[UINT_MAX]; };
+    const functionForObservable functionToCalculateQuantityWithZeroMean = [](Moments in) -> realFloat {
+        throw std::logic_error("General template definition for functionToCalculateQuantityWithZeroMean used!");
+    };
     template<class T>
-    const functionForObservable functionToCalculateQuantityWithNonZeroMean = [](Moments in) -> realFloat { return in[UINT_MAX]; };
+    const functionForObservable functionToCalculateQuantityWithNonZeroMean = [](Moments in) -> realFloat {
+        throw std::logic_error("General template definition for functionToCalculateQuantityWithNonZeroMean used!");
+    };
     template<class T>
-    const functionForObservable functionToCalculateQuantityWithMultipleEstimates = [](Moments in) -> realFloat { return in[UINT_MAX]; };
+    const functionForObservable functionToCalculateQuantityWithMultipleEstimates = [](Moments in) -> realFloat {
+        throw std::logic_error("General template definition for functionToCalculateQuantityWithMultipleEstimates used!");
+    };
     template<class T>
-    const functionForEstimators functionToBeAppliedToEstimatorsWithZeroMean = [](MomentsEstimators in) -> DataSample { return in[UINT_MAX]; };
+    const functionForEstimators functionToBeAppliedToEstimatorsWithZeroMean = [](MomentsEstimators in) -> DataSample {
+        throw std::logic_error("General template definition for functionToBeAppliedToEstimatorsWithZeroMean used!");
+    };
     template<class T>
-    const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean
-        = [](MomentsEstimators in) -> DataSample { return in[UINT_MAX]; };
+    const functionForEstimators functionToBeAppliedToEstimatorsWithNonZeroMean = [](MomentsEstimators in) -> DataSample {
+        throw std::logic_error("General template definition for functionToBeAppliedToEstimatorsWithNonZeroMean used!");
+    };
     template<class T>
-    const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates
-        = [](MomentsEstimators in) -> DataSample { return in[UINT_MAX]; };
+    const functionForEstimators functionToBeAppliedToEstimatorsWithMultipleEstimates = [](MomentsEstimators in) -> DataSample {
+        throw std::logic_error("General template definition for functionToBeAppliedToEstimatorsWithMultipleEstimates used!");
+    };
 
     // Template specialisations -> inline to avoid linking errors! https://stackoverflow.com/a/51987559
     template<> inline const std::string observableName<Mean> = "MEAN";

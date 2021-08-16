@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ template<typename OBSERVABLE>
 functionForObservable pickUpCorrectFunctionForObservable(const bool isMeanZero, const bool useMultipleEstimate)
 {
     if (isMeanZero) {
-        if (std::is_same_v<OBSERVABLE, Mean>)
+        if constexpr (std::is_same_v<OBSERVABLE, Mean>)
             throw std::logic_error("Attempt to get function to calculate mean but isMeanZero==true!");
         else
             return constants::functionToCalculateQuantityWithZeroMean<OBSERVABLE>;
@@ -52,7 +52,7 @@ functionForObservable pickUpCorrectFunctionForObservable(const bool isMeanZero, 
 template<typename OBSERVABLE> functionForEstimators pickUpCorrectFunctionForEstimator(const bool isMeanZero, const bool useMultipleEstimate)
 {
     if (isMeanZero) {
-        if (std::is_same_v<OBSERVABLE, Mean>)
+        if constexpr (std::is_same_v<OBSERVABLE, Mean>)
             throw std::logic_error("Attempt to get function to calculate mean estimators but isMeanZero==true!");
         else
             return constants::functionToBeAppliedToEstimatorsWithZeroMean<OBSERVABLE>;
