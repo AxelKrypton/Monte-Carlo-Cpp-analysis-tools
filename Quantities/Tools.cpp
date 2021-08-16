@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "../IO/io_utilities.hpp"
 
 #include <iomanip>
+#include <numeric>
 
 Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable)
 {
@@ -76,4 +77,42 @@ void printBinningInformation(const BinningParameters& parameters, std::string ob
         std::cout << "# Binsize = " << parameters.number << "\n# Number of bins = " << elementsOfSample / parameters.number << "\n";
     }
     warnIfDiscardedElements(parameters, elementsOfSample);
+}
+
+static realFloat getPowerSum(const std::vector<realFloat>& multipleEstimates, const unsigned int N)
+{
+    return std::accumulate(multipleEstimates.begin(), multipleEstimates.end(), realFloat{},
+                           [N](realFloat partialSum, realFloat x) { return partialSum + std::pow(x, N); });
+}
+
+realFloat getUnbiasEstimateOfNthMomentPerTrajectory(const std::vector<realFloat>& multipleEstimates, const unsigned int N)
+{
+    if (multipleEstimates.size() < N)
+        throw std::logic_error("At least as many estimates as the moment are needed for an unbiased estimate!");
+
+    std::vector<realFloat> powerSums(N);
+    realFloat normalization = 1.0;
+    for (auto i = 0U; i < N; i++) {
+        powerSums[i] = getPowerSum(multipleEstimates, i + 1);
+        normalization *= multipleEstimates.size() - i;
+    }
+    realFloat result;
+    switch (N) {
+        case 1:
+            result = powerSums[0];
+            break;
+        case 2:
+            result = (std::pow(powerSums[0], 2) - powerSums[1]);
+            break;
+        case 3:
+            result = (std::pow(powerSums[0], 3) - 3. * powerSums[0] * powerSums[1] + 2. * powerSums[2]);
+            break;
+        case 4:
+            result = (std::pow(powerSums[0], 4) + 8. * powerSums[0] * powerSums[2] + 3. * std::pow(powerSums[1], 2)
+                      - 6. * powerSums[1] * std::pow(powerSums[0], 2) - 6. * powerSums[3]);
+            break;
+        default:
+            throw std::invalid_argument("Asked for an unbias estimate of a not implemented moment.");
+    }
+    return result / normalization;
 }

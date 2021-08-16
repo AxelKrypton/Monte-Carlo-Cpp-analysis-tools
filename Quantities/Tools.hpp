@@ -32,6 +32,7 @@
 
 Parameters buildLocalParametersWithCorrectBinningInformation(const Parameters& parameters, std::string observable);
 void printBinningInformation(const BinningParameters& parameters, std::string observable, int elementsOfSample);
+realFloat getUnbiasEstimateOfNthMomentPerTrajectory(const std::vector<realFloat>& multipleEstimates, const unsigned int N);
 
 // TODO: Think whether it is possible to unify the following two templates in only one
 template<typename OBSERVABLE>
