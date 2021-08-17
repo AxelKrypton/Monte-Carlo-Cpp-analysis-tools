@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ DatafileAnalyzer::DatafileAnalyzer(Parameters parameters)
     if (parameters.calcAutocorrelation)
         AutocorrelationAnalyzer analyzer(data[0], parameters);
     else
-        ObservableAnalyzer observableAnalyzer(data, parameters);
+        ObservableAnalyzer observableAnalyzer(MultipleDataSample(data), parameters);
     std::cout << "\n";
 }
 

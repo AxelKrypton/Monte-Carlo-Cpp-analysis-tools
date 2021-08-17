@@ -26,7 +26,7 @@
 Mean::Mean() : QuantityAbstract(QuantityAttributes{}) {}
 
 Mean::Mean(DataSample dataSample, BinningParameters parameters, QuantityAttributes options)
-    : Mean(MultipleDataSample({dataSample}), parameters, options)
+    : Mean(MultipleDataSample(dataSample), parameters, options)
 {
 }
 

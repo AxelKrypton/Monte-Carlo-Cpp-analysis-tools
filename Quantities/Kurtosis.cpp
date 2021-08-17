@@ -25,7 +25,7 @@
 Kurtosis::Kurtosis() : QuantityAbstract(QuantityAttributes{}) {}
 
 Kurtosis::Kurtosis(DataSample dataSample, BinningParameters parameters, QuantityAttributes options)
-    : Kurtosis(MultipleDataSample({dataSample}), parameters, options)
+    : Kurtosis(MultipleDataSample(dataSample), parameters, options)
 {
 }
 

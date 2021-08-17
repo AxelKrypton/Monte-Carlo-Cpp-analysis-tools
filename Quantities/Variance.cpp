@@ -26,7 +26,7 @@
 Variance::Variance() : QuantityAbstract(QuantityAttributes{}) {}
 
 Variance::Variance(DataSample dataSample, BinningParameters parameters, QuantityAttributes options)
-    : Variance(MultipleDataSample({dataSample}), parameters, options)
+    : Variance(MultipleDataSample(dataSample), parameters, options)
 {
 }
 

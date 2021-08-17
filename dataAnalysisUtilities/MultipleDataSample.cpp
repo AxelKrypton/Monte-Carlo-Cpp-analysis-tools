@@ -21,8 +21,12 @@
 
 #include "../Quantities/Tools.hpp"
 
+MultipleDataSample::MultipleDataSample(DataSample dataIn) : MultipleDataSample(std::vector<DataSample>(1, dataIn)) {}
+
 MultipleDataSample::MultipleDataSample(std::vector<DataSample> dataIn) : data(dataIn)
 {
+    if (data.empty())
+        throw std::invalid_argument("Forbidden to instantiate a MultipleDataSample with empty std:vector!");
     int size = data[0].getNumberOfElements();
     for (auto sample : data) {
         if (sample.getNumberOfElements() != size)

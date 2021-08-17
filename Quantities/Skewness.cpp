@@ -25,7 +25,7 @@
 Skewness::Skewness() : QuantityAbstract(QuantityAttributes{}) {}
 
 Skewness::Skewness(DataSample dataSample, BinningParameters parameters, QuantityAttributes options)
-    : Skewness(MultipleDataSample({dataSample}), parameters, options)
+    : Skewness(MultipleDataSample(dataSample), parameters, options)
 {
 }
 

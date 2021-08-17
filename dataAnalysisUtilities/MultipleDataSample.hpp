@@ -25,7 +25,8 @@ class MultipleDataSample {
   public:
     MultipleDataSample() = delete;
     MultipleDataSample(std::string dataFilename, int column = 1, int numberOfColumns = 1, int offset = 0);
-    MultipleDataSample(std::vector<DataSample> dataIn);
+    explicit MultipleDataSample(DataSample dataIn);
+    explicit MultipleDataSample(std::vector<DataSample> dataIn);
 
     DataSample getNthMomentPerDataPoint(unsigned int n);
     DataSample getNthCentralMomentPerDataPoint(unsigned int n);
