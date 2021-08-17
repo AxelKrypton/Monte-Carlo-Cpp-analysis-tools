@@ -35,7 +35,10 @@ Variance::Variance(MultipleDataSample dataSamples, BinningParameters parameters,
     if ((dataSamples.size() > 1 && useMultipleEstimates == false) || (dataSamples.size() == 1 && useMultipleEstimates == true))
         throw std::logic_error("Variance object instantiated with contradicting parameters!");
 
-    calculateAndSetValueAndError(dataSamples, parameters);
+    if (dataSamples.size() > 1)
+        QuantityAbstract::calculateAndSetValueAndError(dataSamples, parameters);
+    else
+        calculateAndSetValueAndError(dataSamples, parameters);
     PrintRepeatedSymbol();
 }
 
@@ -51,7 +54,7 @@ static realFloat unbiasedErrorOfVariance(DataSample&);
 void Variance::calculateAndSetValueAndError(MultipleDataSample& dataSamples, BinningParameters parameters)
 {
     if (dataSamples.size() > 1)
-        throw std::invalid_argument("Analysis of Variance with multiple columns not implemented yet!");
+        throw std::logic_error("The function \"Variance::calculateAndSetValueAndError\" should not be called with multiple estimates!");
 
     /*
      * ATTENTION: It is in general wrong to perform binning on the sample BEFORE calculating
