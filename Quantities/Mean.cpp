@@ -50,14 +50,15 @@ Mean::Mean(Moments moments, MomentsEstimators estimators, QuantityAttributes opt
 
 void Mean::calculateAndSetValueAndError(MultipleDataSample& dataSamples, BinningParameters parameters)
 {
+    DataSample preprocessedData(dataSamples[0]);
     if (dataSamples.size() > 1)
-        throw std::invalid_argument("Analysis of Mean with multiple columns not implemented yet!");
+        preprocessedData = dataSamples.getNthMomentPerDataPoint(1);
 
-    DataSample binnedSample(dataSamples[0]);
+    DataSample binnedSample(preprocessedData);
     if (parameters.performBinning) {
-        printCorrectBinningInformation(parameters, dataSamples[0].getNumberOfElements());
+        printCorrectBinningInformation(parameters, preprocessedData.getNumberOfElements());
         DEBUG(std::cout << "# Moment 1\n");
-        binnedSample = performBinning(dataSamples[0], parameters);
+        binnedSample = performBinning(preprocessedData, parameters);
     }
     if (isMeanZero) {
         value.estimate = 0.0;
@@ -66,6 +67,10 @@ void Mean::calculateAndSetValueAndError(MultipleDataSample& dataSamples, Binning
         value.estimate = binnedSample.getNthMoment(1);
         value.error = std::sqrt(1. / realFloat(binnedSample.getNumberOfElements() - 1) * binnedSample.getNthCentralMoment(2));
     }
+    /*
+     * TODO: Clarify whether it is correct to calculate the second central moment to get the standard deviation
+     *       in the error of the mean in case of being using multiple estimates per trajectories.
+     */
 }
 
 void Mean::printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample)

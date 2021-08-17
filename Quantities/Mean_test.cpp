@@ -27,11 +27,15 @@
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"
 #include "TestUtilities.hpp"
 
-#include <boost/test/unit_test.hpp>
-
 static void testMeanAndError(DataSample sample, EstimateAndError expectedMeanAndError)
 {
     Mean mean(sample, BinningParameters{}, QuantityAttributes{expectedMeanAndError.estimate == 0.0, false});
+    checkEstimateAndError(expectedMeanAndError, mean.value, realFloatPrecisionInPercent);
+}
+
+static void testMeanAndError(MultipleDataSample multipleSample, EstimateAndError expectedMeanAndError)
+{
+    Mean mean(multipleSample, BinningParameters{}, QuantityAttributes{expectedMeanAndError.estimate == 0.0, true});
     checkEstimateAndError(expectedMeanAndError, mean.value, realFloatPrecisionInPercent);
 }
 
@@ -51,15 +55,15 @@ static void testMeanAndErrorFromFile(std::string file, int binsizeOrNumberOfBins
     checkEstimateAndError(expectedMeanAndError, mean.value, testPrecision);
 }
 
-BOOST_AUTO_TEST_SUITE(meanAndError)
+static realFloat expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample)
+{
+    realFloat secondMoment = sample.getNthMoment(2);
+    realFloat firstMoment = sample.getNthMoment(1);
+    realFloat prefactor = 1. / (sample.getNumberOfElements() - 1.);
+    return prefactor * (secondMoment - pow(firstMoment, 2.));
+}
 
-    static realFloat expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(DataSample sample)
-    {
-        realFloat secondMoment = sample.getNthMoment(2);
-        realFloat firstMoment = sample.getNthMoment(1);
-        realFloat prefactor = 1. / (sample.getNumberOfElements() - 1.);
-        return prefactor * (secondMoment - pow(firstMoment, 2.));
-    }
+BOOST_AUTO_TEST_SUITE(meanAndError)
 
     BOOST_AUTO_TEST_CASE(test1)
     {
@@ -112,6 +116,54 @@ BOOST_AUTO_TEST_SUITE(meanAndError)
         expectedMeanAndError.estimate = 0.0;
         expectedMeanAndError.error = sqrt(expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(sample));
         testMeanAndError(sample, expectedMeanAndError);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(meanAndErrorWithMultipleEstimates)
+
+    BOOST_AUTO_TEST_CASE(test1)
+    {
+        int numberOfElements = 795;
+        DataSample sample(numberOfElements);
+        MultipleDataSample multipleSample(std::vector<DataSample>(3, sample));
+        EstimateAndError expectedMeanAndError(0, 0);
+        testMeanAndError(multipleSample, expectedMeanAndError);
+    }
+
+    BOOST_AUTO_TEST_CASE(test2)
+    {
+        int numberOfElements = 1542;
+        DataSample sample = getDataSampleBasedOnFillType(numberOfElements, ones);
+        MultipleDataSample multipleSample(std::vector<DataSample>(5, sample));
+        EstimateAndError expectedMeanAndError(1, 0);
+        testMeanAndError(multipleSample, expectedMeanAndError);
+    }
+
+    BOOST_AUTO_TEST_CASE(test3)
+    {
+        int numberOfElements = 1234;
+        DataSample sample = getDataSampleBasedOnFillType(numberOfElements, ones);
+        DataSample samplePM = getDataSampleBasedOnFillType(numberOfElements, onesMinusOnes);
+        EstimateAndError expectedMeanAndError;
+        expectedMeanAndError.estimate = 0.5;  // Half of data are 1 and half are 0
+        expectedMeanAndError.error = sqrt(expectedValueForUnbiasedVarianceBasedOnAnalyticExpression(0.5 * (sample + samplePM)));
+        std::vector<DataSample> tmpData(2);
+        tmpData[0] = sample;
+        tmpData[1] = samplePM;
+        testMeanAndError(MultipleDataSample{tmpData}, expectedMeanAndError);
+    }
+
+    BOOST_AUTO_TEST_CASE(test4)
+    {
+        EstimateAndError expectedMeanAndError = {5.5, 0.957427107756338110};
+        testMeanAndError(buildMultipleDataSampleForTest(false), expectedMeanAndError);
+    }
+
+    BOOST_AUTO_TEST_CASE(test5)
+    {
+        EstimateAndError expectedMeanAndError = {0.0294742063492063492, 0.0961058972090868503};
+        testMeanAndError(buildMultipleDataSampleForTest(true), expectedMeanAndError);
     }
 
 BOOST_AUTO_TEST_SUITE_END()
