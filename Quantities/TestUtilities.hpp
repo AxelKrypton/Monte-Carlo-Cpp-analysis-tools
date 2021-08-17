@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 #pragma once
 
 #include "../dataAnalysisUtilities/DataSample.hpp"
+#include "../dataAnalysisUtilities/MultipleDataSample.hpp"
+#include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"
 #include "EstimateAndError.hpp"
 #include "Moments.hpp"
 
@@ -29,6 +31,60 @@ void checkEstimateAndError(EstimateAndError expectedEstimateAndError, EstimateAn
 {
     BOOST_CHECK_CLOSE(expectedEstimateAndError.error, calculatedEstimateAndError.error, testPrecision);
     BOOST_CHECK_CLOSE(expectedEstimateAndError.estimate, calculatedEstimateAndError.estimate, testPrecision);
+}
+
+MultipleDataSample buildMultipleDataSampleForTest(bool differentSamples)
+{
+    const int numberOfEstimates = 8;
+    const int numberOfElements = 10;
+    DataSample positionData(makeValarrayWithArrayPosition(numberOfElements) + 1.0);
+    std::vector<DataSample> data(numberOfEstimates, positionData);
+    if (differentSamples) {
+        data[0] = 1.0 / positionData;
+        data[1] = DataSample(makeValarrayWithOnesAndMinusOnes(numberOfElements));
+        data[2] = -0.05 * positionData;
+        data[3] = 0.1 * DataSample(makeValarrayWithOnes(numberOfElements));
+        data[4] = data[0];
+        data[5] = data[1];
+        data[6] = data[2];
+        data[7] = data[3];
+    }
+    return MultipleDataSample(data);
+    /*
+     * differentSamples == TRUE
+     *
+     * Calculating (e.g. in Mathematica) the first four unbiased moments
+     * per trajectory and averaging out over numberOfElements, one obtains
+     *
+     *   <UNB_1> = 0.0294742063492063492
+     *   <UNB_2> = 0.0509514096974768743
+     *   <UNB_3> = 0.00807768728853975453
+     *   <UNB_4> = 0.00119897375418421337
+     *
+     * For the mean it follows that (<UNB_1> as central value and standard error)
+     *
+     *   Mean = 0.0294742063492063492 +- 0.0961058972090868503
+     *
+     * However, for the quantities beyond the mean, a Jackknife analysis is needed
+     * and this can also quickly be implemented to get reference values.
+     *
+     *   Variance = 0.0490564204710764376 +- 0.0224903186229649300
+     *   Skewness = 0.308128594671967048  +- 1.03523001446472049
+     *   Kurtosis = 0.190964606824740572  +- 1.08281855793286145
+     *
+     * NOTE: Having a small(er) number of estimates per trajectory can lead to
+     *       negative variance/kurtosis and hence to imaginary skewness. The guess
+     *       here is that with "toy-numbers" the bias is basically larger then the
+     *       quantity to be estimated.
+     *
+     *
+     * differentSamples == FALSE
+     *
+     *       Mean = 5.5                 +- 0.957427107756338110
+     *   Variance = 8.14814814814814815 +- 2.69124475919777037
+     *   Skewness = 0.0                 +- 0.452121680616564996
+     *   Kurtosis = 1.79234043214632025 +- 0.403117909936601779
+     */
 }
 
 Moments buildMomentsForTest()
