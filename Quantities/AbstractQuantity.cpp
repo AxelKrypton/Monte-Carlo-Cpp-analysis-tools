@@ -71,6 +71,8 @@ QuantityAbstract::getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeB
 {
     std::vector<DataSample> returnData;
     std::vector<unsigned int> moments = getNeededMoments();
+    if (moments.size() != dataSampleToBeBinned.size())
+        throw std::logic_error("Mismatching sizes detected in \"" + std::string(__FUNCTION__) + "\" function!");
     for (size_t i = 0; i < dataSampleToBeBinned.size(); i++) {
         DEBUG(std::cout << "# Moment " << moments[i] << "\n");
         returnData.push_back(performBinning(dataSampleToBeBinned[i], parameters));
