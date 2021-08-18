@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
- *  Copyright (c) 2014-2015,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2019-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ std::valarray<realFloat> makeValarrayWithOnesAndMinusOnes(int length)
 {
     std::valarray<realFloat> returnValarray(1., length);
     for (int iteration = 0; iteration < (int)returnValarray.size(); iteration++) {
-        returnValarray[iteration] = pow(-1., iteration);
+        returnValarray[iteration] = std::pow(-1., iteration);
     }
     return returnValarray;
 }

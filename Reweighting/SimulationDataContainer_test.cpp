@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2014-2015,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2019-2021 Alessandro Sciarra
  *  Copyright (c) 2015 Christopher Pinke
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -220,12 +220,12 @@ BOOST_AUTO_TEST_SUITE(UncorrelatedContainer)
         }
         for (int j = 0; j < numberOfBins[0]; j++) {
             // Since the moment is the first, than the picked data must be equal to the original
-            BOOST_REQUIRE_EQUAL(uncorrObject[0][2][j], pow(uncorrObject[0][0][j], 0));
-            BOOST_REQUIRE_EQUAL(uncorrObject[0][3][j], pow(uncorrObject[0][0][j], 1));
-            BOOST_REQUIRE_EQUAL(uncorrObject[0][4][j], pow(uncorrObject[0][0][j], 3));
-            BOOST_REQUIRE_EQUAL(uncorrObject[0][5][j], pow(uncorrObject[0][1][j], 0));
-            BOOST_REQUIRE_EQUAL(uncorrObject[0][6][j], pow(uncorrObject[0][1][j], 1));
-            BOOST_REQUIRE_EQUAL(uncorrObject[0][7][j], pow(uncorrObject[0][1][j], 3));
+            BOOST_REQUIRE_EQUAL(uncorrObject[0][2][j], std::pow(uncorrObject[0][0][j], 0));
+            BOOST_REQUIRE_EQUAL(uncorrObject[0][3][j], std::pow(uncorrObject[0][0][j], 1));
+            BOOST_REQUIRE_EQUAL(uncorrObject[0][4][j], std::pow(uncorrObject[0][0][j], 3));
+            BOOST_REQUIRE_EQUAL(uncorrObject[0][5][j], std::pow(uncorrObject[0][1][j], 0));
+            BOOST_REQUIRE_EQUAL(uncorrObject[0][6][j], std::pow(uncorrObject[0][1][j], 1));
+            BOOST_REQUIRE_EQUAL(uncorrObject[0][7][j], std::pow(uncorrObject[0][1][j], 3));
         }
     }
 
