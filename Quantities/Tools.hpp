@@ -36,7 +36,7 @@ realFloat getUnbiasEstimateOfNthMomentPerTrajectory(const std::vector<realFloat>
 
 // TODO: Think whether it is possible to unify the following two templates in only one
 template<typename OBSERVABLE>
-functionForObservable pickUpFunctionToToBeAppliedToMoments(const bool isMeanZero, const bool useMultipleEstimate)
+functionForQuantity pickUpFunctionToToBeAppliedToMoments(const bool isMeanZero, const bool useMultipleEstimate)
 {
     if (isMeanZero) {
         if constexpr (std::is_same_v<OBSERVABLE, Mean>)
@@ -51,7 +51,7 @@ functionForObservable pickUpFunctionToToBeAppliedToMoments(const bool isMeanZero
     }
 }
 template<typename OBSERVABLE>
-functionForEstimators pickUpFunctionToBeAppliedToMomentsEstimator(const bool isMeanZero, const bool useMultipleEstimate)
+functionForQuantityEstimators pickUpFunctionToBeAppliedToMomentsEstimator(const bool isMeanZero, const bool useMultipleEstimate)
 {
     if (isMeanZero) {
         if constexpr (std::is_same_v<OBSERVABLE, Mean>)

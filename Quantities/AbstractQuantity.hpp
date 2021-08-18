@@ -60,9 +60,9 @@ class QuantityAbstract {
     // Virtual method that must be provided by children classes
     // virtual Parameters getLocalParametersWithCorrectBinningInformation(const BinningParameters& parameters) = 0;
     virtual void printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample) = 0;
-    virtual functionForEstimatorsForJackknife getFunctionToBeAppliedToJackknifeEstimators() = 0;
-    virtual functionForObservable getFunctionToToBeAppliedToMoments() = 0;
-    virtual functionForEstimators getFunctionToBeAppliedToMomentsEstimators() = 0;
+    virtual functionForJackknifeEstimators getFunctionToBeAppliedToJackknifeEstimators() = 0;
+    virtual functionForQuantity getFunctionToToBeAppliedToMoments() = 0;
+    virtual functionForQuantityEstimators getFunctionToBeAppliedToMomentsEstimators() = 0;
     virtual std::initializer_list<unsigned int> getNeededMoments() = 0;
     virtual void checkCalculatedValue() = 0;
 };

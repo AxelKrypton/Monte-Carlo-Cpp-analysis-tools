@@ -48,7 +48,7 @@ void Kurtosis::printCorrectBinningInformation(const BinningParameters& parameter
     printBinningInformation(parameters, constants::observableName<Kurtosis>, elementsOfSample);
 }
 
-functionForEstimatorsForJackknife Kurtosis::getFunctionToBeAppliedToJackknifeEstimators()
+functionForJackknifeEstimators Kurtosis::getFunctionToBeAppliedToJackknifeEstimators()
 {
     /*
      * NOTE: Code duplication left on purpose for clarification on what is being done as analysis
@@ -86,12 +86,12 @@ functionForEstimatorsForJackknife Kurtosis::getFunctionToBeAppliedToJackknifeEst
         };
 }
 
-functionForObservable Kurtosis::getFunctionToToBeAppliedToMoments()
+functionForQuantity Kurtosis::getFunctionToToBeAppliedToMoments()
 {
     return pickUpFunctionToToBeAppliedToMoments<Kurtosis>(isMeanZero, useMultipleEstimates);
 }
 
-functionForEstimators Kurtosis::getFunctionToBeAppliedToMomentsEstimators()
+functionForQuantityEstimators Kurtosis::getFunctionToBeAppliedToMomentsEstimators()
 {
     return pickUpFunctionToBeAppliedToMomentsEstimator<Kurtosis>(isMeanZero, useMultipleEstimates);
 }
