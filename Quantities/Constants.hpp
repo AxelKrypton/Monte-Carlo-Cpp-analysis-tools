@@ -20,10 +20,12 @@
 #pragma once
 
 #include "Moments.hpp"
+#include "Tools.hpp"
 
 #include <climits>
 #include <cmath>
 #include <functional>
+#include <type_traits>
 
 typedef std::function<realFloat(Moments)> functionForQuantity;
 typedef std::function<DataSample(MomentsEstimators)> functionForQuantityEstimators;
@@ -218,4 +220,44 @@ namespace constants {
                 - (3 * firstMoment * firstMoment * firstMoment * firstMoment))
                / ((in[2] - (firstMoment ^ 2)) ^ 2);
     };
+}
+
+// TODO: Think whether it is possible to unify the following two templates in only one
+template<typename OBSERVABLE>
+functionForQuantity pickUpFunctionToToBeAppliedToMoments(const bool isMeanZero, const bool useMultipleEstimate)
+{
+    if (isMeanZero) {
+        if constexpr (std::is_same_v<OBSERVABLE, Mean>)
+            throw std::logic_error("Attempt to get function to calculate mean but isMeanZero==true!");
+        else {
+            if (useMultipleEstimate)
+                return constants::functionToCalculateQuantityWithZeroMeanAndMultipleEstimates<OBSERVABLE>;
+            else
+                return constants::functionToCalculateQuantityWithZeroMean<OBSERVABLE>;
+        }
+    } else {
+        if (useMultipleEstimate)
+            return constants::functionToCalculateQuantityWithMultipleEstimates<OBSERVABLE>;
+        else
+            return constants::functionToCalculateQuantity<OBSERVABLE>;
+    }
+}
+template<typename OBSERVABLE>
+functionForQuantityEstimators pickUpFunctionToBeAppliedToMomentsEstimator(const bool isMeanZero, const bool useMultipleEstimate)
+{
+    if (isMeanZero) {
+        if constexpr (std::is_same_v<OBSERVABLE, Mean>)
+            throw std::logic_error("Attempt to get function to calculate mean estimators but isMeanZero==true!");
+        else {
+            if (useMultipleEstimate)
+                return constants::functionToBeAppliedToEstimatorsWithZeroMeanAndMultipleEstimates<OBSERVABLE>;
+            else
+                return constants::functionToBeAppliedToEstimatorsWithZeroMean<OBSERVABLE>;
+        }
+    } else {
+        if (useMultipleEstimate)
+            return constants::functionToBeAppliedToEstimatorsWithMultipleEstimates<OBSERVABLE>;
+        else
+            return constants::functionToBeAppliedToEstimators<OBSERVABLE>;
+    }
 }

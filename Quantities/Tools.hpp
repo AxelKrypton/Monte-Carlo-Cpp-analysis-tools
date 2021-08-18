@@ -22,11 +22,6 @@
 #include "../Parameters/Parameters.hpp"
 #include "../dataAnalysisUtilities/DataSample.hpp"
 #include "../types.hpp"
-#include "Constants.hpp"
-#include "Kurtosis.hpp"
-#include "Mean.hpp"
-#include "Skewness.hpp"
-#include "Variance.hpp"
 
 #include <numeric>
 #include <type_traits>
@@ -72,36 +67,4 @@ template<typename T> T getUnbiasEstimateOfNthMoment(std::vector<T> multipleEstim
             break;
     }
     return result / normalization;
-}
-
-// TODO: Think whether it is possible to unify the following two templates in only one
-template<typename OBSERVABLE>
-functionForQuantity pickUpFunctionToToBeAppliedToMoments(const bool isMeanZero, const bool useMultipleEstimate)
-{
-    if (isMeanZero) {
-        if constexpr (std::is_same_v<OBSERVABLE, Mean>)
-            throw std::logic_error("Attempt to get function to calculate mean but isMeanZero==true!");
-        else
-            return constants::functionToCalculateQuantityWithZeroMean<OBSERVABLE>;
-    } else {
-        if (useMultipleEstimate)
-            return constants::functionToCalculateQuantityWithMultipleEstimates<OBSERVABLE>;
-        else
-            return constants::functionToCalculateQuantityWithNonZeroMean<OBSERVABLE>;
-    }
-}
-template<typename OBSERVABLE>
-functionForQuantityEstimators pickUpFunctionToBeAppliedToMomentsEstimator(const bool isMeanZero, const bool useMultipleEstimate)
-{
-    if (isMeanZero) {
-        if constexpr (std::is_same_v<OBSERVABLE, Mean>)
-            throw std::logic_error("Attempt to get function to calculate mean estimators but isMeanZero==true!");
-        else
-            return constants::functionToBeAppliedToEstimatorsWithZeroMean<OBSERVABLE>;
-    } else {
-        if (useMultipleEstimate)
-            return constants::functionToBeAppliedToEstimatorsWithMultipleEstimates<OBSERVABLE>;
-        else
-            return constants::functionToBeAppliedToEstimatorsWithNonZeroMean<OBSERVABLE>;
-    }
 }
