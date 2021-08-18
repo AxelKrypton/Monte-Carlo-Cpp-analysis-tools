@@ -57,7 +57,7 @@ DataSample MultipleDataSample::getNthMomentPerDataPoint(unsigned int n)
     else {
         DataSample result(data[0].getNumberOfElements());
         for (auto i = 0; i < result.getNumberOfElements(); i++)
-            result[i] = getUnbiasEstimateOfNthMomentPerTrajectory(getEstimatesPerTrajectory(i), n);
+            result[i] = getUnbiasEstimateOfNthMoment(getEstimatesPerTrajectory(i), n);
         return result;
     }
 }
