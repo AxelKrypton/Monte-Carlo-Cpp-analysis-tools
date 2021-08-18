@@ -82,7 +82,7 @@ void Variance::printCorrectBinningInformation(const BinningParameters& parameter
     printBinningInformation(parameters, constants::observableName<Variance>, elementsOfSample);
 }
 
-functionForEstimatorsForJackknife Variance::getFunctionToBeAppliedToEstimatorsForJackknife()
+functionForEstimatorsForJackknife Variance::getFunctionToBeAppliedToJackknifeEstimators()
 {
     if (useMultipleEstimates)
         if (isMeanZero)
@@ -103,12 +103,12 @@ functionForEstimatorsForJackknife Variance::getFunctionToBeAppliedToEstimatorsFo
         throw std::logic_error("Forbidden to retrieve function for jackknife from Variance class!");
 }
 
-functionForObservable Variance::getFunctionToCalculateObservable()
+functionForObservable Variance::getFunctionToToBeAppliedToMoments()
 {
     return pickUpCorrectFunctionForObservable<Variance>(isMeanZero, useMultipleEstimates);
 }
 
-functionForEstimators Variance::getFunctionToBeAppliedToEstimators()
+functionForEstimators Variance::getFunctionToBeAppliedToMomentsEstimators()
 {
     return pickUpCorrectFunctionForEstimator<Variance>(isMeanZero, useMultipleEstimates);
 }

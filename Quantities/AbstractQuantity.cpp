@@ -44,14 +44,14 @@ void QuantityAbstract::calculateAndSetValueAndError(MultipleDataSample& dataSamp
         printCorrectBinningInformation(parameters, dataSamples[0].getNumberOfElements());
         binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, parameters);
     }
-    value = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
+    value = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToJackknifeEstimators());
     checkCalculatedValue();
 }
 
 void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod)
 {
-    value.estimate = getFunctionToCalculateObservable()(moments);
-    DataSample functionAppliedToEstimators = getFunctionToBeAppliedToEstimators()(estimators);
+    value.estimate = getFunctionToToBeAppliedToMoments()(moments);
+    DataSample functionAppliedToEstimators = getFunctionToBeAppliedToMomentsEstimators()(estimators);
     value.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 }
 

@@ -49,7 +49,7 @@ void Skewness::printCorrectBinningInformation(const BinningParameters& parameter
     printBinningInformation(parameters, constants::observableName<Skewness>, elementsOfSample);
 }
 
-functionForEstimatorsForJackknife Skewness::getFunctionToBeAppliedToEstimatorsForJackknife()
+functionForEstimatorsForJackknife Skewness::getFunctionToBeAppliedToJackknifeEstimators()
 {
     /*
      * NOTE: Code duplication left on purpose for clarification on what is being done as analysis
@@ -86,12 +86,12 @@ functionForEstimatorsForJackknife Skewness::getFunctionToBeAppliedToEstimatorsFo
         };
 }
 
-functionForObservable Skewness::getFunctionToCalculateObservable()
+functionForObservable Skewness::getFunctionToToBeAppliedToMoments()
 {
     return pickUpCorrectFunctionForObservable<Skewness>(isMeanZero, useMultipleEstimates);
 }
 
-functionForEstimators Skewness::getFunctionToBeAppliedToEstimators()
+functionForEstimators Skewness::getFunctionToBeAppliedToMomentsEstimators()
 {
     return pickUpCorrectFunctionForEstimator<Skewness>(isMeanZero, useMultipleEstimates);
 }

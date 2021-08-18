@@ -78,17 +78,17 @@ void Mean::printCorrectBinningInformation(const BinningParameters& parameters, i
     printBinningInformation(parameters, constants::observableName<Mean>, elementsOfSample);
 }
 
-functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToEstimatorsForJackknife()
+functionForEstimatorsForJackknife Mean::getFunctionToBeAppliedToJackknifeEstimators()
 {
     throw std::logic_error("Forbidden to retrieve function for jackknife from Mean class!");
 }
 
-functionForObservable Mean::getFunctionToCalculateObservable()
+functionForObservable Mean::getFunctionToToBeAppliedToMoments()
 {
     return pickUpCorrectFunctionForObservable<Mean>(isMeanZero, useMultipleEstimates);
 }
 
-functionForEstimators Mean::getFunctionToBeAppliedToEstimators()
+functionForEstimators Mean::getFunctionToBeAppliedToMomentsEstimators()
 {
     return pickUpCorrectFunctionForEstimator<Mean>(isMeanZero, useMultipleEstimates);
 }
