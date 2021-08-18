@@ -75,7 +75,10 @@ DataSample Skewness::evaluateObservableOnMomentEstimators(MomentsEstimators esti
     return pickUpCorrectFunctionForEstimator<Skewness>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
-std::initializer_list<unsigned int> Skewness::getNeededMoments(bool expanded)
+std::initializer_list<unsigned int> Skewness::getNeededMoments()
 {
-    return expanded ? constants::neededMomentsExpanded<Skewness> : constants::neededMomentsUnexpanded<Skewness>;
+    if (useMultipleEstimates)
+        return (isMeanZero) ? constants::neededMomentsExpandedWithZeroMean<Skewness> : constants::neededMomentsExpanded<Skewness>;
+    else
+        return constants::neededMomentsUnexpanded<Skewness>;
 }

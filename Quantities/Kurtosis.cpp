@@ -74,7 +74,10 @@ DataSample Kurtosis::evaluateObservableOnMomentEstimators(MomentsEstimators esti
     return pickUpCorrectFunctionForEstimator<Kurtosis>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
-std::initializer_list<unsigned int> Kurtosis::getNeededMoments(bool expanded)
+std::initializer_list<unsigned int> Kurtosis::getNeededMoments()
 {
-    return expanded ? constants::neededMomentsExpanded<Kurtosis> : constants::neededMomentsUnexpanded<Kurtosis>;
+    if (useMultipleEstimates)
+        return (isMeanZero) ? constants::neededMomentsExpandedWithZeroMean<Kurtosis> : constants::neededMomentsExpanded<Kurtosis>;
+    else
+        return constants::neededMomentsUnexpanded<Kurtosis>;
 }

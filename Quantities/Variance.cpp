@@ -102,9 +102,12 @@ DataSample Variance::evaluateObservableOnMomentEstimators(MomentsEstimators esti
     return pickUpCorrectFunctionForEstimator<Variance>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
-std::initializer_list<unsigned int> Variance::getNeededMoments(bool expanded)
+std::initializer_list<unsigned int> Variance::getNeededMoments()
 {
-    return expanded ? constants::neededMomentsExpanded<Variance> : constants::neededMomentsUnexpanded<Variance>;
+    if (useMultipleEstimates)
+        return (isMeanZero) ? constants::neededMomentsExpandedWithZeroMean<Variance> : constants::neededMomentsExpanded<Variance>;
+    else
+        throw std::logic_error("Forbidden to ask for needed moments from Variance class without multiple estimates!");
 }
 
 /**

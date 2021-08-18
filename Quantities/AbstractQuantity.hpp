@@ -47,8 +47,10 @@ class QuantityAbstract {
      *  like for the mean and for the variance where jackknife triggers only rounding errors.
      */
     virtual void calculateAndSetValueAndError(MultipleDataSample&, BinningParameters);
+
     // Calculation for Reweighting
     void calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod);
+
     bool isMeanZero;
     bool useMultipleEstimates;
 
@@ -61,5 +63,5 @@ class QuantityAbstract {
     virtual functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() = 0;
     virtual functionForObservable getFunctionToCalculateObservable() = 0;
     virtual functionForEstimators getFunctionToBeAppliedToEstimators() = 0;
-    virtual std::initializer_list<unsigned int> getNeededMoments(bool expanded = false) = 0;
+    virtual std::initializer_list<unsigned int> getNeededMoments() = 0;
 };

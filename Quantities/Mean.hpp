@@ -44,6 +44,6 @@ class Mean : public QuantityAbstract {
     functionForEstimatorsForJackknife getFunctionToBeAppliedToEstimatorsForJackknife() override;
     functionForObservable getFunctionToCalculateObservable() override;
     functionForEstimators getFunctionToBeAppliedToEstimators() override;
-    std::initializer_list<unsigned int> getNeededMoments(bool expanded = false) override;
+    std::initializer_list<unsigned int> getNeededMoments() override;
     friend class Quantities;
 };

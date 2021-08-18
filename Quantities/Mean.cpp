@@ -98,7 +98,7 @@ DataSample Mean::evaluateObservableOnMomentEstimators(MomentsEstimators estimato
     return pickUpCorrectFunctionForEstimator<Mean>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
 }
 
-std::initializer_list<unsigned int> Mean::getNeededMoments(bool expanded)
+std::initializer_list<unsigned int> Mean::getNeededMoments()
 {
-    return expanded ? constants::neededMomentsExpanded<Mean> : constants::neededMomentsUnexpanded<Mean>;
+    throw std::logic_error("Forbidden to ask for needed moments from Mean class!");
 }
