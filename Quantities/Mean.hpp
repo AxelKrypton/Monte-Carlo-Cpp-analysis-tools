@@ -45,5 +45,6 @@ class Mean : public QuantityAbstract {
     functionForObservable getFunctionToCalculateObservable() override;
     functionForEstimators getFunctionToBeAppliedToEstimators() override;
     std::initializer_list<unsigned int> getNeededMoments() override;
+    void checkCalculatedValue() override;
     friend class Quantities;
 };

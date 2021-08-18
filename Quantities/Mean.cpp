@@ -102,3 +102,8 @@ std::initializer_list<unsigned int> Mean::getNeededMoments()
 {
     throw std::logic_error("Forbidden to ask for needed moments from Mean class!");
 }
+
+void Mean::checkCalculatedValue()
+{
+    throw std::logic_error("Function to check calculated value should not be called in the Mean class!");
+}

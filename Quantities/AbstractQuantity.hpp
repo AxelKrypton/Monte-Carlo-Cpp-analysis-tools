@@ -64,4 +64,5 @@ class QuantityAbstract {
     virtual functionForObservable getFunctionToCalculateObservable() = 0;
     virtual functionForEstimators getFunctionToBeAppliedToEstimators() = 0;
     virtual std::initializer_list<unsigned int> getNeededMoments() = 0;
+    virtual void checkCalculatedValue() = 0;
 };

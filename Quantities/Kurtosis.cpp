@@ -81,3 +81,15 @@ std::initializer_list<unsigned int> Kurtosis::getNeededMoments()
     else
         return constants::neededMomentsUnexpanded<Kurtosis>;
 }
+
+void Kurtosis::checkCalculatedValue()
+{
+    if (useMultipleEstimates) {
+        if (value.estimate < 0)
+            throw std::runtime_error("Obtained negative kurtosis with multiple estimates.");
+        if (std::isnan(value.estimate))
+            throw std::runtime_error("Obtained nan as kurtosis value with multiple estimates.");
+        if (std::isnan(value.error))
+            throw std::runtime_error("Obtained nan as kurtosis error with multiple estimates.");
+    }
+}

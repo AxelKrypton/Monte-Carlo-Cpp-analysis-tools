@@ -82,3 +82,13 @@ std::initializer_list<unsigned int> Skewness::getNeededMoments()
     else
         return constants::neededMomentsUnexpanded<Skewness>;
 }
+
+void Skewness::checkCalculatedValue()
+{
+    if (useMultipleEstimates) {
+        if (std::isnan(value.estimate))
+            throw std::runtime_error("Obtained nan as skewness value with multiple estimates.");
+        if (std::isnan(value.error))
+            throw std::runtime_error("Obtained nan as skewness error with multiple estimates.");
+    }
+}

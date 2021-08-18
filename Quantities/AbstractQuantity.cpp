@@ -48,6 +48,7 @@ void QuantityAbstract::calculateAndSetValueAndError(MultipleDataSample& dataSamp
         binnedMomentsPerDataPoint = getBinnedNeededMoments(neededMomentsPerDataPoint, parameters);
     }
     value = jackknifeAnalysis(binnedMomentsPerDataPoint, getFunctionToBeAppliedToEstimatorsForJackknife());
+    checkCalculatedValue();
 }
 
 void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEstimators estimators, ErrorCalculationMethod errorMethod)

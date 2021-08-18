@@ -110,6 +110,12 @@ std::initializer_list<unsigned int> Variance::getNeededMoments()
         throw std::logic_error("Forbidden to ask for needed moments from Variance class without multiple estimates!");
 }
 
+void Variance::checkCalculatedValue()
+{
+    if (useMultipleEstimates && value.estimate < 0)
+        throw std::runtime_error("Obtained negative variance with multiple estimates.");
+}
+
 /**
  * A Jackknife analysis of the (naive) sample variance
  *
