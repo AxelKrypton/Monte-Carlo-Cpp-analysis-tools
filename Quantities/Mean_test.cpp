@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimators)
     BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)
     {
         double referenceValueNonZeroMean = 5.126236900933244e-01;
-        DataSample resultNonZeroMean = Mean::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
+        DataSample resultNonZeroMean = Mean::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false, false);
         for (int i = 0; i < resultNonZeroMean.getNumberOfElements(); i++) {
             BOOST_CHECK_CLOSE(resultNonZeroMean[i], referenceValueNonZeroMean, realFloatPrecisionInPercent);
         }

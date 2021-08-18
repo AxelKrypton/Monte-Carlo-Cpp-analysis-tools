@@ -141,8 +141,8 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
     {
         double referenceValueZeroMean = 1.0000586137849100;
         double referenceValueNonZeroMean = 0.5728362972699335;
-        DataSample resultZeroMean = Skewness::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true);
-        DataSample resultNonZeroMean = Skewness::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
+        DataSample resultZeroMean = Skewness::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true, false);
+        DataSample resultNonZeroMean = Skewness::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false, false);
         for (int i = 0; i < resultZeroMean.getNumberOfElements(); i++) {
             BOOST_CHECK_CLOSE(resultZeroMean[i], referenceValueZeroMean, realFloatPrecisionInPercent);
             BOOST_CHECK_CLOSE(resultNonZeroMean[i], referenceValueNonZeroMean, realFloatPrecisionInPercent);
