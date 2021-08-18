@@ -27,7 +27,38 @@
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"
 #include "TestUtilities.hpp"
 
+static void testSkewnessAndError(MultipleDataSample multipleSample, EstimateAndError expected, bool isMeanKnownToBeZero, realFloat testPrecision)
+{
+    Skewness skewness(multipleSample, BinningParameters{}, QuantityAttributes{isMeanKnownToBeZero, true});
+    checkEstimateAndError(expected, skewness.value, testPrecision);
+}
+
 BOOST_AUTO_TEST_SUITE(SkewnessAndError)
+
+    /*
+     * TODO: Add tests like for Mean and Variance on given samples!
+     */
+
+    BOOST_AUTO_TEST_CASE(withMultipleEstimate1)
+    {
+        int numberOfElements = 634;
+        DataSample sample = getDataSampleBasedOnFillType(numberOfElements, ones);
+        MultipleDataSample multipleSample(std::vector<DataSample>(3, sample));
+        BOOST_REQUIRE_THROW(Skewness skewness(multipleSample, BinningParameters{}, QuantityAttributes{false, true}), std::runtime_error);
+    }
+
+    BOOST_AUTO_TEST_CASE(withMultipleEstimate2)
+    {
+        EstimateAndError expectedSkewness = {0.0, 0.452121680616564996};
+        // Here we minimally raise precision since some difference in 1e-14 arises w.r.t. Mathematica
+        testSkewnessAndError(buildMultipleDataSampleForTest(false), expectedSkewness, false, realFloatPrecisionInPercent * 2);
+    }
+
+    BOOST_AUTO_TEST_CASE(withMultipleEstimate3)
+    {
+        EstimateAndError expectedSkewness = {0.308128594671967048, 1.03523001446472049};
+        testSkewnessAndError(buildMultipleDataSampleForTest(true), expectedSkewness, false, realFloatPrecisionInPercent);
+    }
 
     const std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_1_3.dat";
 

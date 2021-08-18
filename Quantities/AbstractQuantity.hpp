@@ -56,7 +56,7 @@ class QuantityAbstract {
 
   private:
     std::vector<DataSample> getBinnedNeededMoments(std::vector<DataSample> dataSampleToBeBinned, const BinningParameters& parameters);
-    std::vector<DataSample> calculateNeededMomentsPerDataPoint(DataSample& dataSample);
+    std::vector<DataSample> calculateNeededMomentsPerDataPoint(MultipleDataSample& dataSample);
     // Virtual method that must be provided by children classes
     // virtual Parameters getLocalParametersWithCorrectBinningInformation(const BinningParameters& parameters) = 0;
     virtual void printCorrectBinningInformation(const BinningParameters& parameters, int elementsOfSample) = 0;

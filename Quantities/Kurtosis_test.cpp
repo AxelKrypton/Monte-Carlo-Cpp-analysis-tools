@@ -27,7 +27,37 @@
 #include "../dataAnalysisUtilities/dataSampleTestUtilities.hpp"
 #include "TestUtilities.hpp"
 
+static void testKurtosisAndError(MultipleDataSample multipleSample, EstimateAndError expected, bool isMeanKnownToBeZero, realFloat testPrecision)
+{
+    Kurtosis kurtosis(multipleSample, BinningParameters{}, QuantityAttributes{isMeanKnownToBeZero, true});
+    checkEstimateAndError(expected, kurtosis.value, testPrecision);
+}
+
 BOOST_AUTO_TEST_SUITE(KurtosisAndError)
+
+    /*
+     * TODO: Add tests like for Mean and Variance on given samples!
+     */
+
+    BOOST_AUTO_TEST_CASE(withMultipleEstimate1)
+    {
+        int numberOfElements = 2041;
+        DataSample sample = getDataSampleBasedOnFillType(numberOfElements, ones);
+        MultipleDataSample multipleSample(std::vector<DataSample>(4, sample));
+        BOOST_REQUIRE_THROW(Kurtosis kurtosis(multipleSample, BinningParameters{}, QuantityAttributes{false, true}), std::runtime_error);
+    }
+
+    BOOST_AUTO_TEST_CASE(withMultipleEstimate2)
+    {
+        EstimateAndError expectedKurtosis = {1.79234043214632025, 0.403117909936601779};
+        testKurtosisAndError(buildMultipleDataSampleForTest(false), expectedKurtosis, false, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(withMultipleEstimate3)
+    {
+        EstimateAndError expectedKurtosis = {0.190964606824740572, 1.08281855793286145};
+        testKurtosisAndError(buildMultipleDataSampleForTest(true), expectedKurtosis, false, realFloatPrecisionInPercent);
+    }
 
     const std::string gaussianData = "SampleDatafiles/gaussianNumbers_0_1_1_3.dat";
 

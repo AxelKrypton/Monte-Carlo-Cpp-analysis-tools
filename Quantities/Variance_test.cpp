@@ -37,9 +37,16 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         return prefactor * (secondMoment - pow(firstMoment, 2.));
     }
 
-    static void testVarianceAndError(DataSample sample, EstimateAndError expected, realFloat testPrecision, bool isMeanKnownToBeZero = false)
+    static void testVarianceAndError(DataSample sample, EstimateAndError expected, bool isMeanKnownToBeZero, realFloat testPrecision)
     {
         Variance variance(sample, BinningParameters{}, QuantityAttributes{isMeanKnownToBeZero, false});
+        checkEstimateAndError(expected, variance.value, testPrecision);
+    }
+
+    static void testVarianceAndError(
+        MultipleDataSample multipleSample, EstimateAndError expected, bool isMeanKnownToBeZero, realFloat testPrecision)
+    {
+        Variance variance(multipleSample, BinningParameters{}, QuantityAttributes{isMeanKnownToBeZero, true});
         checkEstimateAndError(expected, variance.value, testPrecision);
     }
 
@@ -49,7 +56,7 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         DataSample sample(numberOfElements);
         realFloat expectedVariance = 0.;
         realFloat expectedError = 0.;
-        testVarianceAndError(sample, {expectedVariance, expectedError}, realFloatPrecisionInPercent, true);
+        testVarianceAndError(sample, {expectedVariance, expectedError}, true, realFloatPrecisionInPercent);
     }
 
     BOOST_AUTO_TEST_CASE(test2)
@@ -58,7 +65,7 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         DataSample sample = getDataSampleBasedOnFillType(numberOfElements, ones);
         realFloat expectedVariance = 0.;
         realFloat expectedError = 0.;
-        testVarianceAndError(sample, {expectedVariance, expectedError}, realFloatPrecisionInPercent);
+        testVarianceAndError(sample, {expectedVariance, expectedError}, false, realFloatPrecisionInPercent);
     }
 
     BOOST_AUTO_TEST_CASE(test3)
@@ -69,7 +76,7 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         realFloat expectedError = 8465.84748859;
         // TODO: check this again!
         // the difference in the error estimate exceeds 1e-13, most likely due to rounding errors.
-        testVarianceAndError(sample, {expectedVariance, expectedError}, realFloatPrecisionInPercent * 1e3);
+        testVarianceAndError(sample, {expectedVariance, expectedError}, false, realFloatPrecisionInPercent * 1e3);
     }
 
     BOOST_AUTO_TEST_CASE(test4)
@@ -78,7 +85,7 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         DataSample sample = getDataSampleBasedOnFillType(numberOfElements, onesMinusOnes);
         realFloat expectedVariance = numberOfElements / (numberOfElements - 1.);
         realFloat expectedError = 0;
-        testVarianceAndError(sample, {expectedVariance, expectedError}, realFloatPrecisionInPercent);
+        testVarianceAndError(sample, {expectedVariance, expectedError}, true, realFloatPrecisionInPercent);
     }
 
     BOOST_AUTO_TEST_CASE(test5)
@@ -96,6 +103,35 @@ BOOST_AUTO_TEST_SUITE(VarianceAndError)
         Variance variance(sample, BinningParameters{true, false, false, false, 5}, QuantityAttributes{});
         BOOST_REQUIRE_EQUAL(variance.value.error, 0);
     }
+
+    BOOST_AUTO_TEST_CASE(withMultipleEstimate1)
+    {
+        int numberOfElements = 2674;
+        DataSample sample(numberOfElements);
+        MultipleDataSample multipleSample(std::vector<DataSample>(3, sample));
+        testVarianceAndError(multipleSample, {0.0, 0.0}, true, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(withMultipleEstimate2)
+    {
+        int numberOfElements = 1542;
+        DataSample sample = getDataSampleBasedOnFillType(numberOfElements, ones);
+        MultipleDataSample multipleSample(std::vector<DataSample>(5, sample));
+        testVarianceAndError(multipleSample, {0.0, 0.0}, false, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(withMultipleEstimate3)
+    {
+        EstimateAndError expectedResult = {8.14814814814814815, 2.69124475919777037};
+        testVarianceAndError(buildMultipleDataSampleForTest(false), expectedResult, false, realFloatPrecisionInPercent);
+    }
+
+    BOOST_AUTO_TEST_CASE(withMultipleEstimate4)
+    {
+        EstimateAndError expectedResult = {0.0490564204710764376, 0.0224903186229649300};
+        testVarianceAndError(buildMultipleDataSampleForTest(true), expectedResult, false, realFloatPrecisionInPercent);
+    }
+
     BOOST_AUTO_TEST_CASE(withBinning1)
     {
         // This file has 1005 entries, from which 5 are discarded when binning with binsize 100

@@ -33,15 +33,12 @@ QuantityAbstract::QuantityAbstract(const QuantityAttributes& options)
 
 void QuantityAbstract::calculateAndSetValueAndError(MultipleDataSample& dataSamples, BinningParameters parameters)
 {
-    if (dataSamples.size() > 1)
-        throw std::invalid_argument("Analysis of generic quantity with multiple columns not implemented yet!");
-
     /*
      * ATTENTION: It is in general wrong to perform binning on the sample BEFORE calculating
      *            the n-th (central) moment per data point. Binning must be done AFTER!
      *            The reason boils down to a power of a sum VS a sum of powers.
      */
-    std::vector<DataSample> neededMomentsPerDataPoint = calculateNeededMomentsPerDataPoint(dataSamples[0]);
+    std::vector<DataSample> neededMomentsPerDataPoint = calculateNeededMomentsPerDataPoint(dataSamples);
     std::vector<DataSample> binnedMomentsPerDataPoint(neededMomentsPerDataPoint);
     if (parameters.performBinning) {
         printCorrectBinningInformation(parameters, dataSamples[0].getNumberOfElements());
@@ -58,11 +55,15 @@ void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEsti
     value.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
 }
 
-std::vector<DataSample> QuantityAbstract::calculateNeededMomentsPerDataPoint(DataSample& dataSample)
+std::vector<DataSample> QuantityAbstract::calculateNeededMomentsPerDataPoint(MultipleDataSample& dataSamples)
 {
     std::vector<DataSample> returnVec;
-    for (auto i : getNeededMoments())
-        returnVec.push_back((isMeanZero) ? dataSample.getNthMomentPerDataPoint(i) : dataSample.getNthCentralMomentPerDataPoint(i));
+    for (auto i : getNeededMoments()) {
+        if (useMultipleEstimates || isMeanZero)
+            returnVec.push_back(dataSamples.getNthMomentPerDataPoint(i));
+        else
+            returnVec.push_back(dataSamples.getNthCentralMomentPerDataPoint(i));
+    }
     return returnVec;
 }
 
