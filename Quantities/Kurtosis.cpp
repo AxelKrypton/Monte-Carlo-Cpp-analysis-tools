@@ -50,13 +50,40 @@ void Kurtosis::printCorrectBinningInformation(const BinningParameters& parameter
 
 functionForEstimatorsForJackknife Kurtosis::getFunctionToBeAppliedToEstimatorsForJackknife()
 {
-    return [](std::vector<DataSample> in) -> DataSample {
-        if (in.size() != 2)
-            throw std::invalid_argument("Invalid call to Kurtosis function for Jackknife!");
-        DataSample ex2 = in[0];  // estimator second central moment
-        DataSample ex4 = in[1];  // estimator fourth central moment
-        return ex4 / (ex2 ^ 2.0);
-    };
+    /*
+     * NOTE: Code duplication left on purpose for clarification on what is being done as analysis
+     */
+    if (useMultipleEstimates)
+        if (isMeanZero)
+            return [](std::vector<DataSample> in) -> DataSample {
+                if (in.size() != 2)
+                    throw std::invalid_argument("Invalid call to Kurtosis function for Jackknife with multiple estimators and zero mean!");
+                DataSample m2 = in[0];  // Jackknife estimators second moment
+                DataSample m4 = in[1];  // Jackknife estimators third moment
+                return m4 / (m2 ^ 2.0);
+            };
+        else
+            return [](std::vector<DataSample> in) -> DataSample {
+                if (in.size() != 4)
+                    throw std::invalid_argument("Invalid call to Kurtosis function for Jackknife with multiple estimators!");
+                DataSample m1 = in[0];  // Jackknife estimators first moment
+                DataSample m2 = in[1];  // Jackknife estimators second moment
+                DataSample m3 = in[2];  // Jackknife estimators third moment
+                DataSample m4 = in[3];  // Jackknife estimators fourth moment
+                return (m4 - 4.0 * m3 * m1 + 6.0 * m2 * (m1 ^ 2.0) - 3.0 * (m1 ^ 4.0)) / ((m2 - (m1 ^ 2.0)) ^ 2.0);
+            };
+    else
+        /*
+         * NOTE: Here no if-else on isMeanZero is needed, since the choice is done
+         *       where the needed moments are evaluated!
+         */
+        return [](std::vector<DataSample> in) -> DataSample {
+            if (in.size() != 2)
+                throw std::invalid_argument("Invalid call to Kurtosis function for Jackknife!");
+            DataSample cm2 = in[0];  // Jackknife estimators second central moment
+            DataSample cm4 = in[1];  // Jackknife estimators fourth central moment
+            return cm4 / (cm2 ^ 2.0);
+        };
 }
 
 functionForObservable Kurtosis::getFunctionToCalculateObservable()

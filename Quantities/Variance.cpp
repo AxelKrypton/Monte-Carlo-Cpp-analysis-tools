@@ -84,7 +84,23 @@ void Variance::printCorrectBinningInformation(const BinningParameters& parameter
 
 functionForEstimatorsForJackknife Variance::getFunctionToBeAppliedToEstimatorsForJackknife()
 {
-    throw std::logic_error("Forbidden to retrieve function for jackknife from Variance class!");
+    if (useMultipleEstimates)
+        if (isMeanZero)
+            return [](std::vector<DataSample> in) -> DataSample {
+                if (in.size() != 1)
+                    throw std::invalid_argument("Invalid call to Variance function for Jackknife!");
+                return in[0];  // Jackknife estimators second moment
+            };
+        else
+            return [](std::vector<DataSample> in) -> DataSample {
+                if (in.size() != 2)
+                    throw std::invalid_argument("Invalid call to Variance function for Jackknife!");
+                DataSample m1 = in[0];  // Jackknife estimators first moment
+                DataSample m2 = in[1];  // Jackknife estimators second moment
+                return m2 - (m1 ^ 2.0);
+            };
+    else
+        throw std::logic_error("Forbidden to retrieve function for jackknife from Variance class!");
 }
 
 functionForObservable Variance::getFunctionToCalculateObservable()
