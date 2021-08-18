@@ -29,8 +29,14 @@
 
 void checkEstimateAndError(EstimateAndError expectedEstimateAndError, EstimateAndError calculatedEstimateAndError, realFloat testPrecision)
 {
-    BOOST_CHECK_CLOSE(expectedEstimateAndError.error, calculatedEstimateAndError.error, testPrecision);
-    BOOST_CHECK_CLOSE(expectedEstimateAndError.estimate, calculatedEstimateAndError.estimate, testPrecision);
+    if (expectedEstimateAndError.estimate == 0.0)
+        BOOST_CHECK_SMALL(calculatedEstimateAndError.estimate, testPrecision);
+    else
+        BOOST_CHECK_CLOSE(expectedEstimateAndError.estimate, calculatedEstimateAndError.estimate, testPrecision);
+    if (expectedEstimateAndError.error == 0.0)
+        BOOST_CHECK_SMALL(calculatedEstimateAndError.error, testPrecision);
+    else
+        BOOST_CHECK_CLOSE(expectedEstimateAndError.error, calculatedEstimateAndError.error, testPrecision);
 }
 
 MultipleDataSample buildMultipleDataSampleForTest(bool differentSamples)
