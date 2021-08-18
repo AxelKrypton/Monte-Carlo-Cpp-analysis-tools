@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
- *  Copyright (c) 2014-2015,2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -102,5 +102,9 @@ class DataSample : public DataSampleBasic {
 };
 
 DataSample removeNElementsFromDataSample(DataSample sampleIn, int n);
+inline DataSample pow(DataSample base, int exponent)
+{
+    return base ^ exponent;
+}
 
 #endif /* DATASAMPLEANALYZER_HPP_ */
