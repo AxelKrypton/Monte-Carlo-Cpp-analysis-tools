@@ -31,7 +31,7 @@ class Skewness : public QuantityAbstract {
     Skewness(MultipleDataSample, BinningParameters, QuantityAttributes);
     Skewness(Moments, MomentsEstimators, QuantityAttributes, ErrorCalculationMethod);
 
-    static DataSample evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate);
+    static DataSample evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero);
 
   private:
     Skewness();

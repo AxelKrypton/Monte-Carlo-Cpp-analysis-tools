@@ -209,8 +209,8 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
     {
         double referenceValueZeroMean = 2.627932923896761e-01;
         double referenceValueNonZeroMean = 1.024474477934190e-05;
-        DataSample resultZeroMean = Variance::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true, false);
-        DataSample resultNonZeroMean = Variance::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false, false);
+        DataSample resultZeroMean = Variance::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true);
+        DataSample resultNonZeroMean = Variance::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
         for (int i = 0; i < resultZeroMean.getNumberOfElements(); i++) {
             BOOST_CHECK_CLOSE(resultZeroMean[i], referenceValueZeroMean, realFloatPrecisionInPercent);
             BOOST_CHECK_CLOSE(resultNonZeroMean[i], referenceValueNonZeroMean, realFloatPrecisionInPercent);

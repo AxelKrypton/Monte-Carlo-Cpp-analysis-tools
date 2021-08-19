@@ -31,7 +31,7 @@ class Kurtosis : public QuantityAbstract {
     Kurtosis(MultipleDataSample, BinningParameters, QuantityAttributes);
     Kurtosis(Moments, MomentsEstimators, QuantityAttributes, ErrorCalculationMethod);
 
-    static DataSample evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate);
+    static DataSample evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero);
 
   private:
     Kurtosis();

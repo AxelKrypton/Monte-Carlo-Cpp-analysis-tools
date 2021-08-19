@@ -85,17 +85,17 @@ functionForJackknifeEstimators Mean::getFunctionToBeAppliedToJackknifeEstimators
 
 functionForQuantity Mean::getFunctionToToBeAppliedToMoments()
 {
-    return pickUpFunctionToToBeAppliedToMoments<Mean>(isMeanZero, useMultipleEstimates);
+    return pickUpFunctionToToBeAppliedToMoments<Mean>(isMeanZero);
 }
 
 functionForQuantityEstimators Mean::getFunctionToBeAppliedToMomentsEstimators()
 {
-    return pickUpFunctionToBeAppliedToMomentsEstimator<Mean>(isMeanZero, useMultipleEstimates);
+    return pickUpFunctionToBeAppliedToMomentsEstimator<Mean>(isMeanZero);
 }
 
-DataSample Mean::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)
+DataSample Mean::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero)
 {
-    return pickUpFunctionToBeAppliedToMomentsEstimator<Mean>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
+    return pickUpFunctionToBeAppliedToMomentsEstimator<Mean>(isMeanKnownToBeZero)(estimators);
 }
 
 std::initializer_list<unsigned int> Mean::getNeededMoments()

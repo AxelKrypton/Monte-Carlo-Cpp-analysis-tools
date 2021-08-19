@@ -105,17 +105,17 @@ functionForJackknifeEstimators Variance::getFunctionToBeAppliedToJackknifeEstima
 
 functionForQuantity Variance::getFunctionToToBeAppliedToMoments()
 {
-    return pickUpFunctionToToBeAppliedToMoments<Variance>(isMeanZero, useMultipleEstimates);
+    return pickUpFunctionToToBeAppliedToMoments<Variance>(isMeanZero);
 }
 
 functionForQuantityEstimators Variance::getFunctionToBeAppliedToMomentsEstimators()
 {
-    return pickUpFunctionToBeAppliedToMomentsEstimator<Variance>(isMeanZero, useMultipleEstimates);
+    return pickUpFunctionToBeAppliedToMomentsEstimator<Variance>(isMeanZero);
 }
 
-DataSample Variance::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)
+DataSample Variance::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero)
 {
-    return pickUpFunctionToBeAppliedToMomentsEstimator<Variance>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
+    return pickUpFunctionToBeAppliedToMomentsEstimator<Variance>(isMeanKnownToBeZero)(estimators);
 }
 
 std::initializer_list<unsigned int> Variance::getNeededMoments()

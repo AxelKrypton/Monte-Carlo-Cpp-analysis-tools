@@ -34,7 +34,7 @@ class Mean : public QuantityAbstract {
     Mean(MultipleDataSample, BinningParameters, QuantityAttributes);
     Mean(Moments, MomentsEstimators, QuantityAttributes, ErrorCalculationMethod);
 
-    static DataSample evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate);
+    static DataSample evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero);
 
   private:
     Mean();

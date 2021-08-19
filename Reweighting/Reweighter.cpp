@@ -49,8 +49,7 @@ static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstima
                                                                                      std::vector<std::vector<Histogram>>,
                                                                                      std::vector<std::vector<HistogramEstimator>>);
 static void setObservablesEstimatorsAtNewPointsFromMomentsEstimators(std::vector<std::vector<std::map<std::string, DataSample>>>&, bool,
-                                                                     std::vector<std::vector<MomentsEstimators>>, std::vector<std::string>,
-                                                                     const std::vector<unsigned int>&, const unsigned int, const unsigned int);
+                                                                     std::vector<std::vector<MomentsEstimators>>, std::vector<std::string>);
 static bool
 isObservableToBeEvaluatedUsingMultipleColumns(const unsigned int, const std::vector<unsigned int>&, const unsigned int, const unsigned int);
 static void setMeanToZeroAtNewPoints(std::vector<std::vector<Quantities>>&);
@@ -143,10 +142,8 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters)
                 momentsEstimatorsAtNewPoints, rewProc.quantitiesConsidered, reweighterIO.columnsToBeReweightedUsingMultipleColumns,
                 reweighterIO.namesOfParametersIgnoringMetaParameters.size(), maximumMomentNeededOverall);
             if (parameters.getPrintEstimatorsToFile())
-                setObservablesEstimatorsAtNewPointsFromMomentsEstimators(
-                    *observablesEstimatorsAtNewPoints, reweighterIO.isMeanKnownToBeZero, momentsEstimatorsAtNewPoints,
-                    rewProc.quantitiesConsidered, reweighterIO.columnsToBeReweightedUsingMultipleColumns,
-                    reweighterIO.namesOfParametersIgnoringMetaParameters.size(), maximumMomentNeededOverall);
+                setObservablesEstimatorsAtNewPointsFromMomentsEstimators(*observablesEstimatorsAtNewPoints, reweighterIO.isMeanKnownToBeZero,
+                                                                         momentsEstimatorsAtNewPoints, rewProc.quantitiesConsidered);
             if (rewProc.reweightProbabilityDistributions) {
                 std::cout << "==========================================================" << std::endl;
                 std::cout << " Set probability distributions from estimators..." << std::endl;
@@ -499,28 +496,23 @@ static void setMeanToZeroAtNewPoints(std::vector<std::vector<Quantities>>& obser
 static void
 setObservablesEstimatorsAtNewPointsFromMomentsEstimators(std::vector<std::vector<std::map<std::string, DataSample>>>& observablesEstimators,
                                                          bool isMeanZero, std::vector<std::vector<MomentsEstimators>> momentsEstimators,
-                                                         std::vector<std::string> quantitiesToBeSet,
-                                                         const std::vector<unsigned int>& columnsToBeReweightedUsingMultipleColumns,
-                                                         const unsigned int numberOfReweightingParameters,
-                                                         const unsigned int mximumMomentNeeded)
+                                                         std::vector<std::string> quantitiesToBeSet)
 {
     for (size_t newPoint = 0; newPoint < observablesEstimators.size(); newPoint++) {
         for (size_t obsInFile = 0; obsInFile < observablesEstimators[newPoint].size(); obsInFile++) {
-            bool useMultipleEstimate = isObservableToBeEvaluatedUsingMultipleColumns(
-                obsInFile, columnsToBeReweightedUsingMultipleColumns, numberOfReweightingParameters, mximumMomentNeeded);
             for (auto quantity : quantitiesToBeSet) {
                 if (quantity == constants::observableName<Mean>)
-                    observablesEstimators[newPoint][obsInFile][quantity] = Mean::evaluateObservableOnMomentEstimators(
-                        momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
+                    observablesEstimators[newPoint][obsInFile][quantity]
+                        = Mean::evaluateObservableOnMomentEstimators(momentsEstimators[newPoint][obsInFile], isMeanZero);
                 else if (quantity == constants::observableName<Variance>)
-                    observablesEstimators[newPoint][obsInFile][quantity] = Variance::evaluateObservableOnMomentEstimators(
-                        momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
+                    observablesEstimators[newPoint][obsInFile][quantity]
+                        = Variance::evaluateObservableOnMomentEstimators(momentsEstimators[newPoint][obsInFile], isMeanZero);
                 else if (quantity == constants::observableName<Skewness>)
-                    observablesEstimators[newPoint][obsInFile][quantity] = Skewness::evaluateObservableOnMomentEstimators(
-                        momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
+                    observablesEstimators[newPoint][obsInFile][quantity]
+                        = Skewness::evaluateObservableOnMomentEstimators(momentsEstimators[newPoint][obsInFile], isMeanZero);
                 else if (quantity == constants::observableName<Kurtosis>)
-                    observablesEstimators[newPoint][obsInFile][quantity] = Kurtosis::evaluateObservableOnMomentEstimators(
-                        momentsEstimators[newPoint][obsInFile], isMeanZero, useMultipleEstimate);
+                    observablesEstimators[newPoint][obsInFile][quantity]
+                        = Kurtosis::evaluateObservableOnMomentEstimators(momentsEstimators[newPoint][obsInFile], isMeanZero);
                 else
                     throw std::invalid_argument(
                         "Unknown observable in \"setObservablesAtNewPointsFromMomentsAndMomentEstimators\" function!");

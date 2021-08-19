@@ -88,17 +88,17 @@ functionForJackknifeEstimators Kurtosis::getFunctionToBeAppliedToJackknifeEstima
 
 functionForQuantity Kurtosis::getFunctionToToBeAppliedToMoments()
 {
-    return pickUpFunctionToToBeAppliedToMoments<Kurtosis>(isMeanZero, useMultipleEstimates);
+    return pickUpFunctionToToBeAppliedToMoments<Kurtosis>(isMeanZero);
 }
 
 functionForQuantityEstimators Kurtosis::getFunctionToBeAppliedToMomentsEstimators()
 {
-    return pickUpFunctionToBeAppliedToMomentsEstimator<Kurtosis>(isMeanZero, useMultipleEstimates);
+    return pickUpFunctionToBeAppliedToMomentsEstimator<Kurtosis>(isMeanZero);
 }
 
-DataSample Kurtosis::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero, bool useMultipleEstimate)
+DataSample Kurtosis::evaluateObservableOnMomentEstimators(MomentsEstimators estimators, bool isMeanKnownToBeZero)
 {
-    return pickUpFunctionToBeAppliedToMomentsEstimator<Kurtosis>(isMeanKnownToBeZero, useMultipleEstimate)(estimators);
+    return pickUpFunctionToBeAppliedToMomentsEstimator<Kurtosis>(isMeanKnownToBeZero)(estimators);
 }
 
 std::initializer_list<unsigned int> Kurtosis::getNeededMoments()
