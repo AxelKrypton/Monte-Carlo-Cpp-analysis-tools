@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2015 Christopher Pinke
- *  Copyright (c) 2015-2016,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2015-2016,2019-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -86,7 +86,7 @@ class Reweighter {
     realFloat precisionOfIterativeProcedureToCalculateLogZ;
     std::vector<std::vector<Quantities>> observablesAtNewPoints;
     std::unique_ptr<std::vector<std::vector<std::map<std::string, DataSample>>>> observablesEstimatorsAtNewPoints;  // e.g.
-                                                                                                                    // [newPoint][obsInFile][Skewness::observableName]
+                                                                                                                    // [newPoint][obsInFile][constants::observableName<Mean>]
     std::vector<std::vector<ProbabilityDistribution>> probabilityDistributionsAtNewPoints;
     // The following methods are here in order to be tested one by one (in principle they could be static function in the .cpp file)
     Reweighter(std::initializer_list<std::string>);
