@@ -53,10 +53,14 @@ ReweighterIO::ReweighterIO(LqcdReweightingParameters parameters)
     valuesOfSpecifiedLogZ = getValuesOfSpecifiedLogZ(readFromFileDataContainer);
     deactivateReweightingForProbabilityDistribution = parameters.getDeactivateReweightingForProbabilityDistribution();
     binsizeProbabilityDistribution = parameters.getBinsizeProbabilityDistribution();
-    int numberOfObservablesGivenAsInput
-        = readFromFileDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
+    int numberOfColumnsWithObservables = readFromFileDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
     checkCorrectnessOfConfigurationFileForReweighting(
-        readFromFileDataContainer, MomentsReweighterHelper::metaParameters, numberOfObservablesGivenAsInput);
+        readFromFileDataContainer, MomentsReweighterHelper::metaParameters, numberOfColumnsWithObservables);
+    if (! columnsToBeReweightedUsingMultipleColumns.empty()) {
+        if (numberOfColumnsWithObservables - columnsToBeReweightedUsingMultipleColumns.back() + 1 < numberOfMultipleColumns)
+            throw std::invalid_argument("Not enough columns to be used for single observable (in col. "
+                                        + std::to_string(columnsToBeReweightedUsingMultipleColumns.back()) + ")!");
+    }
     // Set error information
     if (parameters.getUseJackknifeAsErrorMethod())
         errorMethod = jackknife;
