@@ -128,7 +128,8 @@ std::initializer_list<unsigned int> Variance::getNeededMoments()
 
 void Variance::checkCalculatedValue()
 {
-    if (useMultipleEstimates && value.estimate < 0)
+    // This might happen with multiple estimates
+    if (value.estimate < 0)
         throw std::runtime_error("Obtained negative variance with multiple estimates.");
 }
 

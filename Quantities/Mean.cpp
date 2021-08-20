@@ -105,5 +105,5 @@ std::initializer_list<unsigned int> Mean::getNeededMoments()
 
 void Mean::checkCalculatedValue()
 {
-    throw std::logic_error("Function to check calculated value should not be called in the Mean class!");
+    // Nothing to be checked for the mean
 }

@@ -856,7 +856,12 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
     }
 
     /*
-     * This test is a consistency check for the case in which several columns are used
+     * This test would be the analogous of the previous one in the case in which several columns are used.
+     * However with the datafiles in the codebase (plaquette and Polyakov look only), the bias subtraction
+     * does not make sense and leads to unphysical results (e.g. variance<0). That is why here we reweight
+     * the mean only!
+     *
+     * TODO: Consider test here using real e.g. pbp data.
      */
     BOOST_AUTO_TEST_CASE(quantitiesReweighting2)
     {
@@ -867,7 +872,10 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
                                                        "--newBetaRange_high=5.363",
                                                        "--numberOfNewBetaPoints=11",
                                                        "--obsMultipleColumns=3",
-                                                       "--numberOfMultipleColumnsForSingleObservable=4"};
+                                                       "--numberOfMultipleColumnsForSingleObservable=4",
+                                                       "--deactivateReweightingForKurtosis",
+                                                       "--deactivateReweightingForSkewness",
+                                                       "--deactivateReweightingForVariance"};
         ReweighterTester reweighter(options1, true);
         std::vector<std::vector<Quantities>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
         std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist,
@@ -876,15 +884,18 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
                                                        "--newBetaRange_high=5.363",
                                                        "--numberOfNewBetaPoints=21",
                                                        "--obsMultipleColumns=3",
-                                                       "--numberOfMultipleColumnsForSingleObservable=4"};
+                                                       "--numberOfMultipleColumnsForSingleObservable=4",
+                                                       "--deactivateReweightingForKurtosis",
+                                                       "--deactivateReweightingForSkewness",
+                                                       "--deactivateReweightingForVariance"};
         ReweighterTester reweighter2(options2, true);
         std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter2.getReweightedObservables();
-
         for (size_t i = 0; i < valuesObsNewPoints1.size(); i++) {
             BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0][constants::observableName<Mean>].value.estimate,
                                 valuesObsNewPoints2[2 * i][0][constants::observableName<Mean>].value.estimate, realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0][constants::observableName<Mean>].value.error,
                                 valuesObsNewPoints2[2 * i][0][constants::observableName<Mean>].value.error, realFloatPrecisionInPercent);
+            /*
             BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0][constants::observableName<Variance>].value.estimate,
                                 valuesObsNewPoints2[2 * i][0][constants::observableName<Variance>].value.estimate,
                                 realFloatPrecisionInPercent);
@@ -900,6 +911,7 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
                                 realFloatPrecisionInPercent);
             BOOST_REQUIRE_CLOSE(valuesObsNewPoints1[i][0][constants::observableName<Kurtosis>].value.error,
                                 valuesObsNewPoints2[2 * i][0][constants::observableName<Kurtosis>].value.error, realFloatPrecisionInPercent);
+            */
         }
     }
 

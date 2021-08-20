@@ -53,6 +53,7 @@ void QuantityAbstract::calculateAndSetValueAndError(Moments moments, MomentsEsti
     value.estimate = getFunctionToToBeAppliedToMoments()(moments);
     DataSample functionAppliedToEstimators = getFunctionToBeAppliedToMomentsEstimators()(estimators);
     value.error = evaluateErrorBasedOnMethod(functionAppliedToEstimators, errorMethod);
+    checkCalculatedValue();
 }
 
 std::vector<DataSample> QuantityAbstract::calculateNeededMomentsPerDataPoint(MultipleDataSample& dataSamples)
