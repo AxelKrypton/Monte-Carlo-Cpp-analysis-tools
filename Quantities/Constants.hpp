@@ -44,6 +44,23 @@ class Variance;
 class Skewness;
 class Kurtosis;
 
+/*
+ * ATTENTION: In functions here below to calculate quantities, it is important to remark that,
+ *            the higher the moment the more sensitive is the full expression to rounding errors.
+ *            It is, in particular, important to avoid to evaluate powers at first and this is why
+ *            in the following we write e.g.
+ *               6 * in[2] * in[1] * in[1]
+ *            instead of
+ *               6 * (in[2] * (in[1] ^ 2))
+ *            where ^ is the power function.
+ *
+ * TODO: It is known that polynomial in finite precision should be evaluated using the
+ *       "maximum number of parenthesis" in the sense that the following r.h.s. should be
+ *       preferred to the l.h.s.:
+ *           p(x) = x^3 − 6*x^2 + 3*x + 2 = ((x - 6)*x + 3)*x + 2
+ *       => check if this can be used/is advantageous for skewness/kurtosis numerators.
+ */
+
 namespace constants {
 
     template<class T> const std::string observableName = "UNKNOWN";
@@ -93,7 +110,7 @@ namespace constants {
     // Functions for estimators
     template<>
     inline const functionForQuantityEstimators
-        functionToBeAppliedToEstimators<Variance> = [](MomentsEstimators in) -> DataSample { return in[2] - (in[1] ^ 2); };
+        functionToBeAppliedToEstimators<Variance> = [](MomentsEstimators in) -> DataSample { return in[2] - in[1] * in[1]; };
     template<>
     inline const functionForQuantityEstimators
         functionToBeAppliedToEstimatorsWithZeroMean<Variance> = [](MomentsEstimators in) -> DataSample { return in[2]; };
@@ -115,8 +132,9 @@ namespace constants {
         functionToCalculateQuantityWithZeroMean<Skewness> = [](Moments in) -> realFloat { return in[3] / std::pow(in[2], 1.5); };
     // Functions for estimators
     template<>
-    inline const functionForQuantityEstimators functionToBeAppliedToEstimators<Skewness> =
-        [](MomentsEstimators in) -> DataSample { return (in[3] - 3 * (in[2] * in[1]) + 2 * (in[1] ^ 3)) / ((in[2] - (in[1] ^ 2)) ^ 1.5); };
+    inline const functionForQuantityEstimators functionToBeAppliedToEstimators<Skewness> = [](MomentsEstimators in) -> DataSample {
+        return (in[3] - 3 * in[2] * in[1] + 2 * in[1] * in[1] * in[1]) / ((in[2] - in[1] * in[1]) ^ 1.5);
+    };
     template<>
     inline const functionForQuantityEstimators
         functionToBeAppliedToEstimatorsWithZeroMean<Skewness> = [](MomentsEstimators in) -> DataSample { return in[3] / (in[2] ^ 1.5); };
@@ -140,7 +158,7 @@ namespace constants {
     // Functions for estimators
     template<>
     inline const functionForQuantityEstimators functionToBeAppliedToEstimators<Kurtosis> = [](MomentsEstimators in) -> DataSample {
-        return (in[4] - 4 * (in[3] * in[1]) + 6 * (in[2] * (in[1] ^ 2)) - 3 * (in[1] ^ 4)) / ((in[2] - (in[1] ^ 2)) ^ 2);
+        return (in[4] - 4 * in[3] * in[1] + 6 * in[2] * in[1] * in[1] - 3 * in[1] * in[1] * in[1] * in[1]) / ((in[2] - in[1] * in[1]) ^ 2.0);
     };
     template<>
     inline const functionForQuantityEstimators

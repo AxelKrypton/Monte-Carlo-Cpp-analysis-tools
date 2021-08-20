@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
- *  Copyright (c) 2014-2016,2018-2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2016,2018-2021 Alessandro Sciarra
  *  Copyright (c) 2016 Francesca Cuteri
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -35,8 +35,6 @@
 class DataSample;
 class MultipleDataSample;
 class Parameters;
-class Moments;
-class MomentsEstimators;
 
 /*
  * TODO: The following class should be a container for the quantities above and it should allow the possibility to set only some.

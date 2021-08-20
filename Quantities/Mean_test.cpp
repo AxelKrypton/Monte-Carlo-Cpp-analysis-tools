@@ -301,27 +301,9 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimators)
         BOOST_CHECK_CLOSE(mean.value.error, referenceValue.error, realFloatPrecisionInPercent);
     }
 
-    BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
-    {
-        EstimateAndError referenceValue(0.0, 0.0);
-        Mean mean(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
-                  QuantityAttributes{true, true}, bootstrap);
-        BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(mean.value.error, 1.e-7);
-    }
-
-    BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator6)
-    {
-        EstimateAndError referenceValue(0.5120788163699608, 0.0);
-        Mean mean(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
-                  QuantityAttributes{false, true}, bootstrap);
-        BOOST_CHECK_CLOSE(mean.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(mean.value.error, 1.e-7);
-    }
-
     BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)
     {
-        double referenceValueNonZeroMean = 5.126236900933244e-01;
+        double referenceValueNonZeroMean = 0.5120788163699608;
         DataSample resultNonZeroMean = Mean::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
         for (int i = 0; i < resultNonZeroMean.getNumberOfElements(); i++) {
             BOOST_CHECK_CLOSE(resultNonZeroMean[i], referenceValueNonZeroMean, realFloatPrecisionInPercent);

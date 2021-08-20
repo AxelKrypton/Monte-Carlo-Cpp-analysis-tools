@@ -185,30 +185,12 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
         BOOST_CHECK_CLOSE(variance.value.error, referenceValue.error, realFloatPrecisionInPercent);
     }
 
-    // TODO: Test for Variance variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
-
-    BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
-    {
-        EstimateAndError referenceValue(0.2622374015645983, 0.0);
-        Variance variance(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
-                          QuantityAttributes{true, true}, bootstrap);
-        BOOST_CHECK_CLOSE(variance.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(variance.value.error, 1.e-7);
-    }
-
-    BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
-    {
-        EstimateAndError referenceValue(1.268738973830841e-05, 0.0);
-        Variance variance(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
-                          QuantityAttributes{false, true}, bootstrap);
-        BOOST_CHECK_CLOSE(variance.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(variance.value.error, 1.e-7);
-    }
+    // TODO: Test for Variance variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), WithZeroMean, bootstrap);
 
     BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)
     {
-        double referenceValueZeroMean = 2.627932923896761e-01;
-        double referenceValueNonZeroMean = 1.024474477934190e-05;
+        double referenceValueZeroMean = 0.2622374015645983;
+        double referenceValueNonZeroMean = 1.268738973830841e-05;
         DataSample resultZeroMean = Variance::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true);
         DataSample resultNonZeroMean = Variance::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
         for (int i = 0; i < resultZeroMean.getNumberOfElements(); i++) {

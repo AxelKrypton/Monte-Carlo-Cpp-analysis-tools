@@ -116,31 +116,13 @@ BOOST_AUTO_TEST_SUITE(FromMomentsAndEstimator)
         BOOST_CHECK_SMALL(skewness.value.error, 1.e-7);
     }
 
-    // TODO: Test for Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsForTest(), false, bootstrap);
-    // TODO: Test for Skewness variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
-
-    BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator3)
-    {
-        EstimateAndError referenceValue(1.000072760979389, 0.0);
-        Skewness skewness(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
-                          QuantityAttributes{true, true}, bootstrap);
-        BOOST_CHECK_CLOSE(skewness.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(skewness.value.error, 1.e-7);
-    }
-
-    BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
-    {
-        EstimateAndError referenceValue(0.5694793357428045, 0.0);
-        Skewness skewness(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
-                          QuantityAttributes{false, true}, bootstrap);
-        BOOST_CHECK_CLOSE(skewness.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(skewness.value.error, 1.e-7);
-    }
+    // TODO: Test for Skewness skewness(buildMomentsForTest(), buildMomentsEstimatorsForTest(), WithNonZeroMean, bootstrap);
+    // TODO: Test for Skewness variance(buildMomentsForTest(), buildMomentsEstimatorsForTest(), WithZeroMean, bootstrap);
 
     BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)
     {
-        double referenceValueZeroMean = 1.0000586137849100;
-        double referenceValueNonZeroMean = 0.5728362972699335;
+        double referenceValueZeroMean = 1.000072760979389;
+        double referenceValueNonZeroMean = 0.5694793357428045;
         DataSample resultZeroMean = Skewness::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true);
         DataSample resultNonZeroMean = Skewness::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
         for (int i = 0; i < resultZeroMean.getNumberOfElements(); i++) {

@@ -109,17 +109,6 @@ Moments buildMomentsForTest()
      */
 }
 
-Moments buildMomentsSeveralEstimateForTest()
-{
-    Moments moments;
-    for (int i = 0; i < 4; i++)
-        moments.insert(1, 5.120788163699608e-01);
-    moments.insert(2, 2.622374015645983e-01);
-    moments.insert(3, 1.342992378238976e-01);
-    moments.insert(4, 6.878181572513453e-02);
-    return moments;
-}
-
 MomentsEstimators buildMomentsEstimatorsForTest()
 {
     MomentsEstimators momentsEst;
@@ -151,7 +140,7 @@ MomentsEstimators buildMomentsEstimatorsForTest()
     /*
      * bootstrap     mean = 1.1520239122276158e-03
      * bootstrap variance = 3.0259317682406541e-06
-     * bootstrap skewness = not present in the reference code
+     * bootstrap skewness = not present in the reference code (Sanfilippo)
      * bootstrap kurtosis = 7.2132403917648602e-01
      */
 }
@@ -159,20 +148,12 @@ MomentsEstimators buildMomentsEstimatorsForTest()
 MomentsEstimators buildMomentsEstimatorsSameEntryForTest()
 {
     MomentsEstimators momentsEst;
-    momentsEst.insert(1, DataSample(std::valarray<realFloat>(5.126236900933244e-01, 100)));
-    momentsEst.insert(2, DataSample(std::valarray<realFloat>(2.627932923896761e-01, 100)));
-    momentsEst.insert(3, DataSample(std::valarray<realFloat>(1.347245894580630e-01, 100)));
-    momentsEst.insert(4, DataSample(std::valarray<realFloat>(6.907112186983248e-02, 100)));
+    momentsEst.insert(1, DataSample(std::valarray<realFloat>(5.120788163699608e-01, 100)));
+    momentsEst.insert(2, DataSample(std::valarray<realFloat>(2.622374015645983e-01, 100)));
+    momentsEst.insert(3, DataSample(std::valarray<realFloat>(1.342992378238976e-01, 100)));
+    momentsEst.insert(4, DataSample(std::valarray<realFloat>(6.878181572513453e-02, 100)));
     return momentsEst;
-}
-
-MomentsEstimators buildMomentsEstimatorsSameEntrySeveralEstimateForTest()
-{
-    MomentsEstimators momentsEst;
-    for (int i = 0; i < 4; i++)
-        momentsEst.insert(1, DataSample(std::valarray<realFloat>(5.126236900933244e-01, 100)));
-    momentsEst.insert(2, DataSample(std::valarray<realFloat>(2.627932923896761e-01, 100)));
-    momentsEst.insert(3, DataSample(std::valarray<realFloat>(1.347245894580630e-01, 100)));
-    momentsEst.insert(4, DataSample(std::valarray<realFloat>(6.907112186983248e-02, 100)));
-    return momentsEst;
+    /*
+     * Use here the same (repeated) value as in buildMomentsForTest, so that reference values are the same
+     */
 }

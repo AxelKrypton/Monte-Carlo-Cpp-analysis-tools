@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2016,2018-2020 Alessandro Sciarra
+ *  Copyright (c) 2016,2018-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,43 +25,30 @@
 
 #include <map>
 
-/*
- * NOTE: In order to handle the possibility to have several estimates per moment in the Moment class
- *       and several sets of estimators per moment in the MomentsEstimators class, we use a std::multimap
- *       member. Then we cannot use the access operator[] in the standard way, i.e. both to get and to set
- *       an entry. This is related to the fact that multimap has no operator[] defined. Another thing it
- *       would be cool to have is a method that gets the number of the moment and returns either a single
- *       object or a set of objects (in the case several were set). Nevertheless overload based on return
- *       value is not allowed in C++. So we decided to do in this way. We have an insert method to set
- *       elements. Then we use the operator[] to get a single value (checking for this case) and we use
- *       the operator() to get a set of values (checking for this case).
- *       TODO: In the functions getFunctionTo[...] we should do a try and catch block when asking the Moments
- *             or the MomentsEstimators with the operator() in the useMultipleEstimate case. This is because,
- *             in general, it could happen the (stupid) case in which the reweighting using multiple columns
- *             is done but there is one only multiple column. Then one only value is set and the operator()
- *             throws an exception.
- */
-class Moments {
+template<typename T> class GenericMomentContainer {
   public:
-    Moments();
-    void insert(const unsigned int& whichMoment, const realFloat& momentValue);
-    realFloat operator[](const unsigned int& whichMoment);
-    std::vector<realFloat> operator()(const unsigned int& whichMoment);
+    using reference = T&;
+    using const_reference = const T&;
+    reference operator[](unsigned int whichMoment)
+    {
+        try {
+            return storedData.at(whichMoment);
+        } catch (std::out_of_range& e) {
+            throw std::out_of_range("Attempt to access unset moment in container!");
+        }
+    }
+    void insert(unsigned int whichMoment, const_reference value)
+    {
+        auto emplaceResult = storedData.try_emplace(whichMoment, value);
+        if (emplaceResult.second == false)
+            throw std::invalid_argument("Attempt to overwrite already inserted moment in container!");
+    }
 
   private:
-    std::multimap<unsigned int, realFloat> moments;
+    std::map<unsigned int, T> storedData;
 };
 
-class MomentsEstimators {
-  public:
-    MomentsEstimators();
-    void insert(const unsigned int& whichMoment, const DataSample& momentEstValues);
-    DataSample operator[](const unsigned int& whichMoment);
-    std::vector<DataSample> operator[](const std::initializer_list<unsigned int>& whichMoments);
-    std::vector<DataSample> operator()(const unsigned int& whichMoment);
-
-  private:
-    std::multimap<unsigned int, DataSample> momentsEstimators;
-};
+using Moments = GenericMomentContainer<realFloat>;
+using MomentsEstimators = GenericMomentContainer<DataSample>;
 
 #endif /* MOMENTS_HPP_ */

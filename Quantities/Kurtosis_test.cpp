@@ -125,33 +125,15 @@ BOOST_AUTO_TEST_SUITE(KurtosisTest)
         BOOST_CHECK_CLOSE(kurtosis.value.error, referenceValue.error, realFloatPrecisionInPercent);
     }
 
-    // TODO: Test for Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsForTest(), true, bootstrap);
-
-    BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator4)
-    {
-        EstimateAndError referenceValue(1.000194288875983, 0.0);
-        Kurtosis kurtosis(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
-                          QuantityAttributes{true, true}, bootstrap);
-        BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(kurtosis.value.error, 1.e-7);
-    }
-
-    BOOST_AUTO_TEST_CASE(fromMomentsAndEstimator5)
-    {
-        EstimateAndError referenceValue(3.7478114121524830, 0.0);
-        Kurtosis kurtosis(buildMomentsSeveralEstimateForTest(), buildMomentsEstimatorsSameEntrySeveralEstimateForTest(),
-                          QuantityAttributes{false, true}, bootstrap);
-        BOOST_CHECK_CLOSE(kurtosis.value.estimate, referenceValue.estimate, realFloatPrecisionInPercent);
-        BOOST_CHECK_SMALL(kurtosis.value.error, 3.e-7);
-    }
+    // TODO: Test for Kurtosis kurtosis(buildMomentsForTest(), buildMomentsEstimatorsForTest(), WithZeroMean, bootstrap);
 
     BOOST_AUTO_TEST_CASE(observableFromMomentsEstimators)
     {
-        double referenceValueZeroMean = 1.00015649139308;
-        double referenceValueNonZeroMean = 3.36129098137853;
+        double referenceValueZeroMean = 1.000194288875983;
+        double referenceValueNonZeroMean = 3.7478114121524830;
         DataSample resultZeroMean = Kurtosis::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), true);
         DataSample resultNonZeroMean = Kurtosis::evaluateObservableOnMomentEstimators(buildMomentsEstimatorsSameEntryForTest(), false);
-        for (int i = 0; i < resultZeroMean.getNumberOfElements(); i++) {
+        for (int i = 0; i < resultNonZeroMean.getNumberOfElements(); i++) {
             BOOST_CHECK_CLOSE(resultZeroMean[i], referenceValueZeroMean, realFloatPrecisionInPercent);
             BOOST_CHECK_CLOSE(resultNonZeroMean[i], referenceValueNonZeroMean, realFloatPrecisionInPercent);
         }
