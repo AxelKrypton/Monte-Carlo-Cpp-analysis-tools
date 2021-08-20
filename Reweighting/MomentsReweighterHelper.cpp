@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2014-2015,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2019-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -71,12 +71,6 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
     if (momentsToBeReweighted.empty())
         throw std::logic_error("MomentsReweighterHelper asked to be built without any moment to be reweighted! Aborting...");
     if (! columnsToBeReweightedUsingMultipleColumns.empty()) {
-        std::sort(columnsToBeReweightedUsingMultipleColumns.begin(), columnsToBeReweightedUsingMultipleColumns.end());
-        for (size_t i = 1; i < columnsToBeReweightedUsingMultipleColumns.size(); i++) {
-            if (columnsToBeReweightedUsingMultipleColumns[i] - columnsToBeReweightedUsingMultipleColumns[i - 1] < maximumMomentNeededOverall)
-                throw std::invalid_argument("obsToBeRewUsingMultipleColumns contains columns too close (distance<"
-                                            + std::to_string(maximumMomentNeededOverall) + ")!");
-        }
         unsigned int numberOfColumnsWithObservables
             = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
         if (numberOfColumnsWithObservables - columnsToBeReweightedUsingMultipleColumns.back() + 1 < maximumMomentNeededOverall)
