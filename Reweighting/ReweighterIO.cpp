@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2015 Christopher Pinke
- *  Copyright (c) 2015,2020 Alessandro Sciarra
+ *  Copyright (c) 2015,2020-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -260,7 +260,6 @@ checkCorrectnessOfConfigurationFileForReweighting(SimulationDataContainer simDat
     std::vector<std::string> parNames, auxParNames;
     std::vector<std::vector<realFloat>> parValues;
     extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(simDataCont[0], parNames, metaPar);
-    int numberOfObservablesToBeReweighted = simDataCont[0].getNumberOfDataSample() - parNames.size();
     for (int i = 0; i < simDataCont.getNumberOfDatafiles(); i++) {
         if (i != 0) {
             extractNamesOfParametersFromSimulationDataIgnoringMetaParameters(simDataCont[i], auxParNames, metaPar);
@@ -270,20 +269,13 @@ checkCorrectnessOfConfigurationFileForReweighting(SimulationDataContainer simDat
         // In the following two checks is also excluded the unlucky case in which numObs < 0.
         if ((int)parNames.size() > simDataCont[i].getNumberOfDataSample())
             throw std::logic_error("Configuration file for Reweighting not valid. At least one datafile has not enough columns!");
-        if (numberOfObservablesToBeReweighted != simDataCont[i].getNumberOfDataSample() - (int)parNames.size())
+        if (numObs != simDataCont[i].getNumberOfDataSample() - (int)parNames.size())
             throw std::logic_error("Configuration file for Reweighting not valid. Number of observables in datafiles not coherent!");
     }
     extractValuesOfSimulationParametersIgnoringMetaParameters(simDataCont, parValues, metaPar);
     for (size_t i = 1; i < parValues.size(); i++) {
         if (isLastEntryPresentMoreThanOnce(parValues))
             throw std::logic_error("Files with same reweighting parameters cannot be accumulated, yet!");
-    }
-    for (int i = 0; i < simDataCont.getNumberOfDatafiles(); i++) {
-        // In the following two checks is also excluded the unlucky case in which numObs < 0.
-        if ((int)parNames.size() > simDataCont[i].getNumberOfDataSample())
-            throw std::logic_error("Configuration file for Reweighting not valid. At least one datafile has not enough columns!");
-        if (numObs != simDataCont[i].getNumberOfDataSample() - (int)parNames.size())
-            throw std::logic_error("Configuration file for Reweighting not valid. Number of observables in datafiles not coherent!");
     }
 }
 
