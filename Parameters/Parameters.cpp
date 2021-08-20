@@ -282,6 +282,5 @@ BinningParameters Parameters::getBinningParametersForAnalysis(std::string observ
 
 QuantityAttributes Parameters::getAnalysisOptions() const
 {
-    // TODO: Add member to let use toggle use of multiple estimates!
-    return QuantityAttributes{isMeanKnownToBeZero, false};
+    return QuantityAttributes{isMeanKnownToBeZero, numberOfColumnsToBeConsidered > 1};
 }
