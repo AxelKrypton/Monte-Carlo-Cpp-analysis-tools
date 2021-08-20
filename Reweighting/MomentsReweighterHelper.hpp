@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2014-2015,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2019-2021 Alessandro Sciarra
  *  Copyright (c) 2015 Christopher Pinke
  *  Copyright (c) 2019 David Leemueller
  *
@@ -81,7 +81,6 @@ class MomentsReweighterHelper {
     SimulationDataContainer simulationUncorrDataContainer;
     std::vector<std::string> namesOfParametersIgnoringMetaParameters;
     std::vector<std::vector<realFloat>> valuesOfSimulationParametersIgnoringMetaParameters;
-    std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
     std::vector<unsigned int> momentsToBeReweighted;
     unsigned int maximumMomentNeededOverall;
     ErrorCalculationMethod errorMethod;

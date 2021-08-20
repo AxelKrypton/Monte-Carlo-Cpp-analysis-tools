@@ -41,11 +41,12 @@ struct RawDataForReweightingAndMetainformation {
     bool isMeanKnownToBeZero;
     realFloat precisionToCalculateLogZ;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
+    unsigned int numberOfMultipleColumns;
     ErrorCalculationMethod errorMethod;
     std::shared_ptr<int> bootstrapNumber;
     // Information deriving from some operations done in the program
     unsigned int maximumMomentNeededOverall;  // this could not coincide with the max_element of the vector momentsToBeReweighted in the
-                                              // case of multiple columns per observable!!
+                                              // case of multiple reweighting procedures which have different momentsToBeReweighted
     std::vector<unsigned int> momentsToBeReweighted;
     std::vector<int> binsizesToBeUsedForBinning;
     bool reweightProbabilityDistributions;

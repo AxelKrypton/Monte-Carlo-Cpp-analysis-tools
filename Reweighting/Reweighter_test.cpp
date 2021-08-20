@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2015 Christopher Pinke
- *  Copyright (c) 2015,2018,2020 Alessandro Sciarra
+ *  Copyright (c) 2015,2018,2020-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -861,14 +861,22 @@ BOOST_AUTO_TEST_SUITE(quantitiesReweighting)
     BOOST_AUTO_TEST_CASE(quantitiesReweighting2)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_6";
-        std::initializer_list<std::string> options1 = {"-f" + fileThatDoesExist,     "--useJackknifeAsErrorMethod",
-                                                       "--newBetaRange_low=5.348",   "--newBetaRange_high=5.363",
-                                                       "--numberOfNewBetaPoints=11", "--obsMultipleColumns=3"};
+        std::initializer_list<std::string> options1 = {"-f" + fileThatDoesExist,
+                                                       "--useJackknifeAsErrorMethod",
+                                                       "--newBetaRange_low=5.348",
+                                                       "--newBetaRange_high=5.363",
+                                                       "--numberOfNewBetaPoints=11",
+                                                       "--obsMultipleColumns=3",
+                                                       "--numberOfMultipleColumnsForSingleObservable=4"};
         ReweighterTester reweighter(options1, true);
         std::vector<std::vector<Quantities>> valuesObsNewPoints1 = reweighter.getReweightedObservables();
-        std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist,     "--useJackknifeAsErrorMethod",
-                                                       "--newBetaRange_low=5.348",   "--newBetaRange_high=5.363",
-                                                       "--numberOfNewBetaPoints=21", "--obsMultipleColumns=3"};
+        std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist,
+                                                       "--useJackknifeAsErrorMethod",
+                                                       "--newBetaRange_low=5.348",
+                                                       "--newBetaRange_high=5.363",
+                                                       "--numberOfNewBetaPoints=21",
+                                                       "--obsMultipleColumns=3",
+                                                       "--numberOfMultipleColumnsForSingleObservable=4"};
         ReweighterTester reweighter2(options2, true);
         std::vector<std::vector<Quantities>> valuesObsNewPoints2 = reweighter2.getReweightedObservables();
 

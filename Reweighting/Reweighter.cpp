@@ -40,8 +40,7 @@ static void
     checkSizesOfMomentsAndMomentsEstimators(std::vector<std::vector<Moments>>, std::vector<std::vector<MomentsEstimators>>, size_t, size_t);
 static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<std::vector<Quantities>>&, bool, ErrorCalculationMethod,
                                                                     std::vector<std::vector<Moments>>,
-                                                                    std::vector<std::vector<MomentsEstimators>>, std::vector<std::string>,
-                                                                    const std::vector<unsigned int>&, const unsigned int, const unsigned int);
+                                                                    std::vector<std::vector<MomentsEstimators>>, std::vector<std::string>);
 static void checkSizesOfHistogramsAndHistogramEstimators(std::vector<std::vector<Histogram>>, std::vector<std::vector<HistogramEstimator>>,
                                                          size_t, size_t);
 static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstimators(std::vector<std::vector<ProbabilityDistribution>>&,
@@ -50,8 +49,6 @@ static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstima
                                                                                      std::vector<std::vector<HistogramEstimator>>);
 static void setObservablesEstimatorsAtNewPointsFromMomentsEstimators(std::vector<std::vector<std::map<std::string, DataSample>>>&, bool,
                                                                      std::vector<std::vector<MomentsEstimators>>, std::vector<std::string>);
-static bool
-isObservableToBeEvaluatedUsingMultipleColumns(const unsigned int, const std::vector<unsigned int>&, const unsigned int, const unsigned int);
 static void setMeanToZeroAtNewPoints(std::vector<std::vector<Quantities>>&);
 
 /*****************************************************************************************/
@@ -91,10 +88,7 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters)
     useSimulatedPointsAsNewPoints = parameters.getUseSimulatedPointsAsNewPoints();
     std::vector<ReweightingProcedure> reweightingProceduresToBePerformed = getReweightingProceduresToBePerformed();
     if (reweightingProceduresToBePerformed.size() > 0) {
-        if (parameters.getNumberOfMultipleColumnsForSingleObservable() == 0)
-            maximumMomentNeededOverall = getMaximumMomentToBeReweighted(reweightingProceduresToBePerformed);
-        else
-            maximumMomentNeededOverall = parameters.getNumberOfMultipleColumnsForSingleObservable();
+        maximumMomentNeededOverall = getMaximumMomentToBeReweighted(reweightingProceduresToBePerformed);
         // Before setting the observables, we have to reserve the correct amount of memory
         size_t numberOfNewPoints, numberOfObservablesInFiles;
         if (useSimulatedPointsAsNewPoints)
@@ -105,7 +99,7 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters)
         numberOfObservablesInFiles = reweighterIO.readFromFileDataContainer[0].getNumberOfDataSample()
                                      - reweighterIO.namesOfParametersIgnoringMetaParameters.size()
                                      - reweighterIO.columnsToBeReweightedUsingMultipleColumns.size()
-                                           * (maximumMomentNeededOverall - 1);  // neglect multiple columns (count one column only)
+                                           * (reweighterIO.numberOfMultipleColumns - 1);  // neglect multiple columns (count one column only)
         observablesAtNewPoints
             = std::vector<std::vector<Quantities>>(numberOfNewPoints, std::vector<Quantities>(numberOfObservablesInFiles, Quantities()));
         if (parameters.getPrintEstimatorsToFile())
@@ -137,10 +131,9 @@ Reweighter::Reweighter(LqcdReweightingParameters parameters)
             std::vector<std::vector<MomentsEstimators>> momentsEstimatorsAtNewPoints = momentsReweighter.getMomentsEstimatorsAtNewPoints();
             checkSizesOfMomentsAndMomentsEstimators(
                 momentsAtNewPoints, momentsEstimatorsAtNewPoints, numberOfNewPoints, numberOfObservablesInFiles);
-            setObservablesAtNewPointsFromMomentsAndMomentEstimators(
-                observablesAtNewPoints, reweighterIO.isMeanKnownToBeZero, reweighterIO.errorMethod, momentsAtNewPoints,
-                momentsEstimatorsAtNewPoints, rewProc.quantitiesConsidered, reweighterIO.columnsToBeReweightedUsingMultipleColumns,
-                reweighterIO.namesOfParametersIgnoringMetaParameters.size(), maximumMomentNeededOverall);
+            setObservablesAtNewPointsFromMomentsAndMomentEstimators(observablesAtNewPoints, reweighterIO.isMeanKnownToBeZero,
+                                                                    reweighterIO.errorMethod, momentsAtNewPoints,
+                                                                    momentsEstimatorsAtNewPoints, rewProc.quantitiesConsidered);
             if (parameters.getPrintEstimatorsToFile())
                 setObservablesEstimatorsAtNewPointsFromMomentsEstimators(*observablesEstimatorsAtNewPoints, reweighterIO.isMeanKnownToBeZero,
                                                                          momentsEstimatorsAtNewPoints, rewProc.quantitiesConsidered);
@@ -222,6 +215,7 @@ Reweighter::getRawDataForReweightingAndMetainformation(std::vector<unsigned int>
             reweighterIO.isMeanKnownToBeZero,
             precisionOfIterativeProcedureToCalculateLogZ,
             reweighterIO.columnsToBeReweightedUsingMultipleColumns,
+            reweighterIO.numberOfMultipleColumns,
             reweighterIO.errorMethod,
             reweighterIO.bootstrapNumber,
             maximumMomentNeededOverall,
@@ -389,29 +383,27 @@ static void checkSizesOfMomentsAndMomentsEstimators(std::vector<std::vector<Mome
     }
 }
 
-static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(
-    std::vector<std::vector<Quantities>>& observables, bool isMeanZero, ErrorCalculationMethod errorMethod,
-    std::vector<std::vector<Moments>> moments, std::vector<std::vector<MomentsEstimators>> momentsEstimators,
-    std::vector<std::string> quantitiesToBeSet, const std::vector<unsigned int>& columnsToBeReweightedUsingMultipleColumns,
-    const unsigned int numberOfReweightingParameters, const unsigned int mximumMomentNeeded)
+static void setObservablesAtNewPointsFromMomentsAndMomentEstimators(std::vector<std::vector<Quantities>>& observables, bool isMeanZero,
+                                                                    ErrorCalculationMethod errorMethod,
+                                                                    std::vector<std::vector<Moments>> moments,
+                                                                    std::vector<std::vector<MomentsEstimators>> momentsEstimators,
+                                                                    std::vector<std::string> quantitiesToBeSet)
 {
     for (size_t newPoint = 0; newPoint < observables.size(); newPoint++) {
         for (size_t obsInFile = 0; obsInFile < observables[newPoint].size(); obsInFile++) {
-            bool useMultipleEstimate = isObservableToBeEvaluatedUsingMultipleColumns(
-                obsInFile, columnsToBeReweightedUsingMultipleColumns, numberOfReweightingParameters, mximumMomentNeeded);
             for (auto quantity : quantitiesToBeSet) {
                 if (quantity == constants::observableName<Mean>) {
                     observables[newPoint][obsInFile][quantity] = Mean(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
-                                                                      QuantityAttributes{isMeanZero, useMultipleEstimate}, errorMethod);
+                                                                      QuantityAttributes{isMeanZero, false}, errorMethod);
                 } else if (quantity == constants::observableName<Variance>) {
                     observables[newPoint][obsInFile][quantity] = Variance(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
-                                                                          QuantityAttributes{isMeanZero, useMultipleEstimate}, errorMethod);
+                                                                          QuantityAttributes{isMeanZero, false}, errorMethod);
                 } else if (quantity == constants::observableName<Skewness>) {
                     observables[newPoint][obsInFile][quantity] = Skewness(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
-                                                                          QuantityAttributes{isMeanZero, useMultipleEstimate}, errorMethod);
+                                                                          QuantityAttributes{isMeanZero, false}, errorMethod);
                 } else if (quantity == constants::observableName<Kurtosis>) {
                     observables[newPoint][obsInFile][quantity] = Kurtosis(moments[newPoint][obsInFile], momentsEstimators[newPoint][obsInFile],
-                                                                          QuantityAttributes{isMeanZero, useMultipleEstimate}, errorMethod);
+                                                                          QuantityAttributes{isMeanZero, false}, errorMethod);
                 } else
                     throw std::invalid_argument(
                         "Unknown observable in \"setObservablesAtNewPointsFromMomentsAndMomentEstimators\" function!");
@@ -454,26 +446,6 @@ static void setProbabilityDistributionAtNewPointsFromHistogramAndHistogramEstima
             probabilityDistributions[indexNewPoint][indexInputObservable] = tmpProbabilityDistribution;
         }
     }
-}
-
-/*
- * The following function is needed because the user will tell which columns must be reweighted using several columns
- * with respect to the input files, namely the number of the columns counts implicitly the number of reweighting
- * parameters. After the reweighting, instead, the observable number is just ranging from zero to the total number
- * of observables. Then to understand whether an observable must be estimated using several columns, some logic has
- * to be performed (in this function).
- */
-static bool isObservableToBeEvaluatedUsingMultipleColumns(const unsigned int observable,
-                                                          const std::vector<unsigned int>& columnsToBeReweightedUsingMultipleColumns,
-                                                          const unsigned int numberOfReweightingParameters,
-                                                          const unsigned int maximumMomentNeeded)
-{
-    std::vector<unsigned int> colsToBeRewUsingMultipleColsMappedIntoObsNumber;
-    for (size_t i = 0; i < columnsToBeReweightedUsingMultipleColumns.size(); i++)
-        colsToBeRewUsingMultipleColsMappedIntoObsNumber.push_back(columnsToBeReweightedUsingMultipleColumns[i]
-                                                                  - numberOfReweightingParameters - i * (maximumMomentNeeded - 1));
-    return find(colsToBeRewUsingMultipleColsMappedIntoObsNumber.begin(), colsToBeRewUsingMultipleColsMappedIntoObsNumber.end(), observable)
-           != colsToBeRewUsingMultipleColsMappedIntoObsNumber.end();
 }
 
 static void setMeanToZeroAtNewPoints(std::vector<std::vector<Quantities>>& observables)

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2014-2015,2018-2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2018-2021 Alessandro Sciarra
  *  Copyright (c) 2015 Christopher Czaban
  *  Copyright (c) 2015 Christopher Pinke
  *  Copyright (c) 2019 David Leemueller
@@ -38,7 +38,6 @@
 
 static void writeNewPoints(std::vector<std::vector<realFloat>>&, std::vector<std::vector<realFloat>>, std::vector<realFloat>, int = 0, int = 0);
 static void findIflogZHasToBeCalculated(std::vector<realFloat>, std::vector<int>&);
-static std::vector<bool> areInputObservablesUsingMultipleColumns(std::vector<unsigned int>, int, int, int);
 static realFloat logarithmic_sum(realFloat, realFloat);
 
 /*****************************************************************************************/
@@ -541,7 +540,7 @@ MomentsReweighterAbstract::calculateReweightedObservableValues(bool useUncorrDat
         numberOfNewPoints, std::vector<realFloat>(momentsReweighterHelper.numberOfObservablesToBeReweighted));
     realFloat logarithmOfDenominator
         = std::numeric_limits<double>::quiet_NaN();  // meaningless initial value, since variable will be initialized later.
-    std::vector<int> columnsInputObservables;
+    std::vector<unsigned int> columnsInputObservables;
     if (momentsReweighterHelper.reweightProbabilityDistribution)
         columnsInputObservables = getColumnsToBeConsideredReweightingProbabilityDistribution();
     for (size_t indexNewPoint = 0; indexNewPoint < numberOfNewPoints; indexNewPoint++) {
@@ -736,7 +735,7 @@ void MomentsReweighterAbstract::restoreObservablesAfterReweighting(
      *            here we need to subtract reweightingParameterNames.size().
      */
 
-    std::vector<int> columnsInputObservables;
+    std::vector<unsigned int> columnsInputObservables;
     if (momentsReweighterHelper.reweightProbabilityDistribution) {
         columnsInputObservables = getColumnsToBeConsideredReweightingProbabilityDistribution();
         for (size_t indexNewPoint = 0; indexNewPoint < valuesOfNewParameters.size(); indexNewPoint++) {
@@ -772,13 +771,10 @@ SimulationDataContainer MomentsReweighterAbstract::getSimulationDataContainer(bo
     return (raw == true) ? momentsReweighterHelper.simulationRawDataContainer : momentsReweighterHelper.simulationUncorrDataContainer;
 }
 
-std::vector<int> MomentsReweighterAbstract::getColumnsToBeConsideredReweightingProbabilityDistribution()
+std::vector<unsigned int> MomentsReweighterAbstract::getColumnsToBeConsideredReweightingProbabilityDistribution()
 {
-    std::vector<int> columnsToBeConsideredReweightingProbabilityDistribution;
-    int numberOfReweightingParameters = reweightingParameterNames.size();
-    std::vector<bool> isObservableUsingMultipleColumns = areInputObservablesUsingMultipleColumns(
-        momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns, momentsReweighterHelper.maximumMomentNeededOverall,
-        momentsReweighterHelper.numberOfObservablesGivenAsInput, numberOfReweightingParameters);
+    std::vector<unsigned int> columnsToBeConsideredReweightingProbabilityDistribution;
+    const int numberOfReweightingParameters = reweightingParameterNames.size();
     /*
      * Here we want to identify which "columns" indices in the SimulationDataContainer refer to first moments
      * of observables, which are then those to be used to reweight the probability distributions. Since the
@@ -788,11 +784,7 @@ std::vector<int> MomentsReweighterAbstract::getColumnsToBeConsideredReweightingP
     int rightCol = 0;
     columnsToBeConsideredReweightingProbabilityDistribution.push_back(rightCol + numberOfReweightingParameters);
     for (int i = 1; i < momentsReweighterHelper.numberOfObservablesGivenAsInput; i++) {
-        if (isObservableUsingMultipleColumns.at(i - 1)) {
-            rightCol += momentsReweighterHelper.maximumMomentNeededOverall - 1 + momentsReweighterHelper.momentsToBeReweighted.size();
-        } else {
-            rightCol += momentsReweighterHelper.momentsToBeReweighted.size();
-        }
+        rightCol += momentsReweighterHelper.momentsToBeReweighted.size();
         columnsToBeConsideredReweightingProbabilityDistribution.push_back(rightCol + numberOfReweightingParameters);
     }
     return columnsToBeConsideredReweightingProbabilityDistribution;
@@ -818,30 +810,14 @@ void MomentsReweighterAbstract::extractAndSetReweightedMomentsAndMomentsEstimato
         int numberOfLastColumnThatHasBeenExtracted = 0;
         for (size_t j = 0; j < numberOfObservablesGivenAsInput; j++) {
             for (size_t k = 0; k < numberOfNeededMoments; k++) {
-                if (momentsReweighterHelper.momentsToBeReweighted[k] == 1
-                    && find(momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns.begin(),
-                            momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns.end(), j + reweightingParameterNames.size())
-                           != momentsReweighterHelper.columnsToBeReweightedUsingMultipleColumns.end()) {
-                    // if momentsToBeReweighted[k]==1 insert as many columns as the maximum moment needed says!
-                    for (unsigned int h = 0; h < momentsReweighterHelper.maximumMomentNeededOverall; h++)
-                        momentsAtNewPoints[i][j].insert(1, reweightedObservablesFromRawData[i][numberOfLastColumnThatHasBeenExtracted + h]);
-                    // The estimators are in the valarray in estimatorsForErrorsCalculation, that is the outermost index => temporary object needed
-                    std::valarray<realFloat> auxiliaryArray(estimatorsForErrorsCalculation.size());
-                    for (unsigned int h = 0; h < momentsReweighterHelper.maximumMomentNeededOverall; h++) {
-                        for (size_t l = 0; l < estimatorsForErrorsCalculation.size(); l++)
-                            auxiliaryArray[l] = estimatorsForErrorsCalculation[l][i][numberOfLastColumnThatHasBeenExtracted + h];
-                        momentsEstimatorsAtNewPoints[i][j].insert(momentsReweighterHelper.momentsToBeReweighted[k], DataSample(auxiliaryArray));
-                    }
-                    numberOfLastColumnThatHasBeenExtracted += momentsReweighterHelper.maximumMomentNeededOverall;
-                } else {
-                    momentsAtNewPoints[i][j].insert(momentsReweighterHelper.momentsToBeReweighted[k],
-                                                    reweightedObservablesFromRawData[i][numberOfLastColumnThatHasBeenExtracted]);
-                    std::valarray<realFloat> auxiliaryArray(estimatorsForErrorsCalculation.size());
-                    for (size_t h = 0; h < estimatorsForErrorsCalculation.size(); h++)
-                        auxiliaryArray[h] = estimatorsForErrorsCalculation[h][i][numberOfLastColumnThatHasBeenExtracted];
-                    momentsEstimatorsAtNewPoints[i][j].insert(momentsReweighterHelper.momentsToBeReweighted[k], DataSample(auxiliaryArray));
-                    numberOfLastColumnThatHasBeenExtracted++;
-                }
+                momentsAtNewPoints[i][j].insert(momentsReweighterHelper.momentsToBeReweighted[k],
+                                                reweightedObservablesFromRawData[i][numberOfLastColumnThatHasBeenExtracted]);
+                // The estimators are in the valarray in estimatorsForErrorsCalculation, that is the outermost index => temporary object needed
+                std::valarray<realFloat> auxiliaryArray(estimatorsForErrorsCalculation.size());
+                for (size_t h = 0; h < estimatorsForErrorsCalculation.size(); h++)
+                    auxiliaryArray[h] = estimatorsForErrorsCalculation[h][i][numberOfLastColumnThatHasBeenExtracted];
+                momentsEstimatorsAtNewPoints[i][j].insert(momentsReweighterHelper.momentsToBeReweighted[k], DataSample(auxiliaryArray));
+                numberOfLastColumnThatHasBeenExtracted++;
             }
         }
     }
@@ -910,35 +886,6 @@ static void writeNewPoints(std::vector<std::vector<realFloat>>& valuesOfNewParam
         writeNewPoints(valuesOfNewParameters, newPointValuesForSingleParameter, aux, numberOfRow + 1, atInTheRow);
         aux.pop_back();
     }
-}
-
-static std::vector<bool> areInputObservablesUsingMultipleColumns(std::vector<unsigned int> inputObservablesUsingMultipleColumns,
-                                                                 int maxMomentNeedeOverall, int numberOfObservablesGivenAsInput,
-                                                                 int numberOfReweightingParameters)
-{
-    std::vector<bool> checkIfObservablesUseMultipleColumns;
-    if (inputObservablesUsingMultipleColumns.empty()) {
-        for (int i = 0; i < numberOfObservablesGivenAsInput; i++)
-            checkIfObservablesUseMultipleColumns.push_back(false);
-    } else {
-        for (size_t i = 0; i < inputObservablesUsingMultipleColumns.size(); i++)
-            inputObservablesUsingMultipleColumns.at(i) -= numberOfReweightingParameters;
-        for (unsigned int k = 0; k < inputObservablesUsingMultipleColumns.at(0); k++)
-            checkIfObservablesUseMultipleColumns.push_back(false);
-        checkIfObservablesUseMultipleColumns.push_back(true);
-        for (size_t k = 1; k < inputObservablesUsingMultipleColumns.size(); k++) {
-            int obsBetweenObsUsingMultiCols
-                = inputObservablesUsingMultipleColumns.at(k) - inputObservablesUsingMultipleColumns.at(k - 1) - maxMomentNeedeOverall;
-            for (int i = 0; i < obsBetweenObsUsingMultiCols; i++)
-                checkIfObservablesUseMultipleColumns.push_back(false);
-            checkIfObservablesUseMultipleColumns.push_back(true);
-        }
-    }
-    if ((int)checkIfObservablesUseMultipleColumns.size() < numberOfObservablesGivenAsInput) {
-        for (size_t i = 0; i < numberOfObservablesGivenAsInput - checkIfObservablesUseMultipleColumns.size(); i++)
-            checkIfObservablesUseMultipleColumns.push_back(false);
-    }
-    return checkIfObservablesUseMultipleColumns;
 }
 
 /*

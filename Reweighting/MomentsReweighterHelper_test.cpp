@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2014-2015,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2019-2021 Alessandro Sciarra
  *  Copyright (c) 2015 Christopher Pinke
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -76,13 +76,15 @@ BOOST_AUTO_TEST_SUITE(build)
     BOOST_AUTO_TEST_CASE(build3)
     {
         std::string fileThatDoesExist = "RealTestData/configfile_6";
-        std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--obsMultipleColumns=1"};
+        std::initializer_list<std::string> options = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--obsMultipleColumns=1",
+                                                      "--numberOfMultipleColumnsForSingleObservable=5"};
         MomentsReweighterHelperTest reweightingDataHandler(options, {1, 2, 3, 4}, {100, 100, 100});
-        const int referenceNumberObsGiven = 4;
-        const int referenceNumberObsRew = 19;
+        const int referenceNumberObsGiven = 3;
+        const int referenceNumberObsRew = 12;
         BOOST_REQUIRE_EQUAL(reweightingDataHandler.getNumberOfObsGivenAsInput(), referenceNumberObsGiven);
         BOOST_REQUIRE_EQUAL(reweightingDataHandler.getNumberOfObsToBeRew(), referenceNumberObsRew);
-        std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--obsMultipleColumns=1", "3"};
+        std::initializer_list<std::string> options2 = {"-f" + fileThatDoesExist, "--useJackknifeAsErrorMethod", "--obsMultipleColumns=1",
+                                                       "3", "--numberOfMultipleColumnsForSingleObservable=4"};
         BOOST_REQUIRE_THROW(
             MomentsReweighterHelperTest reweightingDataHandler2(options2, {1, 2, 3, 4}, {100, 100, 100}), std::invalid_argument);
     }

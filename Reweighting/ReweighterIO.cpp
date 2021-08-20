@@ -47,6 +47,7 @@ ReweighterIO::ReweighterIO(LqcdReweightingParameters parameters)
 {
     isMeanKnownToBeZero = parameters.getIsMeanKnownToBeZero();
     columnsToBeReweightedUsingMultipleColumns = parameters.getColumnsToBeReweightedUsingMultipleColumns();
+    numberOfMultipleColumns = parameters.getNumberOfMultipleColumnsForSingleObservable(),
     namesOfParametersIgnoringMetaParameters = getNamesOfParametersIgnoringMetaParameters(readFromFileDataContainer[0]);
     valuesOfSimulationParametersIgnoringMetaParameters = getValuesOfSimulationParametersIgnoringMetaParameters(readFromFileDataContainer);
     valuesOfSpecifiedBinsizes = getValuesOfSpecifiedBinsizes(readFromFileDataContainer);
