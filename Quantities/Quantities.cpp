@@ -72,8 +72,10 @@ std::string Quantities::getObservablesAsString()
     std::stringstream values;
     values.precision(12);
     values.fill(' ');
-    for (auto value : {mean.value, variance.value, skewness.value, kurtosis.value})
-        values << std::scientific << std::setw(20) << std::left << value << "\t";
+    for (auto value : {mean.value, variance.value, skewness.value, kurtosis.value}) {
+        values << std::scientific << std::setw(20) << std::left << value.estimate << "\t" << std::scientific << std::setw(20) << std::left
+               << value.error << "\t";
+    }
     // Remove trailing tab
     return std::regex_replace(values.str(), std::regex("\t$"), "");
 }
