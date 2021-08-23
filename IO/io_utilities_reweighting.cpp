@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2015-2016,2018-2020 Alessandro Sciarra
+ *  Copyright (c) 2015-2016,2018-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -28,6 +28,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <fstream>
+#include <iomanip>
 
 class LqcdReweightedData {
   public:
@@ -49,11 +50,11 @@ class LqcdReweightedData {
             std::ofstream outputstream;
             outputstream.open(filename.c_str(), std::ios::app);
             if (outputstream.is_open()) {
-                outputstream << "# beta\t\t" << values[0].second.getMetaInformation() << std::endl;
+                outputstream << "# beta\t\t\t" << values[0].second.getMetaInformation() << std::endl;
 
                 for (unsigned int index = 0; index < values.size(); index++) {
-                    outputstream << std::scientific << values[index].first << "\t" << values[index].second.getObservablesAsString()
-                                 << std::endl;
+                    outputstream << std::setprecision(10) << std::scientific << std::setw(20) << std::left << values[index].first << "\t"
+                                 << values[index].second.getObservablesAsString() << std::endl;
                 }
                 outputstream.close();
             } else {
