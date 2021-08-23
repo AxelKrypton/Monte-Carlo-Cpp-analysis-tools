@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
- *  Copyright (c) 2014-2015,2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -62,10 +62,10 @@ static void checkDivisionFactor(realFloat factorIn)
     }
 }
 
-void checkNumberOfElements(int lhs, int rhs)
+static void checkNumberOfElements(int lhs, int rhs, std::string label)
 {
     if (lhs != rhs)
-        throw std::invalid_argument("DataSamples have different number of elements!");
+        throw std::invalid_argument("Error in " + label + ": DataSamples have different number of elements!");
 }
 
 realFloat DataSampleBasic::sum()
@@ -117,7 +117,7 @@ DataSampleBasic& DataSampleBasic::operator+=(realFloat factor)
 
 DataSampleBasic& DataSampleBasic::operator+=(DataSampleBasic sampleIn)
 {
-    checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+    checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements(), "+= operator");
     values += sampleIn.values;
     return *this;
 }
@@ -130,7 +130,7 @@ DataSampleBasic& DataSampleBasic::operator-=(realFloat factor)
 
 DataSampleBasic& DataSampleBasic::operator-=(DataSampleBasic sampleIn)
 {
-    checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+    checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements(), "-= operator");
     values -= sampleIn.values;
     return *this;
 }
@@ -149,7 +149,7 @@ DataSampleBasic& DataSampleBasic::operator*=(realFloat factor)
 
 DataSampleBasic& DataSampleBasic::operator*=(DataSampleBasic sampleIn)
 {
-    checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+    checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements(), "*= operator");
     values *= sampleIn.values;
     return *this;
 }
@@ -163,7 +163,7 @@ DataSampleBasic& DataSampleBasic::operator/=(realFloat factor)
 
 DataSampleBasic& DataSampleBasic::operator/=(DataSampleBasic sampleIn)
 {
-    checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements());
+    checkNumberOfElements(numberOfElements, sampleIn.getNumberOfElements(), "/= operator");
     values /= sampleIn.values;
     return *this;
 }
@@ -194,7 +194,7 @@ DataSampleBasic operator+(realFloat factor, DataSampleBasic sampleIn)
 
 DataSampleBasic operator+(DataSampleBasic lhs, DataSampleBasic rhs)
 {
-    checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+    checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements(), "+ operator");
     lhs += rhs;
     return lhs;
 }
@@ -214,7 +214,7 @@ DataSampleBasic operator-(realFloat factor, DataSampleBasic sampleIn)
 
 DataSampleBasic operator-(DataSampleBasic lhs, DataSampleBasic rhs)
 {
-    checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+    checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements(), "- operator");
     lhs -= rhs;
     return lhs;
 }
@@ -245,7 +245,7 @@ DataSampleBasic operator*(realFloat factor, DataSampleBasic sampleIn)
 
 DataSampleBasic operator*(DataSampleBasic lhs, DataSampleBasic rhs)
 {
-    checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+    checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements(), "* operator");
     lhs *= rhs;
     return lhs;
 }
@@ -266,7 +266,7 @@ DataSampleBasic operator/(realFloat factor, DataSampleBasic sampleIn)
 
 DataSampleBasic operator/(DataSampleBasic lhs, DataSampleBasic rhs)
 {
-    checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements());
+    checkNumberOfElements(lhs.getNumberOfElements(), rhs.getNumberOfElements(), "/ operator");
     lhs /= rhs;
     return lhs;
 }

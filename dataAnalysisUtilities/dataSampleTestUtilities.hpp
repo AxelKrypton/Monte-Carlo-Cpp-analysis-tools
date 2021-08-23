@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
- *  Copyright (c) 2014-2015,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2019-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #define DATASAMPLETESTUTITLITIES_HPP_
 
 #include "../types.hpp"
+#include "DataSample.hpp"
 
 #include <valarray>
 
@@ -46,7 +47,7 @@ std::valarray<realFloat> makeValarrayWithOnesAndMinusOnes(int length)
 {
     std::valarray<realFloat> returnValarray(1., length);
     for (int iteration = 0; iteration < (int)returnValarray.size(); iteration++) {
-        returnValarray[iteration] = pow(-1., iteration);
+        returnValarray[iteration] = std::pow(-1., iteration);
     }
     return returnValarray;
 }
@@ -110,5 +111,28 @@ enum FillType {
     entriesBetweenOneAndEight,
     bigAndSmallEntries
 };
+
+DataSample getDataSampleBasedOnFillType(int length, FillType fillType)
+{
+    switch (fillType) {
+        case zeros:
+            return DataSample(std::valarray<realFloat>(length));
+        case ones:
+            return DataSample(makeValarrayWithOnes(length));
+        case onesMinusOnes:
+            return DataSample(makeValarrayWithOnesAndMinusOnes(length));
+        case arrayPosition:
+            return DataSample(makeValarrayWithArrayPosition(length));
+        case entriesSymmetricBetweenZeroAndOne:
+            return DataSample(makeValarrayWithEntriesBetweenZeroAndOne(length));
+        case entriesBetweenOneAndEight:
+            return DataSample(makeValarrayWithEntriesBetweenOneAndEight(length));
+        case bigAndSmallEntries:
+            return DataSample(makeValarrayWithBigAndSmallEntries(length / 2));
+        default:
+            throw std::invalid_argument("Unknown fillType selected!");
+            break;
+    }
+}
 
 #endif /* DATASAMPLETESTUTITLITIES_HPP_ */

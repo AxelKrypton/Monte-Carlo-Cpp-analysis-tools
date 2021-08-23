@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_SUITE(defaults)
     static Parameters createParametersForDefaultCheck()
     {
         int numberOfArguments = 2;
-        const char* arguments[] = {"foo", "-f dummyFile"};
+        const char* arguments[] = {"foo", "-fdummyFile"};
         return Parameters(numberOfArguments, arguments);
     }
 
@@ -123,6 +123,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
     {
         int column_default = 1;
         BOOST_REQUIRE_EQUAL(column_default, createParametersForDefaultCheck().column);
+    }
+
+    BOOST_AUTO_TEST_CASE(columnNumber)
+    {
+        int column_number_default = 1;
+        BOOST_REQUIRE_EQUAL(column_number_default, createParametersForDefaultCheck().numberOfColumnsToBeConsidered);
     }
 
     BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero)
@@ -233,7 +239,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument.c_str()};
         return Parameters(numberOfArguments, arguments);
     }
 
@@ -241,7 +247,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument = argumentName + boost::lexical_cast<std::string>(newValue);
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument.c_str()};
         return Parameters(numberOfArguments, arguments);
     }
 
@@ -315,11 +321,18 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).column);
     }
 
+    BOOST_AUTO_TEST_CASE(columnNumber)
+    {
+        int newValue = 999;
+        std::string argumentName = "--numberOfColumns";
+        BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).numberOfColumnsToBeConsidered);
+    }
+
     static Parameters createParametersForArgumentSettingCheck_implicitOption(std::string argumentName)
     {
         std::string argument = argumentName;
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument.c_str()};
         return Parameters(numberOfArguments, arguments);
     }
 
@@ -353,7 +366,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         std::string argument1 = "--binsize=" + boost::lexical_cast<std::string>(newValueBinsize);
         std::string argument2 = "--numberOfBins=" + boost::lexical_cast<std::string>(newValueBinsize);
         int numberOfArguments = 4;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), argument2.c_str()};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -363,7 +376,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 
         std::string argument1 = "--binsize=" + boost::lexical_cast<std::string>(newValueBinsize);
         int numberOfArguments = 5;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), "--numberOfBinsMoments=2", "20"};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), "--numberOfBinsMoments=2", "20"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -373,7 +386,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 
         std::string argument1 = "--numberOfBins=" + boost::lexical_cast<std::string>(newValueNumberOfBins);
         int numberOfArguments = 5;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), "--binsizeCentralMoments=3", "500"};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), "--binsizeCentralMoments=3", "500"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -381,7 +394,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument1 = "--binsizeMoments";
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str()};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
     }
 
@@ -392,7 +405,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
          *    http://stackoverflow.com/questions/2539077/boost-program-options-parsing-multiple-argument-list
          */
         int numberOfArguments = 7;
-        const char* arguments[] = {"foo", "-f dummyFile", "--binsizeMoments=1", "100", "2", "200", "3"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--binsizeMoments=1", "100", "2", "200", "3"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -405,7 +418,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         referenceValue.push_back(100);
         referenceValue.push_back(400);
         int numberOfArguments = 6;
-        const char* arguments[] = {"foo", "-f dummyFile", "--binsizeMoments=1", "200", "4", "400"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--binsizeMoments=1", "200", "4", "400"};
         BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
         Parameters parameters(numberOfArguments, arguments);
         BOOST_REQUIRE(parameters.binsizeMoments == referenceValue);
@@ -415,14 +428,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument1 = "--binsizeCentralMoments";
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str()};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
     }
 
     BOOST_AUTO_TEST_CASE(binsizeCentralMoments2)
     {
         int numberOfArguments = 7;
-        const char* arguments[] = {"foo", "-f dummyFile", "--binsizeCentralMoments=1", "100", "2", "200", "3"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--binsizeCentralMoments=1", "100", "2", "200", "3"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -435,7 +448,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         referenceValue.push_back(100);
         referenceValue.push_back(400);
         int numberOfArguments = 6;
-        const char* arguments[] = {"foo", "-f dummyFile", "--binsizeCentralMoments=1", "200", "4", "400"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--binsizeCentralMoments=1", "200", "4", "400"};
         BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
         Parameters parameters(numberOfArguments, arguments);
         BOOST_REQUIRE(parameters.binsizeCentralMoments == referenceValue);
@@ -445,14 +458,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument1 = "--numberOfBinsMoments";
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str()};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
     }
 
     BOOST_AUTO_TEST_CASE(numberOfBinsMoments2)
     {
         int numberOfArguments = 7;
-        const char* arguments[] = {"foo", "-f dummyFile", "--numberOfBinsMoments=1", "10", "2", "20", "3"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfBinsMoments=1", "10", "2", "20", "3"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -465,7 +478,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         referenceValue.push_back(10);
         referenceValue.push_back(40);
         int numberOfArguments = 6;
-        const char* arguments[] = {"foo", "-f dummyFile", "--numberOfBinsMoments=1", "20", "4", "40"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfBinsMoments=1", "20", "4", "40"};
         BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
         Parameters parameters(numberOfArguments, arguments);
         BOOST_REQUIRE(parameters.numberOfBinsMoments == referenceValue);
@@ -475,14 +488,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument1 = "--numberOfBinsCentralMoments";
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str()};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
     }
 
     BOOST_AUTO_TEST_CASE(numberOfBinsCentralMoments2)
     {
         int numberOfArguments = 7;
-        const char* arguments[] = {"foo", "-f dummyFile", "--numberOfBinsCentralMoments=1", "10", "2", "20", "3"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfBinsCentralMoments=1", "10", "2", "20", "3"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -495,7 +508,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         referenceValue.push_back(10);
         referenceValue.push_back(40);
         int numberOfArguments = 6;
-        const char* arguments[] = {"foo", "-f dummyFile", "--numberOfBinsCentralMoments=1", "20", "4", "40"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfBinsCentralMoments=1", "20", "4", "40"};
         BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
         Parameters parameters(numberOfArguments, arguments);
         BOOST_REQUIRE(parameters.numberOfBinsCentralMoments == referenceValue);
@@ -508,7 +521,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         std::string argument1 = "--calcAutocorrelation=" + boost::lexical_cast<std::string>(newValue);
         std::string argument2 = "--timeMaxAutocorrelationFunction=10";
         int numberOfArguments = 4;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), argument2.c_str()};
         Parameters parameters(numberOfArguments, arguments);
         BOOST_CHECK_EQUAL(newValue, parameters.calcAutocorrelation);
     }
@@ -520,7 +533,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         std::string argument1 = "--calcAutocorrelation";
         std::string argument2 = "--timeMaxAutocorrelationFunction=10";
         int numberOfArguments = 4;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), argument2.c_str()};
         Parameters parameters(numberOfArguments, arguments);
         BOOST_CHECK_EQUAL(newValue, parameters.calcAutocorrelation);
     }
@@ -532,7 +545,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         std::string argument1 = "-a" + boost::lexical_cast<std::string>(newValue);
         std::string argument2 = "--timeMaxAutocorrelationFunction=10";
         int numberOfArguments = 4;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), argument2.c_str()};
         Parameters parameters(numberOfArguments, arguments);
         BOOST_CHECK_EQUAL(newValue, parameters.calcAutocorrelation);
     }

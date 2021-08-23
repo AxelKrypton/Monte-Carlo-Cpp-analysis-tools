@@ -21,16 +21,36 @@
 #include "io_utilities.hpp"
 
 #include <fstream>
+#include <iomanip>
+
+void PrintRepeatedSymbol(char symbol, int times)
+{
+    std::cout << "#" << std::setfill(symbol) << std::setw(times) << "\n" << std::setfill(' ');
+}
+
+static std::string insertPostfixIntoFilename(const std::string& filename, const std::string& postfix)
+{
+    std::size_t found = filename.find_last_of(".");
+    return filename.substr(0, found) + postfix + filename.substr(found);
+}
 
 std::string getFilenameForObservables(Parameters parameters)
 {
-    return parameters.analysisOutputFilePrefix + parameters.file + parameters.analysisOutputFilePostfix;
+    return insertPostfixIntoFilename(parameters.file, "_quantities");
+}
+
+std::string getFilenameForAutocorrelation(Parameters parameters)
+{
+    return insertPostfixIntoFilename(parameters.file, "_autocorrelation");
 }
 
 void printEstimateAndError(std::string estimateName, realFloat estimateValue, realFloat errorValue)
 {
+    std::ios oldState(nullptr);
+    oldState.copyfmt(std::cout);
     std::cout << "# \033[40m\033[1;32m" << estimateName << ": \033[1;36m" << std::scientific;
     std::cout << estimateValue << " \033[0m\u00B1\033[1;36m " << errorValue << "\033[0m" << std::endl;
+    std::cout.copyfmt(oldState);
 }
 
 // todo: add test for exception
@@ -49,17 +69,15 @@ void writeEstimateAndErrorToFile(std::string estimateName, realFloat estimateVal
     }
 }
 
-void writeEstimateAndErrorArraysToFile(std::string estimateName, std::vector<realFloat> estimate, std::vector<realFloat> error,
-                                       std::string filename)
+void writeEstimateAndErrorArraysToFile(std::vector<EstimateAndError> values, std::string filename)
 {
-    std::cout << "# Writing estimate and error array of \"" << estimateName << "\" to file \"" << filename << "\"" << std::endl;
+    std::cout << "# Writing analysis result to file \"" << filename << "\"\n";
     std::ofstream outputstream;
     outputstream.open(filename.c_str(), std::ios::app);
     if (outputstream.is_open()) {
-        // todo: check if both are of equal size
-        for (int i = 0; i < int(estimate.size()); i++) {
-            outputstream << std::scientific << estimate[i] << "\t" << error[i] << '\n';
-        }
+        outputstream << "#Tau_int\t\terror\n";
+        for (int i = 0; i < int(values.size()); i++)
+            outputstream << std::scientific << std::setprecision(12) << values[i] << '\n';
         outputstream.close();
     } else {
         throw std::invalid_argument("Could open file for estimate and error output. Aborting!");

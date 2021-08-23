@@ -20,6 +20,8 @@
 
 #include "Histogram.hpp"
 
+#include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
+
 #include <cmath>
 #include <iostream>
 #include <tgmath.h>

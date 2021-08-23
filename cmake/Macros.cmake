@@ -17,17 +17,18 @@
 #
 
 # Add a unit test
-# NAME name for the test to use in ctest
+# TEST_NAME name for the test to use in ctest
 # EXE name for the executable to use
 # LIB name of the library to link to
 # The test is expected to have only one source
 # file called EXE.cpp and will be linked automatically
 # ARGN includes all the arguments passed to the macro beyond EXE
 #      and they should all be libraries needed by the executable
-macro(add_unit_test NAME EXE)
-	add_executable("${EXE}" "${EXE}.cpp")
-	target_link_libraries("${EXE}" ${ARGN} ${Boost_LIBRARIES})
-	add_test("${NAME}" "${EXE}")
+macro(add_unit_test TEST_NAME EXE)
+    get_filename_component(EXE_BASE "${EXE}" NAME)
+	add_executable("${EXE_BASE}" "${EXE}.cpp")
+	target_link_libraries("${EXE_BASE}" ${ARGN} ${Boost_LIBRARIES})
+	add_test("${TEST_NAME}" "${EXE_BASE}")
 endmacro()
 
 # Create a list of files just as you'd use set.
@@ -64,5 +65,3 @@ macro(add_set_of_subdirectories MODULE)
 		set_property(GLOBAL APPEND PROPERTY DOC_SOURCE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/${_MODULE}")
 	endforeach()
 endmacro()
-
-

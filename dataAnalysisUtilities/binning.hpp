@@ -24,7 +24,7 @@
 #include "../Parameters/Parameters.hpp"
 #include "DataSample.hpp"
 
-DataSample performBinning(DataSample& rawData, const Parameters parameters);
+DataSample performBinning(DataSample& rawData, const BinningParameters& parameters);
 
 DataSample performBinningFromNumberOfBins(DataSample& rawData, int numberOfBins, bool adjustDataSampleSizeToBinning = true,
                                           bool binningMustFitDataSampleSize = false);

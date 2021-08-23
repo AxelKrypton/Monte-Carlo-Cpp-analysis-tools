@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2015-2016,2018-2020 Alessandro Sciarra
+ *  Copyright (c) 2015-2016,2018-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -20,8 +20,15 @@
 
 #include "io_utilities_reweighting.hpp"
 
+#include "../Quantities/Kurtosis.hpp"
+#include "../Quantities/Mean.hpp"
+#include "../Quantities/Skewness.hpp"
+#include "../Quantities/Variance.hpp"
+#include "../Reweighting/Histogram.hpp"
+
 #include <boost/lexical_cast.hpp>
 #include <fstream>
+#include <iomanip>
 
 class LqcdReweightedData {
   public:
@@ -30,9 +37,9 @@ class LqcdReweightedData {
         filename = outputfilePrefix + "_" + quantityName;
     }
 
-    void append(realFloat betaValue, Observables observables)
+    void append(realFloat betaValue, Quantities observables)
     {
-        std::pair<realFloat, Observables> tmpPair(betaValue, observables);
+        std::pair<realFloat, Quantities> tmpPair(betaValue, observables);
         values.push_back(tmpPair);
     }
 
@@ -43,11 +50,11 @@ class LqcdReweightedData {
             std::ofstream outputstream;
             outputstream.open(filename.c_str(), std::ios::app);
             if (outputstream.is_open()) {
-                outputstream << "# beta\t\t" << values[0].second.getMetaInformation() << std::endl;
+                outputstream << "# beta\t\t\t" << values[0].second.getMetaInformation() << std::endl;
 
                 for (unsigned int index = 0; index < values.size(); index++) {
-                    outputstream << std::scientific << values[index].first << "\t" << values[index].second.getObservablesAsString()
-                                 << std::endl;
+                    outputstream << std::setprecision(10) << std::scientific << std::setw(20) << std::left << values[index].first << "\t"
+                                 << values[index].second.getObservablesAsString() << std::endl;
                 }
                 outputstream.close();
             } else {
@@ -78,7 +85,7 @@ class LqcdReweightedData {
   private:
     std::string quantityName;
     std::string filename;
-    std::vector<std::pair<realFloat, Observables>> values;
+    std::vector<std::pair<realFloat, Quantities>> values;
 };
 
 template<typename T>
@@ -104,7 +111,7 @@ static void checkInputSizes(const std::vector<std::vector<realFloat>>& newBetaVa
 }
 
 void writeLqcdReweightedObservablesToFile(const std::vector<std::vector<realFloat>>& newBetaValues,
-                                          const std::vector<std::vector<Observables>>& reweightedData, std::string outputfilePrefix)
+                                          const std::vector<std::vector<Quantities>>& reweightedData, std::string outputfilePrefix)
 {
     try {
         checkInputSizes(newBetaValues, reweightedData);
@@ -135,30 +142,21 @@ void writeLqcdReweightedObservablesToFile(const std::vector<std::vector<realFloa
     }
 }
 
-static std::vector<Observables> convertMapOfObservableNameAndDataSampleToVectorOfObservables(std::map<std::string, DataSample> inputMap)
+static std::vector<Quantities> convertMapOfObservableNameAndDataSampleToVectorOfObservables(std::map<std::string, DataSample> inputMap)
 {
     if (inputMap.empty())
         throw std::logic_error("Called \"convertMapOfObservableNameAndDataSampleToVectorOfObservables\" function with empty map!");
 
     const int numberOfEstimatorsPerQuantity = inputMap.begin()->second.getNumberOfElements();
-    std::vector<Observables> returnValue(numberOfEstimatorsPerQuantity, Observables());
+    std::vector<Quantities> returnValue(numberOfEstimatorsPerQuantity, Quantities());
 
     for (auto& mapElement : inputMap) {
         if (mapElement.second.getNumberOfElements() != numberOfEstimatorsPerQuantity)
             throw std::logic_error("In \"convertMapOfObservableNameAndDataSampleToVectorOfObservables\" map seems to contain different "
                                    "DataSample sizes, not allowed!");
         for (int dataIndex = 0; dataIndex < mapElement.second.getNumberOfElements(); dataIndex++) {
-            if (mapElement.first == Mean::observableName)
-                returnValue[dataIndex].mean.estimate = mapElement.second[dataIndex];
-            else if (mapElement.first == Variance::observableName)
-                returnValue[dataIndex].susceptibility.estimate = mapElement.second[dataIndex];
-            else if (mapElement.first == Skewness::observableName)
-                returnValue[dataIndex].skewness.estimate = mapElement.second[dataIndex];
-            else if (mapElement.first == Kurtosis::observableName)
-                returnValue[dataIndex].kurtosis.estimate = mapElement.second[dataIndex];
-            else
-                throw std::invalid_argument(
-                    "In \"convertMapOfObservableNameAndDataSampleToVectorOfObservables\" map seems to contain unknown observable!");
+            std::string quantity = mapElement.first;
+            returnValue[dataIndex][quantity].value.estimate = mapElement.second[dataIndex];
         }
     }
 
@@ -182,8 +180,8 @@ void writeLqcdReweightedObservablesEstimatorsToFile(const std::vector<std::vecto
 
     unsigned int numberOfNewPoints = reweightedEstimators.size();
     unsigned int numberOfQuantities = reweightedEstimators[0].size();
-    std::vector<std::vector<std::vector<Observables>>> reweightedEstimatorsNew(
-        numberOfNewPoints, std::vector<std::vector<Observables>>(numberOfQuantities, std::vector<Observables>()));
+    std::vector<std::vector<std::vector<Quantities>>> reweightedEstimatorsNew(
+        numberOfNewPoints, std::vector<std::vector<Quantities>>(numberOfQuantities, std::vector<Quantities>()));
 
     for (unsigned int newPointIndex = 0; newPointIndex < numberOfNewPoints; newPointIndex++) {
         for (unsigned int quantityIndex = 0; quantityIndex < numberOfQuantities; quantityIndex++)

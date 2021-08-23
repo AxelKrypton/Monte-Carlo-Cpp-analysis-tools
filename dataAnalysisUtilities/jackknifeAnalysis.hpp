@@ -21,8 +21,8 @@
 #ifndef JACKKNIFEANALYSIS_HPP_
 #define JACKKNIFEANALYSIS_HPP_
 
+#include "../Quantities/EstimateAndError.hpp"
 #include "DataSample.hpp"
-#include "EstimateAndError.hpp"
 
 realFloat calculateJacknifeEstimate(DataSample sampleWithJackknifeEstimators);
 realFloat calculateJacknifeError(DataSample sampleWithJackknifeEstimators);

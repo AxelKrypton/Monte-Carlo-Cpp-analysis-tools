@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
- *  Copyright (c) 2014-2015,2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -467,6 +467,38 @@ BOOST_AUTO_TEST_SUITE(removeElements)
         DataSample tmp2 = removeNElementsFromDataSample(tmp, numberOfElementsToRemove);
 
         BOOST_REQUIRE_EQUAL(tmp2.getNumberOfElements(), numberOfElements - numberOfElementsToRemove);
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(powFunction)
+
+    BOOST_AUTO_TEST_CASE(pow1)
+    {
+        int numberOfElements = 16;
+        DataSample data(makeValarrayWithEntriesBetweenOneAndEight(numberOfElements));
+        DataSample result = pow(data, 0);
+        for (auto i = 0; i < numberOfElements; i++)
+            BOOST_REQUIRE_EQUAL(result[i], 1.0);
+    }
+
+    BOOST_AUTO_TEST_CASE(pow2)
+    {
+        int numberOfElements = 10;
+        DataSample data(makeValarrayWithOnes(numberOfElements));
+        DataSample result = pow(data, 17);
+        for (auto i = 0; i < numberOfElements; i++)
+            BOOST_REQUIRE_EQUAL(result[i], 1.0);
+    }
+
+    BOOST_AUTO_TEST_CASE(pow3)
+    {
+        int numberOfElements = 16;
+        DataSample data(makeValarrayWithArrayPosition(numberOfElements));
+        DataSample reference(makeValarrayWithSquaredArrayPosition(numberOfElements));
+        DataSample result = pow(data, 2);
+        for (auto i = 0; i < numberOfElements; i++)
+            BOOST_REQUIRE_EQUAL(result[i], reference[i]);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

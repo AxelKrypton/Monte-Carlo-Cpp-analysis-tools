@@ -30,7 +30,7 @@ int main(int argc, const char** argv)
     try {
         LqcdReweightingParameters parameters(argc, argv);
         Reweighter reweighter(parameters);
-        std::vector<std::vector<Observables>> reweightedObservables = reweighter.getReweightedObservables();
+        std::vector<std::vector<Quantities>> reweightedObservables = reweighter.getReweightedObservables();
         std::vector<std::vector<realFloat>> newBetaValues = reweighter.getValuesOfNewParameters();
         // TODO: Think weather the following Output functions should be a responsibility of ReweighterIO
         writeLqcdReweightedObservablesToFile(newBetaValues, reweightedObservables, parameters.getOutputfilePrefix());

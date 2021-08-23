@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2014-2015,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2019-2021 Alessandro Sciarra
  *  Copyright (c) 2015 Christopher Pinke
  *  Copyright (c) 2019 David Leemueller
  *
@@ -22,7 +22,7 @@
 #ifndef MOMENTSREWEIGHTER_H_
 #define MOMENTSREWEIGHTER_H_
 
-#include "../dataAnalysisUtilities/Observables.hpp"
+#include "../Quantities/Quantities.hpp"
 #include "../dataAnalysisUtilities/dataAnalysisUtilities.hpp"
 #include "Histogram.hpp"
 #include "MomentsReweighterHelper.hpp"
@@ -144,7 +144,7 @@ class MomentsReweighterAbstract {
                                                     std::vector<realFloat>* logZAtSimulationPointToBeUsed = NULL);
     // This getter again only for testing reason
     SimulationDataContainer getSimulationDataContainer(bool raw = true);
-    std::vector<int> getColumnsToBeConsideredReweightingProbabilityDistribution();
+    std::vector<unsigned int> getColumnsToBeConsideredReweightingProbabilityDistribution();
     std::vector<std::vector<Histogram>> getReweightedProbabilityDistributions();
     std::vector<std::vector<HistogramEstimator>> getReweightedProbabilityDistributionEstimators();
     // Method used in calculateAndGetReweightedObservables to select data to calculate observables and errors and to set them

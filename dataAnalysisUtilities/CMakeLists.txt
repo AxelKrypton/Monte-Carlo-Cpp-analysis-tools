@@ -19,32 +19,32 @@
 add_library(dataAnalysisUtilities
 	DataSampleBasic.cpp
 	DataSample.cpp
+	MultipleDataSample.cpp
 	binnedDataSample.cpp
 	jackknifeEstimators.cpp
 	dataAnalysisUtilities.cpp
-	DataSampleAnalyzer.cpp
+	Analyzer.cpp
 	jackknifeAnalysis.cpp
 	bootstrapAnalysis.cpp
 	binning.cpp
-	Observables.cpp
 )
-target_link_libraries(dataAnalysisUtilities IO Parameters)
+target_link_libraries(dataAnalysisUtilities IO Parameters Quantities)
 
 if( USE_REW_MULTI_PRECISION )
 
 	add_library(supportSourceForMultiprecisionReweighting
 		DataSampleBasic.cpp
 		DataSample.cpp
+		MultipleDataSample.cpp
 		binnedDataSample.cpp
 		jackknifeEstimators.cpp
 		jackknifeAnalysis.cpp
 		bootstrapAnalysis.cpp
 		binning.cpp
-		Observables.cpp
 	)
 	target_compile_definitions(supportSourceForMultiprecisionReweighting PUBLIC -D_USE_BIG_FLOAT_)
 	target_link_libraries(supportSourceForMultiprecisionReweighting IO Parameters ${MPFR_LIBRARIES})
-		
+
 endif( USE_REW_MULTI_PRECISION )
 
 #Extract test files directly to the build correct folder
@@ -62,7 +62,7 @@ endif(EXTRACTION_EXIT_CODE EQUAL 0)
 
 add_unit_test(dataSampleBasic DataSampleBasic_test dataAnalysisUtilities)
 add_unit_test(dataSample DataSample_test dataAnalysisUtilities)
+add_unit_test(multipleDataSample MultipleDataSample_test dataAnalysisUtilities)
 add_unit_test(binnedDataSample binnedDataSample_test dataAnalysisUtilities)
 add_unit_test(jackknifeEstimators jackknifeEstimators_test dataAnalysisUtilities)
 add_unit_test(dataAnalysisUtilities dataAnalysisUtilities_test dataAnalysisUtilities Parameters)
-add_unit_test(observables Observables_test dataAnalysisUtilities)

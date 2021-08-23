@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2015 Christopher Pinke
- *  Copyright (c) 2015,2020 Alessandro Sciarra
+ *  Copyright (c) 2015,2020-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -87,6 +87,7 @@ class ReweighterIO {
     SimulationDataContainer readFromFileDataContainer;
     bool isMeanKnownToBeZero;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
+    unsigned int numberOfMultipleColumns;
     std::vector<std::string> namesOfParametersIgnoringMetaParameters;  // just vector of string because the simulation parameters are the
                                                                        // same for ALL data files!
     std::vector<std::vector<realFloat>> valuesOfSimulationParametersIgnoringMetaParameters;

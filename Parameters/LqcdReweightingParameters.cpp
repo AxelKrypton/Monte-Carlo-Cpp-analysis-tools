@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
- *  Copyright (c) 2014-2016,2018,2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2016,2018,2020-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -49,7 +49,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char** argv
         ("deactivateReweightingForVariance", po::value<bool>(&deactivateReweightingForVariance)->default_value(false)->implicit_value(true), "Do not perform reweighting for the variance of the data.")
         ("deactivateReweightingForSkewness", po::value<bool>(&deactivateReweightingForSkewness)->default_value(false)->implicit_value(true), "Do not perform reweighting for the skewness of the data.")
         ("deactivateReweightingForKurtosis", po::value<bool>(&deactivateReweightingForKurtosis)->default_value(false)->implicit_value(true), "Do not perform reweighting for the kurtosis of the data.")
-        ("obsMultipleColumns", po::value<std::vector<unsigned int> >(&columnsToBeReweightedUsingMultipleColumns)->multitoken(), getHelpDescription("obsMultipleColumns").c_str())
+        ("obsMultipleColumns", po::value<std::vector<unsigned int> >(&columnsToBeReweightedUsingMultipleColumns)->default_value(std::vector<unsigned int>{},"''")->multitoken(), getHelpDescription("obsMultipleColumns").c_str())
         ("numberOfMultipleColumnsForSingleObservable", po::value<unsigned int>(&numberOfMultipleColumnsForSingleObservable)->default_value(0), "Number of columns to be considered referred to the same observable.")
         ("isMeanKnownToBeZero", po::value<bool>(&isMeanKnownToBeZero)->default_value(false)->implicit_value(true), "ALL observables are known a priori to have zero mean.")
         ("useJackknifeAsErrorMethod", po::value<bool>(&useJackknifeAsErrorMethod)->default_value(false)->implicit_value(true), "Evaluate error in reweighting using Jackknife. ATTENTION: This method implies to use the biggest binsize for all raw data points. Unless the statistics is such that the number of uncorrelated data points is not affected, this method will in general overestimate the errors!!!")
@@ -88,16 +88,26 @@ void LqcdReweightingParameters::checkParsedArguments(po::variables_map& vm, po::
      * a std::initializer_list<bool> in case the error method are more than 2.
      */
 
-    if (vm["useJackknifeAsErrorMethod"].defaulted() && vm["useBootstrapAsErrorMethod"].defaulted()) {
+    if (vm["useJackknifeAsErrorMethod"].defaulted() && vm["useBootstrapAsErrorMethod"].defaulted())
         throw std::invalid_argument("No error method specified. Aborting!");
-    }
 
-    if (! vm["useJackknifeAsErrorMethod"].defaulted() && ! vm["useBootstrapAsErrorMethod"].defaulted()) {
+    if (! vm["useJackknifeAsErrorMethod"].defaulted() && ! vm["useBootstrapAsErrorMethod"].defaulted())
         throw std::invalid_argument("More than one error method specified. Aborting!");
-    }
 
-    if (! vm["deactivateReweightingForMean"].defaulted()) {
+    if (! vm["deactivateReweightingForMean"].defaulted())
         deactivateReweightingForProbabilityDistribution = deactivateReweightingForMean;
+
+    if (! vm["obsMultipleColumns"].defaulted() && numberOfMultipleColumnsForSingleObservable == 0)
+        throw std::invalid_argument("Number of columns to be considered to the same observable not specified or set to 0. Aborting!");
+
+    if (! vm["obsMultipleColumns"].defaulted()) {
+        std::sort(columnsToBeReweightedUsingMultipleColumns.begin(), columnsToBeReweightedUsingMultipleColumns.end());
+        for (size_t i = 1; i < columnsToBeReweightedUsingMultipleColumns.size(); i++) {
+            if (columnsToBeReweightedUsingMultipleColumns[i] - columnsToBeReweightedUsingMultipleColumns[i - 1]
+                < numberOfMultipleColumnsForSingleObservable)
+                throw std::invalid_argument("Columns to be reweighted using multiple estimates too close (distance < "
+                                            + std::to_string(numberOfMultipleColumnsForSingleObservable) + ")!");
+        }
     }
 }
 
@@ -266,13 +276,13 @@ static std::string getHelpDescription(std::string option)
 {
     std::string description = "";
     if (option == "obsMultipleColumns") {
-        description
-            += "Number of FIRST column in the file containing observable to be reweighted using several columns for higher moments. "
-               "Do not forget that the first column (column 0) is reserved for the gauge action. In general the expected "
-               "number of columns for the same observable is equal to the maximum moment needed in the reweighting of the "
-               "required quantities (e.g. 3 if only mean and skewness are asked to be reweighted). Use the option "
-               "--numberOfMultipleColumnsForSingleObservable whenever you want to force the program to consider a different "
-               "number of columns for single observable. ATTENTION: Column ranges start from ZERO!";
+        description += "List of space separated numbers referring to the FIRST observable column to be reweighted using "
+                       "several columns for higher moments. Do not forget that the first column (column 0) "
+                       "is reserved for the gauge action. Use the option  --numberOfMultipleColumnsForSingleObservable "
+                       "to specify how many columns are to be used for the single observable. At the moment, this is a "
+                       "a single number and refers to all observables to be evaluated using several columns; it is hence "
+                       "not possible to specify different numbers of columns for different observables. "
+                       "ATTENTION: Column ranges start from ZERO!";
     } else
         throw std::invalid_argument("Unknown option in \"getHelpDescription\" function!");
     return description;
