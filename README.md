@@ -15,12 +15,13 @@ Clearly, you could use the code as external library for another project, but thi
 
 Unfortunately, at the moment, no documentation is available and you need to explore the repository to understand what has been done how.
 However, as far as building the code is concerned, the procedure is quite standard via CMake.
+From `v0.2` on, `C++17` features are used and, hence, a compiler able to deal with at least this standard is required.
 
 *  After having cloned the repository, checkout to [the latest release](https://gitlab.itp.uni-frankfurt.de/ag-philipsen/lqcd-cpp-analysis-tools/-/releases) (always recommended).
 *  Create a build folder in it and move into it.
 *  Here, you can simply run `cmake ..` in order to run a default setup or you can use the `ccmake ..` command to have access to configuration options.
 *  If no error occurs (in case have a look to the error and act accordingly), you can run `make`
-*  At this stage there should be no compilation error and a couple of executable should be created (also tests executable are built, so that you can run the code base tests using ctest).
+*  At this stage there should be no compilation error and a couple of executable should be created (also tests executable are built, so that you can run the code base tests using `ctest`).
 
 Use
 
