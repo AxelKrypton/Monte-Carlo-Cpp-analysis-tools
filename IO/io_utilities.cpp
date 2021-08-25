@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
- *  Copyright (c) 2016,2020 Alessandro Sciarra
+ *  Copyright (c) 2016,2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,7 +31,10 @@ void PrintRepeatedSymbol(char symbol, int times)
 static std::string insertPostfixIntoFilename(const std::string& filename, const std::string& postfix)
 {
     std::size_t found = filename.find_last_of(".");
-    return filename.substr(0, found) + postfix + filename.substr(found);
+    if (found == std::string::npos)
+        return filename + postfix;
+    else
+        return filename.substr(0, found) + postfix + filename.substr(found);
 }
 
 std::string getFilenameForObservables(Parameters parameters)

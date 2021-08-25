@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014 Christopher Pinke
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,15 @@ BOOST_AUTO_TEST_CASE(filenameForObservable)
 {
     std::string dummyFilename = "foo.dat";
     std::string expectedName = "foo_quantities.dat";
+    Parameters parameters({"foo", dummyFilename.c_str(), "--calcAutocorrelation", "--timeMaxAutocorrelationFunction=10"});
+
+    BOOST_CHECK(expectedName == getFilenameForObservables(parameters));
+}
+
+BOOST_AUTO_TEST_CASE(filenameForObservableNoExtension)
+{
+    std::string dummyFilename = "foo";
+    std::string expectedName = "foo_quantities";
     Parameters parameters({"foo", dummyFilename.c_str(), "--calcAutocorrelation", "--timeMaxAutocorrelationFunction=10"});
 
     BOOST_CHECK(expectedName == getFilenameForObservables(parameters));
