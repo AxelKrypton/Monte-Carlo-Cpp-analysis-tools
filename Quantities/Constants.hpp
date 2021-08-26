@@ -87,7 +87,8 @@ namespace constants {
     // Name and moments
     template<> inline const std::string observableName<Mean> = "MEAN";
     template<> inline const std::initializer_list<unsigned int> neededMomentsExpanded<Mean> = {1};
-    template<> inline const std::initializer_list<unsigned int> neededMomentsUnexpanded<Mean> = {1};  // Needed in Reweighting!
+    template<> inline const std::initializer_list<unsigned int> neededMomentsExpandedWithZeroMean<Mean> = {1};  // For error on zero mean
+    template<> inline const std::initializer_list<unsigned int> neededMomentsUnexpanded<Mean> = {1};            // Needed in Reweighting!
     // Functions for quantity
     template<> inline const functionForQuantity functionToCalculateQuantity<Mean> = [](Moments in) -> realFloat { return in[1]; };
     // Functions for estimators

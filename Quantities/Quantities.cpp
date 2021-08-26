@@ -40,19 +40,16 @@ Quantities::Quantities(const DataSample& dataSample, Parameters parameters) : Qu
 Quantities::Quantities(const MultipleDataSample& data, Parameters parameters)
 {
     if (! parameters.doNotAnalyzeMean) {
-        mean = Mean(data, parameters.getBinningParametersForAnalysis(constants::observableName<Mean>), parameters.getAnalysisOptions());
+        mean = Mean(data, parameters.getBinningParametersForAnalysis<Mean>(), parameters.getAnalysisOptions());
     }
     if (! parameters.doNotAnalyzeVariance) {
-        variance = Variance(
-            data, parameters.getBinningParametersForAnalysis(constants::observableName<Variance>), parameters.getAnalysisOptions());
+        variance = Variance(data, parameters.getBinningParametersForAnalysis<Variance>(), parameters.getAnalysisOptions());
     }
     if (! parameters.doNotAnalyzeSkewness) {
-        skewness = Skewness(
-            data, parameters.getBinningParametersForAnalysis(constants::observableName<Skewness>), parameters.getAnalysisOptions());
+        skewness = Skewness(data, parameters.getBinningParametersForAnalysis<Skewness>(), parameters.getAnalysisOptions());
     }
     if (! parameters.doNotAnalyzeKurtosis) {
-        kurtosis = Kurtosis(
-            data, parameters.getBinningParametersForAnalysis(constants::observableName<Kurtosis>), parameters.getAnalysisOptions());
+        kurtosis = Kurtosis(data, parameters.getBinningParametersForAnalysis<Kurtosis>(), parameters.getAnalysisOptions());
     }
 }
 

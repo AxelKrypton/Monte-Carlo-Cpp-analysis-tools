@@ -21,8 +21,9 @@
 #include "Parameters.hpp"
 
 #include "../IO/io_utilities.hpp"
-#include "../Quantities/Constants.hpp"
 #include "HelperTools.hpp"
+
+#include <algorithm>
 
 Parameters::Parameters(std::vector<std::string> argv)
 {
@@ -227,10 +228,10 @@ void Parameters::printParameters()
  *   n_1 x_1 n_2 x_2 n_3 x_3 ...
  * where n_i are the moments and x_i the binning information (either binsize or number of bins).
  * In this function the input vector is used to create an output vector that will have as many entries
- * as the max{x_i} and that will have all the entries set to the default binning information (either
+ * as the max{n_i} and that will have all the entries set to the default binning information (either
  * binsize or numberOfbins) except the n_i entries that will be set to x_i.
  */
-void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithBinningInformations, const int defaultValue)
+void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithBinningInformations, int defaultValue)
 {
     std::vector<std::vector<int>> auxVector(2);
     for (size_t i = 0; i < vectorWithBinningInformations.size(); i += 2) {
@@ -254,30 +255,6 @@ void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithB
         else
             vectorWithBinningInformations.push_back(defaultValue);
     }
-}
-
-BinningParameters Parameters::getBinningParametersForAnalysis(std::string observable) const
-{
-    BinningParameters returnValue;
-    returnValue.performBinning = ! doNotUseBinning;
-    returnValue.binningMustFitDataSample = binningMustFitDataSampleSize;
-    returnValue.adjustDataSample = adjustDataSampleSizeToBinning;
-    returnValue.useNumberOfBins = useNumberOfBinsForBinning;
-
-    if (observable == constants::observableName<Mean>) {
-        returnValue.number = useNumberOfBinsForBinning ? numberOfBinsMoments[1] : binsizeMoments[1];
-    } else if (observable == constants::observableName<Variance>) {
-        returnValue.number = useNumberOfBinsForBinning ? numberOfBinsCentralMoments[2] : binsizeCentralMoments[2];
-    } else if (observable == constants::observableName<Skewness>) {
-        returnValue.number = (useNumberOfBinsForBinning) ? std::min(numberOfBinsCentralMoments[2], numberOfBinsCentralMoments[3])
-                                                         : std::max(binsizeCentralMoments[2], binsizeCentralMoments[3]);
-    } else if (observable == constants::observableName<Kurtosis>) {
-        returnValue.number = (useNumberOfBinsForBinning) ? std::min(numberOfBinsCentralMoments[2], numberOfBinsCentralMoments[4])
-                                                         : std::max(binsizeCentralMoments[2], binsizeCentralMoments[4]);
-    } else {
-        throw std::invalid_argument("Unknown observable in getBinningParametersForObservablesAnalysis function!");
-    }
-    return returnValue;
 }
 
 QuantityAttributes Parameters::getAnalysisOptions() const
