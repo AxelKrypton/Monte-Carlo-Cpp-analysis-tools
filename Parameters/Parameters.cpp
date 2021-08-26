@@ -169,6 +169,10 @@ void Parameters::checkParsedArguments(po::variables_map& vm, po::options_descrip
     if (! vm.count("numberOfBinsForAutocorrelation")) {
         numberOfBinsForAutocorrelation = 10;
     }
+
+    if (numberOfColumnsToBeConsidered > 1 && (vm.count("numberOfBinsCentralMoments") || vm.count("binsizeCentralMoments")))
+        throw std::logic_error("Analysis with multiple estimates per observable does not make use of central moments,"
+                               " but still binning information for these has been provided!");
 }
 
 void Parameters::printParameters()

@@ -328,6 +328,20 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).numberOfColumnsToBeConsidered);
     }
 
+    BOOST_AUTO_TEST_CASE(columnNumber_invalidArgument1)
+    {
+        int numberOfArguments = 5;
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfColumns=16", "--binsizeCentralMoments=3", "500"};
+        BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
+    }
+
+    BOOST_AUTO_TEST_CASE(columnNumber_invalidArgument2)
+    {
+        int numberOfArguments = 5;
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfColumns=16", "--numberOfBinsCentralMoments=1", "111"};
+        BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
+    }
+
     static Parameters createParametersForArgumentSettingCheck_implicitOption(std::string argumentName)
     {
         std::string argument = argumentName;
