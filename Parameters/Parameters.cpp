@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014 Christopher Pinke
- *  Copyright (c) 2014-2015,2018,2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2018,2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,18 @@
 
 #include "Parameters.hpp"
 
+#include "../IO/io_utilities.hpp"
 #include "HelperTools.hpp"
+
+#include <algorithm>
+
+Parameters::Parameters(std::vector<std::string> argv)
+{
+    int argc = argv.size();
+    std::vector<const char*> Ptrs;
+    std::transform(std::begin(argv), std::end(argv), std::back_inserter(Ptrs), [](std::string& str) { return str.c_str(); });
+    *this = Parameters{argc, Ptrs.data()};
+}
 
 Parameters::Parameters(int argc, const char** argv)
 {
@@ -44,6 +55,7 @@ Parameters::Parameters(int argc, const char** argv)
         ("file,f", po::value<std::string>(&file), "File containing data")
         ("offset,o", po::value<int>(&offset)->default_value(0), "Discard first <offset> values of data")
         ("column,c", po::value<int>(&column)->default_value(1), "Read data from column number <column> (must be >= 1)")
+        ("numberOfColumns", po::value<int>(&numberOfColumnsToBeConsidered)->default_value(1), "Consider multiple columns for estimators of the same observable (must be >= 1)")
         ("isMeanKnownToBeZero,m", po::value<bool>(&isMeanKnownToBeZero)->default_value(false)->implicit_value(true), "The mean for given column is set to zero in the observables' calculation")
         ("binsize,b", po::value<int>(&binsize), "Binsize used for all moments (default: 100)")
         ("binsizeMoments", po::value<std::vector<int> >(&binsizeMoments)->multitoken(), "Binsize for Nth moment (use it giving: N1 binsize N2 binsize ...)")
@@ -90,6 +102,10 @@ void Parameters::checkParsedArguments(po::variables_map& vm, po::options_descrip
     if (calcAutocorrelation && (! vm.count("timeMaxAutocorrelationFunction"))) {
         throw std::invalid_argument(
             "If calcAutocorrelation==true then the option --timeMaxAutocorrelationFunction=... must be given. Aborting!");
+    }
+
+    if (calcAutocorrelation && numberOfColumnsToBeConsidered != 1) {
+        throw std::invalid_argument("No multiple estimators supported in autocorrelation analysis. Aborting!");
     }
 
     /**
@@ -153,54 +169,62 @@ void Parameters::checkParsedArguments(po::variables_map& vm, po::options_descrip
     if (! vm.count("numberOfBinsForAutocorrelation")) {
         numberOfBinsForAutocorrelation = 10;
     }
+
+    if (numberOfColumnsToBeConsidered > 1 && (vm.count("numberOfBinsCentralMoments") || vm.count("binsizeCentralMoments")))
+        throw std::logic_error("Analysis with multiple estimates per observable does not make use of central moments,"
+                               " but still binning information for these has been provided!");
 }
 
 void Parameters::printParameters()
 {
     std::cout << std::endl;
-    std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+    PrintRepeatedSymbol();
     std::cout << "# Datafile:\t" << file << std::endl;
-    std::cout << "# Use column:\t" << column;
+    if (numberOfColumnsToBeConsidered == 1)
+        std::cout << "# Use column:\t" << column;
+    else
+        std::cout << "# Use columns:\t" << column << " to " << column + numberOfColumnsToBeConsidered - 1;
     if (isMeanKnownToBeZero)
         std::cout << "\t(mean is known to be zero)";
     std::cout << std::endl;
     std::cout << "# Offset:\t" << offset << std::endl;
     // todo: add output of observables which are analyzed
-    std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+    PrintRepeatedSymbol();
     if (! doNotUseBinning) {
         std::cout << "# Perform binning with:" << std::endl;
         if (useNumberOfBinsForBinning) {
             std::cout << "# Number of bins:\n";
-            for (size_t i = 0; i < numberOfBinsMoments.size(); i++)
+            for (size_t i = 1; i < numberOfBinsMoments.size(); i++)
                 std::cout << "#   - moment " << i << ": " << numberOfBinsMoments[i] << std::endl;
-            for (size_t i = 0; i < numberOfBinsCentralMoments.size(); i++)
+            for (size_t i = 1; i < numberOfBinsCentralMoments.size(); i++)
                 std::cout << "#   - central moment " << i << ": " << numberOfBinsCentralMoments[i] << std::endl;
         } else {
             std::cout << "# Binsize:\n";
-            for (size_t i = 0; i < binsizeMoments.size(); i++)
+            for (size_t i = 1; i < binsizeMoments.size(); i++)
                 std::cout << "#   - moment " << i << ": " << binsizeMoments[i] << std::endl;
-            for (size_t i = 0; i < binsizeCentralMoments.size(); i++)
+            for (size_t i = 1; i < binsizeCentralMoments.size(); i++)
                 std::cout << "#   - central moment " << i << ": " << binsizeCentralMoments[i] << std::endl;
         }
         if (binningMustFitDataSampleSize) {
-            std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+            PrintRepeatedSymbol();
             std::cout << "# Require binsize/numberOfBins\n#   to be multiple of number of\n#   data points" << std::endl;
         }
         if (adjustDataSampleSizeToBinning) {
-            std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+            PrintRepeatedSymbol();
             std::cout << "# Resize raw data sample in case data points are discarded during binning" << std::endl;
         }
     } else {
         std::cout << "# Do not perform binning!" << std::endl;
     }
     if (calcAutocorrelation) {
-        std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+        PrintRepeatedSymbol();
         std::cout << "# Calculate estimate of autocorrelation time:" << std::endl;
         std::cout << "#  - for \"t\" up to " << timeMaxAutocorrelationFunction << "," << std::endl;
         std::cout << "#  - using " << numberOfBinsForAutocorrelation << " bins to bin the data before" << std::endl;
         std::cout << "#    applying Jackknife." << std::endl;
     }
-    std::cout << "#------------------------------------------------------------------------------------" << std::endl;
+    PrintRepeatedSymbol();
+    std::cout << "\n";
 }
 
 /*
@@ -208,10 +232,10 @@ void Parameters::printParameters()
  *   n_1 x_1 n_2 x_2 n_3 x_3 ...
  * where n_i are the moments and x_i the binning information (either binsize or number of bins).
  * In this function the input vector is used to create an output vector that will have as many entries
- * as the max{x_i} and that will have all the entries set to the default binning information (either
+ * as the max{n_i} and that will have all the entries set to the default binning information (either
  * binsize or numberOfbins) except the n_i entries that will be set to x_i.
  */
-void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithBinningInformations, const int defaultValue)
+void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithBinningInformations, int defaultValue)
 {
     std::vector<std::vector<int>> auxVector(2);
     for (size_t i = 0; i < vectorWithBinningInformations.size(); i += 2) {
@@ -219,7 +243,13 @@ void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithB
         auxVector[1].push_back(vectorWithBinningInformations[i + 1]);
     }
     vectorWithBinningInformations.clear();
-    // Minimum 4 moments. TODO: Improve in the sense that this 4 should not be hard coded!!
+    /*
+     * Minimum 4 moments.
+     * NOTE: Entry 0 is meaningless but we keep it to have the index
+     *       referring exactly to the number of the moment without a
+     *       a shift by one (make rest of code more readable).
+     * TODO: Improve in the sense that this 4 should not be hard coded!!
+     */
     int totalNumberOfMoments = (auxVector[0].size() == 0) ? 4 : std::max(4, *std::max_element(auxVector[0].begin(), auxVector[0].end()));
     for (int i = 0; i <= totalNumberOfMoments; i++) {
         std::vector<int>::iterator it;
@@ -229,4 +259,9 @@ void Parameters::parseBinningInformationForMoments(std::vector<int>& vectorWithB
         else
             vectorWithBinningInformations.push_back(defaultValue);
     }
+}
+
+QuantityAttributes Parameters::getAnalysisOptions() const
+{
+    return QuantityAttributes{isMeanKnownToBeZero, numberOfColumnsToBeConsidered > 1};
 }

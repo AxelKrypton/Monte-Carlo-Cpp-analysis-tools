@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2015 Christopher Pinke
- *  Copyright (c) 2015-2016,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2015-2016,2019-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 #define REWEIGHTER_HPP_
 
 #include "../Parameters/LqcdReweightingParameters.hpp"
-#include "../dataAnalysisUtilities/Observables.hpp"
+#include "../Quantities/Quantities.hpp"
 #include "Histogram.hpp"
 #include "ReweighterIO.hpp"
 #include "SimulationDataContainer.hpp"
@@ -41,11 +41,12 @@ struct RawDataForReweightingAndMetainformation {
     bool isMeanKnownToBeZero;
     realFloat precisionToCalculateLogZ;
     std::vector<unsigned int> columnsToBeReweightedUsingMultipleColumns;
+    unsigned int numberOfMultipleColumns;
     ErrorCalculationMethod errorMethod;
     std::shared_ptr<int> bootstrapNumber;
     // Information deriving from some operations done in the program
     unsigned int maximumMomentNeededOverall;  // this could not coincide with the max_element of the vector momentsToBeReweighted in the
-                                              // case of multiple columns per observable!!
+                                              // case of multiple reweighting procedures which have different momentsToBeReweighted
     std::vector<unsigned int> momentsToBeReweighted;
     std::vector<int> binsizesToBeUsedForBinning;
     bool reweightProbabilityDistributions;
@@ -71,7 +72,7 @@ class Reweighter {
      */
     Reweighter(LqcdReweightingParameters parameters);
     std::vector<std::vector<realFloat>> getValuesOfNewParameters();
-    std::vector<std::vector<Observables>> getReweightedObservables();
+    std::vector<std::vector<Quantities>> getReweightedObservables();
     std::vector<std::vector<std::map<std::string, DataSample>>> getReweightedObservablesEstimators();
     std::vector<std::vector<ProbabilityDistribution>> getReweightedProbabilityDistributions();
 
@@ -84,9 +85,9 @@ class Reweighter {
     bool useSimulatedPointsAsNewPoints;
     std::vector<std::vector<realFloat>> valuesOfNewParameters;
     realFloat precisionOfIterativeProcedureToCalculateLogZ;
-    std::vector<std::vector<Observables>> observablesAtNewPoints;
+    std::vector<std::vector<Quantities>> observablesAtNewPoints;
     std::unique_ptr<std::vector<std::vector<std::map<std::string, DataSample>>>> observablesEstimatorsAtNewPoints;  // e.g.
-                                                                                                                    // [newPoint][obsInFile][Skewness::observableName]
+                                                                                                                    // [newPoint][obsInFile][constants::observableName<Mean>]
     std::vector<std::vector<ProbabilityDistribution>> probabilityDistributionsAtNewPoints;
     // The following methods are here in order to be tested one by one (in principle they could be static function in the .cpp file)
     Reweighter(std::initializer_list<std::string>);
@@ -105,7 +106,7 @@ class ReweighterTester {
     {
         return reweighter.getReweightingProceduresToBePerformed();
     };
-    std::vector<std::vector<Observables>> getReweightedObservables() { return reweighter.getReweightedObservables(); };
+    std::vector<std::vector<Quantities>> getReweightedObservables() { return reweighter.getReweightedObservables(); };
     // The following method is used to test MomentsReweighter(Helper) class
     RawDataForReweightingAndMetainformation getRawDataForReweightingAndMetainformation(std::vector<unsigned int> momentsToBeReweighted,
                                                                                        std::vector<int> binsizesToBeUsed,

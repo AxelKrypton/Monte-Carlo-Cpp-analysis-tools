@@ -2,7 +2,7 @@
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
  *  Copyright (c) 2019 David Leemueller
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,13 +23,26 @@
 #define ESTIMATEANDERROR_HPP_
 #include "../types.hpp"
 
+#include <iostream>
+
 class EstimateAndError {
   public:
-    EstimateAndError() : estimate(0.), error(0.) {}
-    EstimateAndError(realFloat mean, realFloat error) : estimate(mean), error(error) {}
+    // Here default initialisation to 0.0 is crucial, because Histogram classes rely on it!
+    EstimateAndError() : estimate(0.0), error(0.0) {}
+    EstimateAndError(realFloat value, realFloat error) : estimate(value), error(error) {}
 
     realFloat estimate;
     realFloat error;
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const std::pair<EstimateAndError, std::string>& value)
+{
+    return stream << value.first.estimate << value.second << value.first.error;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const EstimateAndError& value)
+{
+    return operator<<(stream, std::make_pair(value, std::string{"\t"}));
+}
 
 #endif

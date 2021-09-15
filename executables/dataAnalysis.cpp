@@ -19,7 +19,7 @@
  */
 
 #include "../Parameters/Parameters.hpp"
-#include "../dataAnalysisUtilities/datafileAnalyzer.hpp"
+#include "../dataAnalysisUtilities/Analyzer.hpp"
 #include "exceptions.hpp"
 #include "exitCodes.hpp"
 
@@ -27,9 +27,7 @@ int main(int argc, const char** argv)
 {
     try {
         Parameters parameters(argc, argv);
-        std::cout << std::endl << "#------------------------------------------------------------------------------------" << std::endl;
         DatafileAnalyzer analyzer(parameters);
-        std::cout << "#------------------------------------------------------------------------------------" << std::endl << std::endl;
     }
     // todo: move catch block into own function?
     catch (wrongBinningParameter& e) {

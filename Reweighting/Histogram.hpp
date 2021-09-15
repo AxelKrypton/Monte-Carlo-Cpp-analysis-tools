@@ -20,9 +20,9 @@
 
 #ifndef HISTOGRAM_HPP_
 #define HISTOGRAM_HPP_
+#include "../Quantities/EstimateAndError.hpp"
+#include "../Quantities/Quantities.hpp"
 #include "../dataAnalysisUtilities/DataSample.hpp"
-#include "../dataAnalysisUtilities/EstimateAndError.hpp"
-#include "../dataAnalysisUtilities/Observables.hpp"
 #include "../types.hpp"
 
 #include <map>

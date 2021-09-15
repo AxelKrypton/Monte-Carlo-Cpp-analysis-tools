@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014-2015 Christopher Pinke
- *  Copyright (c) 2014-2016,2018,2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2016,2018,2020-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -164,6 +164,11 @@ BOOST_AUTO_TEST_SUITE(defaults)
     {
         bool defaultValue = false;
         BOOST_REQUIRE_EQUAL(defaultValue, createParametersForDefaultCheck().getPrintEstimatorsToFile());
+    }
+
+    BOOST_AUTO_TEST_CASE(obsWithMultipleEstimates)
+    {
+        BOOST_REQUIRE(true == createParametersForDefaultCheck().getColumnsToBeReweightedUsingMultipleColumns().empty());
     }
 
     BOOST_AUTO_TEST_CASE(numColsForSingleObs)
@@ -384,30 +389,47 @@ BOOST_AUTO_TEST_SUITE(setArguments)
             newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).getNumberOfBootstrapResample());
     }
 
-    static LqcdReweightingParameters createParametersForArgumentSettingCheck_string(std::string argumentName, std::string newValue)
+    static LqcdReweightingParameters createParametersForArgumentSettingCheck_strings(std::vector<std::string> options)
     {
-        std::string argument = argumentName + "=" + newValue;
-        int numberOfArguments = 4;
-        const char* arguments[] = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod", argument.c_str()};
-        return LqcdReweightingParameters(numberOfArguments, arguments);
+        std::vector<const char*> arguments = {"foo", "-f dummyFile", "--useBootstrapAsErrorMethod"};
+        std::transform(options.begin(), options.end(), std::back_inserter(arguments), [](const std::string& s) { return s.c_str(); });
+        return LqcdReweightingParameters(arguments.size(), arguments.data());
     }
 
     BOOST_AUTO_TEST_CASE(outputfilePrefix)
     {
         std::string newValue = "abcdefg";
         std::string argumentName = "--outputfilePrefix";
-        BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_string(argumentName, newValue).getOutputfilePrefix());
+        std::vector<std::string> options = {argumentName, newValue};
+        BOOST_REQUIRE_EQUAL(newValue, createParametersForArgumentSettingCheck_strings(options).getOutputfilePrefix());
     }
 
-    BOOST_AUTO_TEST_CASE(observablesMultipleColumns)
+    BOOST_AUTO_TEST_CASE(observablesMultipleColumns1)
     {
-        std::string newValues = "5";
-        std::string argumentName = "--obsMultipleColumns";
-        std::vector<unsigned int> refValues;
-        refValues.push_back(5);
-        BOOST_REQUIRE(
-            refValues
-            == createParametersForArgumentSettingCheck_string(argumentName, newValues).getColumnsToBeReweightedUsingMultipleColumns());
+        std::vector<std::string> options = {"--obsMultipleColumns", "5"};
+        BOOST_REQUIRE_THROW(createParametersForArgumentSettingCheck_strings(options), std::invalid_argument);
+    }
+
+    BOOST_AUTO_TEST_CASE(observablesMultipleColumns2)
+    {
+        std::string value = "5";
+        std::vector<std::string> options = {"--obsMultipleColumns", value, "--numberOfMultipleColumns", value};
+        auto parameters = createParametersForArgumentSettingCheck_strings(options);
+        BOOST_REQUIRE_EQUAL(parameters.getColumnsToBeReweightedUsingMultipleColumns()[0], std::stoul(value));
+    }
+
+    BOOST_AUTO_TEST_CASE(observablesMultipleColumns3)
+    {
+        std::vector<std::string> options = {"--obsMultipleColumns", "1", "3", "--numberOfMultipleColumns", "5"};
+        BOOST_REQUIRE_THROW(createParametersForArgumentSettingCheck_strings(options), std::invalid_argument);
+    }
+
+    BOOST_AUTO_TEST_CASE(observablesMultipleColumns4)
+    {
+        std::vector<std::string> options = {"--obsMultipleColumns", "1", "6", "--numberOfMultipleColumns", "5"};
+        auto parameters = createParametersForArgumentSettingCheck_strings(options);
+        BOOST_REQUIRE_EQUAL(parameters.getColumnsToBeReweightedUsingMultipleColumns()[0], 1);
+        BOOST_REQUIRE_EQUAL(parameters.getColumnsToBeReweightedUsingMultipleColumns()[1], 6);
     }
 
     BOOST_AUTO_TEST_CASE(numColsForSingleObs)

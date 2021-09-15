@@ -30,6 +30,10 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
+if( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+    add_definitions( -DDEBUG_MODE )
+endif( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+
 ## Have the user asked for tests
 enable_testing()
 
@@ -37,7 +41,7 @@ enable_testing()
 include(CTest)
 
 # Compiler settings (https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     message(STATUS "Compiling with ${CMAKE_CXX_COMPILER_ID}")
     add_compile_options(
@@ -82,17 +86,18 @@ set(StAT_USED_LIBS ${Boost_LIBRARIES} ${MPFR_LIBRARIES}
 
 # Add to the project each sub-directory as it is, no linking to nothing (see Macros.cmake in cmake folder)
 add_set_of_subdirectories(
-	Parameters
-	IO
-	dataAnalysisUtilities
-	Reweighting
+    dataAnalysisUtilities
+    IO
+    Parameters
+    Quantities
+    Reweighting
 )
 
 # The actual executables (frontends)
 #
 # NOTE: Here, the linking of the executable is done manually since some
 #       sub-libraries are compiled with the definition _USE_BIG_FLOAT_ and
-#       some others no. 
+#       some others no.
 #
 add_executable(dataAnalysis executables/dataAnalysis.cpp)
 target_link_libraries(dataAnalysis dataAnalysisUtilities Parameters IO ${StAT_USED_LIBS})
@@ -103,11 +108,8 @@ if( USE_REW_MULTI_PRECISION )
 	target_link_libraries(lqcdReweighting MultiprecisionReweighting Parameters_MultiprecisionReweighting IO_MultiprecisionReweighting ${StAT_USED_LIBS})
 else( USE_REW_MULTI_PRECISION )
 	target_link_libraries(lqcdReweighting Reweighting Parameters_Reweighting IO_Reweighting ${StAT_USED_LIBS})
-endif( USE_REW_MULTI_PRECISION )	
+endif( USE_REW_MULTI_PRECISION )
 
 
 #include scripts-directory
 add_subdirectory("${CMAKE_SOURCE_DIR}/Scripts")
-
-
-

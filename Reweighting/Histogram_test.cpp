@@ -529,11 +529,6 @@ BOOST_AUTO_TEST_SUITE(buildProbDist)
         histEst.insert(6.0, {1.7, 1.5, 2.1});
         ErrorCalculationMethod errormethod{bootstrap};
         ProbabilityDistribution probDist(hist, histEst, errormethod);
-        for (int i = 0; i < probDist.getNumberOfBins(); i++) {
-            double middleOfBin = probDist.getBins().at(i).first + 0.5 * binsize;
-            EstimateAndError estErr = probDist.getHeightsOfBins().at(i);
-            std::cout << middleOfBin << " : " << estErr.estimate << " +/-" << estErr.error << std::endl;
-        }
     }
 
 BOOST_AUTO_TEST_SUITE_END()

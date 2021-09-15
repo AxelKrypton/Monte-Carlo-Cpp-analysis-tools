@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014 Christopher Pinke
- *  Copyright (c) 2014-2015,2018,2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2018,2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_SUITE(defaults)
     static Parameters createParametersForDefaultCheck()
     {
         int numberOfArguments = 2;
-        const char* arguments[] = {"foo", "-f dummyFile"};
+        const char* arguments[] = {"foo", "-fdummyFile"};
         return Parameters(numberOfArguments, arguments);
     }
 
@@ -123,6 +123,12 @@ BOOST_AUTO_TEST_SUITE(defaults)
     {
         int column_default = 1;
         BOOST_REQUIRE_EQUAL(column_default, createParametersForDefaultCheck().column);
+    }
+
+    BOOST_AUTO_TEST_CASE(columnNumber)
+    {
+        int column_number_default = 1;
+        BOOST_REQUIRE_EQUAL(column_number_default, createParametersForDefaultCheck().numberOfColumnsToBeConsidered);
     }
 
     BOOST_AUTO_TEST_CASE(isMeanKnownToBeZero)
@@ -233,7 +239,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument = argumentName + "=" + boost::lexical_cast<std::string>(newValue);
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument.c_str()};
         return Parameters(numberOfArguments, arguments);
     }
 
@@ -241,7 +247,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument = argumentName + boost::lexical_cast<std::string>(newValue);
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument.c_str()};
         return Parameters(numberOfArguments, arguments);
     }
 
@@ -315,11 +321,32 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_shortOption(argumentName, newValue).column);
     }
 
+    BOOST_AUTO_TEST_CASE(columnNumber)
+    {
+        int newValue = 999;
+        std::string argumentName = "--numberOfColumns";
+        BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).numberOfColumnsToBeConsidered);
+    }
+
+    BOOST_AUTO_TEST_CASE(columnNumber_invalidArgument1)
+    {
+        int numberOfArguments = 5;
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfColumns=16", "--binsizeCentralMoments=3", "500"};
+        BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
+    }
+
+    BOOST_AUTO_TEST_CASE(columnNumber_invalidArgument2)
+    {
+        int numberOfArguments = 5;
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfColumns=16", "--numberOfBinsCentralMoments=1", "111"};
+        BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
+    }
+
     static Parameters createParametersForArgumentSettingCheck_implicitOption(std::string argumentName)
     {
         std::string argument = argumentName;
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument.c_str()};
         return Parameters(numberOfArguments, arguments);
     }
 
@@ -353,7 +380,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         std::string argument1 = "--binsize=" + boost::lexical_cast<std::string>(newValueBinsize);
         std::string argument2 = "--numberOfBins=" + boost::lexical_cast<std::string>(newValueBinsize);
         int numberOfArguments = 4;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), argument2.c_str()};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -363,7 +390,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 
         std::string argument1 = "--binsize=" + boost::lexical_cast<std::string>(newValueBinsize);
         int numberOfArguments = 5;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), "--numberOfBinsMoments=2", "20"};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), "--numberOfBinsMoments=2", "20"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -373,7 +400,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
 
         std::string argument1 = "--numberOfBins=" + boost::lexical_cast<std::string>(newValueNumberOfBins);
         int numberOfArguments = 5;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), "--binsizeCentralMoments=3", "500"};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), "--binsizeCentralMoments=3", "500"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -381,7 +408,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument1 = "--binsizeMoments";
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str()};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
     }
 
@@ -392,7 +419,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
          *    http://stackoverflow.com/questions/2539077/boost-program-options-parsing-multiple-argument-list
          */
         int numberOfArguments = 7;
-        const char* arguments[] = {"foo", "-f dummyFile", "--binsizeMoments=1", "100", "2", "200", "3"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--binsizeMoments=1", "100", "2", "200", "3"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -405,7 +432,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         referenceValue.push_back(100);
         referenceValue.push_back(400);
         int numberOfArguments = 6;
-        const char* arguments[] = {"foo", "-f dummyFile", "--binsizeMoments=1", "200", "4", "400"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--binsizeMoments=1", "200", "4", "400"};
         BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
         Parameters parameters(numberOfArguments, arguments);
         BOOST_REQUIRE(parameters.binsizeMoments == referenceValue);
@@ -415,14 +442,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument1 = "--binsizeCentralMoments";
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str()};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
     }
 
     BOOST_AUTO_TEST_CASE(binsizeCentralMoments2)
     {
         int numberOfArguments = 7;
-        const char* arguments[] = {"foo", "-f dummyFile", "--binsizeCentralMoments=1", "100", "2", "200", "3"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--binsizeCentralMoments=1", "100", "2", "200", "3"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -435,7 +462,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         referenceValue.push_back(100);
         referenceValue.push_back(400);
         int numberOfArguments = 6;
-        const char* arguments[] = {"foo", "-f dummyFile", "--binsizeCentralMoments=1", "200", "4", "400"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--binsizeCentralMoments=1", "200", "4", "400"};
         BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
         Parameters parameters(numberOfArguments, arguments);
         BOOST_REQUIRE(parameters.binsizeCentralMoments == referenceValue);
@@ -445,14 +472,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument1 = "--numberOfBinsMoments";
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str()};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
     }
 
     BOOST_AUTO_TEST_CASE(numberOfBinsMoments2)
     {
         int numberOfArguments = 7;
-        const char* arguments[] = {"foo", "-f dummyFile", "--numberOfBinsMoments=1", "10", "2", "20", "3"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfBinsMoments=1", "10", "2", "20", "3"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -465,7 +492,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         referenceValue.push_back(10);
         referenceValue.push_back(40);
         int numberOfArguments = 6;
-        const char* arguments[] = {"foo", "-f dummyFile", "--numberOfBinsMoments=1", "20", "4", "40"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfBinsMoments=1", "20", "4", "40"};
         BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
         Parameters parameters(numberOfArguments, arguments);
         BOOST_REQUIRE(parameters.numberOfBinsMoments == referenceValue);
@@ -475,14 +502,14 @@ BOOST_AUTO_TEST_SUITE(setArguments)
     {
         std::string argument1 = "--numberOfBinsCentralMoments";
         int numberOfArguments = 3;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str()};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::logic_error);
     }
 
     BOOST_AUTO_TEST_CASE(numberOfBinsCentralMoments2)
     {
         int numberOfArguments = 7;
-        const char* arguments[] = {"foo", "-f dummyFile", "--numberOfBinsCentralMoments=1", "10", "2", "20", "3"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfBinsCentralMoments=1", "10", "2", "20", "3"};
         BOOST_REQUIRE_THROW(Parameters parameters(numberOfArguments, arguments), std::invalid_argument);
     }
 
@@ -495,7 +522,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         referenceValue.push_back(10);
         referenceValue.push_back(40);
         int numberOfArguments = 6;
-        const char* arguments[] = {"foo", "-f dummyFile", "--numberOfBinsCentralMoments=1", "20", "4", "40"};
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfBinsCentralMoments=1", "20", "4", "40"};
         BOOST_REQUIRE_NO_THROW(Parameters parameters(numberOfArguments, arguments));
         Parameters parameters(numberOfArguments, arguments);
         BOOST_REQUIRE(parameters.numberOfBinsCentralMoments == referenceValue);
@@ -508,7 +535,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         std::string argument1 = "--calcAutocorrelation=" + boost::lexical_cast<std::string>(newValue);
         std::string argument2 = "--timeMaxAutocorrelationFunction=10";
         int numberOfArguments = 4;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), argument2.c_str()};
         Parameters parameters(numberOfArguments, arguments);
         BOOST_CHECK_EQUAL(newValue, parameters.calcAutocorrelation);
     }
@@ -520,7 +547,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         std::string argument1 = "--calcAutocorrelation";
         std::string argument2 = "--timeMaxAutocorrelationFunction=10";
         int numberOfArguments = 4;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), argument2.c_str()};
         Parameters parameters(numberOfArguments, arguments);
         BOOST_CHECK_EQUAL(newValue, parameters.calcAutocorrelation);
     }
@@ -532,7 +559,7 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         std::string argument1 = "-a" + boost::lexical_cast<std::string>(newValue);
         std::string argument2 = "--timeMaxAutocorrelationFunction=10";
         int numberOfArguments = 4;
-        const char* arguments[] = {"foo", "-f dummyFile", argument1.c_str(), argument2.c_str()};
+        const char* arguments[] = {"foo", "-fdummyFile", argument1.c_str(), argument2.c_str()};
         Parameters parameters(numberOfArguments, arguments);
         BOOST_CHECK_EQUAL(newValue, parameters.calcAutocorrelation);
     }
@@ -647,4 +674,99 @@ BOOST_AUTO_TEST_SUITE(setArguments)
         std::string argumentName = "--adjustDataSampleSizeToBinning";
         BOOST_CHECK_EQUAL(newValue, createParametersForArgumentSettingCheck_longOption(argumentName, newValue).binningMustFitDataSampleSize);
     }
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(getBinsizeForAnalysis)
+
+    template<typename T> void buildBinningParameterForAnalysisAndTest(const Parameters& parameters, int referenceValue)
+    {
+        auto binningParameters = parameters.getBinningParametersForAnalysis<T>();
+        BOOST_REQUIRE_EQUAL(binningParameters.number, referenceValue);
+    }
+    void testBinningParametersForQuantities(const Parameters& parameters, std::vector<int> referenceValues)
+    {
+        buildBinningParameterForAnalysisAndTest<Mean>(parameters, referenceValues[0]);
+        buildBinningParameterForAnalysisAndTest<Variance>(parameters, referenceValues[1]);
+        buildBinningParameterForAnalysisAndTest<Skewness>(parameters, referenceValues[2]);
+        buildBinningParameterForAnalysisAndTest<Kurtosis>(parameters, referenceValues[3]);
+    }
+
+    BOOST_AUTO_TEST_CASE(binsizeMoments1)
+    {
+        int numberOfArguments = 10;
+        const char* arguments[] = {"foo", "-fdummyFile", "--binsizeMoments=1", "111", "2", "222", "3", "333", "4", "444"};
+        Parameters parameters(numberOfArguments, arguments);
+        // Other quantites use central moment default value here
+        std::vector<int> referenceValues = {111, parameters.binsize, parameters.binsize, parameters.binsize};
+        testBinningParametersForQuantities(parameters, referenceValues);
+    }
+
+    BOOST_AUTO_TEST_CASE(binsizeMoments2)
+    {
+        int numberOfArguments = 10;
+        const char* arguments[] = {"foo", "-fdummyFile", "--binsizeCentralMoments=1", "111", "2", "2222", "3", "3333", "4", "444"};
+        Parameters parameters(numberOfArguments, arguments);
+        std::vector<int> referenceValues = {parameters.binsize, 2222, 3333, 2222};  // default for mean since it does not use central moment!
+        testBinningParametersForQuantities(parameters, referenceValues);
+    }
+
+    BOOST_AUTO_TEST_CASE(binsizeMoments3)
+    {
+        int numberOfArguments = 11;
+        const char* arguments[]
+            = {"foo", "-fdummyFile", "--binsizeMoments=1", "1111", "2", "222", "3", "333", "4", "444", "--numberOfColumns=16"};
+        Parameters parameters(numberOfArguments, arguments);
+        std::vector<int> referenceValues = {1111, 1111, 1111, 1111};
+        testBinningParametersForQuantities(parameters, referenceValues);
+    }
+
+    BOOST_AUTO_TEST_CASE(binsizeMoments4)
+    {
+        int numberOfArguments = 12;
+        const char* arguments[] = {"foo", "-fdummyFile",          "--binsizeMoments=1",   "1111", "2", "222", "3", "333", "4",
+                                   "444", "--numberOfColumns=16", "--isMeanKnownToBeZero"};
+        Parameters parameters(numberOfArguments, arguments);
+        std::vector<int> referenceValues = {1111, 222, 333, 444};
+        testBinningParametersForQuantities(parameters, referenceValues);
+    }
+
+    BOOST_AUTO_TEST_CASE(numberOfBins1)
+    {
+        int numberOfArguments = 10;
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfBinsMoments=1", "11", "2", "22", "3", "33", "4", "44"};
+        Parameters parameters(numberOfArguments, arguments);
+        // Other quantites use central moment default value here
+        std::vector<int> referenceValues = {11, parameters.numberOfBins, parameters.numberOfBins, parameters.numberOfBins};
+        testBinningParametersForQuantities(parameters, referenceValues);
+    }
+
+    BOOST_AUTO_TEST_CASE(numberOfBins2)
+    {
+        int numberOfArguments = 10;
+        const char* arguments[] = {"foo", "-fdummyFile", "--numberOfBinsCentralMoments=1", "11", "2", "22", "3", "33", "4", "4"};
+        Parameters parameters(numberOfArguments, arguments);
+        std::vector<int> referenceValues = {parameters.numberOfBins, 22, 22, 4};  // default for mean since it does not use central moment!
+        testBinningParametersForQuantities(parameters, referenceValues);
+    }
+
+    BOOST_AUTO_TEST_CASE(numberOfBins3)
+    {
+        int numberOfArguments = 11;
+        const char* arguments[]
+            = {"foo", "-fdummyFile", "--numberOfBinsMoments=1", "11", "2", "22", "3", "33", "4", "44", "--numberOfColumns=16"};
+        Parameters parameters(numberOfArguments, arguments);
+        std::vector<int> referenceValues = {11, 11, 11, 11};
+        testBinningParametersForQuantities(parameters, referenceValues);
+    }
+
+    BOOST_AUTO_TEST_CASE(numberOfBins4)
+    {
+        int numberOfArguments = 12;
+        const char* arguments[] = {"foo", "-fdummyFile",          "--numberOfBinsMoments=1", "11", "2", "222", "3", "33", "4",
+                                   "44",  "--numberOfColumns=16", "--isMeanKnownToBeZero"};
+        Parameters parameters(numberOfArguments, arguments);
+        std::vector<int> referenceValues = {11, 222, 33, 44};
+        testBinningParametersForQuantities(parameters, referenceValues);
+    }
+
 BOOST_AUTO_TEST_SUITE_END()

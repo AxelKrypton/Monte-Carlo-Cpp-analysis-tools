@@ -20,18 +20,17 @@
 
 #include "binning.hpp"
 
+#include "../types.hpp"
 #include "binnedDataSample.hpp"
 
-DataSample performBinning(DataSample& rawData, const Parameters parameters)
+DataSample performBinning(DataSample& rawData, const BinningParameters& parameters)
 {
-    if (! parameters.doNotUseBinning) {
-        std::cout << "# Perform binning on data sample..." << std::endl;
-        if (parameters.useNumberOfBinsForBinning) {
-            return performBinningFromNumberOfBins(
-                rawData, parameters.numberOfBins, parameters.adjustDataSampleSizeToBinning, parameters.binningMustFitDataSampleSize);
+    if (parameters.performBinning) {
+        DEBUG(std::cout << "# Perform binning on data sample..." << std::endl);
+        if (parameters.useNumberOfBins) {
+            return performBinningFromNumberOfBins(rawData, parameters.number, parameters.adjustDataSample, parameters.binningMustFitDataSample);
         } else {
-            return performBinningFromBinsize(
-                rawData, parameters.binsize, parameters.adjustDataSampleSizeToBinning, parameters.binningMustFitDataSampleSize);
+            return performBinningFromBinsize(rawData, parameters.number, parameters.adjustDataSample, parameters.binningMustFitDataSample);
         }
     } else {
         throw std::invalid_argument("Binning requested, but have different inputparameters!");
@@ -46,7 +45,7 @@ performBinningFromNumberOfBins(DataSample& rawData, int numberOfBins, bool adjus
 
     resizeRawDataSample(rawData, binnedData, adjustDataSampleSizeToBinning);
 
-    return binnedData;
+    return std::move(binnedData);  // https://stackoverflow.com/a/55924926
 }
 
 DataSample performBinningFromBinsize(DataSample& rawData, int binsize, bool adjustDataSampleSizeToBinning, bool binningMustFitDataSampleSize)
@@ -56,5 +55,5 @@ DataSample performBinningFromBinsize(DataSample& rawData, int binsize, bool adju
 
     resizeRawDataSample(rawData, binnedData, adjustDataSampleSizeToBinning);
 
-    return binnedData;
+    return std::move(binnedData);  // https://stackoverflow.com/a/55924926
 }

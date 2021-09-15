@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2014-2015,2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2020-2021 Alessandro Sciarra
  *  Copyright (c) 2015 Christopher Pinke
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 
 #include "SimulationDataContainer.hpp"
 
+#include "../Quantities/Tools.hpp"
 #include "../dataAnalysisUtilities/binnedDataSample.hpp"
 
 #include <algorithm>
@@ -34,7 +35,6 @@ static bool mapCompare(const std::map<std::string, realFloat>&, const std::map<s
 static bool isAnyMapEmpty(std::vector<std::map<std::string, realFloat>>);
 static void extractInformationFromFile(std::string fileIn, std::vector<std::string>& dataFilenames,
                                        std::vector<std::map<std::string, realFloat>>& dataParameters);
-static DataSample getMomentUsingMultipleColumns(const int, std::vector<DataSample>);
 static DataSampleBasic getRandomlyOneDataPerBinFromDataSample(DataSampleBasic, const int, bool, std::default_random_engine* = NULL);
 /*****************************************************************************************/
 
@@ -122,44 +122,36 @@ std::vector<int> SimulationDataContainer::getNumberOfEntriesLeftOut(std::vector<
 SimulationDataContainer
 SimulationDataContainer::buildAndGetMomentsPerData(std::vector<unsigned int> whichMoments, unsigned int ignoreFirstNColumns,
                                                    std::vector<unsigned int> columnsForWhichMultipleColumnsForMomentsAreUsed,
-                                                   unsigned int maximumMomentNeededOverall)
+                                                   unsigned int numberOfMultipleColumns)
 {
     SimulationDataContainer newSimDataCont(*this);
     for (size_t i = 0; i < columnsForWhichMultipleColumnsForMomentsAreUsed.size(); i++) {
         if (columnsForWhichMultipleColumnsForMomentsAreUsed[i] < ignoreFirstNColumns)
-            throw std::logic_error(
-                "In \"buildAndGetMomentsPerData\" asked to use multiple columns in building moments of an ignored column!");
+            throw std::logic_error("Asked to use multiple columns in building moments of an ignored column!");
     }
 
     for (size_t i = 0; i < simulationDataSet.size(); i++) {
         if ((int)ignoreFirstNColumns >= simulationDataSet[i].getNumberOfDataSample())
-            throw std::logic_error("In \"buildAndGetMomentsPerData\" asked to ignore all columns or more!");
+            throw std::logic_error("Asked to ignore all columns or more in \"" + std::string(__FUNCTION__) + "\" function.");
         for (int j = ignoreFirstNColumns; j < simulationDataSet[i].getNumberOfDataSample(); /*increment in cases below*/) {
             if (find(columnsForWhichMultipleColumnsForMomentsAreUsed.begin(), columnsForWhichMultipleColumnsForMomentsAreUsed.end(), j)
                 == columnsForWhichMultipleColumnsForMomentsAreUsed.end()) {
                 for (size_t k = 0; k < whichMoments.size(); k++) {
                     DataSample temporarySample = newSimDataCont.simulationDataSet[i][j];
-                    newSimDataCont.simulationDataSet[i].appendNewColumnOfData(temporarySample ^ (int)whichMoments[k]);
+                    newSimDataCont.simulationDataSet[i].appendNewColumnOfData(temporarySample ^ static_cast<int>(whichMoments[k]));
                 }
                 j++;
             } else {
-                unsigned int maxMoment = (maximumMomentNeededOverall == 0) ? *max_element(whichMoments.begin(), whichMoments.end())
-                                                                           : maximumMomentNeededOverall;
-                if (int(j + maxMoment - 1) >= simulationDataSet[i].getNumberOfDataSample())
-                    throw std::out_of_range("Columns specified not valid to add specified moments using multipleColumns!");
-                std::vector<DataSample> temporarySamples;
-                for (size_t h = 0; h < maxMoment; h++)
-                    temporarySamples.push_back(simulationDataSet[i][j + h]);
-                for (size_t k = 0; k < whichMoments.size(); k++) {
-                    // If the moments is the first we have to copy all the columns at the end
-                    if (whichMoments[k] == 1) {
-                        for (size_t h = 0; h < temporarySamples.size(); h++)
-                            newSimDataCont.simulationDataSet[i].appendNewColumnOfData(temporarySamples[h]);
-                    } else
-                        newSimDataCont.simulationDataSet[i].appendNewColumnOfData(getMomentUsingMultipleColumns(
-                            whichMoments[k], temporarySamples));
-                }
-                j += maxMoment;
+                if (int(j + numberOfMultipleColumns - 1) >= simulationDataSet[i].getNumberOfDataSample())
+                    throw std::out_of_range("Not enough columns found after column " + std::to_string(j)
+                                            + " to calculate moments using multiple estimates!");
+                std::vector<DataSample> observableEstimates(numberOfMultipleColumns);
+                for (auto h = 0U; h < observableEstimates.size(); h++)
+                    observableEstimates[h] = simulationDataSet[i][j + h];
+                for (size_t k = 0; k < whichMoments.size(); k++)
+                    newSimDataCont.simulationDataSet[i].appendNewColumnOfData(getUnbiasEstimateOfNthMoment(
+                        observableEstimates, whichMoments[k]));
+                j += numberOfMultipleColumns;
             }
         }
     }
@@ -258,30 +250,6 @@ static bool isAnyMapEmpty(std::vector<std::map<std::string, realFloat>> dataPara
             return true;
     }
     return false;
-}
-
-static DataSample getMomentUsingMultipleColumns(const int moment, std::vector<DataSample> tempSamples)
-{
-    if ((int)tempSamples.size() < moment)
-        throw std::invalid_argument("Too few columns given to estimate the desired moment!");
-
-    // TODO: Implement the following in a general way with recursive functions
-    if (tempSamples.size() == 4) {
-        if (moment == 1)
-            return (tempSamples[0] + tempSamples[1] + tempSamples[2] + tempSamples[3]) / (realFloat)4.0;
-        else if (moment == 2)
-            return ((tempSamples[0] * tempSamples[1]) + (tempSamples[0] * tempSamples[2]) + (tempSamples[0] * tempSamples[3])
-                    + (tempSamples[1] * tempSamples[2]) + (tempSamples[1] * tempSamples[3]) + (tempSamples[2] * tempSamples[3]))
-                   / (realFloat)6.0;
-        else if (moment == 3)
-            return ((tempSamples[0] * tempSamples[1] * tempSamples[2]) + (tempSamples[0] * tempSamples[1] * tempSamples[3])
-                    + (tempSamples[0] * tempSamples[2] * tempSamples[3]) + (tempSamples[1] * tempSamples[2] * tempSamples[3]))
-                   / (realFloat)4.0;
-        else
-            return tempSamples[0] * tempSamples[1] * tempSamples[2] * tempSamples[3];
-    } else {
-        throw std::invalid_argument("Calculation of moments using multiple columns not yet implemented in the asked case!");
-    }
 }
 
 static DataSampleBasic getRandomlyOneDataPerBinFromDataSample(DataSampleBasic dataSetIn, const int numberOfBins, bool sameIndecesAsLastTime,

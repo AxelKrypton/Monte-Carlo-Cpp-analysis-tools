@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2014-2015,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2019-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #ifndef SIMULATIONCONTAINERDATA_HPP_
 #define SIMULATIONCONTAINERDATA_HPP_
 
-#include "../dataAnalysisUtilities/Observables.hpp"
+#include "../Quantities/Quantities.hpp"
 #include "SimulationData.hpp"
 
 #include <random>
@@ -35,10 +35,9 @@ class SimulationDataContainer {
                                                              std::default_random_engine* generator = NULL);
     std::vector<int> getNumberOfEntriesLeftOut(std::vector<int> parameterToBeUsed);
     SimulationData& operator[](int index);
-    SimulationDataContainer
-    buildAndGetMomentsPerData(std::vector<unsigned int> whichMoments, unsigned int ignoreFirstNColumns,
-                              std::vector<unsigned int> columnsForWhichMultipleColumnsForMomentsAreUsed = std::vector<unsigned int>(),
-                              unsigned int maximumMomentNeededOverall = 0);
+    SimulationDataContainer buildAndGetMomentsPerData(std::vector<unsigned int> whichMoments, unsigned int ignoreFirstNColumns,
+                                                      std::vector<unsigned int> columnsForWhichMultipleColumnsForMomentsAreUsed,
+                                                      unsigned int numberOfMultipleColumns);
 
   private:
     std::vector<SimulationData> simulationDataSet;

@@ -36,20 +36,18 @@ class BinnedDataSample : public DataSample {
      * p.52.
      */
     DataSampleBasic performBinning(DataSampleBasic sampleIn);
-    void checkDiscardedElements(int valueIn, std::string descriptionIn, int elementsOfSample);
+    void checkDiscardedElements(int valueIn, int elementsOfSample);
 
     int numberOfBins;
     int binsize;
     int discardedElements;
     bool binningMustFitSize;
     bool binningFitsBinsize;
-    bool warningOutput;
 };
 
 class BinnedDataSampleFromNumberOfBins : public BinnedDataSample {
   public:
-    BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn, bool requireBinningToMatchSize = false,
-                                     bool warningOutputIn = true);
+    BinnedDataSampleFromNumberOfBins(DataSampleBasic sampleIn, int numberOfBinsIn, bool requireBinningToMatchSize = false);
 
   protected:
     void checkIfNumberOfBinsIsValid(int elementsOfSample);
@@ -58,7 +56,7 @@ class BinnedDataSampleFromNumberOfBins : public BinnedDataSample {
 
 class BinnedDataSampleFromBinsize : public BinnedDataSample {
   public:
-    BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsize, bool requireBinningToMatchSize = false, bool warningOutputIn = true);
+    BinnedDataSampleFromBinsize(DataSampleBasic sampleIn, int binsize, bool requireBinningToMatchSize = false);
 
   protected:
     void checkIfBinsizeIsValid(int elementsOfSample);

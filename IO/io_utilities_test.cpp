@@ -1,7 +1,7 @@
 /*
  *
  *  Copyright (c) 2014 Christopher Pinke
- *  Copyright (c) 2020 Alessandro Sciarra
+ *  Copyright (c) 2020-2021 Alessandro Sciarra
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,22 +25,37 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(filenameForObservables)
+BOOST_AUTO_TEST_CASE(filenameForObservable)
 {
-    std::string dummyFilename = "foo";
-    const char* arguments[] = {"foo", dummyFilename.c_str()};
-    Parameters parameters(2, arguments);
-
-    std::string expectedName = parameters.analysisOutputFilePrefix + dummyFilename + parameters.analysisOutputFilePostfix;
+    std::string dummyFilename = "foo.dat";
+    std::string expectedName = "foo_quantities.dat";
+    Parameters parameters({"foo", dummyFilename.c_str(), "--calcAutocorrelation", "--timeMaxAutocorrelationFunction=10"});
 
     BOOST_CHECK(expectedName == getFilenameForObservables(parameters));
 }
 
-BOOST_AUTO_TEST_CASE(writeEstimateAndErrorToFile_invalidArgument)
+BOOST_AUTO_TEST_CASE(filenameForObservableNoExtension)
+{
+    std::string dummyFilename = "foo";
+    std::string expectedName = "foo_quantities";
+    Parameters parameters({"foo", dummyFilename.c_str(), "--calcAutocorrelation", "--timeMaxAutocorrelationFunction=10"});
+
+    BOOST_CHECK(expectedName == getFilenameForObservables(parameters));
+}
+
+BOOST_AUTO_TEST_CASE(filenameForAutocorrelation)
+{
+    std::string dummyFilename = "foo.dat";
+    std::string expectedName = "foo_autocorrelation.dat";
+    Parameters parameters({"foo", dummyFilename.c_str(), "--calcAutocorrelation", "--timeMaxAutocorrelationFunction=10"});
+
+    BOOST_CHECK(expectedName == getFilenameForAutocorrelation(parameters));
+}
+
+BOOST_AUTO_TEST_CASE(writeToFile_invalidArgument)
 {
     std::string fileThatCannotBeOpened = "";
-    const char* arguments[] = {"foo", fileThatCannotBeOpened.c_str()};
-    Parameters parameters(2, arguments);
+    Parameters parameters({"foo", fileThatCannotBeOpened.c_str()});
 
-    BOOST_REQUIRE_THROW(writeEstimateAndErrorToFile(fileThatCannotBeOpened, 0., 0., fileThatCannotBeOpened), std::invalid_argument);
+    BOOST_REQUIRE_THROW(writeEstimateAndErrorArraysToFile({}, fileThatCannotBeOpened), std::invalid_argument);
 }

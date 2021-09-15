@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright (c) 2014-2015,2019-2020 Alessandro Sciarra
+ *  Copyright (c) 2014-2015,2019-2021 Alessandro Sciarra
  *  Copyright (c) 2019 David Leemueller
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 
 #include "MomentsReweighterHelper.hpp"
 
+#include "../Quantities/Moments.hpp"
 #include "../dataAnalysisUtilities/binnedDataSample.hpp"
 #include "MomentsReweighter.hpp"
 #include "SimulationData.hpp"
@@ -55,7 +56,6 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
     , namesOfParametersIgnoringMetaParameters(rawDataForReweightingAndMetainformation.namesOfParametersIgnoringMetaParameters)
     , valuesOfSimulationParametersIgnoringMetaParameters(
           rawDataForReweightingAndMetainformation.valuesOfSimulationParametersIgnoringMetaParameters)
-    , columnsToBeReweightedUsingMultipleColumns(rawDataForReweightingAndMetainformation.columnsToBeReweightedUsingMultipleColumns)
     , momentsToBeReweighted(rawDataForReweightingAndMetainformation.momentsToBeReweighted)
     , maximumMomentNeededOverall(rawDataForReweightingAndMetainformation.maximumMomentNeededOverall)
     , errorMethod(rawDataForReweightingAndMetainformation.errorMethod)
@@ -66,36 +66,24 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
     std::vector<int> entriesToBeCutFromRawData;
     setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, rawDataForReweightingAndMetainformation.binsizesToBeUsedForBinning,
                                                  errorMethod, numberOfBinsToBeUsed, entriesToBeCutFromRawData);
-    // Evaluate central moments per data and append them to the raw data container
     if (momentsToBeReweighted.empty())
         throw std::logic_error("MomentsReweighterHelper asked to be built without any moment to be reweighted! Aborting...");
-    if (! columnsToBeReweightedUsingMultipleColumns.empty()) {
-        std::sort(columnsToBeReweightedUsingMultipleColumns.begin(), columnsToBeReweightedUsingMultipleColumns.end());
-        for (size_t i = 1; i < columnsToBeReweightedUsingMultipleColumns.size(); i++) {
-            if (columnsToBeReweightedUsingMultipleColumns[i] - columnsToBeReweightedUsingMultipleColumns[i - 1] < maximumMomentNeededOverall)
-                throw std::invalid_argument("obsToBeRewUsingMultipleColumns contains columns too close (distance<"
-                                            + std::to_string(maximumMomentNeededOverall) + ")!");
-        }
-        unsigned int numberOfColumnsWithObservables
-            = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
-        if (numberOfColumnsWithObservables - columnsToBeReweightedUsingMultipleColumns.back() + 1 < maximumMomentNeededOverall)
-            throw std::invalid_argument("Not enough columns to be used for single observable (in col. "
-                                        + std::to_string(columnsToBeReweightedUsingMultipleColumns.back()) + ")!");
-    }
 
     // Here I set the number of "real" observables given as input (neglecting the multiple columns)
+    auto columnsToBeReweightedUsingMultipleColumns = rawDataForReweightingAndMetainformation.columnsToBeReweightedUsingMultipleColumns;
+    auto numberOfMultipleColumns = rawDataForReweightingAndMetainformation.numberOfMultipleColumns;
     numberOfObservablesGivenAsInput = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
     std::cout << "Obs. given as input counting multiple = " << numberOfObservablesGivenAsInput << "\n";
     numberOfObservablesGivenAsInput -= columnsToBeReweightedUsingMultipleColumns.size()
-                                       * (maximumMomentNeededOverall - 1);  // neglect multiple columns (count one column only)
+                                       * (numberOfMultipleColumns - 1);  // neglect multiple columns (count one column only)
     std::cout << "Obs. given as input NOT counting multiple = " << numberOfObservablesGivenAsInput << "\n";
-
     if (numberOfObservablesGivenAsInput == 0)
         throw std::logic_error("MomentsReweighterHelper asked to be built without any observable as input! Aborting...");
 
+    // Evaluate central moments per data and append them to the raw data container
     simulationRawDataContainer
         = simulationRawDataContainer.buildAndGetMomentsPerData(momentsToBeReweighted, namesOfParametersIgnoringMetaParameters.size(),
-                                                               columnsToBeReweightedUsingMultipleColumns, maximumMomentNeededOverall);
+                                                               columnsToBeReweightedUsingMultipleColumns, numberOfMultipleColumns);
     numberOfObservablesToBeReweighted = simulationRawDataContainer[0].getNumberOfDataSample() - namesOfParametersIgnoringMetaParameters.size();
 
     std::cout << "numberOfObservablesGivenAsInput = " << numberOfObservablesGivenAsInput << "\n";
