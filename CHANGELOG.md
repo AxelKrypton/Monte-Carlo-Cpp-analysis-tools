@@ -32,6 +32,9 @@ Although it will be often be the case, not every breaking change will result in 
 
 ## [Unreleased]
 
+
+## [Version 0.2] &ensp;<sub><sup>15 September 2021</sup></sub>
+
 * :white_check_mark: No multiple estimates per observable need to be handled _during_ and _after_ the reweighting. Lots of simplification in the code.
 * :new: Use of multiple estimate per observable is now supported and correctly implemented in the full codebase.
 * :boom: Header name of quantities has been changed and uniformly written in capital letters.
@@ -43,5 +46,6 @@ Although it will be often be the case, not every breaking change will result in 
 First release of the codebase.
 
 
-[Unreleased]: https://gitlab.itp.uni-frankfurt.de/lattice-qcd/ag-philipsen/lqcd-cpp-analysis-tools/-/compare/v0.1...develop
+[Unreleased]: https://gitlab.itp.uni-frankfurt.de/lattice-qcd/ag-philipsen/lqcd-cpp-analysis-tools/-/compare/v0.2...develop
+[Version 0.2]: https://gitlab.itp.uni-frankfurt.de/lattice-qcd/ag-philipsen/lqcd-cpp-analysis-tools/-/releases/v0.2
 [Version 0.1]: https://gitlab.itp.uni-frankfurt.de/lattice-qcd/ag-philipsen/lqcd-cpp-analysis-tools/-/releases/v0.1
