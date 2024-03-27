@@ -23,6 +23,7 @@
 #include "ReweighterIO.hpp"
 
 #include <boost/test/unit_test.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 static ReweighterIO createLqcdParameters(std::string filename, bool useJackknife = false)
 {
