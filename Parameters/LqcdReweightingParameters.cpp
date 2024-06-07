@@ -110,6 +110,21 @@ void LqcdReweightingParameters::checkParsedArguments(po::variables_map& vm, po::
                                             + std::to_string(numberOfMultipleColumnsForSingleObservable) + ")!");
         }
     }
+
+    if (! vm["useLinearObservableCorrection"].defaulted()) {
+        if (! vm["obsMultipleColumns"].defaulted()) {
+            throw std::invalid_argument("Using linear correction cannot be used with multiple columns per observable. Aborting!");
+        }
+        if (deactivateReweightingForVariance == false || deactivateReweightingForSkewness == false
+            || deactivateReweightingForKurtosis == false) {
+            std::cout << "\033[93m\n";
+            std::cout << "WARNING: Using linear correction can be used only for the reweighting of the mean.\n"
+                      << "         Reweighting of higher moments will be deactivated!\033[0m\n\n";
+            deactivateReweightingForVariance = true;
+            deactivateReweightingForSkewness = true;
+            deactivateReweightingForKurtosis = true;
+        }
+    }
 }
 
 void LqcdReweightingParameters::printParameters()
@@ -295,7 +310,7 @@ static std::string getHelpDescription(std::string option)
                        "in (beta - new_beta). More explicitly, the observable O in the reweighting equation will be "
                        "replaced by 'O + (beta - new_beta) * F' where F is a factor to be specified in separate files. "
                        "In particular, for each data file 'data.dat' an extra file 'aux_data.dat' at the same location "
-                       "must exist and such a file must contain on each line the values of F per trajectory. "
+                       "must exist and such a file must contain on each line the values of F per trajectory."
                        "ATTENTION: Usable only for mean reweighting and without multiple columns!";
     } else
         throw std::invalid_argument("Unknown option in \"getHelpDescription\" function!");
