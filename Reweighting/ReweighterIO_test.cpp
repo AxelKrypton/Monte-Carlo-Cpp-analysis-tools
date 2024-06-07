@@ -22,25 +22,30 @@
 #define BOOST_TEST_MODULE Reweighter
 #include "ReweighterIO.hpp"
 
-#include <boost/test/unit_test.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/test/unit_test.hpp>
 
-static ReweighterIO createLqcdParameters(std::string filename, bool useJackknife = false)
+static ReweighterIO createLqcdParameters(std::string filename, bool useJackknife = false, bool useObsLinearCorrection = false)
 {
-    int numberOfArguments = 3;
+    int numberOfArguments = 4;
     filename = std::string("-f" + filename);
-    std::string whichError;
+    std::string whichError, correction;
     if (useJackknife)
         whichError = "--useJackknifeAsErrorMethod";
     else
         whichError = "--useBootstrapAsErrorMethod";
-    const char* arguments[] = {"foo", filename.c_str(), whichError.c_str()};
+    if (useObsLinearCorrection)
+        correction = "--useLinearObservableCorrection=true";
+    else
+        correction = "--useLinearObservableCorrection=false";
+    const char* arguments[] = {"foo", filename.c_str(), whichError.c_str(), correction.c_str()};
     return ReweighterIO(LqcdReweightingParameters(numberOfArguments, arguments));
 }
 
 class ReweighterIOTester {
   public:
-    ReweighterIOTester(std::string filename, bool useJackknife = false) : reweighterIO(createLqcdParameters(filename, useJackknife)){};
+    ReweighterIOTester(std::string filename, bool useJackknife = false, bool useObsLinearCorrection = false)
+        : reweighterIO(createLqcdParameters(filename, useJackknife, useObsLinearCorrection)){};
     std::vector<std::string> getNamesOfParametersIgnoringMetaParameters() { return reweighterIO.namesOfParametersIgnoringMetaParameters; };
     std::vector<std::vector<realFloat>> getValuesOfSimulationParametersIgnoringMetaParameters()
     {
@@ -105,8 +110,7 @@ BOOST_AUTO_TEST_SUITE(build)
 
     BOOST_AUTO_TEST_CASE(build3)
     {
-        std::string fileThatDoesExist1
-            = "GeneralTestFiles/simulationDataContainer.configfile_1";  // This test should fail since on some line there is no binsize given!
+        std::string fileThatDoesExist1 = "GeneralTestFiles/simulationDataContainer.configfile_1";
         std::string fileThatDoesExist2 = "GeneralTestFiles/simulationDataContainer.configfile_2";
         std::string fileThatDoesExist3 = "GeneralTestFiles/simulationDataContainer.configfile_3";
         std::string fileThatDoesExist4 = "RealTestData/configfile_3";
@@ -182,6 +186,14 @@ BOOST_AUTO_TEST_SUITE(build)
         BOOST_REQUIRE_EQUAL(boost::lexical_cast<std::string>(gottenLogZ[1]), boost::lexical_cast<std::string>(referenceLogZ[1]));
         BOOST_REQUIRE(
             (boost::math::isnan)(gottenLogZ[2]));  // parenthesis around boost::math::isnan crucial otherwise the std lib macro is called!
+    }
+
+    BOOST_AUTO_TEST_CASE(build9)
+    {
+        // Test with auxiliary data
+        std::string fileThatDoesExist1 = "GeneralTestFiles/simulationDataContainer.configfile_1";
+        BOOST_REQUIRE_NO_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExist1, true, true));
+        BOOST_REQUIRE_NO_THROW(ReweighterIOTester reweighterIOTester(fileThatDoesExist1, false, true));
     }
 
 BOOST_AUTO_TEST_SUITE_END()

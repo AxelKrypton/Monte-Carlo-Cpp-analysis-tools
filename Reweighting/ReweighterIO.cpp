@@ -23,6 +23,7 @@
 
 #include "MomentsReweighterHelper.hpp"
 
+#include <filesystem>
 #include <regex>
 
 static std::vector<std::string> getNamesOfParametersIgnoringMetaParameters(SimulationData);
@@ -70,6 +71,15 @@ ReweighterIO::ReweighterIO(LqcdReweightingParameters parameters)
         bootstrapNumber = std::unique_ptr<int>(new int(parameters.getNumberOfBootstrapResample()));
     } else
         throw std::runtime_error("Error method unknown! This exception should never be thrown! Please investigate...");
+    // Read in auxiliary data if needed
+    if (parameters.getUseLinearObservableCorrection()) {
+        auxiliaryData = readFromFileDataContainer;
+        for (int i = 0; i < auxiliaryData->getNumberOfDatafiles(); i++) {
+            std::filesystem::path new_filename{auxiliaryData.value()[i].getDatafileName()};
+            new_filename.replace_filename("aux_" + new_filename.filename().string());
+            auxiliaryData.value()[i] = SimulationData{readFromFileDataContainer[0].getSimulationParameters(), new_filename.string()};
+        }
+    }
 }
 
 /*

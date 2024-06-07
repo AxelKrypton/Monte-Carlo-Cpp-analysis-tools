@@ -24,6 +24,7 @@
 
 #include "../Parameters/LqcdReweightingParameters.hpp"
 #include "SimulationDataContainer.hpp"
+#include <optional>
 
 class Binsizes {
   public:
@@ -98,6 +99,7 @@ class ReweighterIO {
     std::shared_ptr<int> bootstrapNumber;
     bool deactivateReweightingForProbabilityDistribution;
     realFloat binsizeProbabilityDistribution;
+    std::optional<SimulationDataContainer> auxiliaryData;
 };
 
 #endif /* REWEIGHTERIO_HPP_ */
