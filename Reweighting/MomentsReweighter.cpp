@@ -223,14 +223,50 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         std::default_random_engine generator(seed);
         int numberOfBootstrapEstForOutput = 0;
+        /*
+         * Store the number of columns per data file to setup bootstrap estimators with linear correction, if required
+         * NOTE: In this case, the raw data and the auxiliary data are in separate SimulationDataContainer objects,
+         *       but it is CRUCIAL to pick the same entries per column. Hence we use an ugly but effective trick:
+         *       We "merge" the two objects appending columns per file, then calculate the uncorrelated sample and
+         *       in the end extracting and deleting the added columns. TODO: Extract higher-level functionality.
+         */
+        std::vector<int> numberOfColumnsPerRawDataFile{};
+        if (momentsReweighterHelper.simulationAuxData) {
+            SimulationDataContainer& refToRawData = momentsReweighterHelper.simulationRawDataContainer;
+            for (int i = 0; i < refToRawData.getNumberOfDatafiles(); i++) {
+                numberOfColumnsPerRawDataFile.push_back(refToRawData[i].getNumberOfDataSample());
+            }
+        }
         for (int iBoot = 0; iBoot < (*(momentsReweighterHelper.bootstrapNumber)); iBoot++) {
             if (iBoot >= numberOfBootstrapEstForOutput) {
                 std::cout << "     - Calculating estimator number " << iBoot << "...\n" << std::flush;
                 numberOfBootstrapEstForOutput += *(momentsReweighterHelper.bootstrapNumber) / 10;
             }
+            if (momentsReweighterHelper.simulationAuxData) {
+                // Here we need to apply bootstrap to auxiliary data as done to the raw data, hence merge
+                // them into the raw data per each dataset at the end and then remove them afterwards
+                SimulationDataContainer& auxData = momentsReweighterHelper.simulationAuxData.value();
+                for (int i = 0; i < auxData.getNumberOfDatafiles(); i++) {
+                    for (int j = 0; j < auxData[i].getNumberOfDataSample(); j++) {
+                        momentsReweighterHelper.simulationRawDataContainer[i].appendNewColumnOfData(auxData[i][j]);
+                    }
+                }
+            }
             momentsReweighterHelper.simulationUncorrDataContainer
                 = momentsReweighterHelper.simulationRawDataContainer.getUncorrelatedSimulationDataSet(
                     momentsReweighterHelper.numberOfBinsToBeUsed, bootstrap, &generator);
+            if (momentsReweighterHelper.simulationAuxData) {
+                // Here we need to take out the uncorrelated aux data and remove the last columns from the raw data
+                SimulationDataContainer& auxData = momentsReweighterHelper.simulationAuxData.value();
+                SimulationDataContainer& auxUncorrData = momentsReweighterHelper.simulationAuxUncorrData.value();
+                for (int i = 0; i < auxData.getNumberOfDatafiles(); i++) {
+                    for (int j = 0; j < auxData[i].getNumberOfDataSample(); j++) {
+                        auxUncorrData[i][j] = momentsReweighterHelper.simulationUncorrDataContainer[i][numberOfColumnsPerRawDataFile[i]];
+                        momentsReweighterHelper.simulationUncorrDataContainer[i].deleteColumnOfData(numberOfColumnsPerRawDataFile[i]);
+                        momentsReweighterHelper.simulationRawDataContainer[i].deleteColumnOfData(numberOfColumnsPerRawDataFile[i]);
+                    }
+                }
+            }
             std::vector<realFloat> logZAtSimulatedPointsUsingUncorrData = calculateLogZAtSimulatedPoints(true, -1, &smartGuessForLogZ);
             std::vector<realFloat> logZAtNewPointsUsingUncorrData
                 = calculateLogZAtNewPoints(valuesOfNewParameters, true, -1, &logZAtSimulatedPointsUsingUncorrData);
@@ -565,8 +601,26 @@ MomentsReweighterAbstract::calculateReweightedObservableValues(bool useUncorrDat
                     logarithmOfDenominator = (indexSimulation2 == 0) ? newTerm : logarithmic_sum(logarithmOfDenominator, newTerm);
                 }
                 for (int indexObservable = 0; indexObservable < momentsReweighterHelper.numberOfObservablesToBeReweighted; indexObservable++) {
-                    realFloat newTerm = simDataCont[indexSimulation1][indexObservable + numberOfReweightingParameters][indexConfiguration]
-                                        - logarithmOfDenominator;
+                    realFloat newTerm = 0.0;
+                    if (momentsReweighterHelper.simulationAuxData) {
+                        SimulationDataContainer& auxDataCont = (useUncorrData) ? momentsReweighterHelper.simulationAuxUncorrData.value()
+                                                                               : momentsReweighterHelper.simulationAuxData.value();
+                        if (numberOfReweightingParameters != 1)
+                            throw std::runtime_error(
+                                "Code should have failed earlier with use of linear correction and not single-parameter reweighting!");
+                        // Here we need to take the exp of the observable which contains the log, add the linear correction
+                        // and then take again the logarithm, which is safe here as the shift has been done such that for
+                        // all corrections the corrected observable stays positive.
+                        const realFloat observable
+                            = exp(simDataCont[indexSimulation1][indexObservable + numberOfReweightingParameters][indexConfiguration]);
+                        const realFloat correction
+                            = auxDataCont[indexSimulation1][indexObservable][indexConfiguration]
+                              * (valuesOfNewParameters[indexNewPoint][0] - valuesOfSimulationParameters[indexSimulation1][0]);
+                        newTerm = log(observable + correction) - logarithmOfDenominator;
+                    } else {
+                        newTerm = simDataCont[indexSimulation1][indexObservable + numberOfReweightingParameters][indexConfiguration]
+                                  - logarithmOfDenominator;
+                    }
                     outputValuesOfObservables[indexNewPoint][indexObservable]
                         = (indexSimulation1 == 0 && (indexConfiguration == 0 || firstValue))
                               ? newTerm
@@ -574,17 +628,17 @@ MomentsReweighterAbstract::calculateReweightedObservableValues(bool useUncorrDat
                 }
 
                 /*
-                 * In the following the probability distributions are getting reweighted. For that only take the logarithms of the heights and
-                 * not of the binsizes, how one might think, since the observables are also log(simDataCont).
-                 * We do that because for a binsize < 1 the log(Binsize) would be negative.
-                 * So to still get correct results we temporarily exponentiate the observables and use them for filling the Histogram correctly.
+                 * In the following the probability distributions are getting reweighted. For that only take the logarithms of the
+                 * heights and not of the binsizes, how one might think, since the observables are also log(simDataCont). We do that
+                 * because for a binsize < 1 the log(Binsize) would be negative. So to still get correct results we temporarily
+                 * exponentiate the observables and use them for filling the Histogram correctly.
                  *
                  * Here we also deal with the logarithms of the height which is why we have to use logarithmic_sum.
-                 * As a condition whether we just set the height to the newHistoTerm or have to use the sum can't be that it's just the first iteration,
-                 * because here we have multiple histograms with multiple bins. So also after a few iterations they can be empty.
-                 * A better condition is just checking if the bin we want to fill is empty. Checking out a bin that doesn't exist will
-                 * create a new entry of the map which is empty. But that is not a problem because
-                 * immediately after checking a bin it will get filled.
+                 * As a condition whether we just set the height to the newHistoTerm or have to use the sum can't be that it's just the
+                 * first iteration, because here we have multiple histograms with multiple bins. So also after a few iterations they can
+                 * be empty. A better condition is just checking if the bin we want to fill is empty. Checking out a bin that doesn't
+                 * exist will create a new entry of the map which is empty. But that is not a problem because immediately after checking
+                 * a bin it will get filled.
                  */
                 if (momentsReweighterHelper.reweightProbabilityDistribution) {
                     for (int indexInputObservable = 0; indexInputObservable < momentsReweighterHelper.numberOfObservablesGivenAsInput;
@@ -623,15 +677,63 @@ MomentsReweighterAbstract::calculateReweightedObservableValues(bool useUncorrDat
 void MomentsReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<realFloat>& minimumOfEachObservable)
 {
     const int numberOfReweightingParameters = (int)reweightingParameterNames.size();
+    if (momentsReweighterHelper.simulationAuxData) {
+        if (numberOfReweightingParameters != 1)
+            throw std::invalid_argument("Use of linear correction in reweighting possible for single-parameter reweighting only.");
+    }
     // Estimate of minimum of each observable through all files
     for (int indexSimulation = 0; indexSimulation < momentsReweighterHelper.simulationRawDataContainer.getNumberOfDatafiles();
          indexSimulation++) {
         for (int indexObservable = numberOfReweightingParameters;
              indexObservable < momentsReweighterHelper.simulationRawDataContainer[indexSimulation].getNumberOfDataSample(); indexObservable++) {
-            if (momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable].min()
-                < minimumOfEachObservable[indexObservable - numberOfReweightingParameters])
-                minimumOfEachObservable[indexObservable - numberOfReweightingParameters]
-                    = momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable].min();
+            if (momentsReweighterHelper.simulationAuxData) {
+                /*
+                 * Here we want to estimate the "minimal" linear correction. The linear correction has the form
+                 * (beta_new - beta_sim) * F, where the factor comes from simulationAuxData object. Here beta_sim
+                 * is fixed and beta_new can be any of those chosen by the user. We then calculate all differences
+                 * (beta_new - beta_sim) and store the maximum delta_max and minimum delta_min. Then for each value
+                 * of F we either take F*delta_max or F*delta_min depending on the sign of F. There are in principle
+                 * six cases:
+                 * |----------------------------------------------------------|
+                 * |  F  |  delta_min  |  delta_max  |  "minimal" correction  |
+                 * |  >0 |      <0     |     >0      |    F * delta_min < 0   |
+                 * |  <0 |      <0     |     >0      |    F * delta_max < 0   |
+                 * |----------------------------------------------------------|
+                 * |  >0 |      >0     |     >0      |    F * delta_min > 0   |
+                 * |  >0 |      <0     |     <0      |    F * delta_min < 0   |
+                 * |----------------------------------------------------------|
+                 * |  <0 |      >0     |     >0      |    F * delta_max < 0   |
+                 * |  <0 |      <0     |     <0      |    F * delta_max > 0   |
+                 * |----------------------------------------------------------|
+                 *
+                 * NOTE: The auxiliary data container has no conjugated quantities and the column indices have to
+                 *       be adjusted accordingly.
+                 */
+                DataSampleBasic deltaBetas{static_cast<int>(valuesOfNewParameters.size())};
+                for (int i = 0; i < deltaBetas.getNumberOfElements(); i++)
+                    deltaBetas[i] = valuesOfNewParameters[i][0] - valuesOfSimulationParameters[indexSimulation][0];
+                const std::pair<realFloat, realFloat> distanceToOuterBetas{deltaBetas.min(), deltaBetas.max()};
+                DataSampleBasic linearCorrections{
+                    momentsReweighterHelper.simulationAuxData.value()[indexSimulation][indexObservable - numberOfReweightingParameters]
+                        .getNumberOfElements()};
+                for (int indexData = 0; indexData < linearCorrections.getNumberOfElements(); indexData++) {
+                    const auto value = momentsReweighterHelper.simulationAuxData
+                                           .value()[indexSimulation][indexObservable - numberOfReweightingParameters][indexData];
+                    if (value > 0)
+                        linearCorrections[indexData] = value * distanceToOuterBetas.first;
+                    else
+                        linearCorrections[indexData] = value * distanceToOuterBetas.second;
+                }
+                // Now look for minimum of observable with "minimal" linear correction
+                DataSampleBasic tmp = momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable] + linearCorrections;
+                if (tmp.min() < minimumOfEachObservable[indexObservable - numberOfReweightingParameters])
+                    minimumOfEachObservable[indexObservable - numberOfReweightingParameters] = tmp.min();
+            } else {
+                if (momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable].min()
+                    < minimumOfEachObservable[indexObservable - numberOfReweightingParameters])
+                    minimumOfEachObservable[indexObservable - numberOfReweightingParameters]
+                        = momentsReweighterHelper.simulationRawDataContainer[indexSimulation][indexObservable].min();
+            }
         }
     }
     // Shift, if necessary, and logarithm
@@ -663,9 +765,10 @@ void MomentsReweighterAbstract::prepareObservablesBeforeReweighting(std::vector<
             }
             for (int indexData = 0;
                  indexData < momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][indexObservable].getNumberOfElements();
-                 indexData++)
+                 indexData++) {
                 momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][indexObservable][indexData]
                     = log(momentsReweighterHelper.simulationUncorrDataContainer[indexSimulation][indexObservable][indexData]);
+            }
         }
     }
 }
