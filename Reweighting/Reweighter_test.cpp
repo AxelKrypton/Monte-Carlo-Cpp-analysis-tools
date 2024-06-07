@@ -455,6 +455,40 @@ BOOST_AUTO_TEST_SUITE(meanReweighting)
         }
     }
 
+    /*
+     * This is like the meanReweighting3 test, but this time with the observable linear correction switched
+     * on. However, the factors in the auxiliary data files are all zeroes and the reference values of the
+     * test must be the same as with the linear corrections switched off.
+    */
+   BOOST_AUTO_TEST_CASE(meanReweighting6)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_5";
+        std::initializer_list<std::string> options = {"-f" + fileThatDoesExist,
+                                                      "--useBootstrapAsErrorMethod",
+                                                      "--newBetaRange_low=5.348",
+                                                      "--newBetaRange_high=5.363",
+                                                      "--numberOfNewBetaPoints=51",
+                                                      "--deactivateReweightingForVariance",
+                                                      "--deactivateReweightingForSkewness",
+                                                      "--deactivateReweightingForKurtosis",
+                                                      "--useLinearObservableCorrection"};
+        ReweighterTester reweighter(options, true);
+        realFloat referenceValuesObsNewPoints[] = {
+            0.511622217173, 0.511770790824, 0.511922922294, 0.512078816370, 0.512238695862, 0.512402801577, 0.512571391956, 0.512744742291,
+            0.512923143444, 0.513106900003, 0.513296327766, 0.513491750494, 0.513693495837, 0.513901890370, 0.514117253685, 0.514339891515,
+            0.514570087889, 0.514808096378, 0.515054130536, 0.515308353702, 0.515570868411, 0.515841705718, 0.516120814849, 0.516408053606,
+            0.516703180054, 0.517005846018, 0.517315592906, 0.517631850357, 0.517953938106, 0.518281071314, 0.518612369493, 0.518946868901,
+            0.519283538110, 0.519621296244, 0.519959033190, 0.520295630948, 0.520629985226, 0.520961026348, 0.521287738610, 0.521609177330,
+            0.521924482996, 0.522232892118, 0.522533744605, 0.522826487667, 0.523110676440, 0.523385971675, 0.523652134929, 0.523909021753,
+            0.524156573418, 0.524394807658, 0.524623808921};
+        std::vector<std::vector<Quantities>> valuesObsNewPoints = reweighter.getReweightedObservables();
+        for (size_t i = 0; i < valuesObsNewPoints.size(); i++) {
+            BOOST_REQUIRE_CLOSE(
+                referenceValuesObsNewPoints[i], valuesObsNewPoints[i][0][constants::observableName<Mean>].value.estimate, 1.e-8);
+            BOOST_REQUIRE_SMALL(valuesObsNewPoints[i][0][constants::observableName<Mean>].value.error, (realFloat)1.e-6);
+        }
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(suscReweighting)
