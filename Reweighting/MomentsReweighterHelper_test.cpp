@@ -46,6 +46,7 @@ class MomentsReweighterHelperTest {
     int getNumberOfObsGivenAsInput() { return momentsReweighterHelper.numberOfObservablesGivenAsInput; }
     int getNumberOfObsToBeRew() { return momentsReweighterHelper.numberOfObservablesToBeReweighted; }
     SimulationDataContainer getRawData() { return momentsReweighterHelper.simulationRawDataContainer; }
+    std::optional<SimulationDataContainer> getAuxRawData() { return momentsReweighterHelper.simulationAuxData; }
 
   private:
     MomentsReweighterHelper momentsReweighterHelper;
@@ -98,6 +99,20 @@ BOOST_AUTO_TEST_SUITE(build)
         SimulationDataContainer rawData = reweightingDataHandler.getRawData();
         for (int i = 0; i < rawData.getNumberOfDatafiles(); i++)
             BOOST_REQUIRE_EQUAL(rawData[i][0].getNumberOfElements(), fileLines[i]);
+        BOOST_REQUIRE_EQUAL(reweightingDataHandler.getAuxRawData().has_value(), false);
+    }
+
+    BOOST_AUTO_TEST_CASE(build5)
+    {
+        std::string fileThatDoesExist = "RealTestData/configfile_1";
+        std::initializer_list<std::string> options
+            = {"-f" + fileThatDoesExist, "--useBootstrapAsErrorMethod", "--useLinearObservableCorrection"};
+        MomentsReweighterHelperTest reweightingDataHandler(options, {1, 2, 3, 4}, {1, 1, 1});
+        std::vector<int> fileLines{2304, 1653, 2584};
+        BOOST_REQUIRE_EQUAL(reweightingDataHandler.getAuxRawData().has_value(), true);
+        SimulationDataContainer rawAuxData = reweightingDataHandler.getAuxRawData().value();
+        for (int i = 0; i < rawAuxData.getNumberOfDatafiles(); i++)
+            BOOST_REQUIRE_EQUAL(rawAuxData[i][0].getNumberOfElements(), fileLines[i]);
     }
 
 BOOST_AUTO_TEST_SUITE_END()
