@@ -225,7 +225,7 @@ void MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstima
         int numberOfBootstrapEstForOutput = 0;
         for (int iBoot = 0; iBoot < (*(momentsReweighterHelper.bootstrapNumber)); iBoot++) {
             if (iBoot >= numberOfBootstrapEstForOutput) {
-                std::cout << "     - Calculating estimator number " << iBoot << "...\n";
+                std::cout << "     - Calculating estimator number " << iBoot << "...\n" << std::flush;
                 numberOfBootstrapEstForOutput += *(momentsReweighterHelper.bootstrapNumber) / 10;
             }
             momentsReweighterHelper.simulationUncorrDataContainer
