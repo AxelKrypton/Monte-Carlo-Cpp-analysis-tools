@@ -32,6 +32,9 @@ Although it will be often be the case, not every breaking change will result in 
 
 ## [Unreleased]
 
+
+## [Version 0.3] &ensp;<sub><sup>13 June 2024</sup></sub>
+
 * :new: The reweighting of the mean of observables can now be done applying a linear correction to it. This is needed e.g. to reweight the chiral condensate to LO.
 
 ## [Version 0.2] &ensp;<sub><sup>15 September 2021</sup></sub>
@@ -47,6 +50,7 @@ Although it will be often be the case, not every breaking change will result in 
 First release of the codebase.
 
 
-[Unreleased]:  https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/compare/v0.2...develop
+[Unreleased]:  https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/compare/v0.3...develop
+[Version 0.3]: https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/releases/v0.3
 [Version 0.2]: https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/releases/v0.2
 [Version 0.1]: https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/releases/v0.1
