@@ -69,16 +69,16 @@ namespace constants {
     template<class T> const std::initializer_list<unsigned int> neededMomentsUnexpanded = {UINT_MAX};
     template<class T>
     const functionForQuantity functionToCalculateQuantity
-        = [](Moments in) -> realFloat { throw std::logic_error("General template definition for function used!"); };
+        = []([[maybe_unused]]Moments in) -> realFloat { throw std::logic_error("General template definition for function used!"); };
     template<class T>
     const functionForQuantity functionToCalculateQuantityWithZeroMean
-        = [](Moments in) -> realFloat { throw std::logic_error("General template definition for function used!"); };
+        = []([[maybe_unused]]Moments in) -> realFloat { throw std::logic_error("General template definition for function used!"); };
     template<class T>
     const functionForQuantityEstimators functionToBeAppliedToEstimators
-        = [](MomentsEstimators in) -> DataSample { throw std::logic_error("General template definition for function used!"); };
+        = []([[maybe_unused]]MomentsEstimators in) -> DataSample { throw std::logic_error("General template definition for function used!"); };
     template<class T>
     const functionForQuantityEstimators functionToBeAppliedToEstimatorsWithZeroMean
-        = [](MomentsEstimators in) -> DataSample { throw std::logic_error("General template definition for function used!"); };
+        = []([[maybe_unused]]MomentsEstimators in) -> DataSample { throw std::logic_error("General template definition for function used!"); };
 
     /*
      * Template specialisations for each quantity -> inline to avoid linking errors! https://stackoverflow.com/a/51987559

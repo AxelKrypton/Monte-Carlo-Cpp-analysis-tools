@@ -87,6 +87,8 @@ class MomentsReweighterHelper {
     std::shared_ptr<int> bootstrapNumber;
     bool reweightProbabilityDistribution;
     double probabilityDistributionBinsize;
+    std::optional<SimulationDataContainer> simulationAuxData;
+    std::optional<SimulationDataContainer> simulationAuxUncorrData;
 };
 
 #endif /* MOMENTSREWEIGHTERHELPER_H_ */

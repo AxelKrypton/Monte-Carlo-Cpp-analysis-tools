@@ -708,6 +708,33 @@ BOOST_AUTO_TEST_SUITE(columnsReweighting)
             BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], exp(valuesObsNewPoints[i][0]), 1.e-8);
     }
 
+    BOOST_AUTO_TEST_CASE(columnsReweighting5)
+    {
+        /*
+         * This test is identical to columnsReweighting2, but switching on the linear correction for observables.
+         * Since the auxiliary files contain zeroes only as factor, the reference values are identical.
+         */
+        std::string fileThatDoesExist = "RealTestData/configfile_1";
+        std::initializer_list<std::string> options = {"-f" + fileThatDoesExist,     "--useJackknifeAsErrorMethod",
+                                                      "--newBetaRange_low=5.348",   "--newBetaRange_high=5.3509",
+                                                      "--numberOfNewBetaPoints=30", "--useLinearObservableCorrection"};
+        MomentsReweighterTest reweighter(options, {1}, {1, 1, 1});
+        const int numberOfObservablesInFiles = 4;  // 1 obs given + 3 central moments
+        realFloat referenceValuesObsNewPoints[]
+            = {0.51136048194686, 0.51141566283263, 0.51147120976833, 0.51152713131180, 0.51158343617809, 0.51164013323921,
+               0.51169723151890, 0.51175474019037, 0.51181266857210, 0.51187102612138, 0.51192982243020, 0.51198906722145,
+               0.51204877034025, 0.51210894174908, 0.51216959152032, 0.51223072982883, 0.51229236694301, 0.51235451321772,
+               0.51241717908248, 0.51248037503318, 0.51254411162041, 0.51260839943865, 0.51267324911302, 0.51273867128713,
+               0.51280467660836, 0.51287127571465, 0.51293847921736, 0.51300629768625, 0.51307474163220, 0.51314382148783};
+        std::vector<realFloat> minimumOfObservables(numberOfObservablesInFiles, std::numeric_limits<realFloat>::max());
+        reweighter.testPrepareObservablesBeforeReweighting(minimumOfObservables);
+        reweighter.testCalculateLogZAtSimulatedPoints();
+        reweighter.testCalculateLogZAtNewPoints();
+        std::vector<std::vector<realFloat>> valuesObsNewPoints = reweighter.testCalculateReweightedObservableValues();
+        for (int i = 0; i < reweighter.getNumberOfNewPoints(); i++)
+            BOOST_REQUIRE_CLOSE(referenceValuesObsNewPoints[i], exp(valuesObsNewPoints[i][0]), 1.e-8);
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(probabilityDistributionReweighting)

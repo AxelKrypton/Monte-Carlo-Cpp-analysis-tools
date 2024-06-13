@@ -70,6 +70,7 @@ class LqcdReweightingParameters : ReweightingParameters {
     unsigned int getNumberOfMultipleColumnsForSingleObservable();
     bool getDeactivateReweightingForProbabilityDistribution();
     realFloat getBinsizeProbabilityDistribution();
+    bool getUseLinearObservableCorrection();
 
     struct parse_aborted {
     };
@@ -97,6 +98,7 @@ class LqcdReweightingParameters : ReweightingParameters {
     unsigned int numberOfMultipleColumnsForSingleObservable;
     bool deactivateReweightingForProbabilityDistribution;
     realFloat binsizeProbabilityDistribution;
+    bool useLinearObservableCorrection;
 };
 
 #endif

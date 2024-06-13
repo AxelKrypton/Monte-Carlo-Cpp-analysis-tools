@@ -45,10 +45,11 @@ const std::vector<std::string> MomentsReweighterHelper::metaParameters(tmp, tmp 
  * since its content depends on the error method adopted in the reweighting. Actually its content
  * is fixed for the jackknife but it is not for the bootstrap. So it makes sense to set it here
  * for the jackknife (especially because then for the ReweighterTest it has already been done) and
- * set it temporary to a copy of simulationRawDataContainer for the bootstrap (later in the Reweighter
- * we reset it when needed, see MomentsReweighterAbstract::calculateAndGetReweightedObservables method).
+ * set it temporary to a copy of simulationRawDataContainer for the bootstrap (later in the
+ * MomentsReweighter we reset it when needed, see
+ * MomentsReweighterAbstract::calculateAndSetReweightedMomentsAndMomentsEstimators method).
  *
- * TODO: Refactor this ctor that grow more and more in time...
+ * TODO: Refactor this ctor that grew more and more in time...
  */
 MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainformation rawDataForReweightingAndMetainformation)
     : simulationRawDataContainer(rawDataForReweightingAndMetainformation.rawData)
@@ -62,6 +63,8 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
     , bootstrapNumber(rawDataForReweightingAndMetainformation.bootstrapNumber)
     , reweightProbabilityDistribution(rawDataForReweightingAndMetainformation.reweightProbabilityDistributions)
     , probabilityDistributionBinsize(rawDataForReweightingAndMetainformation.binsizeForProbabilityDistribution)
+    , simulationAuxData(rawDataForReweightingAndMetainformation.auxiliaryRawData)
+    , simulationAuxUncorrData(rawDataForReweightingAndMetainformation.auxiliaryRawData)
 {
     std::vector<int> entriesToBeCutFromRawData;
     setNumberOfBinsToBeUsedAndEntriesToBeLeftOut(simulationRawDataContainer, rawDataForReweightingAndMetainformation.binsizesToBeUsedForBinning,
@@ -89,15 +92,26 @@ MomentsReweighterHelper::MomentsReweighterHelper(RawDataForReweightingAndMetainf
     std::cout << "numberOfObservablesGivenAsInput = " << numberOfObservablesGivenAsInput << "\n";
     std::cout << "numberOfObservablesToBeReweighted = " << numberOfObservablesToBeReweighted << "\n";
 
-    if (errorMethod == jackknife)
+    if (errorMethod == jackknife) {
         simulationUncorrDataContainer = simulationRawDataContainer.getUncorrelatedSimulationDataSet(numberOfBinsToBeUsed, jackknife);
-    else
+        if (simulationAuxData)
+            simulationAuxUncorrData = simulationAuxData->getUncorrelatedSimulationDataSet(numberOfBinsToBeUsed, jackknife);
+    } else {
+        // This assignment might seem superfluous as it is already done in the initialization list of the constructor.
+        // However it is crucial because buildAndGetMomentsPerData has been called on the raw data container, which added
+        // in general some columns and we want to keep true that the uncorrelated data are here a copy of the raw ones!
         simulationUncorrDataContainer = simulationRawDataContainer;
+    }
 
     // Refining on the raw data
     for (int i = 0; i < simulationRawDataContainer.getNumberOfDatafiles(); i++) {
         for (int j = 0; j < simulationRawDataContainer[i].getNumberOfDataSample(); j++) {
             simulationRawDataContainer[i][j] = simulationRawDataContainer[i][j].removeLastNElements(entriesToBeCutFromRawData[i]);
+        }
+        if (simulationAuxData) {
+            for (int j = 0; j < simulationAuxData.value()[i].getNumberOfDataSample(); j++) {
+                simulationAuxData.value()[i][j] = simulationAuxData.value()[i][j].removeLastNElements(entriesToBeCutFromRawData[i]);
+            }
         }
     }
     // This has to be done after having cut the data in order to print the right information
