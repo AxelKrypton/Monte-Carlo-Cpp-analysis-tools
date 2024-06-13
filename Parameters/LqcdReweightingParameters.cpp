@@ -40,7 +40,7 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char** argv
     // clang-format off
     desc.add_options()
         ("help,h", "Produce this help message")
-        ("file,f", po::value<std::string>(&inputfile), "Inputfile containing metainformation for reweighting procedure.")
+        ("file,f", po::value<std::string>(&inputfile), "Configuration file containing metainformation for reweighting procedure.")
         ("outputfilePrefix", po::value<std::string>(&outputfilePrefix)->default_value("reweightedData"), "Prefix for output file.")
         ("numberOfNewBetaPoints", po::value<unsigned int>(&numberOfNewBetaPoints)->default_value(2), "Number of new points to produce with reweighting.")
         ("newBetaRange_high", po::value<realFloat>(&newBetaRange_high)->default_value(2), "Upper limit of new beta range of to cover with reweighting.")
@@ -59,7 +59,8 @@ LqcdReweightingParameters::LqcdReweightingParameters(int argc, const char** argv
         ("useSimulatedPointsAsNewPoints", po::value<bool>(&useSimulatedPointsAsNewPoints)->default_value(false)->implicit_value(true), "Perform reweighting evaluating the observables at the simulated points (given in the configuration file).")
         ("weightPrecision", po::value<realFloat>(&weightPrecision)->default_value(1.e-7), "Precision for iterative finding of optimal weights.")
         ("deactivateReweightingForProbabilityDistribution", po::value<bool>(&deactivateReweightingForProbabilityDistribution)->default_value(false)->implicit_value(true), "Do not perform reweighting for the probability distribution of the observables.")
-        ("binsizeProbabilityDistribution", po::value<realFloat>(&binsizeProbabilityDistribution)->default_value(1.e-3), "Size of the bins of the probability distribution.");
+        ("binsizeProbabilityDistribution", po::value<realFloat>(&binsizeProbabilityDistribution)->default_value(1.e-3), "Size of the bins of the probability distribution.")
+        ("useLinearObservableCorrection", po::value<bool>(&useLinearObservableCorrection)->default_value(false)->implicit_value(true), getHelpDescription("useLinearObservableCorrection").c_str());
     // clang-format on
 
     // option "file" can be given without option description
@@ -109,6 +110,21 @@ void LqcdReweightingParameters::checkParsedArguments(po::variables_map& vm, po::
                                             + std::to_string(numberOfMultipleColumnsForSingleObservable) + ")!");
         }
     }
+
+    if (! vm["useLinearObservableCorrection"].defaulted()) {
+        if (! vm["obsMultipleColumns"].defaulted()) {
+            throw std::invalid_argument("Using linear correction cannot be used with multiple columns per observable. Aborting!");
+        }
+        if (deactivateReweightingForVariance == false || deactivateReweightingForSkewness == false
+            || deactivateReweightingForKurtosis == false) {
+            std::cout << "\033[93m\n";
+            std::cout << "WARNING: Using linear correction can be used only for the reweighting of the mean.\n"
+                      << "         Reweighting of higher moments will be deactivated!\033[0m\n\n";
+            deactivateReweightingForVariance = true;
+            deactivateReweightingForSkewness = true;
+            deactivateReweightingForKurtosis = true;
+        }
+    }
 }
 
 void LqcdReweightingParameters::printParameters()
@@ -140,7 +156,12 @@ void LqcdReweightingParameters::printParameters()
     if (useBootstrapAsErrorMethod)
         std::cout << "Bootstrap (" << numberOfBootstrapResample << " resample)\n";
     std::cout << separator << std::endl;
-    std::cout << "# Observables:" << std::endl;
+    std::cout << "# Observables";
+    if (useLinearObservableCorrection) {
+        std::cout << " (WITH linear correction):" << std::endl;
+    } else {
+        std::cout << ":" << std::endl;
+    }
     if (deactivateReweightingForMean) {
         std::cout << "#\tDo NOT reweight mean of data" << std::endl;
     } else {
@@ -168,6 +189,7 @@ void LqcdReweightingParameters::printParameters()
         std::cout << "#\tProbability distribution of observables" << std::endl;
     }
     std::cout << "#   Binsize for reweighting probability distribution:\t" << binsizeProbabilityDistribution << std::endl;
+    std::cout << separator << std::endl;
 }
 
 unsigned int LqcdReweightingParameters::getNumberOfNewBetaPoints()
@@ -270,6 +292,11 @@ realFloat LqcdReweightingParameters::getBinsizeProbabilityDistribution()
     return binsizeProbabilityDistribution;
 }
 
+bool LqcdReweightingParameters::getUseLinearObservableCorrection()
+{
+    return useLinearObservableCorrection;
+}
+
 /***************************************************************************/
 
 static std::string getHelpDescription(std::string option)
@@ -283,6 +310,14 @@ static std::string getHelpDescription(std::string option)
                        "a single number and refers to all observables to be evaluated using several columns; it is hence "
                        "not possible to specify different numbers of columns for different observables. "
                        "ATTENTION: Column ranges start from ZERO!";
+    } else if (option == "useLinearObservableCorrection") {
+        description += "If this option is given, the observable to be reweighted will not simply be that contained in "
+                       "the data files specified in the configuration file, but it will be corrected by a linear term "
+                       "in (beta - new_beta). More explicitly, the observable O in the reweighting equation will be "
+                       "replaced by 'O + (beta - new_beta) * F' where F is a factor to be specified in separate files. "
+                       "In particular, for each data file 'data.dat' an extra file 'aux_data.dat' at the same location "
+                       "must exist and such a file must contain on each line the values of F per trajectory. "
+                       "ATTENTION: Usable only for mean reweighting and without multiple columns!";
     } else
         throw std::invalid_argument("Unknown option in \"getHelpDescription\" function!");
     return description;

@@ -51,6 +51,7 @@ struct RawDataForReweightingAndMetainformation {
     std::vector<int> binsizesToBeUsedForBinning;
     bool reweightProbabilityDistributions;
     realFloat binsizeForProbabilityDistribution;
+    std::optional<SimulationDataContainer> auxiliaryRawData;  // for observable correction -> if has_value() -> correction desired!
 };
 
 struct ReweightingProcedure {
@@ -120,6 +121,14 @@ class ReweighterTester {
         std::cout << "- rawData: " << rawDataAndInfo.rawData.getNumberOfDatafiles() << " files\n";
         for (int i = 0; i < rawDataAndInfo.rawData.getNumberOfDatafiles(); i++)
             std::cout << "  - file " << i << " has " << rawDataAndInfo.rawData[i][0].getNumberOfElements() << " lines\n";
+        if (rawDataAndInfo.auxiliaryRawData.has_value()) {
+            std::cout << "- obs linear correction desired!\n";
+            std::cout << "- auxData: " << rawDataAndInfo.auxiliaryRawData.value().getNumberOfDatafiles() << " files\n";
+            for (int i = 0; i < rawDataAndInfo.auxiliaryRawData.value().getNumberOfDatafiles(); i++)
+                std::cout << "  - file " << i << " has " << rawDataAndInfo.auxiliaryRawData.value()[i][0].getNumberOfElements() << " lines\n";
+        } else {
+            std::cout << "- obs linear correction NOT desired!\n";
+        }
         std::cout << "- namesOfParametersIgnoringMetaParameters: size " << rawDataAndInfo.namesOfParametersIgnoringMetaParameters.size()
                   << "  ->  ";
         for (auto i : rawDataAndInfo.namesOfParametersIgnoringMetaParameters)

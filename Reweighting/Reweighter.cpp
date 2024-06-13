@@ -222,7 +222,8 @@ Reweighter::getRawDataForReweightingAndMetainformation(std::vector<unsigned int>
             momentsToBeReweighted,
             binsizesToBeUsed,
             reweightProbabilityDistributions,
-            reweighterIO.binsizeProbabilityDistribution};
+            reweighterIO.binsizeProbabilityDistribution,
+            reweighterIO.auxiliaryData};
 }
 
 LqcdReweightingParameters Reweighter::createLqcdParameters(std::initializer_list<std::string> options)
