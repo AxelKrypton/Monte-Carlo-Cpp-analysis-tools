@@ -310,7 +310,7 @@ static std::string getHelpDescription(std::string option)
                        "in (beta - new_beta). More explicitly, the observable O in the reweighting equation will be "
                        "replaced by 'O + (beta - new_beta) * F' where F is a factor to be specified in separate files. "
                        "In particular, for each data file 'data.dat' an extra file 'aux_data.dat' at the same location "
-                       "must exist and such a file must contain on each line the values of F per trajectory."
+                       "must exist and such a file must contain on each line the values of F per trajectory. "
                        "ATTENTION: Usable only for mean reweighting and without multiple columns!";
     } else
         throw std::invalid_argument("Unknown option in \"getHelpDescription\" function!");
