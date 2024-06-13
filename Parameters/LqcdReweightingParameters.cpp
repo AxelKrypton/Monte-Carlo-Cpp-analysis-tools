@@ -156,7 +156,12 @@ void LqcdReweightingParameters::printParameters()
     if (useBootstrapAsErrorMethod)
         std::cout << "Bootstrap (" << numberOfBootstrapResample << " resample)\n";
     std::cout << separator << std::endl;
-    std::cout << "# Observables:" << std::endl;
+    std::cout << "# Observables";
+    if (useLinearObservableCorrection) {
+        std::cout << " (WITH linear correction):" << std::endl;
+    } else {
+        std::cout << ":" << std::endl;
+    }
     if (deactivateReweightingForMean) {
         std::cout << "#\tDo NOT reweight mean of data" << std::endl;
     } else {
@@ -184,6 +189,7 @@ void LqcdReweightingParameters::printParameters()
         std::cout << "#\tProbability distribution of observables" << std::endl;
     }
     std::cout << "#   Binsize for reweighting probability distribution:\t" << binsizeProbabilityDistribution << std::endl;
+    std::cout << separator << std::endl;
 }
 
 unsigned int LqcdReweightingParameters::getNumberOfNewBetaPoints()
