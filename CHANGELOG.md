@@ -10,7 +10,7 @@ Generally, given a version number **X.Y**,
 * **X** is incremented for the introduction of substantial new features.
 
 Version **1.0** will be released as the code is in a satisfactory shape also from the programming point of view.
-This conversely means that some piece of code have (lots of) room for improvement and some needed refactoring have been already collected in [issues](https://gitlab.itp.uni-frankfurt.de/lattice-qcd/ag-philipsen/lqcd-cpp-analysis-tools/-/issues).
+This conversely means that some piece of code have (lots of) room for improvement and some needed refactoring have been already collected in [issues](https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/issues).
 
 ## Meaning of the symbols in this file
 
@@ -32,6 +32,7 @@ Although it will be often be the case, not every breaking change will result in 
 
 ## [Unreleased]
 
+* :new: The reweighting of the mean of observables can now be done applying a linear correction to it. This is needed e.g. to reweight the chiral condensate to LO.
 
 ## [Version 0.2] &ensp;<sub><sup>15 September 2021</sup></sub>
 
@@ -46,6 +47,6 @@ Although it will be often be the case, not every breaking change will result in 
 First release of the codebase.
 
 
-[Unreleased]: https://gitlab.itp.uni-frankfurt.de/lattice-qcd/ag-philipsen/lqcd-cpp-analysis-tools/-/compare/v0.2...develop
-[Version 0.2]: https://gitlab.itp.uni-frankfurt.de/lattice-qcd/ag-philipsen/lqcd-cpp-analysis-tools/-/releases/v0.2
-[Version 0.1]: https://gitlab.itp.uni-frankfurt.de/lattice-qcd/ag-philipsen/lqcd-cpp-analysis-tools/-/releases/v0.1
+[Unreleased]:  https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/compare/v0.2...develop
+[Version 0.2]: https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/releases/v0.2
+[Version 0.1]: https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/releases/v0.1
