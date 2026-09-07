@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17986463.svg)](https://doi.org/10.5281/zenodo.17986463)
+
 # A library of analysis tools
 
 Data analysis is a mandatory step in LQCD and to have an efficient, well tested library of tools is very important.
@@ -17,7 +19,7 @@ Unfortunately, at the moment, no documentation is available and you need to expl
 However, as far as building the code is concerned, the procedure is quite standard via CMake.
 From `v0.2` on, `C++17` features are used and, hence, a compiler able to deal with at least this standard is required.
 
-*  After having cloned the repository, checkout to [the latest release](https://gitlab.itp.uni-frankfurt.de/ag-philipsen/lqcd-cpp-analysis-tools/-/releases) (always recommended).
+*  After having cloned the repository, checkout to [the latest release](https://github.com/AxelKrypton/Monte-Carlo-Cpp-analysis-tools/releases) (always recommended).
 *  Create a build folder in it and move into it.
 *  Here, you can simply run `cmake ..` in order to run a default setup or you can use the `ccmake ..` command to have access to configuration options.
 *  If no error occurs (in case have a look to the error and act accordingly), you can run `make`
