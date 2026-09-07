@@ -10,7 +10,7 @@ Generally, given a version number **X.Y**,
 * **X** is incremented for the introduction of substantial new features.
 
 Version **1.0** will be released as the code is in a satisfactory shape also from the programming point of view.
-This conversely means that some piece of code have (lots of) room for improvement and some needed refactoring have been already collected in [issues](https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/issues).
+This conversely means that some piece of code have (lots of) room for improvement and some needed refactoring have been already collected in [issues](https://github.com/AxelKrypton/Monte-Carlo-Cpp-analysis-tools/issues).
 
 ## Meaning of the symbols in this file
 
@@ -50,7 +50,7 @@ Although it will be often be the case, not every breaking change will result in 
 First release of the codebase.
 
 
-[Unreleased]:  https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/compare/v0.3...develop
-[Version 0.3]: https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/releases/v0.3
-[Version 0.2]: https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/releases/v0.2
-[Version 0.1]: https://gitlab.itp.uni-frankfurt.de/sciarra/monte-carlo-cpp-analysis-tools/-/releases/v0.1
+[Unreleased]:  https://github.com/AxelKrypton/Monte-Carlo-Cpp-analysis-tools/compare/v0.3...develop
+[Version 0.3]: https://github.com/AxelKrypton/Monte-Carlo-Cpp-analysis-tools/releases/tag/v0.3
+[Version 0.2]: https://github.com/AxelKrypton/Monte-Carlo-Cpp-analysis-tools/releases/tag/v0.2
+[Version 0.1]: https://github.com/AxelKrypton/Monte-Carlo-Cpp-analysis-tools/releases/tag/v0.1
